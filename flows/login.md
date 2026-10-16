@@ -397,7 +397,7 @@ import { usePreview } from '../../../shared/prototype'
 import { user } from '../../../shared/data/user'
 import { phone } from '../../../shared/data/format'
 import { Intro } from '../../../shared/ui/Intro'
-import { Keyboard, typeKey } from '../../../shared/ui/Keyboard'
+import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
 import { OTP_LENGTH, PROTOTYPE_WRONG_OTP, RESEND_AFTER_S } from '../data'
 import styles from './Form.module.css'
@@ -423,6 +423,7 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
   const [code, setCode] = useState(initial)
   const [left, setLeft] = useState(resendIn)
   const [verifying, setVerifying] = useState(false)
+  const boxes = useKeypadFocus(code, OTP_LENGTH, interactive && !verifying)
 
   useEffect(() => {
     if (!interactive || left <= 0) return
@@ -449,7 +450,7 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
   return (
     <Screen top={<Actionbar onBack={onBack} />} bottom={<Keyboard onKey={onKey} />}>
       <Intro title="Verify your number" description="Enter the 6-digit code we sent you by SMS" />
-      <div className={styles.fields}>
+      <div ref={boxes} className={styles.fields}>
         <OtpInput
           length={OTP_LENGTH}
           label="OTP"
@@ -479,6 +480,7 @@ import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { TextField } from '@l3/components/TextField'
 import { msHelp } from '@l3/icons/material'
 import { phone } from '../../../shared/data/format'
+import { usePreview } from '../../../shared/prototype'
 import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, typeKey } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
@@ -486,9 +488,11 @@ import styles from './Form.module.css'
 
 /**
  * login-02 / 03 · Mobile number. The number keypad types into the field; "Get OTP" turns on at 10 digits.
- * Indian numbers only (+91 is fixed). Real app: a number input with the system keypad.
+ * Indian numbers only (+91 is fixed). The field is focused (Typing state) while the keypad is up.
+ * Real app: a number input with the system keypad.
  */
 export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; onBack?: () => void; onSubmit?: (mobile: string) => void }) {
+  const { interactive } = usePreview()
   const [digits, setDigits] = useState(initial)
   const ready = digits.length === 10
   return (
@@ -509,9 +513,12 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
           label="Mobile number"
           value={digits ? `+91 ${phone(digits)}` : ''}
           placeholder="+91 10-digit number"
-          readOnly
-          inputMode="numeric"
+          // The keypad is open, so the field is focused: L3's Typing state (dark border + caret). Real app: inputMode
+          // "numeric" opens the system number keyboard; here the drawn keypad is that keyboard, so no second one.
+          inputMode="none"
           autoComplete="tel-national"
+          autoFocus={interactive}
+          onChange={(e) => setDigits(e.target.value.replace(/^\+91/, '').replace(/\D/g, '').slice(0, 10))}
         />
         <p className={styles.fine}>
           By continuing, you agree to our <a className={styles.link} href="#terms">Terms</a> and{' '}
@@ -535,7 +542,7 @@ import { msFingerprint, msPassword } from '@l3/icons/material'
 import { usePreview } from '../../../shared/prototype'
 import { user } from '../../../shared/data/user'
 import { Intro } from '../../../shared/ui/Intro'
-import { Keyboard, typeKey } from '../../../shared/ui/Keyboard'
+import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import { PIN_LENGTH } from '../data'
@@ -550,6 +557,7 @@ export function CreatePin({ initial = '', onDone }: { initial?: string; onDone?:
   const [first, setFirst] = useState<string | null>(null)
   const [pin, setPin] = useState(initial)
   const [mismatch, setMismatch] = useState(false)
+  const boxes = useKeypadFocus(pin, PIN_LENGTH, interactive)
 
   const onKey = (k: string) => {
     const next = typeKey(pin, k, PIN_LENGTH)
@@ -570,7 +578,7 @@ export function CreatePin({ initial = '', onDone }: { initial?: string; onDone?:
         title={confirming ? 'Confirm your PIN' : 'Set a 4-digit PIN'}
         description={confirming ? 'Type the same PIN again' : 'You’ll use it to open the app and approve orders'}
       />
-      <div className={styles.fields}>
+      <div ref={boxes} className={styles.fields}>
         <OtpInput
           length={PIN_LENGTH}
           mask
@@ -592,6 +600,7 @@ export function CreatePin({ initial = '', onDone }: { initial?: string; onDone?:
 export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: string; onUnlocked?: () => void; onForgot?: () => void }) {
   const { interactive } = usePreview()
   const [pin, setPin] = useState(initial)
+  const boxes = useKeypadFocus(pin, PIN_LENGTH, interactive)
   const onKey = (k: string) => {
     const next = typeKey(pin, k, PIN_LENGTH)
     setPin(next)
@@ -599,7 +608,7 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
   }
   return (
     <Screen bottom={<Keyboard onKey={onKey} />}>
-      <div className={`${styles.centre} ${styles.fill}`}>
+      <div ref={boxes} className={`${styles.centre} ${styles.fill}`}>
         <BrandLogo brand="lemonn" variant="icon" size={48} decorative />
         <Intro align="center" title={`Welcome back, ${user.name.split(' ')[0]}`} description="Enter your 4-digit PIN" />
         <OtpInput
@@ -718,12 +727,12 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
               Continue with CoinSwitch
             </Button>
           </ButtonGroup>
-          <p className={styles.legal}>SEBI Reg. No. {SEBI_REG}</p>
+          <p className={styles.legal} data-surface="primary">SEBI Reg. No. {SEBI_REG}</p>
         </>
       }
     >
       <div className={styles.page}>
-        <div className={styles.hero}>
+        <div className={styles.hero} data-status-surface="brand">
           <BrandLogo brand="lemonn" size={32} />
           <p className={styles.tagline}>Stock trading made simple</p>
           <div className={styles.art}><Spot icon={slide.icon} tone="plain" /></div>
@@ -905,6 +914,7 @@ export function Intro({ title, description, art, align = 'start', children }: {
 ### `src/shared/ui/Keyboard.tsx`
 
 ```tsx
+import { useEffect, useRef, type PointerEvent } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { msBackspace } from '@l3/icons/material'
 import styles from './Keyboard.module.css'
@@ -914,14 +924,14 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'Backspace']
 /**
  * The phone's own number keypad (OS chrome, NOT part of the app or L3 — real apps get the system keyboard by setting
  * the field's input type to number). Drawn so the phone / OTP / PIN screens read like the phone. In the prototype the
- * keys type into the screen.
+ * keys type into the screen. `data-surface` tells the OS navigation bar below it to take the keypad's grey.
  */
 export function Keyboard({ onKey }: { onKey?: (key: string) => void }) {
   return (
-    <div className={styles.keyboard} role="group" aria-label="Number keypad">
+    <div className={styles.keyboard} role="group" aria-label="Number keypad" data-surface="secondary">
       {KEYS.map((k) =>
         k === '' ? <span key="blank" /> : (
-          <button key={k} type="button" className={styles.key} data-kind={k === 'Backspace' ? 'fn' : 'digit'} aria-label={k === 'Backspace' ? 'Delete' : undefined} onClick={() => onKey?.(k)}>
+          <button key={k} type="button" className={styles.key} data-kind={k === 'Backspace' ? 'fn' : 'digit'} aria-label={k === 'Backspace' ? 'Delete' : undefined} onPointerDown={keepFocus} onClick={() => onKey?.(k)}>
             {k === 'Backspace' ? <Icon icon={msBackspace} /> : k}
           </button>
         ),
@@ -930,9 +940,27 @@ export function Keyboard({ onKey }: { onKey?: (key: string) => void }) {
   )
 }
 
+/** Like the OS keyboard, a key press doesn't take focus: the field being typed into keeps its Typing state. */
+const keepFocus = (e: PointerEvent) => e.preventDefault()
+
 /** Apply a keypad key to a digit string (max length). */
 export const typeKey = (value: string, key: string, max: number) =>
   key === 'Backspace' ? value.slice(0, -1) : /^\d$/.test(key) && value.length < max ? value + key : value
+
+/**
+ * Prototype glue: the drawn keypad types into an L3 OtpInput, so focus follows the box being typed (the next empty
+ * one) — the Typing state moves along as it would with the phone's keyboard. Put the ref on an element around the
+ * OtpInput. Real apps don't need this: the system keyboard types into the focused box.
+ */
+export function useKeypadFocus(value: string, length: number, enabled: boolean) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!enabled) return
+    const boxes = ref.current?.querySelectorAll('input')
+    boxes?.[Math.min(value.length, length - 1)]?.focus({ preventScroll: true })
+  }, [value, length, enabled])
+  return ref
+}
 ```
 
 ### `src/shared/ui/Screen.module.css`
@@ -991,7 +1019,6 @@ export const typeKey = (value: string, key: string, max: number) =>
 
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
-import { SystemStatusbar } from '@l3/components/SystemStatusbar'
 import { usePreview } from '../../preview/context'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
@@ -1010,18 +1037,20 @@ type ScreenProps = {
 }
 
 /**
- * The frame of every screen: the OS status bar (L3 SystemStatusbar), then top · body · bottom, a toast above the
- * bottom, and a sheet over it all. The screen is the sheet's container, so sheets and their scrim stay in the phone;
- * its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash between two sheets).
+ * The frame of every screen: top · body · bottom, a toast above the bottom, and a sheet over it all. It fills the
+ * space between the OS status bar and the OS navigation bar (the preview draws those — real apps get them from the
+ * OS, edge-to-edge insets), so nothing sits under the gesture handle. The screen is the sheet's container, so sheets
+ * and their scrim stay in the app; its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash
+ * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
+ * its colour (the button dock and the bottom navbar are recognised already).
  */
 export function Screen({ top, bottom, toast, sheet, children }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
     <div ref={setEl} className={styles.screen}>
-      <SystemStatusbar />
       <SheetHost container={el}>
-        <div className={styles.page}>
+        <div className={styles.page} data-part="page">
           {top}
           <div className={styles.middle}>
             <div className={styles.body}>{children}</div>

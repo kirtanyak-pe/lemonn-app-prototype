@@ -155,7 +155,6 @@ export function MainNav({ value, onChange }: { value: Section; onChange?: (value
 
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
-import { SystemStatusbar } from '@l3/components/SystemStatusbar'
 import { usePreview } from '../../preview/context'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
@@ -174,18 +173,20 @@ type ScreenProps = {
 }
 
 /**
- * The frame of every screen: the OS status bar (L3 SystemStatusbar), then top · body · bottom, a toast above the
- * bottom, and a sheet over it all. The screen is the sheet's container, so sheets and their scrim stay in the phone;
- * its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash between two sheets).
+ * The frame of every screen: top · body · bottom, a toast above the bottom, and a sheet over it all. It fills the
+ * space between the OS status bar and the OS navigation bar (the preview draws those — real apps get them from the
+ * OS, edge-to-edge insets), so nothing sits under the gesture handle. The screen is the sheet's container, so sheets
+ * and their scrim stay in the app; its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash
+ * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
+ * its colour (the button dock and the bottom navbar are recognised already).
  */
 export function Screen({ top, bottom, toast, sheet, children }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
     <div ref={setEl} className={styles.screen}>
-      <SystemStatusbar />
       <SheetHost container={el}>
-        <div className={styles.page}>
+        <div className={styles.page} data-part="page">
           {top}
           <div className={styles.middle}>
             <div className={styles.body}>{children}</div>

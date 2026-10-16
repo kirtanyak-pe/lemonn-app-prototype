@@ -105,7 +105,7 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 
 | Where | L3 component (Figma name) | Props / variant |
 |---|---|---|
-| Top bar | Actionbar | title + `onBack`; kyc-01 has an empty bar |
+| Top bar | Actionbar | title + `onBack`. kyc-01 has none — nothing to put in it, so the content starts 24 below the status bar |
 | Stage progress under the bar | ProgressBar (`components/StageBar`) | "Step 1 of 3 · Verify your identity", value by stage |
 | Headlines | `Intro` (src/shared/ui) | Heading/24 title + Description/14 secondary; `align="center"` on result screens |
 | Stage list, fetch list, progress | `Steps` (src/shared/ui) | done ✓ / current / loading / to do, with a connector line |
@@ -177,12 +177,16 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 ### `src/flows/kyc/components/StageBar.module.css`
 
 ```css
-/* Under the Actionbar on the setup forms: "Step 1 of 3 · Verify your identity" over a thin progress bar. */
+/*
+ * In the Actionbar's content-bottom slot on the setup forms (it stays put while the page scrolls, so it belongs to the
+ * bar): "Step 1 of 3 · Verify your identity" over a thin progress bar. The slot has no padding of its own; like pill
+ * tabs there, the bar brings 12 top and bottom, 16 at the sides.
+ */
 .bar {
   display: flex;
   flex-direction: column;
   gap: var(--l3-spacing-08);
-  padding: var(--l3-spacing-12) var(--l3-spacing-16) 0;
+  padding: var(--l3-spacing-12) var(--l3-spacing-16);
 }
 
 .label {
@@ -360,7 +364,7 @@ import styles from './Kyc.module.css'
 export function Bank({ filled = false, sheet, onBack, onVerify }: { filled?: boolean; sheet?: ReactNode; onBack?: () => void; onVerify?: () => void }) {
   return (
     <Screen
-      top={<><Actionbar title="Add bank account" onBack={onBack} /><StageBar stage={2} /></>}
+      top={<Actionbar title="Add bank account" onBack={onBack} bottom={<StageBar stage={2} />} />}
       sheet={sheet}
       bottom={<ButtonGroup aria-label="Verify"><Button disabled={!filled} onClick={onVerify}>Verify account</Button></ButtonGroup>}
     >
@@ -426,7 +430,7 @@ export function Details({ withNominee = false, agreed: initialAgreed = false, to
   const [agreed, setAgreed] = useState(initialAgreed)
   return (
     <Screen
-      top={<><Actionbar title="Confirm your details" onBack={onBack} /><StageBar stage={1} /></>}
+      top={<Actionbar title="Confirm your details" onBack={onBack} bottom={<StageBar stage={1} />} />}
       toast={toast}
       sheet={sheet}
       bottom={<ButtonGroup aria-label="Confirm"><Button disabled={!agreed} onClick={onConfirm}>Confirm and continue</Button></ButtonGroup>}
@@ -603,7 +607,7 @@ const why = [
 export function FnoConsent({ onBack, onContinue, onLater }: { onBack?: () => void; onContinue?: () => void; onLater?: () => void }) {
   return (
     <Screen
-      top={<><Actionbar title="Activate F&O" onBack={onBack} /><StageBar stage={3} /></>}
+      top={<Actionbar title="Activate F&O" onBack={onBack} bottom={<StageBar stage={3} />} />}
       bottom={
         <ButtonGroup aria-label="Bank statement">
           <Button onClick={onContinue}>Continue to CAMSfinserv</Button>
@@ -820,7 +824,7 @@ export function Pan({ value = '', sheet, onBack, onSubmit }: { value?: string; s
   const valid = /^[A-Z]{5}\d{4}[A-Z]$/.test(value)
   return (
     <Screen
-      top={<><Actionbar title="Verify identity" onBack={onBack} /><StageBar stage={1} /></>}
+      top={<Actionbar title="Verify identity" onBack={onBack} bottom={<StageBar stage={1} />} />}
       bottom={<ButtonGroup aria-label="Continue"><Button disabled={!valid} onClick={onSubmit}>Continue</Button></ButtonGroup>}
       sheet={sheet}
     >
@@ -844,7 +848,6 @@ export function Pan({ value = '', sheet, onBack, onSubmit }: { value?: string; s
 ### `src/flows/kyc/screens/Start.tsx`
 
 ```tsx
-import { Actionbar } from '@l3/components/Actionbar'
 import { Aerobar } from '@l3/components/Aerobar'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
@@ -857,11 +860,13 @@ import { Steps } from '../../../shared/ui/Steps'
 import { stages } from '../data'
 import styles from './Kyc.module.css'
 
-/** kyc-01 · Account setup overview: three stages and how long they take. Arrives with an "Email verified" toast. */
+/**
+ * kyc-01 · Account setup overview: three stages and how long they take. Arrives with an "Email verified" toast.
+ * No top bar: there's nothing to put in it (no back, title or action), so the content starts 24 below the status bar.
+ */
 export function Start({ emailVerified = true, onStart }: { emailVerified?: boolean; onStart?: () => void }) {
   return (
     <Screen
-      top={<Actionbar />}
       toast={emailVerified && <Aerobar floating type="success" emphasis="primary" icon={<Icon icon={msCheckCircle} />} heading="Email verified" />}
       bottom={<ButtonGroup aria-label="Start"><Button onClick={onStart}>Start</Button></ButtonGroup>}
     >
@@ -1347,7 +1352,6 @@ export function Intro({ title, description, art, align = 'start', children }: {
 
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
-import { SystemStatusbar } from '@l3/components/SystemStatusbar'
 import { usePreview } from '../../preview/context'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
@@ -1366,18 +1370,20 @@ type ScreenProps = {
 }
 
 /**
- * The frame of every screen: the OS status bar (L3 SystemStatusbar), then top · body · bottom, a toast above the
- * bottom, and a sheet over it all. The screen is the sheet's container, so sheets and their scrim stay in the phone;
- * its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash between two sheets).
+ * The frame of every screen: top · body · bottom, a toast above the bottom, and a sheet over it all. It fills the
+ * space between the OS status bar and the OS navigation bar (the preview draws those — real apps get them from the
+ * OS, edge-to-edge insets), so nothing sits under the gesture handle. The screen is the sheet's container, so sheets
+ * and their scrim stay in the app; its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash
+ * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
+ * its colour (the button dock and the bottom navbar are recognised already).
  */
 export function Screen({ top, bottom, toast, sheet, children }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
     <div ref={setEl} className={styles.screen}>
-      <SystemStatusbar />
       <SheetHost container={el}>
-        <div className={styles.page}>
+        <div className={styles.page} data-part="page">
           {top}
           <div className={styles.middle}>
             <div className={styles.body}>{children}</div>

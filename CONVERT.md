@@ -34,6 +34,11 @@ using that codebase's own architecture, state management and API layer.
   scrolling, keyboard, back behaviour and accessibility.
 - **Every state:** empty, loading, error and disabled states listed in the spec are part of the flow.
 - **Indian formatting:** amounts ₹1,23,456.78; percent with sign and 2 decimals.
+- **System bars are the OS's:** the status bar and the 24px navigation bar (gesture handle) aren't app UI. Draw
+  edge-to-edge and inset the content by the system bars, so nothing sits under the gesture handle; colour the
+  navigation bar like what sits right above it (the button dock, keypad, bottom navbar or an open sheet).
+- **Moving between screens** pushes: forward, the new screen comes in from the right; back, from the left (the
+  platform's default page transition). Sheet → sheet over the same page swaps the sheet's content; the page stays.
 - **Don't copy the preview code** (`src/preview/`, `src/main.tsx`, the phone frame, the board) — it only exists to show
   the flow here.
 - When the spec and the code disagree, the spec wins; when both are unclear, the Figma frame decides — ask before
