@@ -29,6 +29,8 @@
   "shared": [
     "src/shared/ui/MainNav.tsx",
     "src/shared/ui/Screen.module.css",
-    "src/shared/ui/Screen.tsx"
+    "src/shared/ui/Screen.tsx",
+    "src/shared/ui/Sheet.module.css",
+    "src/shared/ui/Sheet.tsx"
   ]
 }

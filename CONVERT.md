@@ -12,7 +12,7 @@ using that codebase's own architecture, state management and API layer.
 3. For every L3 component used, look it up in the design system:
    https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt (component pages, props, tokens, rules). The component
    name in code = the component name in Figma (`Button` = "L3: Button").
-4. If you can open web pages: `#/frame/<screen-id>` shows one screen at 360 × 800; `#/play/<screen-id>` is the
+4. If you can open web pages: `#/frame/<screen-id>` shows one screen at 392 × 872 (the design size); `#/play/<screen-id>` is the
    clickable prototype. Figma links are in the screen table.
 
 ## 2. What to carry over, and how

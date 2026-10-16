@@ -6,6 +6,9 @@ Start with [CONVERT.md](https://kirtanyak-pe.github.io/lemonn-app-prototype/CONV
 
 ## Flows
 
+- [First deposit](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/deposit.md): Add money over UPI after account setup: amount, UPI app, confirmation, receipt or failure. — 5 screens · [json](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/deposit.json) · [prototype](https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/deposit)
+- [Account setup](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/kyc.md): KYC after login: PAN, details and declarations, nominee, bank account and F&O activation. — 20 screens · [json](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/kyc.json) · [prototype](https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/kyc)
+- [Login](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/login.md): Welcome, mobile number + OTP, fingerprint, PIN and email — where the app starts. — 9 screens · [json](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/login.json) · [prototype](https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/login)
 - [App shell](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/shell.md): The frame every flow builds on — proves the design system is wired up. Remove once Login and Stocks exist. — 1 screens · [json](https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/shell.json) · [prototype](https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/shell)
 
 ## Design system
