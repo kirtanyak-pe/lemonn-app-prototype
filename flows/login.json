@@ -116,6 +116,7 @@
     "src/flows/login/README.md",
     "src/flows/login/components/Dots.module.css",
     "src/flows/login/components/Dots.tsx",
+    "src/flows/login/components/Raised.module.css",
     "src/flows/login/data.ts",
     "src/flows/login/index.tsx",
     "src/flows/login/screens/Biometrics.tsx",

@@ -109,6 +109,17 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
   into the top bar.
 - Toasts and other states follow L3 rules: toasts float at the bottom.
 
+### Experiment: raised buttons (Login only)
+
+Trying a soft 3D button look, inspired by YouTube's recent buttons, on this flow before deciding on L3
+(`components/Raised.module.css`, applied with Screen `className`). The L3 Button itself is unchanged.
+- A faint vertical sheen (a touch lighter at the top, darker at the bottom), under L3's hover/press layer.
+- A 1px inner highlight on the top edge and a 1px inner shade on the bottom edge.
+- A small soft drop shadow. Pressed: the shadow goes and the bevel turns inward.
+- Filled buttons get a stronger sheen; outlined buttons in dark themes a fainter glint.
+- Disabled, loading and ghost buttons stay flat.
+If approved, it moves into L3 as Button tokens per variant, and this file goes.
+
 ### L3 gaps
 
 - **Carousel indicator:** the dots are local (`components/Dots`), because L3 has no carousel or pagination component.
@@ -116,6 +127,8 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
 - **Google sign-in mark:** the official "G" mark is needed for the Google button; a mail icon stands in.
 
 ### Changelog
+
+- 2026-10-16 — raised-button experiment; keypad fields never open the phone's keyboard (the drawn keypad is the keyboard).
 
 - 2026-10-16 — first version (9 screens).
 
@@ -177,6 +190,62 @@ export function Dots({ count, index, onPick }: { count: number; index: number; o
       ))}
     </div>
   )
+}
+```
+
+### `src/flows/login/components/Raised.module.css`
+
+```css
+/*
+ * EXPERIMENT — Login flow only, not in L3 yet: "raised" buttons, a soft 3D look like YouTube's recent buttons.
+ * On top of the L3 Button (nothing in the design system changes):
+ * - a faint vertical sheen: a touch lighter at the top, a touch darker at the bottom, under L3's hover/press layer;
+ * - a 1px inner highlight on the top edge and a 1px inner shade on the bottom edge (the "lit from above" bevel);
+ * - a small soft drop shadow, so the button sits slightly above the page.
+ * Pressed: the drop shadow goes and the bevel turns inward (pushed in). Disabled / loading / ghost stay flat.
+ * If it's approved for L3, these become Button tokens (e.g. button/raise-sheen, -highlight, -shade) per variant.
+ */
+
+.raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']) {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-60));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
+  background-image:
+    linear-gradient(var(--btn-layer), var(--btn-layer)),
+    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
+  box-shadow:
+    inset 0 0 0 var(--btn-border-width) var(--btn-border),
+    inset 0 1px 0 var(--raise-highlight),
+    inset 0 -1px 0 var(--raise-shade),
+    0 1px 2px var(--raise-drop),
+    var(--l3-shadow-elevation-low);
+}
+
+/* Filled (primary, brand, buy, sell): a stronger sheen and bevel on the solid colour. */
+.raised :is(button, a):is([data-variant='primary'], [data-variant='brand'], [data-variant='buy'], [data-variant='sell'])[data-state='default'] {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+}
+
+/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
+:root[data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default'] {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
+}
+
+/* Pushed in while pressed: no drop shadow, the bevel turns inward. */
+.raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']):active {
+  box-shadow:
+    inset 0 0 0 var(--btn-border-width) var(--btn-border),
+    inset 0 1px 2px var(--raise-shade);
 }
 ```
 
@@ -279,13 +348,14 @@ import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { msFingerprint } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
+import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import styles from './Form.module.css'
 
 /** login-06 · Offer fingerprint / face unlock right after the number is verified. Either choice moves on to the PIN. */
 export function Biometrics({ onAllow, onSkip }: { onAllow?: () => void; onSkip?: () => void }) {
   return (
-    <Screen
+    <Screen className={raised.raised}
       bottom={
         <ButtonGroup aria-label="Biometric unlock">
           <Button onClick={onAllow}>Turn on fingerprint unlock</Button>
@@ -316,6 +386,7 @@ import { Icon } from '@l3/components/Icon'
 import { msMail } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
+import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import styles from './Form.module.css'
 
@@ -326,7 +397,7 @@ import styles from './Form.module.css'
  */
 export function Email({ onGoogle, onManual, onSkip }: { onGoogle?: () => void; onManual?: () => void; onSkip?: () => void }) {
   return (
-    <Screen
+    <Screen className={raised.raised}
       top={<Actionbar actions={<Button variant="ghost" size="sm" onClick={onSkip}>Skip</Button>} />}
       bottom={
         <ButtonGroup aria-label="Add email">
@@ -399,6 +470,7 @@ import { phone } from '../../../shared/data/format'
 import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
+import raised from '../components/Raised.module.css'
 import { OTP_LENGTH, PROTOTYPE_WRONG_OTP, RESEND_AFTER_S } from '../data'
 import styles from './Form.module.css'
 
@@ -448,7 +520,7 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
     : wrong ? 'Incorrect OTP. You have 2 attempts left.' : `Sent to +91 ${phone(user.mobile)}`
 
   return (
-    <Screen top={<Actionbar onBack={onBack} />} bottom={<Keyboard onKey={onKey} />}>
+    <Screen className={raised.raised} top={<Actionbar onBack={onBack} />} bottom={<Keyboard onKey={onKey} />}>
       <Intro title="Verify your number" description="Enter the 6-digit code we sent you by SMS" />
       <div ref={boxes} className={styles.fields}>
         <OtpInput
@@ -462,7 +534,6 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
           edit={{ label: 'Edit number', onClick: () => onEdit?.() }}
           action={{ label: left > 0 ? `Resend in 0:${String(left).padStart(2, '0')}` : 'Resend OTP', disabled: left > 0, onClick: () => setLeft(RESEND_AFTER_S) }}
           disabled={verifying}
-          autoFocus={interactive}
         />
       </div>
     </Screen>
@@ -482,8 +553,9 @@ import { msHelp } from '@l3/icons/material'
 import { phone } from '../../../shared/data/format'
 import { usePreview } from '../../../shared/prototype'
 import { Intro } from '../../../shared/ui/Intro'
-import { Keyboard, typeKey } from '../../../shared/ui/Keyboard'
+import { Keyboard, keypadFieldProps, typeKey } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
+import raised from '../components/Raised.module.css'
 import styles from './Form.module.css'
 
 /**
@@ -496,7 +568,7 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
   const [digits, setDigits] = useState(initial)
   const ready = digits.length === 10
   return (
-    <Screen
+    <Screen className={raised.raised}
       top={<Actionbar onBack={onBack} actions={<ActionbarAction icon={msHelp} label="Help" onClick={() => {}} />} />}
       bottom={
         <>
@@ -513,9 +585,9 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
           label="Mobile number"
           value={digits ? `+91 ${phone(digits)}` : ''}
           placeholder="+91 10-digit number"
-          // The keypad is open, so the field is focused: L3's Typing state (dark border + caret). Real app: inputMode
-          // "numeric" opens the system number keyboard; here the drawn keypad is that keyboard, so no second one.
-          inputMode="none"
+          // The keypad is open, so the field is focused: L3's Typing state. Real app: inputMode "numeric" opens the
+          // system number keyboard; here the drawn keypad is that keyboard, so the phone's own never opens.
+          {...keypadFieldProps()}
           autoComplete="tel-national"
           autoFocus={interactive}
           onChange={(e) => setDigits(e.target.value.replace(/^\+91/, '').replace(/\D/g, '').slice(0, 10))}
@@ -544,6 +616,7 @@ import { user } from '../../../shared/data/user'
 import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
+import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import { PIN_LENGTH } from '../data'
 import styles from './Form.module.css'
@@ -572,7 +645,7 @@ export function CreatePin({ initial = '', onDone }: { initial?: string; onDone?:
 
   const confirming = first !== null
   return (
-    <Screen bottom={<Keyboard onKey={onKey} />}>
+    <Screen className={raised.raised} bottom={<Keyboard onKey={onKey} />}>
       <Intro
         art={<Spot icon={msPassword} tone="brand" size="md" />}
         title={confirming ? 'Confirm your PIN' : 'Set a 4-digit PIN'}
@@ -607,7 +680,7 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
     if (interactive && next.length === PIN_LENGTH && next !== pin) window.setTimeout(() => onUnlocked?.(), 300)
   }
   return (
-    <Screen bottom={<Keyboard onKey={onKey} />}>
+    <Screen className={raised.raised} bottom={<Keyboard onKey={onKey} />}>
       <div ref={boxes} className={`${styles.centre} ${styles.fill}`}>
         <BrandLogo brand="lemonn" variant="icon" size={48} decorative />
         <Intro align="center" title={`Welcome back, ${user.name.split(' ')[0]}`} description="Enter your 4-digit PIN" />
@@ -701,6 +774,7 @@ import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
+import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import { Dots } from '../components/Dots'
 import { SEBI_REG, slides } from '../data'
@@ -718,7 +792,7 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
   const slide = slides[index]
 
   return (
-    <Screen
+    <Screen className={raised.raised}
       bottom={
         <>
           <ButtonGroup aria-label="Get started">
@@ -950,15 +1024,27 @@ export const typeKey = (value: string, key: string, max: number) =>
   key === 'Backspace' ? value.slice(0, -1) : /^\d$/.test(key) && value.length < max ? value + key : value
 
 /**
+ * The drawn keypad IS the keyboard here, so the fields it types into must never open the phone's own keyboard:
+ * inputmode="none" (Android, desktop) and, on touch screens, read-only too (the only sure way on iPhone). They still
+ * take focus, so they show L3's Typing state. Real apps don't need this: the system keyboard is the keypad.
+ */
+export const keypadFieldProps = () => ({
+  inputMode: 'none' as const,
+  readOnly: typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches,
+})
+
+/**
  * Prototype glue: the drawn keypad types into an L3 OtpInput, so focus follows the box being typed (the next empty
- * one) — the Typing state moves along as it would with the phone's keyboard. Put the ref on an element around the
- * OtpInput. Real apps don't need this: the system keyboard types into the focused box.
+ * one) — the Typing state moves along as it would with the phone's keyboard — and the boxes never open the phone's
+ * keyboard (keypadFieldProps). Put the ref on an element around the OtpInput.
  */
 export function useKeypadFocus(value: string, length: number, enabled: boolean) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!enabled) return
     const boxes = ref.current?.querySelectorAll('input')
+    const { inputMode, readOnly } = keypadFieldProps()
+    boxes?.forEach((box) => { box.inputMode = inputMode; box.readOnly = readOnly })
     boxes?.[Math.min(value.length, length - 1)]?.focus({ preventScroll: true })
   }, [value, length, enabled])
   return ref
@@ -1036,6 +1122,8 @@ type ScreenProps = {
   sheet?: ReactNode
   /** Screen content: scrolls when taller than the space between `top` and `bottom`. */
   children?: ReactNode
+  /** A flow's own styling hook on the screen root (e.g. an experiment scoped to one flow). */
+  className?: string
 }
 
 /**
@@ -1046,11 +1134,11 @@ type ScreenProps = {
  * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
  * its colour (the button dock and the bottom navbar are recognised already).
  */
-export function Screen({ top, bottom, toast, sheet, children }: ScreenProps) {
+export function Screen({ top, bottom, toast, sheet, children, className }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
-    <div ref={setEl} className={styles.screen}>
+    <div ref={setEl} className={[styles.screen, className].filter(Boolean).join(' ')}>
       <SheetHost container={el}>
         <div className={styles.page} data-part="page">
           {top}

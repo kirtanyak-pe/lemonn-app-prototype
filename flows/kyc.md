@@ -1367,6 +1367,8 @@ type ScreenProps = {
   sheet?: ReactNode
   /** Screen content: scrolls when taller than the space between `top` and `bottom`. */
   children?: ReactNode
+  /** A flow's own styling hook on the screen root (e.g. an experiment scoped to one flow). */
+  className?: string
 }
 
 /**
@@ -1377,11 +1379,11 @@ type ScreenProps = {
  * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
  * its colour (the button dock and the bottom navbar are recognised already).
  */
-export function Screen({ top, bottom, toast, sheet, children }: ScreenProps) {
+export function Screen({ top, bottom, toast, sheet, children, className }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
-    <div ref={setEl} className={styles.screen}>
+    <div ref={setEl} className={[styles.screen, className].filter(Boolean).join(' ')}>
       <SheetHost container={el}>
         <div className={styles.page} data-part="page">
           {top}
