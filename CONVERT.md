@@ -39,6 +39,8 @@ using that codebase's own architecture, state management and API layer.
   navigation bar like what sits right above it (the button dock, keypad, bottom navbar or an open sheet).
 - **Moving between screens** pushes: forward, the new screen comes in from the right; back, from the left (the
   platform's default page transition). Sheet → sheet over the same page swaps the sheet's content; the page stays.
+- **Raised buttons are an experiment** (`src/shared/ui/Raised.module.css`: a soft sheen, edge bevel and drop shadow on
+  every button). Build plain L3 buttons unless the design system has adopted it.
 - **Don't copy the preview code** (`src/preview/`, `src/main.tsx`, the phone frame, the board) — it only exists to show
   the flow here.
 - When the spec and the code disagree, the spec wins; when both are unclear, the Figma frame decides — ask before

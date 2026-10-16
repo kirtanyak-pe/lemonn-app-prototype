@@ -109,17 +109,6 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
   into the top bar.
 - Toasts and other states follow L3 rules: toasts float at the bottom.
 
-### Experiment: raised buttons (Login only)
-
-Trying a soft 3D button look, inspired by YouTube's recent buttons, on this flow before deciding on L3
-(`components/Raised.module.css`, applied with Screen `className`). The L3 Button itself is unchanged.
-- A faint vertical sheen (a touch lighter at the top, darker at the bottom), under L3's hover/press layer.
-- A 1px inner highlight on the top edge and a 1px inner shade on the bottom edge.
-- A small soft drop shadow. Pressed: the shadow goes and the bevel turns inward.
-- Filled buttons get a stronger sheen; outlined buttons in dark themes a fainter glint.
-- Disabled, loading and ghost buttons stay flat.
-If approved, it moves into L3 as Button tokens per variant, and this file goes.
-
 ### L3 gaps
 
 - **Carousel indicator:** the dots are local (`components/Dots`), because L3 has no carousel or pagination component.
@@ -190,62 +179,6 @@ export function Dots({ count, index, onPick }: { count: number; index: number; o
       ))}
     </div>
   )
-}
-```
-
-### `src/flows/login/components/Raised.module.css`
-
-```css
-/*
- * EXPERIMENT — Login flow only, not in L3 yet: "raised" buttons, a soft 3D look like YouTube's recent buttons.
- * On top of the L3 Button (nothing in the design system changes):
- * - a faint vertical sheen: a touch lighter at the top, a touch darker at the bottom, under L3's hover/press layer;
- * - a 1px inner highlight on the top edge and a 1px inner shade on the bottom edge (the "lit from above" bevel);
- * - a small soft drop shadow, so the button sits slightly above the page.
- * Pressed: the drop shadow goes and the bevel turns inward (pushed in). Disabled / loading / ghost stay flat.
- * If it's approved for L3, these become Button tokens (e.g. button/raise-sheen, -highlight, -shade) per variant.
- */
-
-.raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-60));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
-  background-image:
-    linear-gradient(var(--btn-layer), var(--btn-layer)),
-    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop),
-    var(--l3-shadow-elevation-low);
-}
-
-/* Filled (primary, brand, buy, sell): a stronger sheen and bevel on the solid colour. */
-.raised :is(button, a):is([data-variant='primary'], [data-variant='brand'], [data-variant='buy'], [data-variant='sell'])[data-state='default'] {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-}
-
-/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
-:root[data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default'] {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
-}
-
-/* Pushed in while pressed: no drop shadow, the bevel turns inward. */
-.raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']):active {
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 2px var(--raise-shade);
 }
 ```
 
@@ -348,14 +281,13 @@ import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { msFingerprint } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
-import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import styles from './Form.module.css'
 
 /** login-06 · Offer fingerprint / face unlock right after the number is verified. Either choice moves on to the PIN. */
 export function Biometrics({ onAllow, onSkip }: { onAllow?: () => void; onSkip?: () => void }) {
   return (
-    <Screen className={raised.raised}
+    <Screen
       bottom={
         <ButtonGroup aria-label="Biometric unlock">
           <Button onClick={onAllow}>Turn on fingerprint unlock</Button>
@@ -386,7 +318,6 @@ import { Icon } from '@l3/components/Icon'
 import { msMail } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
-import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import styles from './Form.module.css'
 
@@ -397,7 +328,7 @@ import styles from './Form.module.css'
  */
 export function Email({ onGoogle, onManual, onSkip }: { onGoogle?: () => void; onManual?: () => void; onSkip?: () => void }) {
   return (
-    <Screen className={raised.raised}
+    <Screen
       top={<Actionbar actions={<Button variant="ghost" size="sm" onClick={onSkip}>Skip</Button>} />}
       bottom={
         <ButtonGroup aria-label="Add email">
@@ -470,7 +401,6 @@ import { phone } from '../../../shared/data/format'
 import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
-import raised from '../components/Raised.module.css'
 import { OTP_LENGTH, PROTOTYPE_WRONG_OTP, RESEND_AFTER_S } from '../data'
 import styles from './Form.module.css'
 
@@ -520,7 +450,7 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
     : wrong ? 'Incorrect OTP. You have 2 attempts left.' : `Sent to +91 ${phone(user.mobile)}`
 
   return (
-    <Screen className={raised.raised} top={<Actionbar onBack={onBack} />} bottom={<Keyboard onKey={onKey} />}>
+    <Screen top={<Actionbar onBack={onBack} />} bottom={<Keyboard onKey={onKey} />}>
       <Intro title="Verify your number" description="Enter the 6-digit code we sent you by SMS" />
       <div ref={boxes} className={styles.fields}>
         <OtpInput
@@ -555,7 +485,6 @@ import { usePreview } from '../../../shared/prototype'
 import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, keypadFieldProps, typeKey } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
-import raised from '../components/Raised.module.css'
 import styles from './Form.module.css'
 
 /**
@@ -568,7 +497,7 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
   const [digits, setDigits] = useState(initial)
   const ready = digits.length === 10
   return (
-    <Screen className={raised.raised}
+    <Screen
       top={<Actionbar onBack={onBack} actions={<ActionbarAction icon={msHelp} label="Help" onClick={() => {}} />} />}
       bottom={
         <>
@@ -616,7 +545,6 @@ import { user } from '../../../shared/data/user'
 import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
-import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import { PIN_LENGTH } from '../data'
 import styles from './Form.module.css'
@@ -645,7 +573,7 @@ export function CreatePin({ initial = '', onDone }: { initial?: string; onDone?:
 
   const confirming = first !== null
   return (
-    <Screen className={raised.raised} bottom={<Keyboard onKey={onKey} />}>
+    <Screen bottom={<Keyboard onKey={onKey} />}>
       <Intro
         art={<Spot icon={msPassword} tone="brand" size="md" />}
         title={confirming ? 'Confirm your PIN' : 'Set a 4-digit PIN'}
@@ -680,7 +608,7 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
     if (interactive && next.length === PIN_LENGTH && next !== pin) window.setTimeout(() => onUnlocked?.(), 300)
   }
   return (
-    <Screen className={raised.raised} bottom={<Keyboard onKey={onKey} />}>
+    <Screen bottom={<Keyboard onKey={onKey} />}>
       <div ref={boxes} className={`${styles.centre} ${styles.fill}`}>
         <BrandLogo brand="lemonn" variant="icon" size={48} decorative />
         <Intro align="center" title={`Welcome back, ${user.name.split(' ')[0]}`} description="Enter your 4-digit PIN" />
@@ -774,7 +702,6 @@ import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
-import raised from '../components/Raised.module.css'
 import { Spot } from '../../../shared/ui/Spot'
 import { Dots } from '../components/Dots'
 import { SEBI_REG, slides } from '../data'
@@ -792,7 +719,7 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
   const slide = slides[index]
 
   return (
-    <Screen className={raised.raised}
+    <Screen
       bottom={
         <>
           <ButtonGroup aria-label="Get started">
@@ -1051,6 +978,64 @@ export function useKeypadFocus(value: string, length: number, enabled: boolean) 
 }
 ```
 
+### `src/shared/ui/Raised.module.css`
+
+```css
+/*
+ * EXPERIMENT — every screen and sheet of the app, not in L3 yet: "raised" buttons, a soft 3D look like YouTube's
+ * recent buttons. On when <html data-buttons="raised"> (the default; the prototype controls switch it to "flat" to
+ * compare with plain L3). On top of the L3 Button (nothing in the design system changes):
+ * - a faint vertical sheen: a touch lighter at the top, a touch darker at the bottom, under L3's hover/press layer;
+ * - a 1px inner highlight on the top edge and a 1px inner shade on the bottom edge (the "lit from above" bevel);
+ * - a small soft drop shadow, so the button sits slightly above the page.
+ * Pressed: the drop shadow goes and the bevel turns inward (pushed in). Disabled / loading / ghost stay flat.
+ * If it's approved for L3, these become Button tokens (e.g. button/raise-sheen, -highlight, -shade) per variant.
+ */
+
+:root[data-buttons='raised'] .raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']) {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-60));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
+  background-image:
+    linear-gradient(var(--btn-layer), var(--btn-layer)),
+    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
+  box-shadow:
+    inset 0 0 0 var(--btn-border-width) var(--btn-border),
+    inset 0 1px 0 var(--raise-highlight),
+    inset 0 -1px 0 var(--raise-shade),
+    0 1px 2px var(--raise-drop),
+    var(--l3-shadow-elevation-low);
+}
+
+/* Filled (primary, brand, buy, sell): a stronger sheen and bevel on the solid colour. */
+/* (:not(ghost) only matches the base rule's specificity, so these values win.) */
+:root[data-buttons='raised'] .raised :is(button, a):is([data-variant='primary'], [data-variant='brand'], [data-variant='buy'], [data-variant='sell'])[data-state='default']:not([data-variant='ghost']) {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+}
+
+/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
+:root[data-buttons='raised'][data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default'] {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
+}
+
+/* Pushed in while pressed: no drop shadow, the bevel turns inward. */
+:root[data-buttons='raised'] .raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']):active {
+  box-shadow:
+    inset 0 0 0 var(--btn-border-width) var(--btn-border),
+    inset 0 1px 2px var(--raise-shade);
+}
+```
+
 ### `src/shared/ui/Screen.module.css`
 
 ```css
@@ -1108,6 +1093,7 @@ export function useKeypadFocus(value: string, length: number, enabled: boolean) 
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
 import { usePreview } from '../../preview/context'
+import raised from './Raised.module.css'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
 
@@ -1132,13 +1118,14 @@ type ScreenProps = {
  * OS, edge-to-edge insets), so nothing sits under the gesture handle. The screen is the sheet's container, so sheets
  * and their scrim stay in the app; its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash
  * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
- * its colour (the button dock and the bottom navbar are recognised already).
+ * its colour (the button dock and the bottom navbar are recognised already). Buttons on every screen and its sheets
+ * get the raised-button experiment (Raised.module.css) while <html data-buttons="raised">.
  */
 export function Screen({ top, bottom, toast, sheet, children, className }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
-    <div ref={setEl} className={[styles.screen, className].filter(Boolean).join(' ')}>
+    <div ref={setEl} className={[styles.screen, raised.raised, className].filter(Boolean).join(' ')}>
       <SheetHost container={el}>
         <div className={styles.page} data-part="page">
           {top}
