@@ -78,7 +78,7 @@ From `src/shared/data/user.ts` (fictional sample user) and `data.ts`:
 | Mobile number | TextField ("L3: input field & text Box") | label "Mobile number", value `+91 …`, numeric |
 | OTP | OtpInput | `length={6}`, `edit` (Edit number), `action` (Resend in 0:45 → Resend OTP), `status="error"` |
 | PIN | OtpInput | `length={4}`, `mask`, `action` = Forgot PIN? (returning) |
-| Use fingerprint | Button | `variant="tertiary"`, `size="md"`, icon `fingerprint` |
+| Use fingerprint | Button | `variant="tertiary"`, Large, icon `fingerprint` |
 | Email Skip | Button in Actionbar actions | `variant="ghost"`, `size="sm"` |
 | Keypad | — | the phone's system number keyboard (not an app component) |
 
@@ -619,7 +619,7 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
           onChange={setPin}
           action={{ label: 'Forgot PIN?', onClick: () => onForgot?.() }}
         />
-        <Button variant="tertiary" size="md" iconLeft={<Icon icon={msFingerprint} />} onClick={onUnlocked}>Use fingerprint</Button>
+        <Button variant="tertiary" iconLeft={<Icon icon={msFingerprint} />} onClick={onUnlocked}>Use fingerprint</Button>
       </div>
     </Screen>
   )

@@ -68,7 +68,7 @@ From `src/shared/data/user.ts` (fictional sample user) and `data.ts`:
 | Top bar | Actionbar | "Add money" + `onBack` (no back while the UPI app is open) |
 | First-deposit perks | Aerobar | `floating`, `placement="inline"`, `type="success"`, celebration icon, heading + paragraph |
 | Amount | TextField | numeric, `₹1,000` formatted, `status="error"` + helper below min / above max |
-| "+" chips | Button | `variant="tertiary"`, `size="sm"`, in a wrapping row |
+| "+" amounts | Button | `variant="tertiary"`, Large, `fullWidth`, in a 2 × 2 grid |
 | Pay with | SectionHeader + ListCell | `variant="card"`, `as="button"`, UPI icon left, chevron right |
 | Pay button | ButtonGroup + Button | primary, label repeats the amount ("Add ₹1,000"); off when the amount is invalid |
 | Waiting / confirming | Loader + `Intro` (src/shared/ui) | `size="lg"`, centred Heading/24 + description |
@@ -200,7 +200,7 @@ export function AddMoney({ first = true, onBack, onPay, onMethod }: { first?: bo
           />
           <div className={styles.quick} role="group" aria-label="Add to amount">
             {quickAmounts.map((q) => (
-              <Button key={q} variant="tertiary" size="sm" onClick={() => setAmount((a) => a + q)}>+{inr(q, 0)}</Button>
+              <Button key={q} variant="tertiary" fullWidth onClick={() => setAmount((a) => a + q)}>+{inr(q, 0)}</Button>
             ))}
           </div>
         </section>
@@ -232,9 +232,10 @@ export function AddMoney({ first = true, onBack, onPay, onMethod }: { first?: bo
   gap: var(--l3-spacing-12);
 }
 
+/* Quick "+" amounts: four Large tertiary buttons don't fit one row at phone width, so an even 2 × 2 grid. */
 .quick {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--l3-spacing-08);
 }
 
