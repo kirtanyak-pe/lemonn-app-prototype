@@ -1593,7 +1593,10 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
 ### `src/shared/ui/Steps.module.css`
 
 ```css
-/* A vertical checklist joined by a hairline: done ✓ · current (bold, maybe a loader) · to do ○. */
+/*
+ * A vertical progress list: done = solid green ✓ · current = green ring with a halo (or a loader while it runs) ·
+ * to do = outline ring. The line to the next step is green after a done step, a hairline otherwise.
+ */
 .steps {
   display: flex;
   flex-direction: column;
@@ -1625,7 +1628,8 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
 }
 
 .step[data-state='done']:not(:last-child)::before {
-  border-left-color: var(--l3-content-accent-success-default);
+  border-left: var(--l3-spacing-02) solid var(--l3-border-accent-success-default);
+  transform: translateX(-50%);
 }
 
 .marker {
@@ -1637,11 +1641,34 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
   color: var(--l3-content-tertiary);
 }
 
-.step[data-state='done'] .marker {
-  color: var(--l3-content-accent-success-default);
+/* The marker shape (20 in the 24 box). Rings are 2 wide, like the line after a done step. */
+.dot {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: var(--l3-icon-size-20);
+  height: var(--l3-icon-size-20);
+  border-radius: var(--l3-radius-full);
 }
 
-.step[data-state='current'] .marker,
+/* To do: the outline ring. */
+.step[data-state='todo'] .dot {
+  border: var(--l3-spacing-02) solid var(--l3-border-intense);
+}
+
+/* Done: a solid green disc, white tick (text on a solid success fill is static/white). */
+.step[data-state='done'] .dot {
+  background: var(--l3-surface-accent-success-default);
+  color: var(--l3-static-white);
+}
+
+/* Current: a green ring on a light green fill, with a soft halo — "you are here", not a selected option. */
+.step[data-state='current'] .dot {
+  border: var(--l3-spacing-02) solid var(--l3-border-accent-success-default);
+  background: var(--l3-surface-accent-success-light);
+  box-shadow: 0 0 0 var(--l3-spacing-04) var(--l3-surface-accent-success-light);
+}
+
 .step[data-state='loading'] .marker {
   color: var(--l3-content-primary);
 }
@@ -1674,17 +1701,21 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
 import type { ReactNode } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { Loader } from '@l3/components/Loader'
-import { msCheckCircleFill, msRadioButtonUnchecked, msRadioButtonChecked } from '@l3/icons/material'
+import { msCheck } from '@l3/icons/material'
 import styles from './Steps.module.css'
 
 export type StepState = 'done' | 'current' | 'loading' | 'todo'
 export type Step = { label: string; description?: ReactNode; state: StepState }
 
+/** Done: a solid green disc with a tick · current: a green ring with a soft halo · to do: a plain outline ring. */
 const marker = (state: StepState) =>
-  state === 'loading' ? <Loader size="sm" label={null} />
-    : <Icon icon={state === 'done' ? msCheckCircleFill : state === 'current' ? msRadioButtonChecked : msRadioButtonUnchecked} />
+  state === 'loading' ? <Loader size="sm" label={null} /> : <span className={styles.dot}>{state === 'done' && <Icon icon={msCheck} size={16} />}</span>
 
-/** Progress through a few steps (KYC stages, fetching details, bank → F&O). Not tappable. */
+/**
+ * Progress through a few steps (KYC stages, fetching details, bank → F&O), read as progress — not as options: green
+ * for what's done and where you are, a plain ring for what's next, and the line between them green as far as you've
+ * got. Not tappable.
+ */
 export function Steps({ steps, label }: { steps: Step[]; label: string }) {
   return (
     <ol className={styles.steps} aria-label={label}>
