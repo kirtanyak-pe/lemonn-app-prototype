@@ -163,9 +163,9 @@ export function Shortcuts({ onOpen }: { onOpen?: (id: string) => void }) {
               <span className={styles.shortcutIcon}>
                 <Spot icon={s.icon} tone="success" size="md" />
                 {s.badge?.count !== undefined && (
-                  <span className={styles.shortcutBadge}><Badge count={s.badge.count} color="neutral" label={`${s.badge.count} in your watchlist`} /></span>
+                  <span className={styles.overIcon}><Badge count={s.badge.count} color="neutral" label={`${s.badge.count} in your watchlist`} /></span>
                 )}
-                {s.badge?.text && <span className={styles.shortcutBadge}><Tag color="error" variant="primary" size="sm">{s.badge.text}</Tag></span>}
+                {s.badge?.text && <span className={styles.overIcon}><Tag color="error" variant="primary" size="sm">{s.badge.text}</Tag></span>}
               </span>
               <span className={styles.shortcutLabel}>{s.label}</span>
             </span>
@@ -188,7 +188,7 @@ export function TopMovers({ initial = 'gainers', onStock, onViewAll }: { initial
   return (
     <section className={styles.section} aria-label="Top movers">
       <div className={styles.head}><SectionHeader title="Top movers" action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></div>
-      <div className={styles.moversChips}>
+      <div className={styles.inset}>
         <Tabs
           aria-label="Movers"
           appearance="pill"
@@ -197,7 +197,7 @@ export function TopMovers({ initial = 'gainers', onStock, onViewAll }: { initial
           onChange={(v) => setList(v as MoverList)}
         />
       </div>
-      <Rail label={moverTabs.find((t) => t.value === list)!.label} visible={2.3} rows={2}>
+      <Rail label={moverTabs.find((t) => t.value === list)!.label} visible={2.15} rows={2}>
         {movers[list].map((stock) => (
           <Card key={stock.symbol} onClick={() => onStock?.(stock.symbol)}>
             <span className={styles.cardStack}>
@@ -218,7 +218,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   return (
     <section className={styles.section} aria-label="Watchlist">
       <div className={styles.head}><SectionHeader title="Watchlist" action={{ type: 'view-all', label: 'New watchlist', onClick: () => onCreate?.() }} /></div>
-      <Rail label="Your watchlists" visible={1.6}>
+      <Rail label="Your watchlists" visible={1.45}>
         {watchlists.map((w) => (
           <ListCell
             key={w.id}
@@ -255,6 +255,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 
 /* ---- Index strip: NIFTY 50 23,146.15 +0.65% › | SENSEX … — scrolls sideways ---- */
 .indexStrip {
+  position: relative; /* keeps absolutely placed bits inside the scrolling strip (see Rail) */
   display: flex;
   align-items: center;
   gap: var(--l3-spacing-16);
@@ -392,13 +393,13 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 /* "New" sits on the card's top edge, at the content's left (the products row leaves room above for it). */
-.cornerTag {
+.onEdge {
   position: absolute;
   top: calc(-1 * (var(--l3-spacing-12) + var(--l3-spacing-10)));
   left: 0;
 }
 
-.products {
+.onEdgeRoom {
   padding-top: var(--l3-spacing-12);
 }
 
@@ -424,7 +425,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 /* The count / "New" over the icon's top edge. */
-.shortcutBadge {
+.overIcon {
   position: absolute;
   top: calc(-1 * var(--l3-spacing-08));
   left: 50%;
@@ -437,7 +438,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 /* ---- Top movers ---- */
-.moversChips {
+.inset {
   padding-inline: var(--l3-spacing-16);
 }
 
@@ -523,6 +524,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 .charges {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -619,6 +621,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 .ideaActions {
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--l3-spacing-12);
@@ -691,7 +694,7 @@ export function TradeIdeas({ onDetails, onBuy, onViewAll }: { onDetails?: (id: s
   return (
     <section className={styles.section} aria-label="Trade ideas">
       <div className={styles.head}><SectionHeader title="Trade ideas" tag={<Tag color="discover" variant="primary" iconLeft={<span className={styles.liveDot} />}>Live analysis</Tag>} /></div>
-      <Rail label="Trade ideas" visible={1.25} snap="center">
+      <Rail label="Trade ideas" visible={1.15} snap="center">
         {tradeIdeas.map((idea) => (
           <Card
             key={idea.id}
@@ -725,7 +728,7 @@ export function IdeaBaskets({ onOpen }: { onOpen?: (id: string) => void }) {
   return (
     <section className={styles.section} aria-label="Invest in ideas">
       <div className={styles.head}><SectionHeader title="Invest in ideas" description="Curated industry-based stock offerings" /></div>
-      <Rail label="Idea baskets" visible={1.3}>
+      <Rail label="Idea baskets" visible={1.15}>
         {ideaBaskets.map((b) => (
           <Card key={b.id} onClick={() => onOpen?.(b.id)}>
             <span className={styles.cardStack}>
@@ -778,7 +781,7 @@ export function SmartInvest({ onInvest, onOpen }: { onInvest?: (id: string) => v
   return (
     <section className={styles.section} aria-label="Smart Invest">
       <div className={styles.head}><SectionHeader title="Smart Invest" tag={<Tag color="success" iconLeft={<Icon icon={msVerified} size={16} />}>NSE/BSE approved</Tag>} /></div>
-      <Rail label="Strategies" visible={1.12}>
+      <Rail label="Strategies" visible={1.08}>
         {strategies.map((s) => (
           <Card
             key={s.id}
@@ -833,7 +836,7 @@ export function Announcement({ onOpen }: { onOpen?: () => void }) {
   return (
     <section className={styles.section} aria-label="Announcements">
       <div className={styles.head}><SectionHeader title="Announcements" /></div>
-      <div className={styles.moversChips}>
+      <div className={styles.inset}>
         <Card onClick={onOpen} footer={<Button variant="brand" fullWidth onClick={onOpen}>{announcement.cta}</Button>}>
           <span className={styles.announcement}>
             <span className={styles.announcementText}>
@@ -854,7 +857,7 @@ export function Sectors({ onOpen, onViewAll }: { onOpen?: (id: string) => void; 
   return (
     <section className={styles.section} aria-label="Invest in sectors">
       <div className={styles.head}><SectionHeader title="Invest in sectors" action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></div>
-      <Rail label="Sectors" visible={2}>
+      <Rail label="Sectors" visible={1.75}>
         {sectors.map((s) => (
           <Card key={s.id} onClick={() => onOpen?.(s.id)}>
             <span className={styles.cardStack}>
@@ -879,7 +882,7 @@ export function Highlights({ onExplore }: { onExplore?: (id: string) => void }) 
   return (
     <section className={styles.section} aria-label="Highlights">
       <div className={styles.head}><SectionHeader title="Highlights" /></div>
-      <Rail label="Highlights" visible={1.5}>
+      <Rail label="Highlights" visible={1.3}>
         {highlights.map((h) => (
           <Card key={h.id} onClick={() => onExplore?.(h.id)} footer={<Button variant="tertiary" onClick={() => onExplore?.(h.id)}>{h.cta}</Button>}>
             <span className={styles.highlightCard}>
@@ -954,11 +957,11 @@ export function HoldingsSummary({ onOpen }: { onOpen?: () => void }) {
 /** Mutual funds · Equity F&O · Commodities — each product's one-line promise. */
 export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }) {
   return (
-    <Rail label="Products" visible={2.3} className={styles.products}>
+    <Rail label="Products" visible={2.15} className={styles.onEdgeRoom}>
       {products.map((p) => (
         <Card key={p.id} onClick={() => onProduct?.(p.id)}>
           <span className={styles.cardStack}>
-            {p.isNew && <span className={styles.cornerTag}><Tag color="success" size="sm">New</Tag></span>}
+            {p.isNew && <span className={styles.onEdge}><Tag color="success" size="sm">New</Tag></span>}
             <span className={styles.cardRow}>
               <span className={styles.productTitle}>{p.name}</span>
               <span className={styles.chevron}><Icon icon={msChevronRight} size={16} /></span>
@@ -1079,6 +1082,7 @@ export const disclosure =
 
 ```tsx
 import type { Flow } from '../types'
+import { goToTab } from '../../shared/ui/MainNav'
 import { Home } from './screens/Home'
 
 /**
@@ -1091,13 +1095,13 @@ export const stocks: Flow = {
   description: 'The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.',
   figmaFile: '',
   screens: [
-    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', render: () => <Home /> },
-    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', render: () => <Home scrollTo="movers" /> },
-    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', render: () => <Home scrollTo="movers" movers="losers" /> },
-    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', render: () => <Home scrollTo="invest" /> },
-    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', render: () => <Home scrollTo="sectors" /> },
-    { id: 'stocks-06', name: 'Home · trade ideas', figma: '', note: 'Same page, scrolled: featured ideas, neighbours peek.', render: () => <Home scrollTo="ideas" /> },
-    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page.', render: () => <Home scrollTo="more" /> },
+    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} /> },
+    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="movers" /> },
+    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="movers" movers="losers" /> },
+    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="invest" /> },
+    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="sectors" /> },
+    { id: 'stocks-06', name: 'Home · trade ideas', figma: '', note: 'Same page, scrolled: featured ideas, neighbours peek.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="ideas" /> },
+    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="more" /> },
   ],
 }
 ```
@@ -1154,7 +1158,7 @@ export const stocks: Flow = {
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Actionbar, ActionbarAction } from '@l3/components/Actionbar'
 import { msAccountBalanceWallet, msAccountCircle } from '@l3/icons/material'
-import { MainNav } from '../../../shared/ui/MainNav'
+import { MainNav, type Section } from '../../../shared/ui/MainNav'
 import { Screen } from '../../../shared/ui/Screen'
 import { Disclosure, IdeaBaskets, TradeIdeas } from '../components/Ideas'
 import { Announcement, Highlights, Sectors, SmartInvest } from '../components/Invest'
@@ -1170,6 +1174,8 @@ type Props = {
   scrollTo?: HomePart
   /** Which Top movers list is picked (board state). */
   movers?: MoverList
+  /** The main navbar: go to another tab. */
+  onTab?: (section: Section) => void
 }
 
 /**
@@ -1178,7 +1184,7 @@ type Props = {
  * products; and on the rounded sheet over it, the feed: shortcuts, top movers, watchlists, Smart Invest (brand tint),
  * an announcement, sectors, highlights, trade ideas (discover tint), idea baskets and the broker's disclosure.
  */
-export function Home({ scrollTo = 'top', movers }: Props) {
+export function Home({ scrollTo = 'top', movers, onTab }: Props) {
   const [query, setQuery] = useState('')
   const page = useRef<HTMLDivElement>(null)
 
@@ -1204,7 +1210,7 @@ export function Home({ scrollTo = 'top', movers }: Props) {
           }
         />
       }
-      bottom={<MainNav value="stocks" />}
+      bottom={<MainNav value="stocks" onChange={onTab} />}
     >
       <div ref={page} className={styles.home}>
         <div className={styles.summary} data-home="top">
@@ -1351,19 +1357,31 @@ export function MainNav({ value, onChange }: { value: Section; onChange?: (value
     />
   )
 }
+
+/** The first screen of each tab that's built so far (prototype navigation). Tabs not built yet stay where they are. */
+const tabScreens: Partial<Record<Section, string>> = { stocks: 'stocks-01', market: 'market-01' }
+
+/** The navbar's onChange in a flow: `onTab={(t) => goToTab(go, t)}`. */
+export const goToTab = (go: (id: string) => void, section: Section) => {
+  const id = tabScreens[section]
+  if (id) go(id)
+}
 ```
 
 ### `src/shared/ui/Rail.module.css`
 
 ```css
 /*
- * Sideways rail. Item width = the row's width shown as `--rail-visible` items (16 inset, 12 gaps), so the same rail
- * reads well from 360 to 412. --rail-visible is a count (set inline), not a size.
+ * Sideways rail. Item width = the row (inside its 16 insets) shared by `--rail-visible` items with 12 between them, so
+ * the same rail reads well from 360 to 412. --rail-visible is a count (set inline), not a size.
  */
 .rail {
+  /* Positioned, so absolutely placed bits inside (e.g. PriceChange's screen-reader text) are clipped by the rail
+     instead of hanging off a far-away ancestor and making the whole page scroll sideways. */
+  position: relative;
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: calc((100% - var(--l3-spacing-16)) / var(--rail-visible) - var(--l3-spacing-12));
+  grid-auto-columns: calc((100% - (var(--rail-visible) - 1) * var(--l3-spacing-12)) / var(--rail-visible));
   gap: var(--l3-spacing-12);
   overflow-x: auto;
   overscroll-behavior-x: contain;
@@ -1521,6 +1539,7 @@ export function Rail({ children, label, visible, rows = 1, snap = 'start', class
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow-x: hidden; /* a screen never scrolls sideways — only rails inside it do */
   overflow-y: auto;
 }
 

@@ -1073,6 +1073,7 @@ export function useKeypadFocus(value: string, length: number, enabled: boolean) 
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow-x: hidden; /* a screen never scrolls sideways — only rails inside it do */
   overflow-y: auto;
 }
 

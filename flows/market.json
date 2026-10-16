@@ -1,0 +1,102 @@
+{
+  "id": "market",
+  "title": "Market",
+  "description": "The Market tab — stock lists (all, gainers, losers, under ₹100 / ₹500) and Filters.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "7739bca",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "board": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/market",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/play/<screen-id>",
+    "frame": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/frame/<screen-id>"
+  },
+  "screens": [
+    {
+      "id": "market-01",
+      "name": "Market · All",
+      "figma": "",
+      "note": "The filter bar shows \"Apply filters\" until something is applied.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-02",
+      "name": "Market · Top gainers",
+      "figma": "",
+      "note": "Same layout — only the list changes.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-03",
+      "name": "Market · Top losers",
+      "figma": "",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-04",
+      "name": "Market · Under ₹100",
+      "figma": "",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-05",
+      "name": "Filters",
+      "figma": "",
+      "note": "Side tabs on the left, every group in one scroll on the right.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-06",
+      "name": "Filters · indices",
+      "figma": "",
+      "note": "Scrolled to Indices — Nifty 500 picked; its side tab shows a dot.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-07",
+      "name": "Filters · sectors & sort",
+      "figma": "",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "market-08",
+      "name": "Market · filters applied",
+      "figma": "",
+      "note": "Applied filters as removable chips; the filter button gets a dot.",
+      "goesTo": [],
+      "figmaUrl": ""
+    }
+  ],
+  "files": [
+    "src/flows/market/README.md",
+    "src/flows/market/components/StockRow.module.css",
+    "src/flows/market/components/StockRow.tsx",
+    "src/flows/market/data.ts",
+    "src/flows/market/index.tsx",
+    "src/flows/market/screens/Market.module.css",
+    "src/flows/market/screens/Market.tsx",
+    "src/flows/market/sheets/FilterSheet.module.css",
+    "src/flows/market/sheets/FilterSheet.tsx"
+  ],
+  "shared": [
+    "src/shared/data/format.ts",
+    "src/shared/data/market.ts",
+    "src/shared/ui/MainNav.tsx",
+    "src/shared/ui/Raised.module.css",
+    "src/shared/ui/Screen.module.css",
+    "src/shared/ui/Screen.tsx",
+    "src/shared/ui/Sheet.module.css",
+    "src/shared/ui/Sheet.tsx"
+  ]
+}
