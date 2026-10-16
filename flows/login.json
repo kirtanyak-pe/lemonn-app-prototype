@@ -96,7 +96,7 @@
       "figma": "5436:7918",
       "note": "Opening the app again on this phone. Goes straight into the app.",
       "goesTo": [
-        "shell-01",
+        "stocks-01",
         "login-04"
       ],
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7918"

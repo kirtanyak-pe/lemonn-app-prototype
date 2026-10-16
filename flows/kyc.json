@@ -222,7 +222,7 @@
       "note": "Replaces the live \"KYC already completed\" web page. Add money → First deposit.",
       "goesTo": [
         "deposit-01",
-        "shell-01"
+        "stocks-01"
       ],
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7951"
     }

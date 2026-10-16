@@ -29,7 +29,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/kyc · mac
 | `kyc-17` | Share bank statement | [5436:7937](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7937) | `kyc-16`, `kyc-18`, `kyc-20` |  |
 | `kyc-18` | CAMSfinserv (external) | [5436:7938](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7938) | `kyc-17` | Handoff placeholder: CAMSfinserv’s own OTP, account and consent pages (frames 5436:7939, 5436:7913, 5436:7940) are not built by Lemonn. |
 | `kyc-19` | Statement received | [5436:7941](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7941) | `kyc-20` |  |
-| `kyc-20` | You’re all set | [5436:7951](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7951) | `deposit-01`, `shell-01` | Replaces the live "KYC already completed" web page. Add money → First deposit. |
+| `kyc-20` | You’re all set | [5436:7951](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7951) | `deposit-01`, `stocks-01` | Replaces the live "KYC already completed" web page. Add money → First deposit. |
 
 ## Spec (README.md)
 
@@ -338,7 +338,7 @@ export const kyc: Flow = {
     { id: 'kyc-18', section: 'fno', name: 'CAMSfinserv (external)', figma: '5436:7938', note: 'Handoff placeholder: CAMSfinserv’s own OTP, account and consent pages (frames 5436:7939, 5436:7913, 5436:7940) are not built by Lemonn.', render: (go) => <FnoHandoff next="kyc-19" onBack={() => go('kyc-17')} /> },
     { id: 'kyc-19', section: 'fno', name: 'Statement received', figma: '5436:7941', render: (go) => <FnoReceived onContinue={() => go('kyc-20')} /> },
 
-    { id: 'kyc-20', section: 'done', name: 'You’re all set', figma: '5436:7951', note: 'Replaces the live "KYC already completed" web page. Add money → First deposit.', render: (go) => <Done onAddMoney={() => go('deposit-01')} onExplore={() => go('shell-01')} /> },
+    { id: 'kyc-20', section: 'done', name: 'You’re all set', figma: '5436:7951', note: 'Replaces the live "KYC already completed" web page. Add money → First deposit.', render: (go) => <Done onAddMoney={() => go('deposit-01')} onExplore={() => go('stocks-01')} /> },
   ],
 }
 ```

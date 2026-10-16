@@ -17,7 +17,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/login · m
 | `login-05` | OTP · incorrect | [5436:7916](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7916) | `login-03`, `login-06`, `login-05` | Not in the live screenshots — the error state the screen needs. |
 | `login-06` | Fingerprint unlock | [5436:7917](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7917) | `login-07` |  |
 | `login-07` | Set PIN | [5436:7918](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7918) | `login-09` | New users set the PIN, then confirm it (the live app only had "Enter your PIN"). |
-| `login-08` | Enter PIN · returning user | [5436:7918](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7918) | `shell-01`, `login-04` | Opening the app again on this phone. Goes straight into the app. |
+| `login-08` | Enter PIN · returning user | [5436:7918](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7918) | `stocks-01`, `login-04` | Opening the app again on this phone. Goes straight into the app. |
 | `login-09` | Add email | [5436:7919](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7919) | `kyc-01` | All three choices lead to Account setup (typing the email isn’t drawn yet). |
 
 ## Spec (README.md)
@@ -262,7 +262,7 @@ export const login: Flow = {
     {
       id: 'login-08', name: 'Enter PIN · returning user', figma: '5436:7918',
       note: 'Opening the app again on this phone. Goes straight into the app.',
-      render: (go) => <EnterPin initial="1" onUnlocked={() => go('shell-01')} onForgot={() => go('login-04')} />,
+      render: (go) => <EnterPin initial="1" onUnlocked={() => go('stocks-01')} onForgot={() => go('login-04')} />,
     },
     {
       id: 'login-09', name: 'Add email', figma: '5436:7919',

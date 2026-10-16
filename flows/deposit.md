@@ -13,7 +13,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/deposit ·
 | `deposit-01` | Add money | [5436:7952](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7952) | `kyc-20`, `deposit-02` | The "+" chips add to the amount. Perks only on the first deposit. |
 | `deposit-02` | Approve in UPI app (external) | [5436:7954](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7954) | `deposit-05` | Handoff placeholder: the UPI app’s own payment sheet is not built by Lemonn. |
 | `deposit-03` | Confirming payment | [5436:7953](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7953) | — |  |
-| `deposit-04` | Money added | [5436:7955](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7955) | `shell-01` | Start investing → the app. |
+| `deposit-04` | Money added | [5436:7955](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7955) | `stocks-01` | Start investing → the Stocks home. |
 | `deposit-05` | Payment failed | — | `deposit-02`, `deposit-01` | Not in the live screenshots — the failure state the flow needs. |
 
 ## Spec (README.md)
@@ -148,7 +148,7 @@ export const deposit: Flow = {
     { id: 'deposit-01', name: 'Add money', figma: '5436:7952', note: 'The "+" chips add to the amount. Perks only on the first deposit.', render: (go) => <AddMoney onBack={() => go('kyc-20')} onPay={() => go('deposit-02')} /> },
     { id: 'deposit-02', name: 'Approve in UPI app (external)', figma: '5436:7954', note: 'Handoff placeholder: the UPI app’s own payment sheet is not built by Lemonn.', render: (go) => <UpiHandoff next="deposit-03" onCancel={() => go('deposit-05')} /> },
     { id: 'deposit-03', name: 'Confirming payment', figma: '5436:7953', render: () => <Processing next="deposit-04" /> },
-    { id: 'deposit-04', name: 'Money added', figma: '5436:7955', note: 'Start investing → the app.', render: (go) => <Success onStart={() => go('shell-01')} /> },
+    { id: 'deposit-04', name: 'Money added', figma: '5436:7955', note: 'Start investing → the Stocks home.', render: (go) => <Success onStart={() => go('stocks-01')} /> },
     { id: 'deposit-05', name: 'Payment failed', figma: '', note: 'Not in the live screenshots — the failure state the flow needs.', render: (go) => <Failed onRetry={() => go('deposit-02')} onChange={() => go('deposit-01')} /> },
   ],
 }

@@ -1,0 +1,100 @@
+{
+  "id": "stocks",
+  "title": "Stocks",
+  "description": "The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "7739bca",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "board": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/play/<screen-id>",
+    "frame": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/frame/<screen-id>"
+  },
+  "screens": [
+    {
+      "id": "stocks-01",
+      "name": "Home",
+      "figma": "",
+      "note": "Top of the page: search, indices, holdings, products, shortcuts.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-02",
+      "name": "Home · top movers & watchlists",
+      "figma": "",
+      "note": "Same page, scrolled.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-03",
+      "name": "Home · top losers",
+      "figma": "",
+      "note": "The \"Top losers\" chip picked.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-04",
+      "name": "Home · Smart Invest",
+      "figma": "",
+      "note": "Same page, scrolled: managed strategies, then the announcement.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-05",
+      "name": "Home · sectors & highlights",
+      "figma": "",
+      "note": "Same page, scrolled.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-06",
+      "name": "Home · trade ideas",
+      "figma": "",
+      "note": "Same page, scrolled: featured ideas, neighbours peek.",
+      "goesTo": [],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-07",
+      "name": "Home · idea baskets & disclosure",
+      "figma": "",
+      "note": "The end of the page.",
+      "goesTo": [],
+      "figmaUrl": ""
+    }
+  ],
+  "files": [
+    "src/flows/stocks/README.md",
+    "src/flows/stocks/components/Discover.tsx",
+    "src/flows/stocks/components/Home.module.css",
+    "src/flows/stocks/components/Ideas.tsx",
+    "src/flows/stocks/components/Invest.tsx",
+    "src/flows/stocks/components/Overview.tsx",
+    "src/flows/stocks/data.ts",
+    "src/flows/stocks/index.tsx",
+    "src/flows/stocks/screens/Home.module.css",
+    "src/flows/stocks/screens/Home.tsx"
+  ],
+  "shared": [
+    "src/shared/data/format.ts",
+    "src/shared/data/market.ts",
+    "src/shared/data/portfolio.ts",
+    "src/shared/ui/MainNav.tsx",
+    "src/shared/ui/Rail.module.css",
+    "src/shared/ui/Rail.tsx",
+    "src/shared/ui/Raised.module.css",
+    "src/shared/ui/Screen.module.css",
+    "src/shared/ui/Screen.tsx",
+    "src/shared/ui/Sheet.module.css",
+    "src/shared/ui/Sheet.tsx",
+    "src/shared/ui/Spot.module.css",
+    "src/shared/ui/Spot.tsx"
+  ]
+}

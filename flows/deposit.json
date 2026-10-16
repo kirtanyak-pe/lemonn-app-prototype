@@ -46,9 +46,9 @@
       "id": "deposit-04",
       "name": "Money added",
       "figma": "5436:7955",
-      "note": "Start investing → the app.",
+      "note": "Start investing → the Stocks home.",
       "goesTo": [
-        "shell-01"
+        "stocks-01"
       ],
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7955"
     },
