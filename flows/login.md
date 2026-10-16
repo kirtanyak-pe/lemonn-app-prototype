@@ -882,6 +882,8 @@ export function Intro({ title, description, art, align = 'start', children }: {
   grid-template-columns: repeat(3, 1fr);
   gap: var(--app-space-key);
   padding: var(--l3-spacing-12) var(--l3-spacing-12) var(--l3-spacing-24);
+  /* On a real phone, clear the home indicator (like the L3 button dock does). */
+  padding-bottom: calc(var(--l3-spacing-24) + env(safe-area-inset-bottom, var(--l3-spacing-00)));
   background: var(--l3-surface-secondary);
 }
 
