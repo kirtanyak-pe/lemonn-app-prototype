@@ -1547,6 +1547,16 @@ export function Rail({ children, label, visible, rows = 1, snap = 'start', class
   min-height: 0;
 }
 
+/* Like a phone: no scrollbar that stays on screen — the page, rails and open sheets still scroll (touch, wheel, keys). */
+.screen,
+.screen * {
+  scrollbar-width: none;
+}
+
+.screen ::-webkit-scrollbar {
+  display: none;
+}
+
 .body {
   display: flex;
   flex-direction: column;

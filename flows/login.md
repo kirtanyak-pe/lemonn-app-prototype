@@ -1068,6 +1068,16 @@ export function useKeypadFocus(value: string, length: number, enabled: boolean) 
   min-height: 0;
 }
 
+/* Like a phone: no scrollbar that stays on screen — the page, rails and open sheets still scroll (touch, wheel, keys). */
+.screen,
+.screen * {
+  scrollbar-width: none;
+}
+
+.screen ::-webkit-scrollbar {
+  display: none;
+}
+
 .body {
   display: flex;
   flex-direction: column;

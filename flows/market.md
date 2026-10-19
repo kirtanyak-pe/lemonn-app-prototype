@@ -72,7 +72,7 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 | List tabs | Tabs | `underline` — hug + scroll (5 tabs) |
 | "Apply filters" | text, Heading/16 | replaced by the applied filters' chips |
 | Applied filter chip | Button | `secondary`, icon right ✕ — removes that filter (L3 has no removable chip: see gaps) |
-| Filter button | Button + Badge | `tertiary` icon-only (`filter_alt`), Badge `dot` when filters are applied |
+| Filter button | Button + Badge | `tertiary` `sm` icon-only (`filter_alt`, 32 × 32), Badge `dot` when filters are applied |
 | Stock card | ListCell | `variant="card"`, `as="button"`; Avatar 40 left; symbol, company; price + PriceChange right |
 | No results | EmptyState | "No stocks match" |
 | Filters sheet | BottomSheet + BottomSheetHeader | heading "Filters", `trailing` = Clear all (ghost) |
@@ -109,6 +109,7 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 
 ### Changelog
 
+- 2026-10-19 — the filter button is Small (32 × 32).
 - 2026-10-19 — the Search action opens the Search flow (`search-24`); back returns to Market.
 - 2026-10-17 — first version: lists (5 tabs, one layout) and the redesigned Filters sheet.
 
@@ -491,7 +492,7 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
           )}
           <span className={styles.filterButton}>
             <Badge dot={applied.length > 0} label={`${applied.length} applied`}>
-              <Button variant="tertiary" iconLeft={<Icon icon={msFilterAlt} />} aria-label="Filters" onClick={() => setOpen(true)} />
+              <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msFilterAlt} />} aria-label="Filters" onClick={() => setOpen(true)} />
             </Badge>
           </span>
         </div>
@@ -881,6 +882,16 @@ export const goToTab = (go: (id: string) => void, section: Section) => {
   display: flex;
   flex: 1;
   min-height: 0;
+}
+
+/* Like a phone: no scrollbar that stays on screen — the page, rails and open sheets still scroll (touch, wheel, keys). */
+.screen,
+.screen * {
+  scrollbar-width: none;
+}
+
+.screen ::-webkit-scrollbar {
+  display: none;
 }
 
 .body {
