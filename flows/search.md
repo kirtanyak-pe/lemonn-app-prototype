@@ -113,7 +113,7 @@ any screen ─back─▶ stocks-01
 | Watchlist match | ListCell ("L3: list cell", card, tappable, small) | `variant="card" size="sm" as="button"`, Avatar 32 rounded, label + "n stocks", chevron; 12 apart |
 | Result row | ListCell (plain, small, breathable) + Avatar + PriceChange | `size="sm" density="breathable" as="button"` (70 tall); right: price (Label/12) over `PriceChange size="sm" arrow`; 1px `border/light` line under each row, 16 in |
 | Bookmark | Button (Ghost, icon only) + L3 custom icons | `variant="ghost"` (lg, 24 icon): `watchlist_add` (outline bookmark with +) / `watchlist_added` (filled, ✓ cut out) when saved — Icons library → Custom icons; 16 from the edge |
-| F&O / MF tiles | Card (clickable) | no shadow (1px `border/light` only); 2 columns, 12 apart; label Label/12 (MF: `content/tertiary`), 10 / 12 padding |
+| F&O / MF tiles | Card (clickable) | radius 8, no shadow (1px `border/light` only); 2 columns, 12 apart; label Label/12 (MF: `content/tertiary`), 10 / 12 padding |
 | Sort | Select ("L3: Select switcher") | `size="sm" icon="swap"`: Price ↕ / Volume, 3Y Returns ↕ |
 | Filter | Button | `variant="ghost" size="sm"`, `filter_list` on the right |
 | Indices / Stocks pill | Tab (action pill) | `action appearance="pill"`, ↕ icon right — switches the underlyings |
@@ -144,7 +144,7 @@ any screen ─back─▶ stocks-01
   discontinued version).
 - **Colours:** Figma's `content/secondary` at 60% opacity (labels, chip names) is `content/tertiary` (the same 36%).
   Chips and tiles are L3 clickable cards but, by the designer's call, **without the shadow** — only the 1px
-  `border/light` outline (chips keep Figma's **8 radius**, tiles L3's 12). Watchlist rows keep L3's clickable look
+  `border/light` outline — and with Figma's **8 radius** (L3 cards are 12). Watchlist rows keep L3's clickable look
   (`surface/primary` + `border/light` + `elevation-low`).
 - **Empty state:** the L3 default illustration (a document with ✕) instead of the old magnifier; Clear Search is a
   Large button (app rule: Large buttons everywhere), Figma has Small.
@@ -166,6 +166,7 @@ any screen ─back─▶ stocks-01
 
 ### Changelog
 
+- 2026-10-19 — tiles: 8 radius, like the chips.
 - 2026-10-19 — bookmark uses the design's icons: L3 custom icons watchlist_add / watchlist_added (Icons 1.4.0).
 - 2026-10-19 — chips: 8 radius, no shadow; tiles: no shadow; the focused search field no longer shows a line under the
   bar (L3 Actionbar 1.5.1).
@@ -488,9 +489,10 @@ export function SearchChips({ title, rows, onPick }: { title: string; rows: Sear
   flex: 1;
 }
 
-/* Designer's call (2026-10-19): no shadow — only the 1px border/light outline, not L3's clickable-card lift.
-   Doubled class so it wins over the Card's own [data-interactive] rule. */
+/* Designer's call (2026-10-19), as in Figma's "option" tiles: 8 radius and no shadow — only the 1px border/light
+   outline, not L3's clickable-card lift. Doubled class so it wins over the Card's own [data-interactive] rule. */
 .tile.tile {
+  border-radius: var(--l3-radius-08);
   box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
