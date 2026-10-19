@@ -1,6 +1,6 @@
 # Flow: Search (`search`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8f81c75` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `84dd189` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Search stocks, F&O contracts, mutual funds and IPOs; Smart Options & Futures lists; add to watchlist.
 
@@ -109,11 +109,11 @@ any screen ─back─▶ stocks-01
 | Tabs under the bar | Tabs ("L3: Tabs group", Flat, isSmall) | `size="sm"`, labels "Stocks (8)" once there's a query; fill the row |
 | Group labels | — (text) | Label/12, `content/tertiary`, 16 tall, 16 from the edges; 24 between groups |
 | View All | Button ("L3: Button" Ghost Small) | `variant="ghost" size="sm"`, chevron right |
-| Recent / popular chip | Card (clickable) + Avatar | `padding="none"`; inside: 8 / 12 / 8 / 8 padding, Avatar 24 rounded (initials), Label/12 `content/tertiary`; max 200 wide; rows scroll sideways |
+| Recent / popular chip | Card (clickable) + Avatar | `padding="none"`, radius 8, no shadow (1px `border/light` only); inside: 8 / 12 / 8 / 8 padding, Avatar 24 rounded (initials), Label/12 `content/tertiary`; max 200 wide; rows scroll sideways |
 | Watchlist match | ListCell ("L3: list cell", card, tappable, small) | `variant="card" size="sm" as="button"`, Avatar 32 rounded, label + "n stocks", chevron; 12 apart |
 | Result row | ListCell (plain, small, breathable) + Avatar + PriceChange | `size="sm" density="breathable" as="button"` (70 tall); right: price (Label/12) over `PriceChange size="sm" arrow`; 1px `border/light` line under each row, 16 in |
 | Bookmark | Button (Ghost, icon only) | `variant="ghost"` (lg, 24 icon): `bookmark` / `bookmark_added` (filled) when saved; 16 from the edge |
-| F&O / MF tiles | Card (clickable) | 2 columns, 12 apart; label Label/12 (MF: `content/tertiary`), 10 / 12 padding |
+| F&O / MF tiles | Card (clickable) | no shadow (1px `border/light` only); 2 columns, 12 apart; label Label/12 (MF: `content/tertiary`), 10 / 12 padding |
 | Sort | Select ("L3: Select switcher") | `size="sm" icon="swap"`: Price ↕ / Volume, 3Y Returns ↕ |
 | Filter | Button | `variant="ghost" size="sm"`, `filter_list` on the right |
 | Indices / Stocks pill | Tab (action pill) | `action appearance="pill"`, ↕ icon right — switches the underlyings |
@@ -143,8 +143,9 @@ any screen ─back─▶ stocks-01
   arrow is PriceChange, D2 icons are Material Symbols, the bottom sheet is the current L3 sheet (Figma used the
   discontinued version).
 - **Colours:** Figma's `content/secondary` at 60% opacity (labels, chip names) is `content/tertiary` (the same 36%).
-  Tappable cards (chips, tiles, watchlist rows) get L3's clickable look: `surface/primary` + `border/light` +
-  `elevation-low`, 12 radius (Figma: 8 on chips and tiles).
+  Chips and tiles are L3 clickable cards but, by the designer's call, **without the shadow** — only the 1px
+  `border/light` outline (chips keep Figma's **8 radius**, tiles L3's 12). Watchlist rows keep L3's clickable look
+  (`surface/primary` + `border/light` + `elevation-low`).
 - **Empty state:** the L3 default illustration (a document with ✕) instead of the old magnifier; Clear Search is a
   Large button (app rule: Large buttons everywhere), Figma has Small.
 - **Watchlist row gap:** L3's small list cell keeps 12 between the logo and the text (Figma result rows have 16).
@@ -165,6 +166,8 @@ any screen ─back─▶ stocks-01
 
 ### Changelog
 
+- 2026-10-19 — chips: 8 radius, no shadow; tiles: no shadow; the focused search field no longer shows a line under the
+  bar (L3 Actionbar 1.5.1).
 - 2026-10-19 — first version (23 screens) from the final Figma layouts.
 
 
@@ -402,6 +405,13 @@ function Trailing({ item, showVolume }: { item: SearchResult; showVolume?: boole
   max-width: var(--app-size-search-chip-max);
 }
 
+/* Designer's call (2026-10-19), as in Figma's "history card": 8 radius and no shadow — only the 1px border/light
+   outline, not L3's clickable-card lift. Doubled class so it wins over the Card's own [data-interactive] rule. */
+.chip.chip {
+  border-radius: var(--l3-radius-08);
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
+}
+
 .body {
   display: flex;
   align-items: center;
@@ -474,6 +484,12 @@ export function SearchChips({ title, rows, onPick }: { title: string; rows: Sear
 
 .tile {
   flex: 1;
+}
+
+/* Designer's call (2026-10-19): no shadow — only the 1px border/light outline, not L3's clickable-card lift.
+   Doubled class so it wins over the Card's own [data-interactive] rule. */
+.tile.tile {
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
 /* Figma "option": 10 above and below, 12 at the sides — 36 tall with one line. */
