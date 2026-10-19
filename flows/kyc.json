@@ -4,7 +4,7 @@
   "description": "KYC after login: PAN, details and declarations, nominee, bank account and F&O activation.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "fb72770",
+    "commit": "8f81c75",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -262,8 +262,6 @@
     "src/shared/ui/Sheet.module.css",
     "src/shared/ui/Sheet.tsx",
     "src/shared/ui/Spot.module.css",
-    "src/shared/ui/Spot.tsx",
-    "src/shared/ui/Steps.module.css",
-    "src/shared/ui/Steps.tsx"
+    "src/shared/ui/Spot.tsx"
   ]
 }

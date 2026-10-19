@@ -1,6 +1,6 @@
 # Flow: Account setup (`kyc`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `fb72770` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8f81c75` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 KYC after login: PAN, details and declarations, nominee, bank account and F&O activation.
 
@@ -108,7 +108,7 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 | Top bar | Actionbar | title + `onBack`. kyc-01 has none — nothing to put in it, so the content starts 24 below the status bar |
 | Stage progress under the bar | ProgressBar (`components/StageBar`) | "Step 1 of 3 · Verify your identity", value by stage |
 | Headlines | `Intro` (src/shared/ui) | Heading/24 title + Description/14 secondary; `align="center"` on result screens |
-| Stage list, fetch list, progress | `Steps` (src/shared/ui) | done ✓ / current / loading / to do, with a connector line |
+| Stage list, fetch list, progress | L3 `Steps` | done ✓ / current / loading / to do, with a connector line |
 | Illustration | **Illustration slot** (`Spot`, src/shared/ui) | md 64 in sheet headers and kyc-17, lg 96 + halo on result screens |
 | Sheets | BottomSheet + BottomSheetHeader | `size="lg"` + `icon` for confirmations; small header for details / date |
 | Sheet and screen buttons | ButtonGroup ("L3: Button Dock") | vertical: primary over secondary; horizontal for Edit / Done, Skip / Save, Add another / Done |
@@ -164,12 +164,13 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 ### L3 gaps
 
 - **Illustrations:** L3 has none for onboarding / results; `Spot` slots stand in (marked `data-illustration-slot`).
-- **Steps / timeline:** L3 has no vertical step list; `Steps` (src/shared/ui) is built from L3 tokens and icons.
 - **Stage progress:** made from ProgressBar + a label (`components/StageBar`); an L3 "stepper header" would replace it.
 
 ### Changelog
 
 - 2026-10-16 — first version (20 screens).
+- 2026-10-19 — the step lists use L3 `Steps` (1.0.0); the local `shared/ui/Steps` is gone. Current is now a green dot
+  with a light halo, to do a 16 ring, and done / current / loading rows have 24 below them.
 
 
 ## Source — this flow
@@ -502,7 +503,7 @@ import { user } from '../../../shared/data/user'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
-import { Steps } from '../../../shared/ui/Steps'
+import { Steps } from '@l3/components/Steps'
 import styles from './Kyc.module.css'
 
 /** kyc-20 · Account ready. Stocks and mutual funds work now; F&O follows its review. Next: add money (or look around). */
@@ -547,7 +548,7 @@ import { useAutoAdvance } from '../../../shared/prototype'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
-import { Steps, type StepState } from '../../../shared/ui/Steps'
+import { Steps, type StepState } from '@l3/components/Steps'
 import { fetchSteps } from '../data'
 import styles from './Kyc.module.css'
 
@@ -856,7 +857,7 @@ import { Icon } from '@l3/components/Icon'
 import { msCheckCircle } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
-import { Steps } from '../../../shared/ui/Steps'
+import { Steps } from '@l3/components/Steps'
 import { stages } from '../data'
 import styles from './Kyc.module.css'
 
@@ -896,7 +897,7 @@ import { useAutoAdvance } from '../../../shared/prototype'
 import { inr, mask } from '../../../shared/data/format'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { Spot } from '../../../shared/ui/Spot'
-import { Steps } from '../../../shared/ui/Steps'
+import { Steps } from '@l3/components/Steps'
 import { foundBank, PENNY_DROP } from '../data'
 import styles from '../screens/Kyc.module.css'
 
@@ -1649,152 +1650,6 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
     <span className={styles.spot} data-tone={tone} data-size={size} aria-hidden="true" data-illustration-slot="">
       <Icon icon={icon} className={styles.glyph} />
     </span>
-  )
-}
-```
-
-### `src/shared/ui/Steps.module.css`
-
-```css
-/*
- * A vertical progress list: done = solid green ✓ · current = green ring with a halo (or a loader while it runs) ·
- * to do = outline ring. The line to the next step is green after a done step, a hairline otherwise.
- */
-.steps {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.step {
-  position: relative;
-  display: grid;
-  grid-template-columns: var(--l3-icon-size-24) 1fr;
-  column-gap: var(--l3-spacing-12);
-  padding-bottom: var(--l3-spacing-16);
-}
-
-.step:last-child {
-  padding-bottom: 0;
-}
-
-/* The line to the next step, centred under the marker. */
-.step:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  top: var(--l3-size-28);
-  bottom: var(--l3-spacing-04);
-  left: calc(var(--l3-icon-size-24) / 2);
-  border-left: 1px solid var(--l3-border-light);
-}
-
-.step[data-state='done']:not(:last-child)::before {
-  border-left: var(--l3-spacing-02) solid var(--l3-border-accent-success-default);
-  transform: translateX(-50%);
-}
-
-.marker {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--l3-icon-size-24);
-  height: var(--l3-icon-size-24);
-  color: var(--l3-content-tertiary);
-}
-
-/* The marker shape (20 in the 24 box). Rings are 2 wide, like the line after a done step. */
-.dot {
-  box-sizing: border-box;
-  display: grid;
-  place-items: center;
-  width: var(--l3-icon-size-20);
-  height: var(--l3-icon-size-20);
-  border-radius: var(--l3-radius-full);
-}
-
-/* To do: the outline ring. */
-.step[data-state='todo'] .dot {
-  border: var(--l3-spacing-02) solid var(--l3-border-intense);
-}
-
-/* Done: a solid green disc, white tick (text on a solid success fill is static/white). */
-.step[data-state='done'] .dot {
-  background: var(--l3-surface-accent-success-default);
-  color: var(--l3-static-white);
-}
-
-/* Current: a green ring on a light green fill, with a soft halo — "you are here", not a selected option. */
-.step[data-state='current'] .dot {
-  border: var(--l3-spacing-02) solid var(--l3-border-accent-success-default);
-  background: var(--l3-surface-accent-success-light);
-  box-shadow: 0 0 0 var(--l3-spacing-04) var(--l3-surface-accent-success-light);
-}
-
-.step[data-state='loading'] .marker {
-  color: var(--l3-content-primary);
-}
-
-.text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-02);
-  padding-top: var(--l3-spacing-02);
-}
-
-.label {
-  font: var(--l3-text-label-14);
-  color: var(--l3-content-secondary);
-}
-
-.step:is([data-state='current'], [data-state='loading'], [data-state='done']) .label {
-  color: var(--l3-content-primary);
-}
-
-.description {
-  font: var(--l3-text-description-12);
-  color: var(--l3-content-secondary);
-}
-```
-
-### `src/shared/ui/Steps.tsx`
-
-```tsx
-import type { ReactNode } from 'react'
-import { Icon } from '@l3/components/Icon'
-import { Loader } from '@l3/components/Loader'
-import { msCheck } from '@l3/icons/material'
-import styles from './Steps.module.css'
-
-export type StepState = 'done' | 'current' | 'loading' | 'todo'
-export type Step = { label: string; description?: ReactNode; state: StepState }
-
-/** Done: a solid green disc with a tick · current: a green ring with a soft halo · to do: a plain outline ring. */
-const marker = (state: StepState) =>
-  state === 'loading' ? <Loader size="sm" label={null} /> : <span className={styles.dot}>{state === 'done' && <Icon icon={msCheck} size={16} />}</span>
-
-/**
- * Progress through a few steps (KYC stages, fetching details, bank → F&O), read as progress — not as options: green
- * for what's done and where you are, a plain ring for what's next, and the line between them green as far as you've
- * got. Not tappable.
- */
-export function Steps({ steps, label }: { steps: Step[]; label: string }) {
-  return (
-    <ol className={styles.steps} aria-label={label}>
-      {steps.map((s) => (
-        <li key={s.label} className={styles.step} data-state={s.state} aria-current={s.state === 'current' || s.state === 'loading' ? 'step' : undefined}>
-          <span className={styles.marker}>{marker(s.state)}</span>
-          <span className={styles.text}>
-            <span className={styles.label}>
-              {s.label}
-              <span className="sr-only">{s.state === 'done' ? ' — done' : s.state === 'loading' ? ' — in progress' : s.state === 'todo' ? ' — to do' : ''}</span>
-            </span>
-            {s.description && <span className={styles.description}>{s.description}</span>}
-          </span>
-        </li>
-      ))}
-    </ol>
   )
 }
 ```
