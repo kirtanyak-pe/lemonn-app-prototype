@@ -11,6 +11,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/search · 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
 | `search-01` | Stocks · before typing | [4912:13308](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13308) | `stocks-01`, `search-18` | From the search field on Stocks home. Recent (last 5) and popular searches as chips, max 200 wide. Type to search; the tabs switch in place. |
+| `search-24` | Stocks · before typing (from Market) | [4912:13308](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13308) | `market-01`, `search-18` | Opened from the Search action on the Market tab: the same screen as search-01, but back returns to Market. |
 | `search-02` | Stocks · results | [4912:13483](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13483) | `stocks-01`, `search-18` | "Bank": 2 matching watchlists, then 8 stocks. A bookmark opens Add to watchlist; ✕ clears. |
 | `search-03` | Stocks · only a watchlist matches | [4912:13671](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13671) | `stocks-01` | "Penny": the watchlist, and "Stocks (0)" with nothing under it. |
 | `search-04` | Stocks · no matching watchlist | [4912:13587](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13587) | `stocks-01`, `search-18` | Same results without the watchlist group. |
@@ -45,7 +46,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/search · 
   handoff file) — **final layouts** in the old D2 system. This flow keeps every layout as it is and swaps the parts for
   L3 components, tokens and text styles. Figma frames are dark; the code works in every L3 theme.
 - **Status:** ✅ · last updated 2026-10-19
-- **Entry:** the search field on Stocks home (`stocks-01`) · **Exit:** back → Stocks home; a result opens its page
+- **Entry:** the search field on Stocks home (`stocks-01`), or the Search action on Market (`market-01` → `search-24`) ·
+  **Exit:** back → where it was opened from (Stocks home or Market); a result opens its page
   (stock / contract / fund / IPO page — not in this flow)
 
 ### Screens
@@ -53,6 +55,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/search · 
 | Id | Screen | Figma | What it shows / when |
 |---|---|---|---|
 | `search-01` | Stocks · before typing | 4912:13308 | Recent searches (last 5) and popular searches as chips; keyboard up, field focused |
+| `search-24` | Stocks · before typing (from Market) | 4912:13308 | Same as `search-01`, opened from Market's Search action; back returns to Market |
 | `search-02` | Stocks · results | 4912:13483 | "Bank": Your watchlist (2), then Stocks (8) with price, change and a bookmark each |
 | `search-03` | Stocks · only a watchlist matches | 4912:13671 | "Penny": one watchlist, "Stocks (0)" |
 | `search-04` | Stocks · no matching watchlist | 4912:13587 | "Bank" without the watchlist group |
@@ -81,11 +84,12 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/search · 
 ### Navigation
 
 ```
+market Search action ─▶ search-24 (= search-01; back ─▶ market-01)
 stocks-01 search field ─▶ search-01 ─type─▶ results in place (search-02 …) · tabs switch in place · ✕ / Clear Search ─▶ before typing
 search-06 tile / View All ─▶ search-09 ─back─▶ search-06        (↕ pill, list pills and Price ↕ change the list in place)
 search-02 bookmark ─▶ search-18 ─tick─▶ search-19 ─Save─▶ search-20 (toast) ─OK / auto─▶ search-21
                       search-18 + Create ─▶ search-22 ─Create─▶ search-20 · no watchlist yet: bookmark ─▶ search-22
-any screen ─back─▶ stocks-01
+any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 ```
 
 ### Data
@@ -166,6 +170,7 @@ any screen ─back─▶ stocks-01
 
 ### Changelog
 
+- 2026-10-19 — opened from Market too (`search-24`, back returns to Market).
 - 2026-10-19 — Clear Search back to Small (empty-state action).
 - 2026-10-19 — tiles: 8 radius, like the chips.
 - 2026-10-19 — bookmark uses the design's icons: L3 custom icons watchlist_add / watchlist_added (Icons 1.4.0).
@@ -923,6 +928,7 @@ export const search: Flow = {
   screens: [
     // ---- Stocks
     { id: 'search-01', section: 'stocks', name: 'Stocks · before typing', figma: '4912:13308', note: 'From the search field on Stocks home. Recent (last 5) and popular searches as chips, max 200 wide. Type to search; the tabs switch in place.', render: (go) => <Search tab="stocks" onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
+    { id: 'search-24', section: 'stocks', name: 'Stocks · before typing (from Market)', figma: '4912:13308', note: 'Opened from the Search action on the Market tab: the same screen as search-01, but back returns to Market.', render: (go) => <Search tab="stocks" onBack={() => go('market-01')} onBookmark={() => go('search-18')} /> },
     { id: 'search-02', section: 'stocks', name: 'Stocks · results', figma: '4912:13483', note: '"Bank": 2 matching watchlists, then 8 stocks. A bookmark opens Add to watchlist; ✕ clears.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
     { id: 'search-03', section: 'stocks', name: 'Stocks · only a watchlist matches', figma: '4912:13671', note: '"Penny": the watchlist, and "Stocks (0)" with nothing under it.', render: (go) => <Search results={penny} onBack={() => go('stocks-01')} /> },
     { id: 'search-04', section: 'stocks', name: 'Stocks · no matching watchlist', figma: '4912:13587', note: 'Same results without the watchlist group.', render: (go) => <Search results={bankNoWatchlist} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },

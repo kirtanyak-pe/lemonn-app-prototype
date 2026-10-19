@@ -18,7 +18,9 @@
       "name": "Market · All",
       "figma": "",
       "note": "The filter bar shows \"Apply filters\" until something is applied.",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -26,7 +28,9 @@
       "name": "Market · Top gainers",
       "figma": "",
       "note": "Same layout — only the list changes.",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -34,7 +38,9 @@
       "name": "Market · Top losers",
       "figma": "",
       "note": "",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -42,7 +48,9 @@
       "name": "Market · Under ₹100",
       "figma": "",
       "note": "",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -50,7 +58,9 @@
       "name": "Filters",
       "figma": "",
       "note": "Side tabs on the left, every group in one scroll on the right.",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -58,7 +68,9 @@
       "name": "Filters · indices",
       "figma": "",
       "note": "Scrolled to Indices — Nifty 500 picked; its side tab shows a dot.",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -66,7 +78,9 @@
       "name": "Filters · sectors & sort",
       "figma": "",
       "note": "",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     },
     {
@@ -74,7 +88,9 @@
       "name": "Market · filters applied",
       "figma": "",
       "note": "Applied filters as removable chips; the filter button gets a dot.",
-      "goesTo": [],
+      "goesTo": [
+        "search-24"
+      ],
       "figmaUrl": ""
     }
   ],

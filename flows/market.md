@@ -10,14 +10,14 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/market · 
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `market-01` | Market · All | — | — | The filter bar shows "Apply filters" until something is applied. |
-| `market-02` | Market · Top gainers | — | — | Same layout — only the list changes. |
-| `market-03` | Market · Top losers | — | — |  |
-| `market-04` | Market · Under ₹100 | — | — |  |
-| `market-05` | Filters | — | — | Side tabs on the left, every group in one scroll on the right. |
-| `market-06` | Filters · indices | — | — | Scrolled to Indices — Nifty 500 picked; its side tab shows a dot. |
-| `market-07` | Filters · sectors & sort | — | — |  |
-| `market-08` | Market · filters applied | — | — | Applied filters as removable chips; the filter button gets a dot. |
+| `market-01` | Market · All | — | `search-24` | The filter bar shows "Apply filters" until something is applied. |
+| `market-02` | Market · Top gainers | — | `search-24` | Same layout — only the list changes. |
+| `market-03` | Market · Top losers | — | `search-24` |  |
+| `market-04` | Market · Under ₹100 | — | `search-24` |  |
+| `market-05` | Filters | — | `search-24` | Side tabs on the left, every group in one scroll on the right. |
+| `market-06` | Filters · indices | — | `search-24` | Scrolled to Indices — Nifty 500 picked; its side tab shows a dot. |
+| `market-07` | Filters · sectors & sort | — | `search-24` |  |
+| `market-08` | Market · filters applied | — | `search-24` | Applied filters as removable chips; the filter button gets a dot. |
 
 ## Spec (README.md)
 
@@ -51,6 +51,7 @@ market-0x ─filter button─▶ Filters (sheet) ─Show n stocks─▶ the list
                               └Cancel / backdrop / drag down─▶ unchanged
 chip ✕ ─▶ that filter removed · list tab ─▶ same screen, another list (filters stay)
 navbar Stocks / Market ─▶ the other tab (instant — a tab switch, no push)
+Search (top bar) ─▶ search-24 (Search flow: Stocks tab, keyboard up) ─back─▶ market-01
 ```
 
 ### Data
@@ -108,6 +109,7 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 
 ### Changelog
 
+- 2026-10-19 — the Search action opens the Search flow (`search-24`); back returns to Market.
 - 2026-10-17 — first version: lists (5 tabs, one layout) and the redesigned Filters sheet.
 
 
@@ -335,14 +337,14 @@ export const market: Flow = {
     { id: 'filters', title: 'Filters' },
   ],
   screens: [
-    { id: 'market-01', section: 'lists', name: 'Market · All', figma: '', note: 'The filter bar shows "Apply filters" until something is applied.', tab: true, render: (go) => <Market onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-02', section: 'lists', name: 'Market · Top gainers', figma: '', note: 'Same layout — only the list changes.', tab: true, render: (go) => <Market tab="gainers" onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-03', section: 'lists', name: 'Market · Top losers', figma: '', tab: true, render: (go) => <Market tab="losers" onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-04', section: 'lists', name: 'Market · Under ₹100', figma: '', tab: true, render: (go) => <Market tab="under-100" onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-05', section: 'filters', name: 'Filters', figma: '', note: 'Side tabs on the left, every group in one scroll on the right.', tab: true, render: (go) => <Market sheet onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-06', section: 'filters', name: 'Filters · indices', figma: '', note: 'Scrolled to Indices — Nifty 500 picked; its side tab shows a dot.', tab: true, render: (go) => <Market sheet sheetSection="index" filters={{ index: 'nifty-500' }} onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-07', section: 'filters', name: 'Filters · sectors & sort', figma: '', tab: true, render: (go) => <Market sheet sheetSection="sector" filters={{ index: 'nifty-500', sort: 'price-desc' }} onTab={(t) => goToTab(go, t)} /> },
-    { id: 'market-08', section: 'filters', name: 'Market · filters applied', figma: '', note: 'Applied filters as removable chips; the filter button gets a dot.', tab: true, render: (go) => <Market filters={{ index: 'nifty-500', sort: 'price-desc' }} onTab={(t) => goToTab(go, t)} /> },
+    { id: 'market-01', section: 'lists', name: 'Market · All', figma: '', note: 'The filter bar shows "Apply filters" until something is applied.', tab: true, render: (go) => <Market onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-02', section: 'lists', name: 'Market · Top gainers', figma: '', note: 'Same layout — only the list changes.', tab: true, render: (go) => <Market tab="gainers" onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-03', section: 'lists', name: 'Market · Top losers', figma: '', tab: true, render: (go) => <Market tab="losers" onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-04', section: 'lists', name: 'Market · Under ₹100', figma: '', tab: true, render: (go) => <Market tab="under-100" onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-05', section: 'filters', name: 'Filters', figma: '', note: 'Side tabs on the left, every group in one scroll on the right.', tab: true, render: (go) => <Market sheet onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-06', section: 'filters', name: 'Filters · indices', figma: '', note: 'Scrolled to Indices — Nifty 500 picked; its side tab shows a dot.', tab: true, render: (go) => <Market sheet sheetSection="index" filters={{ index: 'nifty-500' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-07', section: 'filters', name: 'Filters · sectors & sort', figma: '', tab: true, render: (go) => <Market sheet sheetSection="sector" filters={{ index: 'nifty-500', sort: 'price-desc' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-08', section: 'filters', name: 'Market · filters applied', figma: '', note: 'Applied filters as removable chips; the filter button gets a dot.', tab: true, render: (go) => <Market filters={{ index: 'nifty-500', sort: 'price-desc' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
   ],
 }
 ```
@@ -430,6 +432,8 @@ type Props = {
   sheet?: boolean
   sheetSection?: FilterGroupId
   onTab?: (section: Section) => void
+  /** The Search action in the top bar: opens the Search screen (search-24 — its back returns here). */
+  onSearch?: () => void
 }
 
 /**
@@ -437,7 +441,7 @@ type Props = {
  * same layout; only the stocks change. Above the list: the applied filters as removable chips (or "Apply filters")
  * and the filter button, with a dot when something is applied.
  */
-export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, sheet = false, sheetSection, onTab }: Props) {
+export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, sheet = false, sheetSection, onTab, onSearch }: Props) {
   const [tab, setTab] = useState<MarketTab>(initialTab)
   const [filters, setFilters] = useState<Filters>(initialFilters)
   const [open, setOpen] = useState(sheet)
@@ -454,7 +458,7 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
           title="Market"
           actions={
             <>
-              <ActionbarAction icon={msSearch} label="Search" onClick={() => {}} />
+              <ActionbarAction icon={msSearch} label="Search" onClick={() => onSearch?.()} />
               <ActionbarAction icon={msAccountBalanceWallet} label="Wallet" onClick={() => {}} />
             </>
           }

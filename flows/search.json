@@ -25,6 +25,17 @@
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13308"
     },
     {
+      "id": "search-24",
+      "name": "Stocks · before typing (from Market)",
+      "figma": "4912:13308",
+      "note": "Opened from the Search action on the Market tab: the same screen as search-01, but back returns to Market.",
+      "goesTo": [
+        "market-01",
+        "search-18"
+      ],
+      "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13308"
+    },
+    {
       "id": "search-02",
       "name": "Stocks · results",
       "figma": "4912:13483",
