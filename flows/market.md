@@ -14,10 +14,10 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/market · 
 | `market-02` | Market · Top gainers | — | `search-24` | Same layout — only the list changes. |
 | `market-03` | Market · Top losers | — | `search-24` |  |
 | `market-04` | Market · Under ₹100 | — | `search-24` |  |
-| `market-05` | Filters | — | `search-24` | Side tabs on the left, every group in one scroll on the right. |
-| `market-06` | Filters · indices | — | `search-24` | Scrolled to Indices — Nifty 500 picked; its side tab shows a dot. |
-| `market-07` | Filters · sectors & sort | — | `search-24` |  |
-| `market-08` | Market · filters applied | — | `search-24` | Applied filters as removable chips; the filter button gets a dot. |
+| `market-05` | Filters | — | `search-24` | Side tabs on the left (grey rail, the open one connected to the pane); only the open group on the right. Opens on Sort by. |
+| `market-06` | Filters · indices | — | `search-24` | Indices open — Nifty 500 picked (one choice); its side tab shows 1. Each option says how many stocks it gives. |
+| `market-07` | Filters · sectors (several) | — | `search-24` | Sectors open — Banking and IT picked (any number); sort and index picked too. Sectors with no stocks in Nifty 500 are off. |
+| `market-08` | Market · filters applied | — | `search-24` | One removable chip per pick; the filter button gets a dot. |
 
 ## Spec (README.md)
 
@@ -39,10 +39,10 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/market · 
 | `market-02` | Market · Top gainers | Same layout — only the list (biggest risers first) |
 | `market-03` | Market · Top losers | Same layout — biggest fallers first |
 | `market-04` | Market · Under ₹100 | Same layout — stocks under ₹100 (Under ₹500 is the fifth tab) |
-| `market-05` | Filters | The sheet: side tabs + all groups in one scroll; Cancel · Show n stocks |
-| `market-06` | Filters · indices | Scrolled to Indices, Nifty 500 picked (its side tab has a dot) |
-| `market-07` | Filters · sectors & sort | Scrolled further; sort picked too |
-| `market-08` | Market · filters applied | Applied filters as removable chips; the filter button has a dot |
+| `market-05` | Filters | The sheet: side tabs (grey rail) + only the open group (Sort by); Clear all · Show n stocks |
+| `market-06` | Filters · indices | Indices open, Nifty 500 picked (one choice); its side tab shows 1; stock counts per option |
+| `market-07` | Filters · sectors (several) | Sectors open, Banking + IT picked (any number); sectors with no stocks are off |
+| `market-08` | Market · filters applied | One removable chip per pick; the filter button has a dot |
 
 ### Navigation
 
@@ -60,9 +60,13 @@ Search (top bar) ─▶ search-24 (Search flow: Stocks tab, keyboard up) ─back
 mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's in. Every list comes from it:
 - Tabs (`listFor`): All · Top gainers (rising, biggest first) · Top losers (falling, biggest first) · Under ₹100 ·
   Under ₹500.
-- Filters (`filterGroups`): Quick filters · Indices · Market cap · Sectors · Sort by — one choice per group; groups
-  combine (all must match); sort orders the result (`applyFilters`). Tickers and prices are samples from the live app.
-- API: the list for a tab + filter params (index, cap, sector, quick filter, sort) → stocks; live prices on the list.
+- Filters (`filterGroups`): Sort by · Quick filters · Indices · Market cap · Sectors. Sort and Indices take one choice
+  (`select: 'one'`); Quick filters, Market cap and Sectors take any number (`select: 'any'` — a stock matches the group
+  if it matches any choice). Groups combine (all must match); sort orders the result (`applyFilters`). `Filters` holds
+  one id (sort, index) or a list (quick, cap, sector); `pickedIn`, `withPicks`, `picks` read and change it. Tickers and
+  prices are samples from the live app.
+- API: the list for a tab + filter params (sort, index, quick[], cap[], sector[]) → stocks + a count per option (the
+  facet counts the sheet shows); live prices on the list.
 
 ### Components (L3 → any platform)
 
@@ -71,50 +75,187 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 | Top bar | Actionbar | `title="Market"` (L1, Heading/18), actions Search + Wallet, list tabs in `bottom` (sticky) |
 | List tabs | Tabs | `underline` — hug + scroll (5 tabs) |
 | "Apply filters" | text, Heading/16 | replaced by the applied filters' chips |
-| Applied filter chip | Button | `secondary`, icon right ✕ — removes that filter (L3 has no removable chip: see gaps) |
+| Applied filter chip | Button | `secondary`, icon right ✕ — one per pick, removes just that pick (L3 has no removable chip: see gaps) |
 | Filter button | Button + Badge | `tertiary` `sm` icon-only (`filter_alt`, 32 × 32), Badge `dot` when filters are applied |
 | Stock card | ListCell | `variant="card"`, `as="button"`; Avatar 40 left; symbol, company; price + PriceChange right |
 | No results | EmptyState | "No stocks match" |
-| Filters sheet | BottomSheet + BottomSheetHeader | heading "Filters", `trailing` = Clear all (ghost) |
-| Side tabs | ListCell | plain, `size="sm"`, `as="button"`, `selected` for the group in view; Badge dot when picked |
-| Group titles | SectionHeader | `headingLevel={3}` |
-| Options | ListCell + Radio | `as="label"`, `size="sm"`, `multiline` (market cap shows its range) |
-| Sheet buttons | ButtonGroup | horizontal: Cancel (secondary) · "Show n stocks" (primary — never the brand colour) |
+| Filters sheet | BottomSheet + BottomSheetHeader | heading "Filters" (no trailing action) |
+| Side tabs | local `SideTabs` (L3 gap) + Badge | grey rail (`surface/secondary`); open tab `surface/primary` + the L3 tab indicator (`surface/inverted`) on its left edge; Label/14 (same weight selected or not); Badge `count` `neutral` = picks in that group; ↑ ↓ Home End |
+| "Pick one" / "Pick any" | text, Description/12 | top of the pane: says radio or checkbox |
+| Options | ListCell + Radio / Checkbox | `as="label"`, `size="sm"`, `multiline`; description = range (market cap) · "n stocks" (what it gives); a 0-stock option's control is `disabled` |
+| Sheet buttons | ButtonGroup | horizontal: Clear all (secondary, off when nothing is picked) · "Show n stocks" (primary — never the brand colour) |
 | Main navbar | BottomNavbar (`MainNav`) | `value="market"` |
 
 ### Rules & behaviour
 
 - All list tabs share one layout; switching a tab keeps the filters and the filter bar.
-- Filters: one choice per group (radio); tapping the picked option again doesn't clear it — Clear all does.
-- **The sheet:** side tab tap → the pane scrolls to that group; scrolling the pane → the side tab follows the group at
-  the top. A side tab shows a dot when its group has a choice. The last group can scroll to the top too.
-- "Show n stocks" counts what the choice would show, live; with 0 it reads "No stocks" and is off.
-- Cancel, a backdrop tap or a drag down closes the sheet without applying.
-- A chip ✕ removes just that filter; the dot on the filter button goes when nothing is applied.
+- Filters: Sort by and Indices — one choice (radio; the picked one stays until Clear all or its chip ✕); Quick
+  filters, Market cap, Sectors — any number (checkbox).
+- **The sheet:** opens on the first group with picks (else Sort by). A side tab shows only its group on the right (its
+  own scroll; the sheet's height never changes). Each side tab shows how many picks it has.
+- Every option says how many stocks it would give with the other groups as they are; an option that would give none
+  reads "No stocks" and can't be picked (no dead ends) — unless it's already picked.
+- "Show n stocks" counts the whole choice, live; with 0 it reads "No stocks" and is off. Clear all empties the draft
+  (the sheet stays open).
+- A backdrop tap or a drag down closes the sheet without applying.
+- One chip per pick on the page; its ✕ removes just that pick. The dot on the filter button goes when nothing is applied.
 
 ### Differences from the live app
 
-- **Filter sheet redesigned:** the live sheet had no header, a "Filter" title + Clear all repeated in the pane, one
-  group visible at a time, lime brand buttons and outlined option cards. Now: an L3 sheet header "Filters" with Clear
-  all, connected side tabs + one scrolling pane with every group, plain radio rows, and Cancel · "Show n stocks" in L3
-  secondary / primary.
+- **Filter sheet redesigned (2026-10-19, after Zomato / Blinkit / Swiggy):** split sheet with a grey side-tab rail
+  and only the open group on the right; counts of picks on the side tabs; several sectors / caps / quick filters at
+  once; stock counts on every option and no 0-result options; Clear all next to "Show n stocks" in the dock (Cancel
+  removed — the backdrop and drag close it); Sort by first. The live sheet had no header, a repeated "Filter" title,
+  lime brand buttons and outlined option cards; the 2026-10-17 version had every group in one scroll.
 - **Applied chip** is an L3 secondary button with ✕; the filter button's dot is an L3 Badge.
 - Market cap options show their ranges as descriptions; sort options read "Price: low to high".
 
 ### L3 gaps
 
-- **Vertical side tabs** (a tab list down the side of a sheet) — composed from plain ListCells with `selected`.
+- **Vertical side tabs** (a tab list down the side of a sheet, connected to the pane) — local `components/SideTabs`
+  (L3 tokens, Badge for the count).
 - **Removable filter chip** — an L3 secondary Button with ✕ stands in.
 - **Split sheet body** (two columns, fixed height, the right one scrolling) — local `--app-size-filter-body`.
 
 ### Changelog
 
+- 2026-10-19 — Filters sheet redesigned: side tabs show one group at a time (grey rail, pick counts), multi-select
+  for quick filters / market cap / sectors, stock counts per option (0 = off), Clear all · Show n stocks in the dock.
 - 2026-10-19 — the filter button is Small (32 × 32).
 - 2026-10-19 — the Search action opens the Search flow (`search-24`); back returns to Market.
 - 2026-10-17 — first version: lists (5 tabs, one layout) and the redesigned Filters sheet.
 
 
 ## Source — this flow
+
+### `src/flows/market/components/SideTabs.module.css`
+
+```css
+/* The rail: a grey column the full height of the sheet body (an intentional grey area — it's what makes the selected
+   tab read as part of the pane). */
+.rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-block: var(--l3-spacing-08);
+  overflow-y: auto;
+  background: var(--l3-surface-secondary);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--l3-spacing-08);
+  min-height: var(--l3-size-48);
+  padding: var(--l3-spacing-12) var(--l3-spacing-12) var(--l3-spacing-12) var(--l3-spacing-16);
+  border: 0;
+  background: transparent;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-14); /* L3/Label/14 — same weight selected or not (L3: never bolder on selection) */
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Selected: the pane's surface (connected to it) + the L3 tab indicator, vertical, on the left edge. */
+.tab[aria-selected='true'] {
+  background: var(--l3-surface-primary);
+  color: var(--l3-content-primary);
+}
+
+.tab[aria-selected='true']::before {
+  content: '';
+  position: absolute;
+  inset: var(--l3-spacing-08) auto var(--l3-spacing-08) 0;
+  width: var(--l3-spacing-04);
+  border-radius: 0 var(--l3-radius-full) var(--l3-radius-full) 0;
+  background: var(--l3-surface-inverted);
+}
+
+@media (hover: hover) {
+  .tab[aria-selected='false']:hover {
+    background-image: linear-gradient(var(--l3-state-layer-dark-hover), var(--l3-state-layer-dark-hover));
+  }
+}
+
+.tab:active {
+  background-image: linear-gradient(var(--l3-state-layer-dark-pressed), var(--l3-state-layer-dark-pressed));
+}
+
+.tab:focus-visible {
+  outline: var(--l3-spacing-02) solid var(--l3-border-dark);
+  outline-offset: calc(-1 * var(--l3-spacing-02));
+}
+```
+
+### `src/flows/market/components/SideTabs.tsx`
+
+```tsx
+import { useRef, type KeyboardEvent } from 'react'
+import { Badge } from '@l3/components/Badge'
+import styles from './SideTabs.module.css'
+
+type SideTab<V extends string> = { value: V; label: string; /** How many choices are picked in it (0 = none). */ count?: number }
+
+type SideTabsProps<V extends string> = {
+  items: SideTab<V>[]
+  value: V
+  onChange: (value: V) => void
+  'aria-label': string
+  /** Id prefix: tab `${idBase}-tab-${value}` controls panel `${idBase}-panel`. */
+  idBase: string
+}
+
+/**
+ * Vertical tabs down the left of a split sheet (Zomato / Blinkit / Swiggy filters). The rail is grey; the selected tab
+ * takes the pane's surface so it reads as connected to it, with the L3 tab indicator (surface/inverted) on its left
+ * edge. A tab with picks shows their count (L3 Badge). Not in L3 yet (L3 Tabs are horizontal) — an L3 gap.
+ * Keyboard: ↑ ↓ Home End move between tabs.
+ */
+export function SideTabs<V extends string>({ items, value, onChange, idBase, ...rest }: SideTabsProps<V>) {
+  const list = useRef<HTMLDivElement>(null)
+  const onKeyDown = (e: KeyboardEvent) => {
+    const i = items.findIndex((t) => t.value === value)
+    const next = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: items.length - 1 }[e.key]
+    if (next === undefined) return
+    e.preventDefault()
+    const target = items[(next + items.length) % items.length]
+    onChange(target.value)
+    list.current?.querySelector<HTMLElement>(`#${CSS.escape(`${idBase}-tab-${target.value}`)}`)?.focus()
+  }
+  return (
+    <div ref={list} className={styles.rail} role="tablist" aria-orientation="vertical" aria-label={rest['aria-label']} onKeyDown={onKeyDown}>
+      {items.map((t) => {
+        const selected = t.value === value
+        return (
+          <button
+            key={t.value}
+            id={`${idBase}-tab-${t.value}`}
+            type="button"
+            role="tab"
+            aria-selected={selected}
+            aria-controls={`${idBase}-panel`}
+            tabIndex={selected ? 0 : -1}
+            className={styles.tab}
+            onClick={() => onChange(t.value)}
+          >
+            <span className={styles.label}>{t.label}</span>
+            {t.count ? <Badge count={t.count} color="neutral" label="picked" /> : null}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+```
 
 ### `src/flows/market/components/StockRow.module.css`
 
@@ -237,17 +378,29 @@ export const listFor = (tab: MarketTab): MarketStock[] => {
   }
 }
 
-/** Filters: five groups, one choice in each (radio). Groups combine (all must match); sort orders the result. */
-export type FilterGroupId = 'quick' | 'index' | 'cap' | 'sector' | 'sort'
+/**
+ * Filters: five groups. Sort and Indices take one choice (radio); Quick filters, Market cap and Sectors take any number
+ * (checkbox) — a stock matches a group if it matches any choice in it. Groups combine (all must match); sort orders the
+ * result.
+ */
+export type FilterGroupId = 'sort' | 'quick' | 'index' | 'cap' | 'sector'
 export type FilterOption = { id: string; label: string; description?: string; test?: (x: MarketStock) => boolean }
-export type FilterGroup = { id: FilterGroupId; label: string; options: FilterOption[] }
+export type FilterGroup = { id: FilterGroupId; label: string; select: 'one' | 'any'; options: FilterOption[] }
 
 const inIndex = (id: IndexId) => (x: MarketStock) => x.indices.includes(id)
 const inSector = (id: SectorId) => (x: MarketStock) => x.sector === id
 
 export const filterGroups: FilterGroup[] = [
   {
-    id: 'quick', label: 'Quick filters', options: [
+    id: 'sort', label: 'Sort by', select: 'one', options: [
+      { id: 'mcap-asc', label: 'Market cap: low to high' },
+      { id: 'mcap-desc', label: 'Market cap: high to low' },
+      { id: 'price-asc', label: 'Price: low to high' },
+      { id: 'price-desc', label: 'Price: high to low' },
+    ],
+  },
+  {
+    id: 'quick', label: 'Quick filters', select: 'any', options: [
       { id: 'nifty-midcap-100', label: 'NIFTY Midcap 100', test: inIndex('nifty-midcap-100') },
       { id: 'banking', label: 'Banking stocks', test: inSector('banking') },
       { id: 'fmcg', label: 'FMCG stocks', test: inSector('fmcg') },
@@ -255,7 +408,7 @@ export const filterGroups: FilterGroup[] = [
     ],
   },
   {
-    id: 'index', label: 'Indices', options: [
+    id: 'index', label: 'Indices', select: 'one', options: [
       { id: 'nifty-50', label: 'Nifty 50', test: inIndex('nifty-50') },
       { id: 'nifty-500', label: 'Nifty 500', test: inIndex('nifty-500') },
       { id: 'nifty-auto', label: 'Nifty Auto', test: inIndex('nifty-auto') },
@@ -267,14 +420,14 @@ export const filterGroups: FilterGroup[] = [
     ],
   },
   {
-    id: 'cap', label: 'Market cap', options: [
+    id: 'cap', label: 'Market cap', select: 'any', options: [
       { id: 'small', label: 'Small cap', description: 'Less than ₹5,000 Cr', test: (x) => x.cap === 'small' },
       { id: 'mid', label: 'Mid cap', description: '₹5,000 Cr to ₹20,000 Cr', test: (x) => x.cap === 'mid' },
       { id: 'large', label: 'Large cap', description: 'More than ₹20,000 Cr', test: (x) => x.cap === 'large' },
     ],
   },
   {
-    id: 'sector', label: 'Sectors', options: [
+    id: 'sector', label: 'Sectors', select: 'any', options: [
       { id: 'oil-gas', label: 'Oil and gas', test: inSector('oil-gas') },
       { id: 'agriculture', label: 'Agriculture', test: inSector('agriculture') },
       { id: 'pharma', label: 'Pharma', test: inSector('pharma') },
@@ -287,25 +440,35 @@ export const filterGroups: FilterGroup[] = [
       { id: 'finance', label: 'Finance', test: inSector('finance') },
     ],
   },
-  {
-    id: 'sort', label: 'Sort by', options: [
-      { id: 'mcap-asc', label: 'Market cap: low to high' },
-      { id: 'mcap-desc', label: 'Market cap: high to low' },
-      { id: 'price-asc', label: 'Price: low to high' },
-      { id: 'price-desc', label: 'Price: high to low' },
-    ],
-  },
 ]
 
-/** The picked option per group (none picked = the group isn't applied). */
-export type Filters = Partial<Record<FilterGroupId, string>>
+/** What's picked: one id for Sort and Indices, a list for the others. A group with nothing picked isn't applied. */
+export type Filters = Partial<{ sort: string; index: string; quick: string[]; cap: string[]; sector: string[] }>
 
-export const optionOf = (group: FilterGroupId, id: string | undefined) => filterGroups.find((g) => g.id === group)?.options.find((o) => o.id === id)
+export const groupOf = (id: FilterGroupId) => filterGroups.find((g) => g.id === id)!
+export const optionOf = (group: FilterGroupId, id: string | undefined) => groupOf(group).options.find((o) => o.id === id)
+
+/** The picked ids of one group, always as a list. */
+export function pickedIn(filters: Filters, group: FilterGroupId): string[] {
+  const v = filters[group]
+  return v === undefined ? [] : Array.isArray(v) ? v : [v]
+}
+
+/** The filters with one group's picks replaced (an empty list removes the group). */
+export function withPicks(filters: Filters, group: FilterGroupId, ids: string[]): Filters {
+  const { [group]: _old, ...rest } = filters
+  if (!ids.length) return rest
+  return { ...rest, [group]: groupOf(group).select === 'one' ? ids[0] : ids }
+}
+
+/** Every pick as { group, option } — in group order (the Market page shows one removable chip each). */
+export const picks = (filters: Filters) =>
+  filterGroups.flatMap((g) => pickedIn(filters, g.id).map((id) => ({ group: g.id, option: optionOf(g.id, id)! }))).filter((p) => p.option)
 
 /** The tab's list with the filters applied and the sort order. */
 export function applyFilters(list: MarketStock[], filters: Filters): MarketStock[] {
-  const tests = (Object.keys(filters) as FilterGroupId[]).filter((g) => g !== 'sort').map((g) => optionOf(g, filters[g])?.test).filter(Boolean) as ((x: MarketStock) => boolean)[]
-  const result = list.filter((x) => tests.every((t) => t(x)))
+  const groups = filterGroups.filter((g) => g.id !== 'sort' && pickedIn(filters, g.id).length)
+  const result = list.filter((x) => groups.every((g) => pickedIn(filters, g.id).some((id) => optionOf(g.id, id)?.test?.(x))))
   const by: Record<string, (a: MarketStock, b: MarketStock) => number> = {
     'mcap-asc': (a, b) => a.marketCapCr - b.marketCapCr,
     'mcap-desc': (a, b) => b.marketCapCr - a.marketCapCr,
@@ -342,10 +505,10 @@ export const market: Flow = {
     { id: 'market-02', section: 'lists', name: 'Market · Top gainers', figma: '', note: 'Same layout — only the list changes.', tab: true, render: (go) => <Market tab="gainers" onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
     { id: 'market-03', section: 'lists', name: 'Market · Top losers', figma: '', tab: true, render: (go) => <Market tab="losers" onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
     { id: 'market-04', section: 'lists', name: 'Market · Under ₹100', figma: '', tab: true, render: (go) => <Market tab="under-100" onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
-    { id: 'market-05', section: 'filters', name: 'Filters', figma: '', note: 'Side tabs on the left, every group in one scroll on the right.', tab: true, render: (go) => <Market sheet onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
-    { id: 'market-06', section: 'filters', name: 'Filters · indices', figma: '', note: 'Scrolled to Indices — Nifty 500 picked; its side tab shows a dot.', tab: true, render: (go) => <Market sheet sheetSection="index" filters={{ index: 'nifty-500' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
-    { id: 'market-07', section: 'filters', name: 'Filters · sectors & sort', figma: '', tab: true, render: (go) => <Market sheet sheetSection="sector" filters={{ index: 'nifty-500', sort: 'price-desc' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
-    { id: 'market-08', section: 'filters', name: 'Market · filters applied', figma: '', note: 'Applied filters as removable chips; the filter button gets a dot.', tab: true, render: (go) => <Market filters={{ index: 'nifty-500', sort: 'price-desc' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-05', section: 'filters', name: 'Filters', figma: '', note: 'Side tabs on the left (grey rail, the open one connected to the pane); only the open group on the right. Opens on Sort by.', tab: true, render: (go) => <Market sheet onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-06', section: 'filters', name: 'Filters · indices', figma: '', note: 'Indices open — Nifty 500 picked (one choice); its side tab shows 1. Each option says how many stocks it gives.', tab: true, render: (go) => <Market sheet sheetSection="index" filters={{ index: 'nifty-500' }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-07', section: 'filters', name: 'Filters · sectors (several)', figma: '', note: 'Sectors open — Banking and IT picked (any number); sort and index picked too. Sectors with no stocks in Nifty 500 are off.', tab: true, render: (go) => <Market sheet sheetSection="sector" filters={{ sort: 'price-desc', index: 'nifty-500', sector: ['banking', 'it'] }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
+    { id: 'market-08', section: 'filters', name: 'Market · filters applied', figma: '', note: 'One removable chip per pick; the filter button gets a dot.', tab: true, render: (go) => <Market filters={{ sort: 'price-desc', index: 'nifty-500', sector: ['banking', 'it'] }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-24')} /> },
   ],
 }
 ```
@@ -422,7 +585,7 @@ import { msAccountBalanceWallet, msClose, msFilterAlt, msSearch } from '@l3/icon
 import { MainNav, type Section } from '../../../shared/ui/MainNav'
 import { Screen } from '../../../shared/ui/Screen'
 import { StockRow } from '../components/StockRow'
-import { applyFilters, listFor, optionOf, tabs, type FilterGroupId, type Filters, type MarketTab } from '../data'
+import { applyFilters, listFor, pickedIn, picks, tabs, withPicks, type FilterGroupId, type Filters, type MarketTab } from '../data'
 import { FilterSheet } from '../sheets/FilterSheet'
 import styles from './Market.module.css'
 
@@ -448,9 +611,10 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
   const [open, setOpen] = useState(sheet)
   const base = listFor(tab)
   const list = applyFilters(base, filters)
-  const applied = (Object.keys(filters) as FilterGroupId[]).map((g) => ({ group: g, option: optionOf(g, filters[g]) })).filter((a) => a.option)
+  const applied = picks(filters)
 
-  const remove = (group: FilterGroupId) => setFilters(({ [group]: _gone, ...rest }) => rest)
+  /** A chip's ✕ removes just that pick (other picks in the same group stay). */
+  const remove = (group: FilterGroupId, id: string) => setFilters((f) => withPicks(f, group, pickedIn(f, group).filter((x) => x !== id)))
 
   return (
     <Screen
@@ -482,8 +646,8 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
           {applied.length ? (
             <div className={styles.applied} role="group" aria-label="Applied filters">
               {applied.map(({ group, option }) => (
-                <Button key={group} variant="secondary" iconRight={<Icon icon={msClose} />} aria-label={`Remove ${option!.label}`} onClick={() => remove(group)}>
-                  {option!.label}
+                <Button key={`${group}-${option.id}`} variant="secondary" iconRight={<Icon icon={msClose} />} aria-label={`Remove ${option.label}`} onClick={() => remove(group, option.id)}>
+                  {option.label}
                 </Button>
               ))}
             </div>
@@ -514,8 +678,9 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
 
 ```css
 /*
- * Filters body: side tabs (left) and one scrolling pane with every group (right), edge to edge in the sheet — it
- * steps out of the sheet content's padding (16 sides and top, 24 below) so the two columns meet the sheet edges.
+ * Filters body: side tabs (left, grey rail) and the open group's options (right, scrolls on its own), edge to edge in
+ * the sheet — it steps out of the sheet content's padding (16 sides and top, 24 below) so the two columns meet the
+ * sheet edges and the dock. A fixed height, so switching groups never makes the sheet jump.
  */
 .split {
   display: grid;
@@ -524,161 +689,110 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
   margin: calc(-1 * var(--l3-spacing-16)) calc(-1 * var(--l3-spacing-16)) calc(-1 * var(--l3-spacing-24));
 }
 
-/* Side tabs: plain rows; the picked one has L3's selected fill. A hairline separates them from the pane. */
-.tabs {
-  display: flex;
-  flex-direction: column;
-  padding-block: var(--l3-spacing-08);
-  border-right: 1px solid var(--l3-border-light);
-  overflow-y: auto;
-}
-
 .pane {
-  position: relative; /* offsetTop of each group is measured from here */
+  min-height: 0;
+  padding-block: var(--l3-spacing-08) var(--l3-spacing-16);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.group {
-  padding-block: var(--l3-spacing-12);
-}
-
-/* The last group fills the pane, so a side tab can bring even it to the top. */
-.group:last-child {
-  min-height: 100%;
-  box-sizing: border-box;
-}
-
-.group + .group {
-  border-top: 1px solid var(--l3-border-light);
-}
-
-.groupHead {
-  padding: 0 var(--l3-spacing-16) var(--l3-spacing-04);
+/* "Pick one" / "Pick any": says radio or checkbox before the first tap. */
+.hint {
+  margin: 0;
+  padding: var(--l3-spacing-08) var(--l3-spacing-16) var(--l3-spacing-04);
+  font: var(--l3-text-description-12); /* L3/Description/12 */
+  color: var(--l3-content-secondary);
 }
 ```
 
 ### `src/flows/market/sheets/FilterSheet.tsx`
 
 ```tsx
-import { useCallback, useId, useRef, useState } from 'react'
-import { Badge } from '@l3/components/Badge'
+import { useId, useState } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
-import { Radio } from '@l3/components/Checkbox'
+import { Checkbox, Radio } from '@l3/components/Checkbox'
 import { ListCell } from '@l3/components/ListCell'
-import { SectionHeader } from '@l3/components/SectionHeader'
 import { Sheet } from '../../../shared/ui/Sheet'
-import { filterGroups, type FilterGroupId, type Filters } from '../data'
+import { SideTabs } from '../components/SideTabs'
+import { filterGroups, groupOf, pickedIn, picks, withPicks, type FilterGroupId, type FilterOption, type Filters } from '../data'
 import styles from './FilterSheet.module.css'
 
 type Props = {
-  /** The filters applied now (the sheet edits a copy until Apply). */
+  /** The filters applied now (the sheet edits a copy until "Show n stocks"). */
   initial: Filters
-  /** Open scrolled to this group (board frames). */
+  /** Open on this group (board frames); otherwise the first group with picks, else Sort by. */
   section?: FilterGroupId
-  /** How many stocks a set of filters would show — the Apply button says it. */
+  /** How many stocks a set of filters would show — the dock button and every option's count say it. */
   resultCount: (filters: Filters) => number
   onApply: (filters: Filters) => void
   onClose: () => void
 }
 
 /**
- * market-05 … 07 · Filters. Header "Filters" + Clear all. Body in two connected parts: side tabs for the five groups on
- * the left, and on the right every group as a section in ONE scroll — tap a side tab to jump to its section, or just
- * scroll and the side tab follows. One choice per group (radio). Footer: Cancel · "Show n stocks" (applies).
+ * market-05 … 07 · Filters — the split sheet food and grocery apps use for long filter lists (Zomato, Blinkit,
+ * Swiggy): side tabs for the groups on the left (grey rail, the open one connected to the pane, a count of picks on
+ * each), and on the right ONLY the open group, scrolling on its own. Sort by and Indices take one choice (radio);
+ * Quick filters, Market cap and Sectors take any number (checkbox). Every option says how many stocks it would give;
+ * one that would give none is off, so there are no dead ends. Dock: Clear all · "Show n stocks" (applies). Close by
+ * backdrop or dragging down (L3 sheets).
  */
 export function FilterSheet({ initial, section, resultCount, onApply, onClose }: Props) {
   const headingId = useId()
+  const idBase = useId().replace(/:/g, '')
   const [draft, setDraft] = useState<Filters>(initial)
-  const [active, setActive] = useState<FilterGroupId>(section ?? filterGroups[0].id)
-  const pane = useRef<HTMLDivElement>(null)
-  const jumping = useRef(false)
-  const picked = (Object.keys(draft) as FilterGroupId[]).length
-  const count = resultCount(draft)
+  const [active, setActive] = useState<FilterGroupId>(section ?? filterGroups.find((g) => pickedIn(initial, g.id).length)?.id ?? filterGroups[0].id)
+  const group = groupOf(active)
+  const picked = pickedIn(draft, active)
+  const total = resultCount(draft)
+  const nothingPicked = picks(draft).length === 0
 
-  const sectionEl = (id: FilterGroupId) => pane.current?.querySelector<HTMLElement>(`[data-group="${id}"]`)
-
-  // The pane, when it's on screen (in the prototype the sheet's body is drawn by the screen's sheet host, a moment
-  // later than this component). Board frames open with a group already at the top.
-  const paneRef = useCallback((el: HTMLDivElement | null) => {
-    pane.current = el
-    const target = el && section ? el.querySelector<HTMLElement>(`[data-group="${section}"]`) : null
-    if (el && target) el.scrollTop = target.offsetTop
-  }, [section])
-
-  // Scrolling the pane moves the side tab to the group at the top (not while a side-tab tap is scrolling it).
-  const onPaneScroll = () => {
-    const el = pane.current
-    if (!el || jumping.current) return
-    const top = el.scrollTop + 1
-    const current = [...el.querySelectorAll<HTMLElement>('[data-group]')].filter((g) => g.offsetTop <= top).pop()
-    if (current) setActive(current.dataset.group as FilterGroupId)
+  const toggle = (id: string) => {
+    if (group.select === 'one') return setDraft((d) => withPicks(d, active, [id]))
+    setDraft((d) => {
+      const now = pickedIn(d, active)
+      return withPicks(d, active, now.includes(id) ? now.filter((x) => x !== id) : [...now, id])
+    })
   }
 
-  const jump = (id: FilterGroupId) => {
-    const el = sectionEl(id)
-    if (!el || !pane.current) return
-    setActive(id)
-    jumping.current = true
-    pane.current.scrollTo({ top: el.offsetTop, behavior: 'smooth' })
-    window.setTimeout(() => { jumping.current = false }, 500)
-  }
-
-  const pick = (group: FilterGroupId, id: string) => setDraft((d) => ({ ...d, [group]: id }))
+  // What this option alone would give, with the other groups as they are (facet count). Sort options don't filter.
+  const countFor = (o: FilterOption) => (active === 'sort' ? undefined : resultCount(withPicks(draft, active, [o.id])))
 
   return (
     <Sheet
       labelledBy={headingId}
       onClose={onClose}
-      header={
-        <BottomSheetHeader
-          headingId={headingId}
-          heading="Filters"
-          trailing={<Button variant="ghost" size="sm" disabled={picked === 0} onClick={() => setDraft({})}>Clear all</Button>}
-        />
-      }
+      header={<BottomSheetHeader headingId={headingId} heading="Filters" />}
       footer={
         <ButtonGroup aria-label="Filters" direction="horizontal">
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button disabled={count === 0} onClick={() => onApply(draft)}>{count === 0 ? 'No stocks' : `Show ${count} ${count === 1 ? 'stock' : 'stocks'}`}</Button>
+          <Button variant="secondary" disabled={nothingPicked} onClick={() => setDraft({})}>Clear all</Button>
+          <Button disabled={total === 0} onClick={() => onApply(draft)}>{total === 0 ? 'No stocks' : `Show ${total} ${total === 1 ? 'stock' : 'stocks'}`}</Button>
         </ButtonGroup>
       }
     >
       <div className={styles.split}>
-        <nav className={styles.tabs} aria-label="Filter groups">
-          {filterGroups.map((g) => (
-            <ListCell
-              key={g.id}
-              as="button"
-              size="sm"
-              label={g.label}
-              selected={g.id === active}
-              trailing={draft[g.id] ? <Badge dot color="discover" label="picked" /> : undefined}
-              onClick={() => jump(g.id)}
-            />
-          ))}
-        </nav>
-        <div ref={paneRef} className={styles.pane} onScroll={onPaneScroll}>
-          {filterGroups.map((g) => (
-            <section key={g.id} className={styles.group} data-group={g.id} aria-label={g.label}>
-              <div className={styles.groupHead}><SectionHeader title={g.label} headingLevel={3} /></div>
-              <div role="radiogroup" aria-label={g.label}>
-                {g.options.map((o) => (
-                  <ListCell
-                    key={o.id}
-                    as="label"
-                    size="sm"
-                    multiline
-                    label={o.label}
-                    description={o.description}
-                    trailing={<Radio name={`filter-${g.id}`} checked={draft[g.id] === o.id} onChange={() => pick(g.id, o.id)} />}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+        <SideTabs
+          aria-label="Filter groups"
+          idBase={idBase}
+          items={filterGroups.map((g) => ({ value: g.id, label: g.label, count: pickedIn(draft, g.id).length }))}
+          value={active}
+          onChange={setActive}
+        />
+        <div key={active} id={`${idBase}-panel`} className={styles.pane} role="tabpanel" aria-labelledby={`${idBase}-tab-${active}`}>
+          <p className={styles.hint}>{group.select === 'one' ? 'Pick one' : 'Pick any'}</p>
+          <div role={group.select === 'one' ? 'radiogroup' : 'group'} aria-label={group.label}>
+            {group.options.map((o) => {
+              const on = picked.includes(o.id)
+              const n = countFor(o)
+              const off = n === 0 && !on
+              const description = [o.description, n === undefined ? undefined : n === 0 ? 'No stocks' : `${n} ${n === 1 ? 'stock' : 'stocks'}`].filter(Boolean).join(' · ')
+              const control = group.select === 'one'
+                ? <Radio name={`${idBase}-${active}`} checked={on} disabled={off} onChange={() => toggle(o.id)} />
+                : <Checkbox checked={on} disabled={off} onChange={() => toggle(o.id)} />
+              return <ListCell key={o.id} as="label" size="sm" multiline label={o.label} description={description || undefined} trailing={control} />
+            })}
+          </div>
         </div>
       </div>
     </Sheet>

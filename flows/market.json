@@ -57,7 +57,7 @@
       "id": "market-05",
       "name": "Filters",
       "figma": "",
-      "note": "Side tabs on the left, every group in one scroll on the right.",
+      "note": "Side tabs on the left (grey rail, the open one connected to the pane); only the open group on the right. Opens on Sort by.",
       "goesTo": [
         "search-24"
       ],
@@ -67,7 +67,7 @@
       "id": "market-06",
       "name": "Filters · indices",
       "figma": "",
-      "note": "Scrolled to Indices — Nifty 500 picked; its side tab shows a dot.",
+      "note": "Indices open — Nifty 500 picked (one choice); its side tab shows 1. Each option says how many stocks it gives.",
       "goesTo": [
         "search-24"
       ],
@@ -75,9 +75,9 @@
     },
     {
       "id": "market-07",
-      "name": "Filters · sectors & sort",
+      "name": "Filters · sectors (several)",
       "figma": "",
-      "note": "",
+      "note": "Sectors open — Banking and IT picked (any number); sort and index picked too. Sectors with no stocks in Nifty 500 are off.",
       "goesTo": [
         "search-24"
       ],
@@ -87,7 +87,7 @@
       "id": "market-08",
       "name": "Market · filters applied",
       "figma": "",
-      "note": "Applied filters as removable chips; the filter button gets a dot.",
+      "note": "One removable chip per pick; the filter button gets a dot.",
       "goesTo": [
         "search-24"
       ],
@@ -96,6 +96,8 @@
   ],
   "files": [
     "src/flows/market/README.md",
+    "src/flows/market/components/SideTabs.module.css",
+    "src/flows/market/components/SideTabs.tsx",
     "src/flows/market/components/StockRow.module.css",
     "src/flows/market/components/StockRow.tsx",
     "src/flows/market/data.ts",
