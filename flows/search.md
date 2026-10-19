@@ -118,7 +118,7 @@ any screen ─back─▶ stocks-01
 | Filter | Button | `variant="ghost" size="sm"`, `filter_list` on the right |
 | Indices / Stocks pill | Tab (action pill) | `action appearance="pill"`, ↕ icon right — switches the underlyings |
 | Signals lists | Tabs (pill) | `appearance="pill"` (md), in the top bar's bottom slot, 12 above and below |
-| Nothing found | EmptyState ("L3 → Empty state") | default illustration; "No search results found" / "Make sure you’ve spelled it correctly."; Clear Search = Button (lg, `delete_forever`) |
+| Nothing found | EmptyState ("L3 → Empty state") | default illustration; "No search results found" / "Make sure you’ve spelled it correctly."; Clear Search = Button (primary, `sm`, `delete_forever`) — the empty state's action is Small |
 | Add to watchlist | BottomSheet + BottomSheetHeader + ListCell + Checkbox + ButtonGroup | header `trailing` = Tertiary Small "+ Create"; rows `as="label"`, Checkbox in `iconLeft`; Save (primary lg) off until one is ticked |
 | Create watchlist | BottomSheet + TextField + ButtonGroup | "Watchlist Name" (typing), Create (primary lg) |
 | Added | Aerobar (floating, primary) | `check` icon, heading, action OK |
@@ -146,8 +146,8 @@ any screen ─back─▶ stocks-01
   Chips and tiles are L3 clickable cards but, by the designer's call, **without the shadow** — only the 1px
   `border/light` outline — and with Figma's **8 radius** (L3 cards are 12). Watchlist rows keep L3's clickable look
   (`surface/primary` + `border/light` + `elevation-low`).
-- **Empty state:** the L3 default illustration (a document with ✕) instead of the old magnifier; Clear Search is a
-  Large button (app rule: Large buttons everywhere), Figma has Small.
+- **Empty state:** the L3 default illustration (a document with ✕) instead of the old magnifier. Clear Search stays
+  Small, as in Figma (the empty state's action is the one exception to the app's Large-buttons rule).
 - **Watchlist row gap:** L3's small list cell keeps 12 between the logo and the text (Figma result rows have 16).
 - **Toast timing:** L3 keeps a toast with an action for 6 s (Figma's flow says 2 s).
 - **Content:** obvious typos fixed (ICICIBANK, KOTAKBANK, AXISBANK, OI Gainers), and the repeated placeholder prices /
@@ -166,6 +166,7 @@ any screen ─back─▶ stocks-01
 
 ### Changelog
 
+- 2026-10-19 — Clear Search back to Small (empty-state action).
 - 2026-10-19 — tiles: 8 radius, like the chips.
 - 2026-10-19 — bookmark uses the design's icons: L3 custom icons watchlist_add / watchlist_added (Icons 1.4.0).
 - 2026-10-19 — chips: 8 radius, no shadow; tiles: no shadow; the focused search field no longer shows a line under the
@@ -1077,7 +1078,7 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
           <EmptyState
             title="No search results found"
             description="Make sure you’ve spelled it correctly."
-            action={<Button iconLeft={<Icon icon={msDeleteForever} />} onClick={clear}>Clear Search</Button>}
+            action={<Button size="sm" iconLeft={<Icon icon={msDeleteForever} />} onClick={clear}>Clear Search</Button>}
           />
         </div>
       )}
