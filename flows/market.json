@@ -4,7 +4,7 @@
   "description": "The Market tab — stock lists (all, gainers, losers, under ₹100 / ₹500) and Filters.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "84dd189",
+    "commit": "df57857",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {

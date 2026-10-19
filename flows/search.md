@@ -1,6 +1,6 @@
 # Flow: Search (`search`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `84dd189` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Search stocks, F&O contracts, mutual funds and IPOs; Smart Options & Futures lists; add to watchlist.
 
@@ -112,7 +112,7 @@ any screen ─back─▶ stocks-01
 | Recent / popular chip | Card (clickable) + Avatar | `padding="none"`, radius 8, no shadow (1px `border/light` only); inside: 8 / 12 / 8 / 8 padding, Avatar 24 rounded (initials), Label/12 `content/tertiary`; max 200 wide; rows scroll sideways |
 | Watchlist match | ListCell ("L3: list cell", card, tappable, small) | `variant="card" size="sm" as="button"`, Avatar 32 rounded, label + "n stocks", chevron; 12 apart |
 | Result row | ListCell (plain, small, breathable) + Avatar + PriceChange | `size="sm" density="breathable" as="button"` (70 tall); right: price (Label/12) over `PriceChange size="sm" arrow`; 1px `border/light` line under each row, 16 in |
-| Bookmark | Button (Ghost, icon only) | `variant="ghost"` (lg, 24 icon): `bookmark` / `bookmark_added` (filled) when saved; 16 from the edge |
+| Bookmark | Button (Ghost, icon only) + L3 custom icons | `variant="ghost"` (lg, 24 icon): `watchlist_add` (outline bookmark with +) / `watchlist_added` (filled, ✓ cut out) when saved — Icons library → Custom icons; 16 from the edge |
 | F&O / MF tiles | Card (clickable) | no shadow (1px `border/light` only); 2 columns, 12 apart; label Label/12 (MF: `content/tertiary`), 10 / 12 padding |
 | Sort | Select ("L3: Select switcher") | `size="sm" icon="swap"`: Price ↕ / Volume, 3Y Returns ↕ |
 | Filter | Button | `variant="ghost" size="sm"`, `filter_list` on the right |
@@ -140,7 +140,7 @@ any screen ─back─▶ stocks-01
 
 - **Components only, same layout.** Every part is now L3: result rows are L3 list cells (Figma had a local "search
   stock listing" component), watchlist matches are card list cells, chips and tiles are clickable cards, the trend
-  arrow is PriceChange, D2 icons are Material Symbols, the bottom sheet is the current L3 sheet (Figma used the
+  arrow is PriceChange, D2 icons are Material Symbols (the bookmark: L3 custom icons watchlist_add / watchlist_added), the bottom sheet is the current L3 sheet (Figma used the
   discontinued version).
 - **Colours:** Figma's `content/secondary` at 60% opacity (labels, chip names) is `content/tertiary` (the same 36%).
   Chips and tiles are L3 clickable cards but, by the designer's call, **without the shadow** — only the 1px
@@ -166,6 +166,7 @@ any screen ─back─▶ stocks-01
 
 ### Changelog
 
+- 2026-10-19 — bookmark uses the design's icons: L3 custom icons watchlist_add / watchlist_added (Icons 1.4.0).
 - 2026-10-19 — chips: 8 radius, no shadow; tiles: no shadow; the focused search field no longer shows a line under the
   bar (L3 Actionbar 1.5.1).
 - 2026-10-19 — first version (23 screens) from the final Figma layouts.
@@ -290,7 +291,7 @@ import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
 import { PriceChange } from '@l3/components/PriceChange'
-import { msBookmark, msBookmarkAddedFill } from '@l3/icons/material'
+import { lmWatchlistAdd, lmWatchlistAdded } from '@l3/icons/lemonnade'
 import { inr } from '../../../shared/data/format'
 import type { SearchResult } from '../data'
 import styles from './ResultList.module.css'
@@ -313,7 +314,8 @@ type ResultListProps = {
  * Search results: flat L3 list rows (ListCell plain, small, breathable — 70 tall, the asset-list density) with a
  * hairline between them, 16 in from the edges. Left: the logo (stocks, IPOs) as a 32 Avatar; then name + detail; on
  * the right the price over its change (L3 PriceChange), 3Y returns, an IPO price band or the volume; then the
- * bookmark (an L3 Ghost icon button, filled with a tick once the item is in a watchlist).
+ * bookmark (an L3 Ghost icon button with the L3 custom icons watchlist_add — outline + — and watchlist_added — filled,
+ * ✓ cut out — once the item is in a watchlist).
  */
 export function ResultList({ items, label, showVolume, bookmarks = true, saved, onOpen, onBookmark }: ResultListProps) {
   return (
@@ -337,7 +339,7 @@ export function ResultList({ items, label, showVolume, bookmarks = true, saved, 
               <Button
                 className={styles.bookmark}
                 variant="ghost"
-                iconLeft={<Icon icon={isSaved ? msBookmarkAddedFill : msBookmark} />}
+                iconLeft={<Icon icon={isSaved ? lmWatchlistAdded : lmWatchlistAdd} />}
                 aria-label={isSaved ? `${item.name} is in a watchlist — change` : `Add ${item.name} to a watchlist`}
                 aria-pressed={isSaved}
                 onClick={() => onBookmark?.(item)}
