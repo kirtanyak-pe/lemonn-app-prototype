@@ -10,13 +10,13 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks · 
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `stocks-01` | Home | — | — | Top of the page: search, indices, holdings, products, shortcuts. |
-| `stocks-02` | Home · top movers & watchlists | — | — | Same page, scrolled. |
-| `stocks-03` | Home · top losers | — | — | The "Top losers" chip picked. |
-| `stocks-04` | Home · Smart Invest | — | — | Same page, scrolled: managed strategies, then the announcement. |
-| `stocks-05` | Home · sectors & highlights | — | — | Same page, scrolled. |
-| `stocks-06` | Home · trade ideas | — | — | Same page, scrolled: featured ideas, neighbours peek. |
-| `stocks-07` | Home · idea baskets & disclosure | — | — | The end of the page. |
+| `stocks-01` | Home | — | `search-01` | Top of the page: search, indices, holdings, products, shortcuts. |
+| `stocks-02` | Home · top movers & watchlists | — | `search-01` | Same page, scrolled. |
+| `stocks-03` | Home · top losers | — | `search-01` | The "Top losers" chip picked. |
+| `stocks-04` | Home · Smart Invest | — | `search-01` | Same page, scrolled: managed strategies, then the announcement. |
+| `stocks-05` | Home · sectors & highlights | — | `search-01` | Same page, scrolled. |
+| `stocks-06` | Home · trade ideas | — | `search-01` | Same page, scrolled: featured ideas, neighbours peek. |
+| `stocks-07` | Home · idea baskets & disclosure | — | `search-01` | The end of the page. |
 
 ## Spec (README.md)
 
@@ -27,7 +27,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks · 
 - **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks · one screen: `#/frame/stocks-01`
 - **Source:** screenshots of the live app's Stocks tab (dark theme), shared 2026-10-17 — there's no Figma for it yet.
   Rebuilt in L3.
-- **Status:** 🟨 Home done (the rest of the Stocks tab — stock page, search, lists — comes next) · 2026-10-17
+- **Status:** 🟨 Home done; search is its own flow (`search`), opened from the top bar (stock page and lists come next) · 2026-10-19
 - **Entry:** the app's home: after login (returning user), after account setup ("Explore stocks first"), after the
   first deposit ("Start investing"); the Stocks tab of the main navbar. **Exit:** everything on the page opens its
   own screen (not built yet).
@@ -48,7 +48,8 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 ### Page structure (top to bottom)
 
-1. **Top bar (sticky):** search ("Search stocks") · Wallet · Profile.
+1. **Top bar (sticky):** search ("Search stocks") · Wallet · Profile. Tapping the search field opens Search
+   (`search-01`, the Search flow: Stocks tab, keyboard up); nothing is typed on Home. Back on Search returns here.
 2. **Summary area** (grey, `surface/secondary`):
    - **Index strip** (scrolls sideways): NIFTY 50 / SENSEX / NIFTY BANK — value, day change; each opens its chart.
    - **Current holdings:** the value (the page's biggest number) and the overall return; the block opens Portfolio.
@@ -125,6 +126,7 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 ### Changelog
 
+- 2026-10-19 — the search field opens the Search flow (`search-01`).
 - 2026-10-17 — first version: Home (7 frames of one page).
 
 
@@ -1095,13 +1097,13 @@ export const stocks: Flow = {
   description: 'The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.',
   figmaFile: '',
   screens: [
-    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} /> },
-    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="movers" /> },
-    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="movers" movers="losers" /> },
-    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="invest" /> },
-    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="sectors" /> },
-    { id: 'stocks-06', name: 'Home · trade ideas', figma: '', note: 'Same page, scrolled: featured ideas, neighbours peek.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="ideas" /> },
-    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} scrollTo="more" /> },
+    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} /> },
+    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="movers" /> },
+    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="movers" movers="losers" /> },
+    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="invest" /> },
+    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="sectors" /> },
+    { id: 'stocks-06', name: 'Home · trade ideas', figma: '', note: 'Same page, scrolled: featured ideas, neighbours peek.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="ideas" /> },
+    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="more" /> },
   ],
 }
 ```
@@ -1150,6 +1152,11 @@ export const stocks: Flow = {
 .tinted[data-tint='discover'] {
   background: var(--l3-surface-accent-discover-light);
 }
+
+/* Wraps the top bar only to catch a tap on its search field (opens Search); adds no box of its own. */
+.searchEntry {
+  display: contents;
+}
 ```
 
 ### `src/flows/stocks/screens/Home.tsx`
@@ -1176,15 +1183,18 @@ type Props = {
   movers?: MoverList
   /** The main navbar: go to another tab. */
   onTab?: (section: Section) => void
+  /** Tapping the search field opens the Search screen (search-01), where the typing happens. */
+  onSearch?: () => void
 }
 
 /**
  * stocks-01 … 07 · Stocks home — the app's first L1 screen (the Stocks tab).
- * Top bar: search + wallet + profile (sticky). Then, on a grey summary area: today's indices, the holdings and the
+ * Top bar: search + wallet + profile (sticky). The search field is the way into Search: tapping it opens the Search
+ * screen (stocks tab, keyboard up) — nothing is typed here. Then, on a grey summary area: today's indices, the holdings and the
  * products; and on the rounded sheet over it, the feed: shortcuts, top movers, watchlists, Smart Invest (brand tint),
  * an announcement, sectors, highlights, trade ideas (discover tint), idea baskets and the broker's disclosure.
  */
-export function Home({ scrollTo = 'top', movers, onTab }: Props) {
+export function Home({ scrollTo = 'top', movers, onTab, onSearch }: Props) {
   const [query, setQuery] = useState('')
   const page = useRef<HTMLDivElement>(null)
 
@@ -1200,15 +1210,18 @@ export function Home({ scrollTo = 'top', movers, onTab }: Props) {
   return (
     <Screen
       top={
-        <Actionbar
-          search={{ value: query, onChange: setQuery, placeholder: 'Search stocks', label: 'Search stocks' }}
-          actions={
-            <>
-              <ActionbarAction icon={msAccountBalanceWallet} label="Wallet" onClick={() => {}} />
-              <ActionbarAction icon={msAccountCircle} label="Profile" onClick={() => {}} />
-            </>
-          }
-        />
+        // Focus on the field (a tap) opens Search. The wrapper is display: contents, so the bar's layout is untouched.
+        <div className={styles.searchEntry} onFocus={(e) => { if ((e.target as HTMLElement).matches('input[type="search"]')) onSearch?.() }}>
+          <Actionbar
+            search={{ value: query, onChange: setQuery, placeholder: 'Search stocks', label: 'Search stocks' }}
+            actions={
+              <>
+                <ActionbarAction icon={msAccountBalanceWallet} label="Wallet" onClick={() => {}} />
+                <ActionbarAction icon={msAccountCircle} label="Profile" onClick={() => {}} />
+              </>
+            }
+          />
+        </div>
       }
       bottom={<MainNav value="stocks" onChange={onTab} />}
     >

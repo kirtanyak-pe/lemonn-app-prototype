@@ -18,7 +18,9 @@
       "name": "Home",
       "figma": "",
       "note": "Top of the page: search, indices, holdings, products, shortcuts.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     },
     {
@@ -26,7 +28,9 @@
       "name": "Home · top movers & watchlists",
       "figma": "",
       "note": "Same page, scrolled.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     },
     {
@@ -34,7 +38,9 @@
       "name": "Home · top losers",
       "figma": "",
       "note": "The \"Top losers\" chip picked.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     },
     {
@@ -42,7 +48,9 @@
       "name": "Home · Smart Invest",
       "figma": "",
       "note": "Same page, scrolled: managed strategies, then the announcement.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     },
     {
@@ -50,7 +58,9 @@
       "name": "Home · sectors & highlights",
       "figma": "",
       "note": "Same page, scrolled.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     },
     {
@@ -58,7 +68,9 @@
       "name": "Home · trade ideas",
       "figma": "",
       "note": "Same page, scrolled: featured ideas, neighbours peek.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     },
     {
@@ -66,7 +78,9 @@
       "name": "Home · idea baskets & disclosure",
       "figma": "",
       "note": "The end of the page.",
-      "goesTo": [],
+      "goesTo": [
+        "search-01"
+      ],
       "figmaUrl": ""
     }
   ],
