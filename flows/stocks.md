@@ -4,7 +4,7 @@
 
 The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.
 
-Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks · machine-readable: https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/stocks.json
+Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machine-readable: https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/stocks.json
 
 ## Screens
 
@@ -24,7 +24,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks · 
 > The spec for this flow. A developer should be able to build it on any platform (Flutter, iOS, web) from this file,
 > the screens in this folder and the live app — without reading the rest of the repo.
 
-- **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks · one screen: `#/frame/stocks-01`
+- **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · one screen: `#/stocks-01`
 - **Source:** screenshots of the live app's Stocks tab (dark theme), shared 2026-10-17 — there's no Figma for it yet.
   Rebuilt in L3.
 - **Status:** 🟨 Home done; search is its own flow (`search`), opened from the top bar (stock page and lists come next) · 2026-10-19
@@ -1312,10 +1312,7 @@ export type CopyVars = Record<string, string | number>
 export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
   return function t(key: keyof Copy & string, vars?: CopyVars): string {
     const template = copy[key] ?? key
-    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
-    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
-    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
-    return text
+    return vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
   }
 }
 ```
@@ -1410,6 +1407,43 @@ export const watchlists: Watchlist[] = [
   { id: 'banks', name: 'Banks', count: 6 },
   { id: 'to-research', name: 'To research', count: 0 },
 ]
+```
+
+### `src/shared/prototype.ts`
+
+```ts
+// Prototype behaviour the flows use — the ONLY way a flow touches the preview (src/preview). In a real app: interactive
+// is always true, `go` is the app's navigation, and useAutoAdvance is "when the server answers, go on" (a loader /
+// polling step).
+import { createContext, useContext, useEffect } from 'react'
+
+export type Preview = {
+  /**
+   * Prototype (true): real modal L3 BottomSheets, taps move to the next screen, loaders advance on their own.
+   * Board (false): every screen frozen as in the Figma board — sheets are drawn as static surfaces.
+   */
+  interactive: boolean
+  /** Go to another screen of the flow (by id). Does nothing on the board. */
+  go: (id: string) => void
+  /** The screen being shown — a new id gives the sheet a fresh mount while the page behind it stays put. */
+  screenId?: string
+}
+
+export const PreviewContext = createContext<Preview>({ interactive: false, go: () => {} })
+export const usePreview = () => useContext(PreviewContext)
+
+/** Prototype only: after `ms`, go to `next` (loaders, "Verifying…"). */
+export function useAutoAdvance(next: string | undefined, ms: number) {
+  const { interactive, go } = usePreview()
+  useEffect(() => {
+    if (!interactive || !next) return
+    const t = window.setTimeout(() => go(next), ms)
+    return () => window.clearTimeout(t)
+  }, [interactive, next, ms, go])
+}
+
+/** How long a loader or "Verifying…" state stays up in the prototype. */
+export const LOADING_MS = 1600
 ```
 
 ### `src/shared/ui/MainNav.tsx`
@@ -1651,7 +1685,7 @@ export function Rail({ children, label, visible, rows = 1, snap = 'start', class
 
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
-import { usePreview } from '../../preview/context'
+import { usePreview } from '../prototype'
 import raised from './Raised.module.css'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
@@ -1726,7 +1760,7 @@ export function Screen({ top, bottom, toast, sheet, children, className }: Scree
 import { createContext, useCallback, useContext, useId, useLayoutEffect, useState, type ReactNode } from 'react'
 import { BottomSheet, BottomSheetSurface } from '@l3/components/BottomSheet'
 import { Overlay } from '@l3/components/Overlay'
-import { usePreview } from '../../preview/context'
+import { usePreview } from '../prototype'
 import styles from './Sheet.module.css'
 
 /** Lets the L3 sheet play its exit before the next screen replaces it (≈ motion/duration-medium). */

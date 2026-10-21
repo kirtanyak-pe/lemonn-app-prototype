@@ -4,13 +4,13 @@
 
 Welcome, mobile number + OTP, fingerprint, PIN and email — where the app starts.
 
-Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/login · machine-readable: https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/login.json
+Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/login · machine-readable: https://kirtanyak-pe.github.io/lemonn-app-prototype/flows/login.json
 
 ## Screens
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `login-01` | Welcome | [5436:7914](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7914) | `login-02`, `login-06` | Slides auto-advance every 3.5 s (dots jump). Continue with CoinSwitch signs in via CoinSwitch and skips the OTP. |
+| `login-01` | Welcome | [5436:7914](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7914) | `login-03`, `login-06` | Slides auto-advance every 3.5 s (dots jump). Continue with CoinSwitch signs in via CoinSwitch and skips the OTP. |
 | `login-02` | Mobile number | [5436:7915](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7915) | `login-01`, `login-04` | Get OTP is off until 10 digits are typed. |
 | `login-03` | Mobile number · typed | [5436:7915](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7915) | `login-01`, `login-04` |  |
 | `login-04` | OTP | [5436:7916](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7916) | `login-03`, `login-06`, `login-05` | The 6th digit verifies on its own. In the prototype 000000 is a wrong code. |
@@ -26,7 +26,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/login · m
 > The spec for this flow. A developer should be able to build it on any platform (Flutter, iOS, web) from this file,
 > the Figma links and the screens in this folder — without reading the rest of the repo.
 
-- **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/login · one screen: `#/frame/login-01`
+- **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/login · one screen: `#/login-01`
 - **Figma:** [User flow – auth, account setup](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=2103-86)
   (screenshots of the live app, old design system — this flow redesigns them in L3)
 - **Status:** ✅ · last updated 2026-10-16
@@ -198,8 +198,8 @@ export function Dots({ count, index, onPick }: { count: number; index: number; o
   "welcome.slide3.title": "Trade with guardrails",
   "welcome.slide3.description": "Stop-loss, take-profit and P&L protection built in",
   "welcome.actionsLabel": "Get started",
-  "welcome.login": "Login & Signup",
-  "welcome.coinswitch": "Continue with CoinSwitch",
+  "welcome.login": "Login with Coinswitch",
+  "welcome.coinswitch": "Login & Signup",
   "welcome.sebi": "SEBI Reg. No. {reg}",
   "dots.label": "Slides",
   "dots.slide": "Slide {n} of {count}",
@@ -308,7 +308,7 @@ export const login: Flow = {
     {
       id: 'login-01', name: 'Welcome', figma: '5436:7914',
       note: 'Slides auto-advance every 3.5 s (dots jump). Continue with CoinSwitch signs in via CoinSwitch and skips the OTP.',
-      render: (go) => <Welcome onLogin={() => go('login-02')} onCoinSwitch={() => go('login-06')} />,
+      render: (go) => <Welcome onLogin={() => go('login-03')} onCoinSwitch={() => go('login-06')} />,
     },
     {
       id: 'login-02', name: 'Mobile number', figma: '5436:7915',
@@ -531,6 +531,8 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
       <Intro title={copy('otp.title')} description={copy('otp.description')} />
       <Section paddingBlock="24" paddingInline="16" gap="16" ref={boxes}>
         <OtpInput
+          autoFocus
+          mask
           length={OTP_LENGTH}
           label={copy('otp.label')}
           value={code}
@@ -581,7 +583,7 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
       bottom={
         <>
           <ButtonGroup aria-label={t('phone.actionsLabel')}>
-            <Button disabled={!ready} onClick={() => onSubmit?.(digits)}>{t('phone.submit')}</Button>
+            <Button variant="brand" disabled={!ready} onClick={() => onSubmit?.(digits)}>{t('phone.submit')}</Button>
           </ButtonGroup>
           <Keyboard onKey={(k) => setDigits((d) => typeKey(d, k, 10))} />
         </>
@@ -798,7 +800,7 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
       bottom={
         <>
           <ButtonGroup aria-label={copy('welcome.actionsLabel')}>
-            <Button onClick={onLogin}>{copy('welcome.login')}</Button>
+            <Button variant="buy" onClick={onLogin}>{copy('welcome.login')}</Button>
             <Button variant="secondary" iconLeft={<BrandLogo brand="coinswitch" variant="icon" size={24} decorative />} onClick={onCoinSwitch}>
               {copy('welcome.coinswitch')}
             </Button>
@@ -807,15 +809,15 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
         </>
       }
     >
-      <Stack className={styles.page}>
-        <Stack align="center" gap="48" className={styles.hero} data-status-surface="brand">
-          <Stack align="center" gap="08">
+      <Stack style={{ background: 'var(--l3-surface-accent-brand-light)' }} className={styles.page}>
+        <Stack style={{ borderRadius: 'var(--l3-radius-00)' }} align="center" gap="48" className={styles.hero} data-status-surface="brand">
+          <Stack style={{ borderRadius: 'var(--l3-radius-00)' }} align="center" gap="08">
             <BrandLogo brand="lemonn" size={32} />
             <p className={styles.tagline}>{copy('welcome.tagline')}</p>
           </Stack>
           <Spot icon={slide.icon} tone="plain" />
         </Stack>
-        <Stack justify="center" className={styles.fill}>
+        <Stack style={{ borderRadius: 'var(--l3-radius-24)', background: 'var(--l3-surface-primary)' }} justify="center" className={styles.fill}>
           <Section padding="24" gap="24" align="center" className={styles.slide}>
             <div aria-live="polite">
               <h1 className={styles.title}>{copy(`welcome.${slide.id}.title`)}</h1>
@@ -851,10 +853,7 @@ export type CopyVars = Record<string, string | number>
 export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
   return function t(key: keyof Copy & string, vars?: CopyVars): string {
     const template = copy[key] ?? key
-    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
-    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
-    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
-    return text
+    return vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
   }
 }
 ```
@@ -914,9 +913,38 @@ export const bankAccount: BankAccount = {
 ### `src/shared/prototype.ts`
 
 ```ts
-// Prototype behaviour flows may use — the ONLY way a flow touches the preview. In a real app these are: interactive =
-// always true; useAutoAdvance = "when the server answers, go on" (a loader / polling step).
-export { LOADING_MS, usePreview, useAutoAdvance } from '../preview/context'
+// Prototype behaviour the flows use — the ONLY way a flow touches the preview (src/preview). In a real app: interactive
+// is always true, `go` is the app's navigation, and useAutoAdvance is "when the server answers, go on" (a loader /
+// polling step).
+import { createContext, useContext, useEffect } from 'react'
+
+export type Preview = {
+  /**
+   * Prototype (true): real modal L3 BottomSheets, taps move to the next screen, loaders advance on their own.
+   * Board (false): every screen frozen as in the Figma board — sheets are drawn as static surfaces.
+   */
+  interactive: boolean
+  /** Go to another screen of the flow (by id). Does nothing on the board. */
+  go: (id: string) => void
+  /** The screen being shown — a new id gives the sheet a fresh mount while the page behind it stays put. */
+  screenId?: string
+}
+
+export const PreviewContext = createContext<Preview>({ interactive: false, go: () => {} })
+export const usePreview = () => useContext(PreviewContext)
+
+/** Prototype only: after `ms`, go to `next` (loaders, "Verifying…"). */
+export function useAutoAdvance(next: string | undefined, ms: number) {
+  const { interactive, go } = usePreview()
+  useEffect(() => {
+    if (!interactive || !next) return
+    const t = window.setTimeout(() => go(next), ms)
+    return () => window.clearTimeout(t)
+  }, [interactive, next, ms, go])
+}
+
+/** How long a loader or "Verifying…" state stays up in the prototype. */
+export const LOADING_MS = 1600
 ```
 
 ### `src/shared/ui/Intro.module.css`
@@ -1209,7 +1237,7 @@ export function useKeypadFocus(value: string, length: number, enabled: boolean) 
 
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
-import { usePreview } from '../../preview/context'
+import { usePreview } from '../prototype'
 import raised from './Raised.module.css'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
@@ -1284,7 +1312,7 @@ export function Screen({ top, bottom, toast, sheet, children, className }: Scree
 import { createContext, useCallback, useContext, useId, useLayoutEffect, useState, type ReactNode } from 'react'
 import { BottomSheet, BottomSheetSurface } from '@l3/components/BottomSheet'
 import { Overlay } from '@l3/components/Overlay'
-import { usePreview } from '../../preview/context'
+import { usePreview } from '../prototype'
 import styles from './Sheet.module.css'
 
 /** Lets the L3 sheet play its exit before the next screen replaces it (≈ motion/duration-medium). */

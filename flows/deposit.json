@@ -8,9 +8,8 @@
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
-    "board": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/deposit",
-    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/play/<screen-id>",
-    "frame": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/frame/<screen-id>"
+    "flow": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/deposit",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/<screen-id>"
   },
   "screens": [
     {

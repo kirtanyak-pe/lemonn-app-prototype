@@ -1,6 +1,6 @@
 # Converting a Lemonn flow (for AI agents and developers)
 
-You were given a link to a flow of the Lemonn app (e.g. `…/flows/market.md`, `…/#/flow/market`, or the GitHub folder
+You were given a link to a flow of the Lemonn app (e.g. `…/flows/market.md`, `…/#/market`, or the GitHub folder
 `src/flows/market`). This repo is the **design reference**: React + the Lemonnade V3 (L3) design system, built to
 match the Figma designs. Your job is to reproduce the flow in the target codebase (Flutter for Android, or iOS / web),
 using that codebase's own architecture, state management and API layer.
@@ -12,8 +12,7 @@ using that codebase's own architecture, state management and API layer.
 3. For every L3 component used, look it up in the design system:
    https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt (component pages, props, tokens, rules). The component
    name in code = the component name in Figma (`Button` = "L3: Button").
-4. If you can open web pages: `#/frame/<screen-id>` shows one screen at 392 × 872 (the design size); `#/play/<screen-id>` is the
-   clickable prototype. Figma links are in the screen table.
+4. If you can open web pages: `#/<screen-id>` plays one screen in a 392 × 872 mockup (the design size), clickable. Figma links are in the screen table.
 
 ## 2. What to carry over, and how
 | In this repo | In the target app |
@@ -41,7 +40,7 @@ using that codebase's own architecture, state management and API layer.
   platform's default page transition). Sheet → sheet over the same page swaps the sheet's content; the page stays.
 - **Raised buttons are an experiment** (`src/shared/ui/Raised.module.css`: a soft sheen, edge bevel and drop shadow on
   every button). Build plain L3 buttons unless the design system has adopted it.
-- **Don't copy the preview code** (`src/preview/`, `src/main.tsx`, the phone frame, the board) — it only exists to show
+- **Don't copy the preview code** (`src/preview/`, `src/main.tsx`, the phone mockup, the list of flows) — it only exists to show
   the flow here.
 - When the spec and the code disagree, the spec wins; when both are unclear, the Figma frame decides — ask before
   inventing.

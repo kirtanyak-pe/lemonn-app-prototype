@@ -8,9 +8,8 @@
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
-    "board": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/stocks",
-    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/play/<screen-id>",
-    "frame": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/frame/<screen-id>"
+    "flow": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/<screen-id>"
   },
   "screens": [
     {
@@ -103,6 +102,7 @@
     "src/shared/data/format.ts",
     "src/shared/data/market.ts",
     "src/shared/data/portfolio.ts",
+    "src/shared/prototype.ts",
     "src/shared/ui/MainNav.tsx",
     "src/shared/ui/Rail.module.css",
     "src/shared/ui/Rail.tsx",

@@ -8,9 +8,8 @@
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
-    "board": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/flow/login",
-    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/play/<screen-id>",
-    "frame": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/frame/<screen-id>"
+    "flow": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/login",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/<screen-id>"
   },
   "screens": [
     {
@@ -19,7 +18,7 @@
       "figma": "5436:7914",
       "note": "Slides auto-advance every 3.5 s (dots jump). Continue with CoinSwitch signs in via CoinSwitch and skips the OTP.",
       "goesTo": [
-        "login-02",
+        "login-03",
         "login-06"
       ],
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=5436-7914"
