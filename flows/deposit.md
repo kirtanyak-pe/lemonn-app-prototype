@@ -1,6 +1,6 @@
 # Flow: First deposit (`deposit`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Add money over UPI after account setup: amount, UPI app, confirmation, receipt or failure.
 
@@ -76,6 +76,7 @@ From `src/shared/data/user.ts` (fictional sample user) and `data.ts`:
 | Result art | **Illustration slot** (`Spot`, src/shared/ui) | lg 96 + halo: success / error tone |
 | Receipt | KeyValueList + KeyValueRow | `variant="card"`, reference row `copy` |
 | Failed buttons | ButtonGroup | vertical: Try again (primary) over Change payment method (secondary) |
+| Layout | Section · Stack · Grid (Figma auto-layout frames) | Add money: Section `paddingBlock="24" paddingInline="16" gap="24"` → Stack `gap="12"` per block; "+" amounts Grid `columns={2} gap="08"`. Status screens: Stack `justify="center"` filling the body → Section 24 / 16, `gap="24"` |
 
 ### Rules & behaviour
 
@@ -108,9 +109,62 @@ From `src/shared/data/user.ts` (fictional sample user) and `data.ts`:
 ### Changelog
 
 - 2026-10-16 — first version (5 screens).
+- 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Section, Stack, Grid); nothing moved (measured at 392).
 
 
 ## Source — this flow
+
+### `src/flows/deposit/copy.json`
+
+```json
+{
+  "addMoney.title": "Add money",
+  "addMoney.payLabel": "Pay",
+  "addMoney.cta": "Add {amount}",
+  "addMoney.perksHeading": "Your first-deposit perks",
+  "addMoney.amountLabel": "Amount",
+  "addMoney.tooLow": "Add at least {min}",
+  "addMoney.tooHigh": "You can add up to {max} at a time",
+  "addMoney.range": "Min {min} · Max {max}",
+  "addMoney.quickLabel": "Add to amount",
+  "addMoney.payWith": "Pay with",
+  "addMoney.upi": "UPI · {app}",
+  "addMoney.upiLimit": "UPI works up to {limit} a day. For more, choose net banking.",
+  "handoff.title": "Add money",
+  "handoff.groupLabel": "Payment",
+  "handoff.cancel": "Cancel payment",
+  "handoff.heading": "Approve {amount} in {app}",
+  "handoff.description": "Keep this screen open — we’ll update as soon as you pay",
+  "handoff.provider": "{app} · UPI app",
+  "handoff.step1": "Pick the bank account (it must be your verified one)",
+  "handoff.step2": "Enter your UPI PIN to approve",
+  "processing.title": "Confirming your payment",
+  "processing.description": "This takes a few seconds",
+  "success.groupLabel": "Next",
+  "success.cta": "Start investing",
+  "success.title": "{amount} added",
+  "success.description": "It’s in your Lemonn balance, ready to invest",
+  "success.receiptLabel": "Payment receipt",
+  "success.paidWith": "Paid with",
+  "success.reference": "Reference no.",
+  "success.time": "Time",
+  "failed.groupLabel": "Try again",
+  "failed.retry": "Try again",
+  "failed.change": "Change payment method",
+  "failed.title": "Payment didn’t go through",
+  "failed.description": "If money left your bank, it comes back in 3–5 working days. Nothing was added to Lemonn."
+}
+```
+
+### `src/flows/deposit/copy.ts`
+
+```ts
+import { makeCopy } from '../../shared/copy'
+import copy from './copy.json'
+
+/** Every user-facing string of Deposit is in copy.json: t('addMoney.title'), t('addMoney.cta', { amount }). */
+export const t = makeCopy('deposit', copy)
+```
 
 ### `src/flows/deposit/data.ts`
 
@@ -161,15 +215,19 @@ import { useState } from 'react'
 import { Actionbar } from '@l3/components/Actionbar'
 import { Aerobar } from '@l3/components/Aerobar'
 import { Button } from '@l3/components/Button'
+import { Grid } from '@l3/components/Grid'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
+import { Section } from '@l3/components/Section'
 import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
 import { TextField } from '@l3/components/TextField'
 import { msCelebration, msChevronRight, msUpiPay } from '@l3/icons/material'
 import { inr } from '../../../shared/data/format'
 import { Screen } from '../../../shared/ui/Screen'
 import { defaultAmount, firstDepositPerks, MAX_DEPOSIT, MIN_DEPOSIT, quickAmounts, UPI_LIMIT, upiApp } from '../data'
+import { t } from '../copy'
 import styles from './Deposit.module.css'
 
 /**
@@ -182,34 +240,34 @@ export function AddMoney({ first = true, onBack, onPay, onMethod }: { first?: bo
   const tooHigh = amount > MAX_DEPOSIT
   return (
     <Screen
-      top={<Actionbar title="Add money" onBack={onBack} />}
-      bottom={<ButtonGroup aria-label="Pay"><Button disabled={tooLow || tooHigh} onClick={onPay}>Add {inr(amount, 0)}</Button></ButtonGroup>}
+      top={<Actionbar title={t('addMoney.title')} onBack={onBack} />}
+      bottom={<ButtonGroup aria-label={t('addMoney.payLabel')}><Button disabled={tooLow || tooHigh} onClick={onPay}>{t('addMoney.cta', { amount: inr(amount, 0) })}</Button></ButtonGroup>}
     >
-      <div className={styles.content}>
+      <Section paddingBlock="24" paddingInline="16" gap="24">
         {first && (
-          <Aerobar floating placement="inline" type="success" icon={<Icon icon={msCelebration} />} heading="Your first-deposit perks" paragraph={firstDepositPerks.join(' · ')} />
+          <Aerobar floating placement="inline" type="success" icon={<Icon icon={msCelebration} />} heading={t('addMoney.perksHeading')} paragraph={firstDepositPerks.join(' · ')} />
         )}
-        <section className={styles.section}>
+        <Stack as="section" gap="12">
           <TextField
-            label="Amount"
+            label={t('addMoney.amountLabel')}
             inputMode="numeric"
             value={inr(amount, 0)}
             onChange={(e) => setAmount(Number(e.target.value.replace(/[^\d]/g, '')) || 0)}
             status={tooLow || tooHigh ? 'error' : undefined}
-            helperText={tooLow ? `Add at least ${inr(MIN_DEPOSIT, 0)}` : tooHigh ? `You can add up to ${inr(MAX_DEPOSIT, 0)} at a time` : `Min ${inr(MIN_DEPOSIT, 0)} · Max ${inr(MAX_DEPOSIT, 0)}`}
+            helperText={tooLow ? t('addMoney.tooLow', { min: inr(MIN_DEPOSIT, 0) }) : tooHigh ? t('addMoney.tooHigh', { max: inr(MAX_DEPOSIT, 0) }) : t('addMoney.range', { min: inr(MIN_DEPOSIT, 0), max: inr(MAX_DEPOSIT, 0) })}
           />
-          <div className={styles.quick} role="group" aria-label="Add to amount">
+          <Grid columns={2} gap="08" role="group" aria-label={t('addMoney.quickLabel')}>
             {quickAmounts.map((q) => (
               <Button key={q} variant="tertiary" fullWidth onClick={() => setAmount((a) => a + q)}>+{inr(q, 0)}</Button>
             ))}
-          </div>
-        </section>
-        <section className={styles.section}>
-          <SectionHeader title="Pay with" />
-          <ListCell variant="card" as="button" iconLeft={<Icon icon={msUpiPay} />} label={`UPI · ${upiApp.name}`} description={upiApp.detail} iconRight={<Icon icon={msChevronRight} />} onClick={onMethod} />
-          <p className={styles.fine}>UPI works up to {inr(UPI_LIMIT, 0)} a day. For more, choose net banking.</p>
-        </section>
-      </div>
+          </Grid>
+        </Stack>
+        <Stack as="section" gap="12">
+          <SectionHeader title={t('addMoney.payWith')} />
+          <ListCell variant="card" as="button" iconLeft={<Icon icon={msUpiPay} />} label={t('addMoney.upi', { app: upiApp.name })} description={upiApp.detail} iconRight={<Icon icon={msChevronRight} />} onClick={onMethod} />
+          <p className={styles.fine}>{t('addMoney.upiLimit', { limit: inr(UPI_LIMIT, 0) })}</p>
+        </Stack>
+      </Section>
     </Screen>
   )
 }
@@ -218,34 +276,11 @@ export function AddMoney({ first = true, onBack, onPay, onMethod }: { first?: bo
 ### `src/flows/deposit/screens/Deposit.module.css`
 
 ```css
-/* Shared layout for the deposit screens. */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-24);
-  padding: var(--l3-spacing-24) var(--l3-spacing-16);
-}
+/* Deposit screens: layout is L3 Stack / Section / Grid; only what those blocks don't cover lives here. */
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
-}
-
-/* Quick "+" amounts: four Large tertiary buttons don't fit one row at phone width, so an even 2 × 2 grid. */
-.quick {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--l3-spacing-08);
-}
-
-.centre {
-  display: flex;
+/* The centred status screens: the Stack fills the body so justify="center" centres the Section vertically. */
+.fill {
   flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--l3-spacing-24);
-  padding: var(--l3-spacing-24) var(--l3-spacing-16);
 }
 
 .fine {
@@ -263,6 +298,8 @@ import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
 import { Loader } from '@l3/components/Loader'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msCheckCircle, msError } from '@l3/icons/material'
 import { useAutoAdvance } from '../../../shared/prototype'
 import { inr } from '../../../shared/data/format'
@@ -271,6 +308,7 @@ import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import { defaultAmount, receipt, upiApp } from '../data'
+import { t } from '../copy'
 import styles from './Deposit.module.css'
 
 /** deposit-02 · HANDOFF: the payment is approved in the UPI app (not built by Lemonn). */
@@ -278,13 +316,15 @@ export function UpiHandoff({ next, onCancel }: { next?: string; onCancel?: () =>
   useAutoAdvance(next, 2800)
   return (
     <Screen
-      top={<Actionbar title="Add money" />}
-      bottom={<ButtonGroup aria-label="Payment"><Button variant="secondary" onClick={onCancel}>Cancel payment</Button></ButtonGroup>}
+      top={<Actionbar title={t('handoff.title')} />}
+      bottom={<ButtonGroup aria-label={t('handoff.groupLabel')}><Button variant="secondary" onClick={onCancel}>{t('handoff.cancel')}</Button></ButtonGroup>}
     >
-      <div className={styles.centre}>
-        <Intro align="center" art={<Loader size="lg" label={null} />} title={`Approve ${inr(defaultAmount, 0)} in ${upiApp.name}`} description="Keep this screen open — we’ll update as soon as you pay" />
-        <External provider={`${upiApp.name} · UPI app`} steps={['Pick the bank account (it must be your verified one)', 'Enter your UPI PIN to approve']} />
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro align="center" art={<Loader size="lg" label={null} />} title={t('handoff.heading', { amount: inr(defaultAmount, 0), app: upiApp.name })} description={t('handoff.description')} />
+          <External provider={t('handoff.provider', { app: upiApp.name })} steps={[t('handoff.step1'), t('handoff.step2')]} />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -294,9 +334,11 @@ export function Processing({ next }: { next?: string }) {
   useAutoAdvance(next, 2000)
   return (
     <Screen>
-      <div className={styles.centre}>
-        <Intro align="center" art={<Loader size="lg" label={null} />} title="Confirming your payment" description="This takes a few seconds" />
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro align="center" art={<Loader size="lg" label={null} />} title={t('processing.title')} description={t('processing.description')} />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -304,15 +346,17 @@ export function Processing({ next }: { next?: string }) {
 /** deposit-04 · Money added: the receipt, then into the app. */
 export function Success({ onStart }: { onStart?: () => void }) {
   return (
-    <Screen bottom={<ButtonGroup aria-label="Next"><Button onClick={onStart}>Start investing</Button></ButtonGroup>}>
-      <div className={styles.centre}>
-        <Intro align="center" art={<Spot icon={msCheckCircle} tone="success" />} title={`${inr(defaultAmount, 0)} added`} description="It’s in your Lemonn balance, ready to invest" />
-        <KeyValueList variant="card" aria-label="Payment receipt">
-          <KeyValueRow label="Paid with" value={`${upiApp.name} · ${upiApp.detail}`} />
-          <KeyValueRow label="Reference no." value={receipt.reference} copy />
-          <KeyValueRow label="Time" value={receipt.time} />
-        </KeyValueList>
-      </div>
+    <Screen bottom={<ButtonGroup aria-label={t('success.groupLabel')}><Button onClick={onStart}>{t('success.cta')}</Button></ButtonGroup>}>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro align="center" art={<Spot icon={msCheckCircle} tone="success" />} title={t('success.title', { amount: inr(defaultAmount, 0) })} description={t('success.description')} />
+          <KeyValueList variant="card" aria-label={t('success.receiptLabel')}>
+            <KeyValueRow label={t('success.paidWith')} value={`${upiApp.name} · ${upiApp.detail}`} />
+            <KeyValueRow label={t('success.reference')} value={receipt.reference} copy />
+            <KeyValueRow label={t('success.time')} value={receipt.time} />
+          </KeyValueList>
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -322,21 +366,50 @@ export function Failed({ onRetry, onChange }: { onRetry?: () => void; onChange?:
   return (
     <Screen
       bottom={
-        <ButtonGroup aria-label="Try again">
-          <Button onClick={onRetry}>Try again</Button>
-          <Button variant="secondary" onClick={onChange}>Change payment method</Button>
+        <ButtonGroup aria-label={t('failed.groupLabel')}>
+          <Button onClick={onRetry}>{t('failed.retry')}</Button>
+          <Button variant="secondary" onClick={onChange}>{t('failed.change')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.centre}>
-        <Intro align="center" art={<Spot icon={msError} tone="error" />} title="Payment didn’t go through" description="If money left your bank, it comes back in 3–5 working days. Nothing was added to Lemonn." />
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro align="center" art={<Spot icon={msError} tone="error" />} title={t('failed.title')} description={t('failed.description')} />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
 ```
 
 ## Source — shared app parts it uses
+
+### `src/shared/copy.ts`
+
+```ts
+/**
+ * UI copy. Every user-facing string of a flow lives in ONE file, `src/flows/<flow-id>/copy.json` — flat keys
+ * ("empty.title") → the text. Screens read it through the flow's `t`:
+ *
+ *   t('empty.title')                       → "No search results found"
+ *   t('group.results', { list, count })    → "Stocks (8)"   ({name} placeholders are filled in)
+ *
+ * Sample data (stock names, prices, watchlists) stays in the flow's data.ts — copy.json is only the words the app
+ * itself says: titles, labels, buttons, empty states, accessible names. Porting a flow: this file is the string
+ * table (Flutter ARB / iOS Localizable.strings).
+ */
+export type CopyVars = Record<string, string | number>
+
+export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
+  return function t(key: keyof Copy & string, vars?: CopyVars): string {
+    const template = copy[key] ?? key
+    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
+    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
+    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
+    return text
+  }
+}
+```
 
 ### `src/shared/data/format.ts`
 

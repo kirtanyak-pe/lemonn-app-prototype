@@ -1,6 +1,6 @@
 # Flow: Market (`market`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 The Market tab — stock lists (all, gainers, losers, under ₹100 / ₹500) and Filters.
 
@@ -85,6 +85,7 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 | Options | ListCell + Radio / Checkbox | `as="label"`, `size="sm"`, `multiline`; description = range (market cap) · "n stocks" (what it gives); a 0-stock option's control is `disabled` |
 | Sheet buttons | ButtonGroup | horizontal: Clear all (secondary, off when nothing is picked) · "Show n stocks" (primary — never the brand colour) |
 | Main navbar | BottomNavbar (`MainNav`) | `value="market"` |
+| Layout | Stack · Inset · Section (Figma auto-layout frames) | Page: Stack `gap="16"` (16 above, 24 below); filter bar: Inset `paddingInline="16"` → Stack `direction="horizontal" align="center" gap="12"`, applied chips a horizontal Stack `gap="08"` that scrolls; list: Section `as="ul" paddingInline="16" gap="16"`. The Filters sheet's 2 : 3 split and side tabs stay CSS |
 
 ### Rules & behaviour
 
@@ -119,6 +120,7 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 
 ### Changelog
 
+- 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Stack, Inset, Section); nothing moved (measured at 392).
 - 2026-10-19 — Filters sheet redesigned: side tabs show one group at a time (grey rail, pick counts), multi-select
   for quick filters / market cap / sectors, stock counts per option (0 = off), Clear all · Show n stocks in the dock.
 - 2026-10-19 — the filter button is Small (32 × 32).
@@ -201,6 +203,7 @@ mid ₹5,000–20,000 Cr, large > ₹20,000 Cr), market cap and the indices it's
 ```tsx
 import { useRef, type KeyboardEvent } from 'react'
 import { Badge } from '@l3/components/Badge'
+import { t as copy } from '../copy'
 import styles from './SideTabs.module.css'
 
 type SideTab<V extends string> = { value: V; label: string; /** How many choices are picked in it (0 = none). */ count?: number }
@@ -248,7 +251,7 @@ export function SideTabs<V extends string>({ items, value, onChange, idBase, ...
             onClick={() => onChange(t.value)}
           >
             <span className={styles.label}>{t.label}</span>
-            {t.count ? <Badge count={t.count} color="neutral" label="picked" /> : null}
+            {t.count ? <Badge count={t.count} color="neutral" label={copy('sheet.picked')} /> : null}
           </button>
         )
       })}
@@ -303,6 +306,55 @@ export function StockRow({ stock, onOpen }: { stock: MarketStock; onOpen?: (symb
     />
   )
 }
+```
+
+### `src/flows/market/copy.json`
+
+```json
+{
+  "title": "Market",
+  "action.search": "Search",
+  "action.wallet": "Wallet",
+  "tabs.label": "Market lists",
+  "tab.all": "All",
+  "tab.gainers": "Top gainers",
+  "tab.losers": "Top losers",
+  "tab.under-100": "Under ₹100",
+  "tab.under-500": "Under ₹500",
+  "filterBar.hint": "Apply filters",
+  "filterBar.appliedLabel": "Applied filters",
+  "filterBar.remove": "Remove {name}",
+  "filterBar.button": "Filters",
+  "filterBar.appliedCount": "{count} applied",
+  "empty.title": "No stocks match",
+  "empty.description": "Try removing a filter, or pick another list.",
+  "sheet.title": "Filters",
+  "sheet.groupsLabel": "Filter groups",
+  "group.sort": "Sort by",
+  "group.quick": "Quick filters",
+  "group.index": "Indices",
+  "group.cap": "Market cap",
+  "group.sector": "Sectors",
+  "sheet.pickOne": "Pick one",
+  "sheet.pickAny": "Pick any",
+  "sheet.picked": "picked",
+  "sheet.clearAll": "Clear all",
+  "sheet.noStocks": "No stocks",
+  "sheet.oneStock": "1 stock",
+  "sheet.stocks": "{count} stocks",
+  "sheet.showOne": "Show 1 stock",
+  "sheet.show": "Show {count} stocks"
+}
+```
+
+### `src/flows/market/copy.ts`
+
+```ts
+import { makeCopy } from '../../shared/copy'
+import copy from './copy.json'
+
+/** Every user-facing string of Market is in copy.json: t('empty.title'), t('sheet.show', { count }). */
+export const t = makeCopy('market', copy)
 ```
 
 ### `src/flows/market/data.ts`
@@ -360,13 +412,8 @@ export const universe: MarketStock[] = [
 
 /** The Market tabs: same layout, a different list (and, for the movers, a different order). */
 export type MarketTab = 'all' | 'gainers' | 'losers' | 'under-100' | 'under-500'
-export const tabs: { value: MarketTab; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'gainers', label: 'Top gainers' },
-  { value: 'losers', label: 'Top losers' },
-  { value: 'under-100', label: 'Under ₹100' },
-  { value: 'under-500', label: 'Under ₹500' },
-]
+/** In order. Their names are in copy.json (tab.<id>). */
+export const tabs: MarketTab[] = ['all', 'gainers', 'losers', 'under-100', 'under-500']
 
 export const listFor = (tab: MarketTab): MarketStock[] => {
   switch (tab) {
@@ -385,14 +432,15 @@ export const listFor = (tab: MarketTab): MarketStock[] => {
  */
 export type FilterGroupId = 'sort' | 'quick' | 'index' | 'cap' | 'sector'
 export type FilterOption = { id: string; label: string; description?: string; test?: (x: MarketStock) => boolean }
-export type FilterGroup = { id: FilterGroupId; label: string; select: 'one' | 'any'; options: FilterOption[] }
+/** A group's name is in copy.json (group.<id>). */
+export type FilterGroup = { id: FilterGroupId; select: 'one' | 'any'; options: FilterOption[] }
 
 const inIndex = (id: IndexId) => (x: MarketStock) => x.indices.includes(id)
 const inSector = (id: SectorId) => (x: MarketStock) => x.sector === id
 
 export const filterGroups: FilterGroup[] = [
   {
-    id: 'sort', label: 'Sort by', select: 'one', options: [
+    id: 'sort', select: 'one', options: [
       { id: 'mcap-asc', label: 'Market cap: low to high' },
       { id: 'mcap-desc', label: 'Market cap: high to low' },
       { id: 'price-asc', label: 'Price: low to high' },
@@ -400,7 +448,7 @@ export const filterGroups: FilterGroup[] = [
     ],
   },
   {
-    id: 'quick', label: 'Quick filters', select: 'any', options: [
+    id: 'quick', select: 'any', options: [
       { id: 'nifty-midcap-100', label: 'NIFTY Midcap 100', test: inIndex('nifty-midcap-100') },
       { id: 'banking', label: 'Banking stocks', test: inSector('banking') },
       { id: 'fmcg', label: 'FMCG stocks', test: inSector('fmcg') },
@@ -408,7 +456,7 @@ export const filterGroups: FilterGroup[] = [
     ],
   },
   {
-    id: 'index', label: 'Indices', select: 'one', options: [
+    id: 'index', select: 'one', options: [
       { id: 'nifty-50', label: 'Nifty 50', test: inIndex('nifty-50') },
       { id: 'nifty-500', label: 'Nifty 500', test: inIndex('nifty-500') },
       { id: 'nifty-auto', label: 'Nifty Auto', test: inIndex('nifty-auto') },
@@ -420,14 +468,14 @@ export const filterGroups: FilterGroup[] = [
     ],
   },
   {
-    id: 'cap', label: 'Market cap', select: 'any', options: [
+    id: 'cap', select: 'any', options: [
       { id: 'small', label: 'Small cap', description: 'Less than ₹5,000 Cr', test: (x) => x.cap === 'small' },
       { id: 'mid', label: 'Mid cap', description: '₹5,000 Cr to ₹20,000 Cr', test: (x) => x.cap === 'mid' },
       { id: 'large', label: 'Large cap', description: 'More than ₹20,000 Cr', test: (x) => x.cap === 'large' },
     ],
   },
   {
-    id: 'sector', label: 'Sectors', select: 'any', options: [
+    id: 'sector', select: 'any', options: [
       { id: 'oil-gas', label: 'Oil and gas', test: inSector('oil-gas') },
       { id: 'agriculture', label: 'Agriculture', test: inSector('agriculture') },
       { id: 'pharma', label: 'Pharma', test: inSector('pharma') },
@@ -516,20 +564,14 @@ export const market: Flow = {
 ### `src/flows/market/screens/Market.module.css`
 
 ```css
-/* Market — the filter bar over a list of stock cards (16 apart, inside the 16 page margin). */
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-16);
-  padding-block: var(--l3-spacing-16) var(--l3-spacing-24);
-}
+/*
+ * Market — the filter bar over a list of stock cards (16 apart, inside the 16 page margin). Layout is L3 Stack /
+ * Inset / Section; only text styles and what those blocks don't cover live here.
+ */
 
-/* Applied filters (or the hint) on the left, the filter button on the right; the chips scroll if they don't fit. */
-.filterBar {
-  display: flex;
-  align-items: center;
-  gap: var(--l3-spacing-12);
-  padding-inline: var(--l3-spacing-16);
+/* 16 above the filter bar but 24 below the list: Section's paddingBlock is the same top and bottom. */
+.page {
+  padding-block: var(--l3-spacing-16) var(--l3-spacing-24);
 }
 
 .filterHint {
@@ -538,12 +580,10 @@ export const market: Flow = {
   font: var(--l3-text-heading-16);
 }
 
+/* Applied filters: the row takes the space left of the filter button and scrolls sideways if the chips don't fit. */
 .applied {
   position: relative; /* keeps absolutely placed bits inside the scrolling row */
-  display: flex;
   flex: 1;
-  gap: var(--l3-spacing-08);
-  min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -560,15 +600,6 @@ export const market: Flow = {
   display: inline-flex;
   flex: none;
 }
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-16);
-  margin: 0;
-  padding: 0 var(--l3-spacing-16);
-  list-style: none;
-}
 ```
 
 ### `src/flows/market/screens/Market.tsx`
@@ -580,13 +611,17 @@ import { Badge } from '@l3/components/Badge'
 import { Button } from '@l3/components/Button'
 import { EmptyState } from '@l3/components/EmptyState'
 import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { Tabs } from '@l3/components/Tabs'
 import { msAccountBalanceWallet, msClose, msFilterAlt, msSearch } from '@l3/icons/material'
-import { MainNav, type Section } from '../../../shared/ui/MainNav'
+import { MainNav, type Section as NavSection } from '../../../shared/ui/MainNav'
 import { Screen } from '../../../shared/ui/Screen'
 import { StockRow } from '../components/StockRow'
 import { applyFilters, listFor, pickedIn, picks, tabs, withPicks, type FilterGroupId, type Filters, type MarketTab } from '../data'
 import { FilterSheet } from '../sheets/FilterSheet'
+import { t } from '../copy'
 import styles from './Market.module.css'
 
 type Props = {
@@ -595,7 +630,7 @@ type Props = {
   /** Open with the Filters sheet up, scrolled to a group (board frames). */
   sheet?: boolean
   sheetSection?: FilterGroupId
-  onTab?: (section: Section) => void
+  onTab?: (section: NavSection) => void
   /** The Search action in the top bar: opens the Search screen (search-24 — its back returns here). */
   onSearch?: () => void
 }
@@ -620,14 +655,14 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
     <Screen
       top={
         <Actionbar
-          title="Market"
+          title={t('title')}
           actions={
             <>
-              <ActionbarAction icon={msSearch} label="Search" onClick={() => onSearch?.()} />
-              <ActionbarAction icon={msAccountBalanceWallet} label="Wallet" onClick={() => {}} />
+              <ActionbarAction icon={msSearch} label={t('action.search')} onClick={() => onSearch?.()} />
+              <ActionbarAction icon={msAccountBalanceWallet} label={t('action.wallet')} onClick={() => {}} />
             </>
           }
-          bottom={<Tabs aria-label="Market lists" items={tabs} value={tab} onChange={(v) => setTab(v as MarketTab)} />}
+          bottom={<Tabs aria-label={t('tabs.label')} items={tabs.map((id) => ({ value: id, label: t(`tab.${id}`) }))} value={tab} onChange={(v) => setTab(v as MarketTab)} />}
         />
       }
       bottom={<MainNav value="market" onChange={onTab} />}
@@ -641,34 +676,36 @@ export function Market({ tab: initialTab = 'all', filters: initialFilters = {}, 
         />
       ) : undefined}
     >
-      <div className={styles.page}>
-        <div className={styles.filterBar}>
-          {applied.length ? (
-            <div className={styles.applied} role="group" aria-label="Applied filters">
-              {applied.map(({ group, option }) => (
-                <Button key={`${group}-${option.id}`} variant="secondary" iconRight={<Icon icon={msClose} />} aria-label={`Remove ${option.label}`} onClick={() => remove(group, option.id)}>
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          ) : (
-            <p className={styles.filterHint}>Apply filters</p>
-          )}
-          <span className={styles.filterButton}>
-            <Badge dot={applied.length > 0} label={`${applied.length} applied`}>
-              <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msFilterAlt} />} aria-label="Filters" onClick={() => setOpen(true)} />
-            </Badge>
-          </span>
-        </div>
+      <Stack gap="16" className={styles.page}>
+        <Inset paddingInline="16" paddingBlock="00">
+          <Stack direction="horizontal" align="center" gap="12">
+            {applied.length ? (
+              <Stack direction="horizontal" gap="08" className={styles.applied} role="group" aria-label={t('filterBar.appliedLabel')}>
+                {applied.map(({ group, option }) => (
+                  <Button key={`${group}-${option.id}`} variant="secondary" iconRight={<Icon icon={msClose} />} aria-label={t('filterBar.remove', { name: option.label })} onClick={() => remove(group, option.id)}>
+                    {option.label}
+                  </Button>
+                ))}
+              </Stack>
+            ) : (
+              <p className={styles.filterHint}>{t('filterBar.hint')}</p>
+            )}
+            <span className={styles.filterButton}>
+              <Badge dot={applied.length > 0} label={t('filterBar.appliedCount', { count: applied.length })}>
+                <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msFilterAlt} />} aria-label={t('filterBar.button')} onClick={() => setOpen(true)} />
+              </Badge>
+            </span>
+          </Stack>
+        </Inset>
 
         {list.length ? (
-          <ul className={styles.list} aria-label={tabs.find((t) => t.value === tab)!.label}>
+          <Section as="ul" paddingInline="16" gap="16" aria-label={t(`tab.${tab}`)}>
             {list.map((stock) => <li key={stock.symbol}><StockRow stock={stock} /></li>)}
-          </ul>
+          </Section>
         ) : (
-          <EmptyState title="No stocks match" description="Try removing a filter, or pick another list." />
+          <EmptyState title={t('empty.title')} description={t('empty.description')} />
         )}
-      </div>
+      </Stack>
     </Screen>
   )
 }
@@ -717,6 +754,7 @@ import { ListCell } from '@l3/components/ListCell'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { SideTabs } from '../components/SideTabs'
 import { filterGroups, groupOf, pickedIn, picks, withPicks, type FilterGroupId, type FilterOption, type Filters } from '../data'
+import { t } from '../copy'
 import styles from './FilterSheet.module.css'
 
 type Props = {
@@ -763,30 +801,30 @@ export function FilterSheet({ initial, section, resultCount, onApply, onClose }:
     <Sheet
       labelledBy={headingId}
       onClose={onClose}
-      header={<BottomSheetHeader headingId={headingId} heading="Filters" />}
+      header={<BottomSheetHeader headingId={headingId} heading={t('sheet.title')} />}
       footer={
-        <ButtonGroup aria-label="Filters" direction="horizontal">
-          <Button variant="secondary" disabled={nothingPicked} onClick={() => setDraft({})}>Clear all</Button>
-          <Button disabled={total === 0} onClick={() => onApply(draft)}>{total === 0 ? 'No stocks' : `Show ${total} ${total === 1 ? 'stock' : 'stocks'}`}</Button>
+        <ButtonGroup aria-label={t('sheet.title')} direction="horizontal">
+          <Button variant="secondary" disabled={nothingPicked} onClick={() => setDraft({})}>{t('sheet.clearAll')}</Button>
+          <Button disabled={total === 0} onClick={() => onApply(draft)}>{total === 0 ? t('sheet.noStocks') : total === 1 ? t('sheet.showOne') : t('sheet.show', { count: total })}</Button>
         </ButtonGroup>
       }
     >
       <div className={styles.split}>
         <SideTabs
-          aria-label="Filter groups"
+          aria-label={t('sheet.groupsLabel')}
           idBase={idBase}
-          items={filterGroups.map((g) => ({ value: g.id, label: g.label, count: pickedIn(draft, g.id).length }))}
+          items={filterGroups.map((g) => ({ value: g.id, label: t(`group.${g.id}`), count: pickedIn(draft, g.id).length }))}
           value={active}
           onChange={setActive}
         />
         <div key={active} id={`${idBase}-panel`} className={styles.pane} role="tabpanel" aria-labelledby={`${idBase}-tab-${active}`}>
-          <p className={styles.hint}>{group.select === 'one' ? 'Pick one' : 'Pick any'}</p>
-          <div role={group.select === 'one' ? 'radiogroup' : 'group'} aria-label={group.label}>
+          <p className={styles.hint}>{group.select === 'one' ? t('sheet.pickOne') : t('sheet.pickAny')}</p>
+          <div role={group.select === 'one' ? 'radiogroup' : 'group'} aria-label={t(`group.${group.id}`)}>
             {group.options.map((o) => {
               const on = picked.includes(o.id)
               const n = countFor(o)
               const off = n === 0 && !on
-              const description = [o.description, n === undefined ? undefined : n === 0 ? 'No stocks' : `${n} ${n === 1 ? 'stock' : 'stocks'}`].filter(Boolean).join(' · ')
+              const description = [o.description, n === undefined ? undefined : n === 0 ? t('sheet.noStocks') : n === 1 ? t('sheet.oneStock') : t('sheet.stocks', { count: n })].filter(Boolean).join(' · ')
               const control = group.select === 'one'
                 ? <Radio name={`${idBase}-${active}`} checked={on} disabled={off} onChange={() => toggle(o.id)} />
                 : <Checkbox checked={on} disabled={off} onChange={() => toggle(o.id)} />
@@ -801,6 +839,33 @@ export function FilterSheet({ initial, section, resultCount, onApply, onClose }:
 ```
 
 ## Source — shared app parts it uses
+
+### `src/shared/copy.ts`
+
+```ts
+/**
+ * UI copy. Every user-facing string of a flow lives in ONE file, `src/flows/<flow-id>/copy.json` — flat keys
+ * ("empty.title") → the text. Screens read it through the flow's `t`:
+ *
+ *   t('empty.title')                       → "No search results found"
+ *   t('group.results', { list, count })    → "Stocks (8)"   ({name} placeholders are filled in)
+ *
+ * Sample data (stock names, prices, watchlists) stays in the flow's data.ts — copy.json is only the words the app
+ * itself says: titles, labels, buttons, empty states, accessible names. Porting a flow: this file is the string
+ * table (Flutter ARB / iOS Localizable.strings).
+ */
+export type CopyVars = Record<string, string | number>
+
+export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
+  return function t(key: keyof Copy & string, vars?: CopyVars): string {
+    const template = copy[key] ?? key
+    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
+    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
+    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
+    return text
+  }
+}
+```
 
 ### `src/shared/data/format.ts`
 

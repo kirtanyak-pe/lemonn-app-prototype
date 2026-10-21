@@ -4,7 +4,7 @@
   "description": "The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "df57857",
+    "commit": "cd84910",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -91,12 +91,15 @@
     "src/flows/stocks/components/Ideas.tsx",
     "src/flows/stocks/components/Invest.tsx",
     "src/flows/stocks/components/Overview.tsx",
+    "src/flows/stocks/copy.json",
+    "src/flows/stocks/copy.ts",
     "src/flows/stocks/data.ts",
     "src/flows/stocks/index.tsx",
     "src/flows/stocks/screens/Home.module.css",
     "src/flows/stocks/screens/Home.tsx"
   ],
   "shared": [
+    "src/shared/copy.ts",
     "src/shared/data/format.ts",
     "src/shared/data/market.ts",
     "src/shared/data/portfolio.ts",

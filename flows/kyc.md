@@ -1,6 +1,6 @@
 # Flow: Account setup (`kyc`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 KYC after login: PAN, details and declarations, nominee, bank account and F&O activation.
 
@@ -123,6 +123,7 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 | Toasts | Aerobar | `floating`, `emphasis="primary"`: success (Email verified, Nominee added), warning (Slow connection) |
 | Loaders | Loader | `size="lg"` in the penny-drop sheet and the handoff screen |
 | CAMSfinserv handoff | `External` (src/shared/ui) | filled Card + "External" Tag + the provider's steps |
+| Layout | Section · Stack (Figma auto-layout frames) | Forms: Section `paddingBlock="24" paddingInline="16" gap="24"` under the Intro → Stack `as="section" gap="16"` per block; segment rows Stack `gap="08"`. Status screens (fetching, F&O handoff / received, done): Stack `justify="center"` filling the body → Section 24 / 16, `gap="24"`. Sheet bodies: Stack `gap="16"`. Step bar: Section `paddingBlock="12" paddingInline="16" gap="08"` |
 
 ### Rules & behaviour
 
@@ -171,6 +172,7 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 - 2026-10-16 — first version (20 screens).
 - 2026-10-19 — the step lists use L3 `Steps` (1.0.0); the local `shared/ui/Steps` is gone. Current is now a green dot
   with a light halo, to do a 16 ring, and done / current / loading rows have 24 below them.
+- 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Section, Stack); nothing moved (measured at 392).
 
 
 ## Source — this flow
@@ -181,14 +183,8 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 /*
  * In the Actionbar's content-bottom slot on the setup forms (it stays put while the page scrolls, so it belongs to the
  * bar): "Step 1 of 3 · Verify your identity" over a thin progress bar. The slot has no padding of its own; like pill
- * tabs there, the bar brings 12 top and bottom, 16 at the sides.
+ * tabs there, the bar (a Section) brings 12 top and bottom, 16 at the sides.
  */
-.bar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-08);
-  padding: var(--l3-spacing-12) var(--l3-spacing-16);
-}
 
 .label {
   font: var(--l3-text-label-12);
@@ -200,19 +196,234 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 
 ```tsx
 import { ProgressBar } from '@l3/components/ProgressBar'
+import { Section } from '@l3/components/Section'
+import { t } from '../copy'
 import { stages } from '../data'
 import styles from './StageBar.module.css'
 
 /** Where the user is in account setup (stage 1–3). */
 export function StageBar({ stage }: { stage: 1 | 2 | 3 }) {
-  const name = stages[stage - 1].label
+  const name = t(`stage.${stages[stage - 1]}.label`)
   return (
-    <div className={styles.bar}>
-      <span className={styles.label}>Step {stage} of {stages.length} · {name}</span>
-      <ProgressBar size="sm" value={(stage / stages.length) * 100 - 15} label={`Account setup: step ${stage} of ${stages.length}`} />
-    </div>
+    <Section paddingBlock="12" paddingInline="16" gap="08">
+      <span className={styles.label}>{t('stageBar.step', { stage, count: stages.length, name })}</span>
+      <ProgressBar size="sm" value={(stage / stages.length) * 100 - 15} label={t('stageBar.label', { stage, count: stages.length })} />
+    </Section>
   )
 }
+```
+
+### `src/flows/kyc/copy.json`
+
+```json
+{
+  "stage.identity.label": "Verify your identity",
+  "stage.identity.description": "PAN and personal details · about 2 min",
+  "stage.bank.label": "Add your bank account",
+  "stage.bank.description": "To add money and withdraw · about 1 min",
+  "stage.fno.label": "Activate F&O (optional)",
+  "stage.fno.description": "Needs a bank statement · about 2 min",
+  "stageBar.step": "Step {stage} of {count} · {name}",
+  "stageBar.label": "Account setup: step {stage} of {count}",
+  "start.emailVerified": "Email verified",
+  "start.actionsLabel": "Start",
+  "start.cta": "Start",
+  "start.title": "Let’s open your account",
+  "start.description": "3 quick steps, about 5 minutes. Keep your PAN card handy.",
+  "start.stepsLabel": "Account setup",
+  "start.trust": "Your details are verified with SEBI-registered KRAs and stay encrypted.",
+  "pan.screenTitle": "Verify identity",
+  "pan.actionsLabel": "Continue",
+  "pan.cta": "Continue",
+  "pan.title": "Enter your PAN",
+  "pan.description": "It links your trading account to your tax records",
+  "pan.label": "PAN",
+  "pan.placeholder": "ABCDE1234F",
+  "pan.error": "A PAN has 5 letters, 4 digits and a letter",
+  "pan.helper": "10 characters, as printed on your PAN card",
+  "panFound.title": "Is this your PAN?",
+  "panFound.description": "We found a PAN linked to your mobile number",
+  "panFound.actionsLabel": "Confirm PAN",
+  "panFound.use": "Yes, use this PAN",
+  "panFound.other": "Enter a different PAN",
+  "panFound.listLabel": "PAN found",
+  "panFound.name": "Name",
+  "panFound.pan": "PAN",
+  "fetching.slowTitle": "Slow connection",
+  "fetching.slowText": "This may take a little longer. Please keep the app open.",
+  "fetching.title": "Getting your details",
+  "fetching.description": "From the government database, so you don’t have to type them",
+  "fetching.stepsLabel": "Fetching details",
+  "fetching.step.pan": "PAN details",
+  "fetching.step.personal": "Personal details",
+  "fetching.step.bank": "Bank details",
+  "details.screenTitle": "Confirm your details",
+  "details.actionsLabel": "Confirm",
+  "details.cta": "Confirm and continue",
+  "details.personal.title": "Personal details",
+  "details.personal.description": "From the government database. Something wrong? Contact support.",
+  "details.personal.listLabel": "Personal details",
+  "details.personal.name": "Full name",
+  "details.personal.father": "Father’s name",
+  "details.personal.dob": "Date of birth",
+  "details.personal.occupation": "Occupation",
+  "details.personal.marital": "Marital status",
+  "details.segments.title": "What you’ll trade",
+  "segment.cash.label": "Stocks & mutual funds",
+  "segment.cash.description": "Always included",
+  "segment.fno.label": "Futures & options (F&O)",
+  "segment.fno.description": "Needs a bank statement — you’ll add it after the bank",
+  "details.nominee.title": "Nominee",
+  "details.nominee.description": "Who receives your holdings if something happens to you",
+  "details.nominee.summary": "{relationship} · born {dob}",
+  "details.nominee.add": "Add a nominee",
+  "details.nominee.addDescription": "Recommended · you can skip this",
+  "details.funds.title": "Unused funds",
+  "details.funds.label": "Return unused funds to my bank every",
+  "details.funds.value": "90 days",
+  "details.declarations.title": "Declarations",
+  "declaration.pep": "I am not a politically exposed person.",
+  "declaration.resident": "I am an Indian resident — not a US person, US citizen / green card holder or tax resident of any other country.",
+  "declaration.ddpi": "I accept the DDPI (Demat Debit and Pledge Instruction).",
+  "declaration.mf": "I accept the BSE StAR MF terms.",
+  "declaration.ecn": "Send contract notes (ECN) and other communications to my email.",
+  "declaration.capable": "I am capable of operating my account on my own.",
+  "declaration.sebi": "I have no past actions from SEBI or an exchange in the last 3 years.",
+  "declaration.nominee": "Print my nominee details in my statements of holdings.",
+  "details.declarations.agree": "I agree to all the declarations above",
+  "risk.title": "Before you trade F&O",
+  "risk.description": "Risk disclosure on derivatives (SEBI)",
+  "risk.point.losses": "9 out of 10 individual traders in equity F&O made net losses.",
+  "risk.point.average": "On average, loss makers lost close to ₹50,000.",
+  "risk.point.lossCosts": "Loss makers spent an extra 28% of their net trading losses on transaction costs.",
+  "risk.point.profitCosts": "Traders who made a profit spent 15% to 50% of it on transaction costs.",
+  "risk.source": "Source: SEBI study, FY 2022–24.",
+  "risk.actionsLabel": "Acknowledge",
+  "risk.accept": "I understand",
+  "nomineeForm.screenTitle": "Add a nominee",
+  "nomineeForm.actionsLabel": "Nominee",
+  "nomineeForm.skip": "Skip",
+  "nomineeForm.save": "Save nominee",
+  "nomineeForm.who": "Who is your nominee?",
+  "nomineeForm.relationshipLabel": "Relationship",
+  "relationship.Father": "Father",
+  "relationship.Mother": "Mother",
+  "relationship.Spouse": "Spouse",
+  "relationship.Son": "Son",
+  "relationship.Daughter": "Daughter",
+  "relationship.Other": "Other",
+  "nomineeForm.name": "Full name",
+  "nomineeForm.namePlaceholder": "As on their ID",
+  "nomineeForm.dob": "Date of birth",
+  "nomineeForm.dobPlaceholder": "DD MMM YYYY",
+  "nomineeForm.aadhaar": "Last 4 digits of Aadhaar",
+  "nomineeForm.aadhaarPlaceholder": "1234",
+  "nomineeForm.aadhaarHelper": "Only for identification — we don’t verify it",
+  "nomineeForm.sameContact": "Same contact details as mine",
+  "nomineeForm.sameContactDescription": "Address, email and phone number",
+  "nomineeList.screenTitle": "Nominees",
+  "nomineeList.actionsLabel": "Nominees",
+  "nomineeList.addAnother": "Add another",
+  "nomineeList.done": "Done",
+  "nomineeList.summary": "{relationship} · born {dob}",
+  "nomineeList.fine": "You can add up to 10 nominees and split your holdings between them. Change this anytime in Profile.",
+  "nomineeAdded.title": "Nominee added",
+  "dob.title": "Nominee’s date of birth",
+  "dob.actionsLabel": "Date of birth",
+  "dob.confirm": "Confirm",
+  "dob.label": "Date of birth",
+  "nomineeSheet.title": "Nominee details",
+  "nomineeSheet.actionsLabel": "Nominee",
+  "nomineeSheet.edit": "Edit",
+  "nomineeSheet.done": "Done",
+  "nomineeSheet.listLabel": "Nominee",
+  "nomineeSheet.name": "Name",
+  "nomineeSheet.relationship": "Relationship",
+  "nomineeSheet.dob": "Date of birth",
+  "nomineeSheet.aadhaar": "Aadhaar (last 4)",
+  "nomineeSheet.share": "Share",
+  "nomineeSheet.shareValue": "{share}%",
+  "bank.screenTitle": "Add bank account",
+  "bank.actionsLabel": "Verify",
+  "bank.cta": "Verify account",
+  "bank.title": "Add your bank account",
+  "bank.description": "Money you add or withdraw only moves between this account and Lemonn",
+  "bank.accountNumber": "Account number",
+  "bank.accountNumberPlaceholder": "Your account number",
+  "bank.confirmNumber": "Confirm account number",
+  "bank.confirmNumberPlaceholder": "Type it again",
+  "bank.ifsc": "IFSC",
+  "bank.ifscPlaceholder": "e.g. HDFC0001234",
+  "bank.ifscFound": "{bank} · {branch}",
+  "bank.ifscHelper": "11 characters, on your cheque or passbook",
+  "bankFound.title": "Use this bank account?",
+  "bankFound.description": "We found it linked to your PAN",
+  "bankFound.actionsLabel": "Bank account",
+  "bankFound.use": "Use this account",
+  "bankFound.other": "Add a different account",
+  "bankFound.listLabel": "Bank account found",
+  "bankFound.bank": "Bank",
+  "bankFound.accountNumber": "Account number",
+  "bankFound.ifsc": "IFSC",
+  "bankFound.type": "Type",
+  "bankVerifying.title": "Verifying your bank account",
+  "bankVerifying.description": "We’re sending {amount} to it. It shows as “Lemonn” in your statement.",
+  "bankVerifying.fine": "Takes a few seconds — please keep the app open",
+  "bankVerified.title": "Bank account verified",
+  "bankVerified.description": "{bank} {account}",
+  "bankVerified.actionsLabel": "Next",
+  "bankVerified.fno": "Activate F&O",
+  "bankVerified.skip": "Skip for now",
+  "bankVerified.stepsLabel": "Account setup",
+  "bankVerified.step.identity": "Identity verified",
+  "bankVerified.step.bank": "Bank account verified",
+  "bankVerified.step.fno": "Activate F&O",
+  "bankVerified.step.fnoDescription": "Share a bank statement · about 2 min",
+  "fno.screenTitle": "Activate F&O",
+  "fno.actionsLabel": "Bank statement",
+  "fno.continue": "Continue to CAMSfinserv",
+  "fno.later": "Do this later",
+  "fno.title": "Share your bank statement",
+  "fno.description": "SEBI needs proof of income before you can trade futures and options",
+  "fno.why.aggregator.label": "Through CAMSfinserv",
+  "fno.why.aggregator.description": "An RBI-regulated account aggregator — Lemonn never sees your bank login",
+  "fno.why.readonly.label": "Read-only, one time",
+  "fno.why.readonly.description": "The last 6 months of statements, only to check your income",
+  "fno.why.time.label": "About 2 minutes",
+  "fno.why.time.description": "Approve it with an OTP on CAMSfinserv",
+  "fnoHandoff.title": "Opening CAMSfinserv",
+  "fnoHandoff.description": "You’ll come back here once you approve",
+  "fnoHandoff.provider": "CAMSfinserv · account aggregator",
+  "fnoHandoff.step1": "Verify the mobile number with a 6-digit OTP",
+  "fnoHandoff.step2": "Pick the bank account to share",
+  "fnoHandoff.step3": "Approve sharing the statement",
+  "fnoReceived.actionsLabel": "Continue",
+  "fnoReceived.cta": "Continue",
+  "fnoReceived.title": "Bank statement received",
+  "fnoReceived.description": "We’re reviewing it. F&O usually activates within 24–48 hours — we’ll notify you.",
+  "done.actionsLabel": "What next",
+  "done.addMoney": "Add money",
+  "done.explore": "Explore stocks first",
+  "done.title": "You’re all set, {name}",
+  "done.description": "Start investing in stocks and mutual funds today",
+  "done.stepsLabel": "Account status",
+  "done.step.identity": "Identity verified",
+  "done.step.bank": "Bank account added",
+  "done.step.fnoReview": "F&O under review",
+  "done.step.fnoReviewDescription": "Usually 24–48 hours",
+  "done.step.fnoOff": "F&O not activated",
+  "done.step.fnoOffDescription": "Activate it anytime from Profile"
+}
+```
+
+### `src/flows/kyc/copy.ts`
+
+```ts
+import { makeCopy } from '../../shared/copy'
+import copy from './copy.json'
+
+/** Every user-facing string of Account setup (KYC) is in copy.json: t('pan.title'), t('done.title', { name }). */
+export const t = makeCopy('kyc', copy)
 ```
 
 ### `src/flows/kyc/data.ts`
@@ -220,34 +431,18 @@ export function StageBar({ stage }: { stage: 1 | 2 | 3 }) {
 ```ts
 import { bankAccount } from '../../shared/data/user'
 
-/** The three stages shown at the start and the end of account setup. */
-export const stages = [
-  { label: 'Verify your identity', description: 'PAN and personal details · about 2 min' },
-  { label: 'Add your bank account', description: 'To add money and withdraw · about 1 min' },
-  { label: 'Activate F&O (optional)', description: 'Needs a bank statement · about 2 min' },
-]
+/** The three stages shown at the start and the end of account setup (texts: copy.json stage.<id>.label / .description). */
+export const stages = ['identity', 'bank', 'fno'] as const
 
-/** What's fetched from the government (NSDL / KRA) database after PAN confirmation. */
-export const fetchSteps = ['PAN details', 'Personal details', 'Bank details']
+/** What's fetched from the government (NSDL / KRA) database after PAN confirmation (texts: copy.json fetching.step.<id>). */
+export const fetchSteps = ['pan', 'personal', 'bank'] as const
 
 /** Segments the user can trade. Stocks & mutual funds are always on; F&O needs income proof. */
-export type Segment = { id: 'cash' | 'fno'; label: string; description: string; required?: boolean }
-export const segments: Segment[] = [
-  { id: 'cash', label: 'Stocks & mutual funds', description: 'Always included', required: true },
-  { id: 'fno', label: 'Futures & options (F&O)', description: 'Needs a bank statement — you’ll add it after the bank' },
-]
+export type Segment = { id: 'cash' | 'fno'; required?: boolean }
+export const segments: Segment[] = [{ id: 'cash', required: true }, { id: 'fno' }]
 
-/** Regulatory declarations (the live app's list, reworded). The user agrees to all of them once. */
-export const declarations = [
-  'I am not a politically exposed person.',
-  'I am an Indian resident — not a US person, US citizen / green card holder or tax resident of any other country.',
-  'I accept the DDPI (Demat Debit and Pledge Instruction).',
-  'I accept the BSE StAR MF terms.',
-  'Send contract notes (ECN) and other communications to my email.',
-  'I am capable of operating my account on my own.',
-  'I have no past actions from SEBI or an exchange in the last 3 years.',
-  'Print my nominee details in my statements of holdings.',
-]
+/** Regulatory declarations (the live app's list, reworded; texts: copy.json declaration.<id>). The user agrees to all of them once. */
+export const declarations = ['pep', 'resident', 'ddpi', 'mf', 'ecn', 'capable', 'sebi', 'nominee'] as const
 
 /** Running-account settlement: how often unused funds go back to the bank. */
 export const settlementOptions = ['30 days', '90 days']
@@ -262,13 +457,8 @@ export const nominee: Nominee = { name: 'Suresh Mehta', relationship: 'Father', 
 export const foundBank = bankAccount
 export const PENNY_DROP = 1
 
-/** SEBI's mandated F&O risk disclosure (summary). */
-export const riskDisclosure = [
-  '9 out of 10 individual traders in equity F&O made net losses.',
-  'On average, loss makers lost close to ₹50,000.',
-  'Loss makers spent an extra 28% of their net trading losses on transaction costs.',
-  'Traders who made a profit spent 15% to 50% of it on transaction costs.',
-]
+/** SEBI's mandated F&O risk disclosure (summary; texts: copy.json risk.point.<id>). */
+export const riskDisclosure = ['losses', 'average', 'lossCosts', 'profitCosts'] as const
 ```
 
 ### `src/flows/kyc/index.tsx`
@@ -279,6 +469,7 @@ import { Icon } from '@l3/components/Icon'
 import { msCheckCircle } from '@l3/icons/material'
 import { user } from '../../shared/data/user'
 import type { Flow } from '../types'
+import { t } from './copy'
 import { Bank } from './screens/Bank'
 import { Details } from './screens/Details'
 import { Done } from './screens/Done'
@@ -293,7 +484,7 @@ import { NomineeSheet } from './sheets/NomineeSheet'
 import { PanFoundSheet } from './sheets/PanFoundSheet'
 import { RiskSheet } from './sheets/RiskSheet'
 
-const nomineeAdded = <Aerobar floating type="success" emphasis="primary" icon={<Icon icon={msCheckCircle} />} heading="Nominee added" />
+const nomineeAdded = () => <Aerobar floating type="success" emphasis="primary" icon={<Icon icon={msCheckCircle} />} heading={t('nomineeAdded.title')} />
 
 /**
  * Account setup (KYC) — after Login: identity (PAN + government fetch), details & declarations, nominee, bank
@@ -327,7 +518,7 @@ export const kyc: Flow = {
     { id: 'kyc-08', section: 'details', name: 'Add a nominee', figma: '5436:7926', render: (go) => <NomineeForm onBack={() => go('kyc-06')} onDob={() => go('kyc-09')} onSkip={() => go('kyc-06')} /> },
     { id: 'kyc-09', section: 'details', name: 'Nominee · date of birth', figma: '5436:7927', render: (go) => <NomineeForm filled sheet={<DobSheet onConfirm={() => go('kyc-10')} onClose={() => go('kyc-08')} />} /> },
     { id: 'kyc-10', section: 'details', name: 'Nominees', figma: '5436:7928', render: (go) => <NomineeList onBack={() => go('kyc-08')} onAdd={() => go('kyc-08')} onDone={() => go('kyc-11')} /> },
-    { id: 'kyc-11', section: 'details', name: 'Confirm details · nominee added', figma: '5436:7933', render: (go) => <Details withNominee agreed toast={nomineeAdded} onBack={() => go('kyc-03')} onFno={() => go('kyc-07')} onNominee={() => go('kyc-12')} onConfirm={() => go('kyc-13')} /> },
+    { id: 'kyc-11', section: 'details', name: 'Confirm details · nominee added', figma: '5436:7933', render: (go) => <Details withNominee agreed toast={nomineeAdded()} onBack={() => go('kyc-03')} onFno={() => go('kyc-07')} onNominee={() => go('kyc-12')} onConfirm={() => go('kyc-13')} /> },
     { id: 'kyc-12', section: 'details', name: 'Nominee details', figma: '5436:7931', render: (go) => <Details withNominee agreed sheet={<NomineeSheet onClose={() => go('kyc-11')} onEdit={() => go('kyc-08')} />} /> },
 
     { id: 'kyc-13', section: 'bank', name: 'Bank account found', figma: '5436:7934', render: (go) => <Bank sheet={<BankFoundSheet onUse={() => go('kyc-15')} onOther={() => go('kyc-14')} />} /> },
@@ -351,10 +542,12 @@ import type { ReactNode } from 'react'
 import { Actionbar } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Section } from '@l3/components/Section'
 import { TextField } from '@l3/components/TextField'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { StageBar } from '../components/StageBar'
+import { t } from '../copy'
 import { foundBank } from '../data'
 import styles from './Kyc.module.css'
 
@@ -365,23 +558,23 @@ import styles from './Kyc.module.css'
 export function Bank({ filled = false, sheet, onBack, onVerify }: { filled?: boolean; sheet?: ReactNode; onBack?: () => void; onVerify?: () => void }) {
   return (
     <Screen
-      top={<Actionbar title="Add bank account" onBack={onBack} bottom={<StageBar stage={2} />} />}
+      top={<Actionbar title={t('bank.screenTitle')} onBack={onBack} bottom={<StageBar stage={2} />} />}
       sheet={sheet}
-      bottom={<ButtonGroup aria-label="Verify"><Button disabled={!filled} onClick={onVerify}>Verify account</Button></ButtonGroup>}
+      bottom={<ButtonGroup aria-label={t('bank.actionsLabel')}><Button disabled={!filled} onClick={onVerify}>{t('bank.cta')}</Button></ButtonGroup>}
     >
-      <Intro title="Add your bank account" description="Money you add or withdraw only moves between this account and Lemonn" />
-      <div className={styles.content}>
-        <TextField label="Account number" inputMode="numeric" readOnly value={filled ? foundBank.accountNumber : ''} placeholder="Your account number" />
-        <TextField label="Confirm account number" inputMode="numeric" readOnly value={filled ? foundBank.accountNumber : ''} placeholder="Type it again" />
+      <Intro title={t('bank.title')} description={t('bank.description')} />
+      <Section paddingBlock="24" paddingInline="16" gap="24">
+        <TextField label={t('bank.accountNumber')} inputMode="numeric" readOnly value={filled ? foundBank.accountNumber : ''} placeholder={t('bank.accountNumberPlaceholder')} />
+        <TextField label={t('bank.confirmNumber')} inputMode="numeric" readOnly value={filled ? foundBank.accountNumber : ''} placeholder={t('bank.confirmNumberPlaceholder')} />
         <TextField
-          label="IFSC"
+          label={t('bank.ifsc')}
           readOnly
           value={filled ? foundBank.ifsc : ''}
-          placeholder="e.g. HDFC0001234"
+          placeholder={t('bank.ifscPlaceholder')}
           status={filled ? 'success' : undefined}
-          helperText={filled ? `${foundBank.bank} · ${foundBank.branch}` : '11 characters, on your cheque or passbook'}
+          helperText={filled ? t('bank.ifscFound', { bank: foundBank.bank, branch: foundBank.branch }) : t('bank.ifscHelper')}
         />
-      </div>
+      </Section>
     </Screen>
   )
 }
@@ -399,13 +592,16 @@ import { Checkbox } from '@l3/components/Checkbox'
 import { Icon } from '@l3/components/Icon'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
 import { ListCell } from '@l3/components/ListCell'
+import { Section } from '@l3/components/Section'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msChevronRight, msPersonAdd } from '@l3/icons/material'
 import { user } from '../../../shared/data/user'
 import { Screen } from '../../../shared/ui/Screen'
 import { StageBar } from '../components/StageBar'
+import { t } from '../copy'
 import { declarations, nominee, segments } from '../data'
 import styles from './Kyc.module.css'
 
@@ -431,62 +627,62 @@ export function Details({ withNominee = false, agreed: initialAgreed = false, to
   const [agreed, setAgreed] = useState(initialAgreed)
   return (
     <Screen
-      top={<Actionbar title="Confirm your details" onBack={onBack} bottom={<StageBar stage={1} />} />}
+      top={<Actionbar title={t('details.screenTitle')} onBack={onBack} bottom={<StageBar stage={1} />} />}
       toast={toast}
       sheet={sheet}
-      bottom={<ButtonGroup aria-label="Confirm"><Button disabled={!agreed} onClick={onConfirm}>Confirm and continue</Button></ButtonGroup>}
+      bottom={<ButtonGroup aria-label={t('details.actionsLabel')}><Button disabled={!agreed} onClick={onConfirm}>{t('details.cta')}</Button></ButtonGroup>}
     >
-      <div className={styles.content}>
-        <section className={styles.section}>
-          <SectionHeader title="Personal details" description="From the government database. Something wrong? Contact support." />
-          <KeyValueList variant="card" aria-label="Personal details">
-            <KeyValueRow label="Full name" value={user.name} />
-            <KeyValueRow label="Father’s name" value={user.fatherName} />
-            <KeyValueRow label="Date of birth" value={user.dob} />
-            <KeyValueRow label="Occupation" value={user.occupation} />
-            <KeyValueRow label="Marital status" value={user.maritalStatus} />
+      <Section paddingBlock="24" paddingInline="16" gap="24">
+        <Stack as="section" gap="16">
+          <SectionHeader title={t('details.personal.title')} description={t('details.personal.description')} />
+          <KeyValueList variant="card" aria-label={t('details.personal.listLabel')}>
+            <KeyValueRow label={t('details.personal.name')} value={user.name} />
+            <KeyValueRow label={t('details.personal.father')} value={user.fatherName} />
+            <KeyValueRow label={t('details.personal.dob')} value={user.dob} />
+            <KeyValueRow label={t('details.personal.occupation')} value={user.occupation} />
+            <KeyValueRow label={t('details.personal.marital')} value={user.maritalStatus} />
           </KeyValueList>
-        </section>
+        </Stack>
 
-        <section className={styles.section}>
-          <SectionHeader title="What you’ll trade" />
-          <div className={styles.stack}>
+        <Stack as="section" gap="16">
+          <SectionHeader title={t('details.segments.title')} />
+          <Stack gap="08">
             {segments.map((s) => (
               <ListCell
                 key={s.id}
                 variant="card"
                 as="label"
-                label={s.label}
-                description={s.description}
+                label={t(`segment.${s.id}.label`)}
+                description={t(`segment.${s.id}.description`)}
                 multiline
                 trailing={<Checkbox defaultChecked disabled={s.required} onChange={s.id === 'fno' ? (e) => e.target.checked && onFno?.() : undefined} />}
               />
             ))}
-          </div>
-        </section>
+          </Stack>
+        </Stack>
 
-        <section className={styles.section}>
-          <SectionHeader title="Nominee" description="Who receives your holdings if something happens to you" />
+        <Stack as="section" gap="16">
+          <SectionHeader title={t('details.nominee.title')} description={t('details.nominee.description')} />
           {withNominee ? (
-            <ListCell variant="card" as="button" label={nominee.name} description={`${nominee.relationship} · born ${nominee.dob}`} trailing={<Tag color="neutral">{nominee.share}%</Tag>} iconRight={<Icon icon={msChevronRight} />} onClick={onNominee} />
+            <ListCell variant="card" as="button" label={nominee.name} description={t('details.nominee.summary', { relationship: nominee.relationship, dob: nominee.dob })} trailing={<Tag color="neutral">{nominee.share}%</Tag>} iconRight={<Icon icon={msChevronRight} />} onClick={onNominee} />
           ) : (
-            <ListCell variant="card" as="button" iconLeft={<Icon icon={msPersonAdd} />} label="Add a nominee" description="Recommended · you can skip this" iconRight={<Icon icon={msChevronRight} />} onClick={onAddNominee} />
+            <ListCell variant="card" as="button" iconLeft={<Icon icon={msPersonAdd} />} label={t('details.nominee.add')} description={t('details.nominee.addDescription')} iconRight={<Icon icon={msChevronRight} />} onClick={onAddNominee} />
           )}
-        </section>
+        </Stack>
 
-        <section className={styles.section}>
-          <SectionHeader title="Unused funds" />
-          <ListCell variant="card" label="Return unused funds to my bank every" multiline trailing={<Select size="sm" onClick={() => {}}>90 days</Select>} />
-        </section>
+        <Stack as="section" gap="16">
+          <SectionHeader title={t('details.funds.title')} />
+          <ListCell variant="card" label={t('details.funds.label')} multiline trailing={<Select size="sm" onClick={() => {}}>{t('details.funds.value')}</Select>} />
+        </Stack>
 
-        <section className={styles.section}>
-          <SectionHeader title="Declarations" />
+        <Stack as="section" gap="16">
+          <SectionHeader title={t('details.declarations.title')} />
           <Card>
-            <ul className={styles.bullets}>{declarations.map((d) => <li key={d} className={styles.fine}>{d}</li>)}</ul>
+            <ul className={styles.bullets}>{declarations.map((d) => <li key={d} className={styles.fine}>{t(`declaration.${d}`)}</li>)}</ul>
           </Card>
-          <ListCell variant="card" as="label" label="I agree to all the declarations above" multiline trailing={<Checkbox checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />} />
-        </section>
-      </div>
+          <ListCell variant="card" as="label" label={t('details.declarations.agree')} multiline trailing={<Checkbox checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />} />
+        </Stack>
+      </Section>
     </Screen>
   )
 }
@@ -498,12 +694,15 @@ export function Details({ withNominee = false, agreed: initialAgreed = false, to
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Card } from '@l3/components/Card'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
+import { Steps } from '@l3/components/Steps'
 import { msCelebration } from '@l3/icons/material'
 import { user } from '../../../shared/data/user'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
-import { Steps } from '@l3/components/Steps'
+import { t } from '../copy'
 import styles from './Kyc.module.css'
 
 /** kyc-20 · Account ready. Stocks and mutual funds work now; F&O follows its review. Next: add money (or look around). */
@@ -511,27 +710,29 @@ export function Done({ fnoUnderReview = true, onAddMoney, onExplore }: { fnoUnde
   return (
     <Screen
       bottom={
-        <ButtonGroup aria-label="What next">
-          <Button onClick={onAddMoney}>Add money</Button>
-          <Button variant="secondary" onClick={onExplore}>Explore stocks first</Button>
+        <ButtonGroup aria-label={t('done.actionsLabel')}>
+          <Button onClick={onAddMoney}>{t('done.addMoney')}</Button>
+          <Button variant="secondary" onClick={onExplore}>{t('done.explore')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.centre}>
-        <Intro align="center" art={<Spot icon={msCelebration} tone="brand" />} title={`You’re all set, ${user.name.split(' ')[0]}`} description="Start investing in stocks and mutual funds today" />
-        <Card>
-          <Steps
-            label="Account status"
-            steps={[
-              { label: 'Identity verified', state: 'done' },
-              { label: 'Bank account added', state: 'done' },
-              fnoUnderReview
-                ? { label: 'F&O under review', description: 'Usually 24–48 hours', state: 'loading' }
-                : { label: 'F&O not activated', description: 'Activate it anytime from Profile', state: 'todo' },
-            ]}
-          />
-        </Card>
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro align="center" art={<Spot icon={msCelebration} tone="brand" />} title={t('done.title', { name: user.name.split(' ')[0] })} description={t('done.description')} />
+          <Card>
+            <Steps
+              label={t('done.stepsLabel')}
+              steps={[
+                { label: t('done.step.identity'), state: 'done' },
+                { label: t('done.step.bank'), state: 'done' },
+                fnoUnderReview
+                  ? { label: t('done.step.fnoReview'), description: t('done.step.fnoReviewDescription'), state: 'loading' }
+                  : { label: t('done.step.fnoOff'), description: t('done.step.fnoOffDescription'), state: 'todo' },
+              ]}
+            />
+          </Card>
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -543,12 +744,15 @@ export function Done({ fnoUnderReview = true, onAddMoney, onExplore }: { fnoUnde
 import { Aerobar } from '@l3/components/Aerobar'
 import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
+import { Steps, type StepState } from '@l3/components/Steps'
 import { msDatabase, msWifiOff } from '@l3/icons/material'
 import { useAutoAdvance } from '../../../shared/prototype'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
-import { Steps, type StepState } from '@l3/components/Steps'
+import { t } from '../copy'
 import { fetchSteps } from '../data'
 import styles from './Kyc.module.css'
 
@@ -561,19 +765,21 @@ export function Fetching({ done = 1, slow = false, next }: { done?: number; slow
   const state = (i: number): StepState => (i < done ? 'done' : i === done ? 'loading' : 'todo')
   return (
     <Screen
-      toast={slow && <Aerobar floating type="warning" icon={<Icon icon={msWifiOff} />} heading="Slow connection" paragraph="This may take a little longer. Please keep the app open." />}
+      toast={slow && <Aerobar floating type="warning" icon={<Icon icon={msWifiOff} />} heading={t('fetching.slowTitle')} paragraph={t('fetching.slowText')} />}
     >
-      <div className={styles.centre}>
-        <Intro
-          align="center"
-          art={<Spot icon={msDatabase} tone="discover" />}
-          title="Getting your details"
-          description="From the government database, so you don’t have to type them"
-        />
-        <Card variant="filled">
-          <Steps label="Fetching details" steps={fetchSteps.map((label, i) => ({ label, state: state(i) }))} />
-        </Card>
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro
+            align="center"
+            art={<Spot icon={msDatabase} tone="discover" />}
+            title={t('fetching.title')}
+            description={t('fetching.description')}
+          />
+          <Card variant="filled">
+            <Steps label={t('fetching.stepsLabel')} steps={fetchSteps.map((id, i) => ({ label: t(`fetching.step.${id}`), state: state(i) }))} />
+          </Card>
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -589,6 +795,8 @@ import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
 import { Loader } from '@l3/components/Loader'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msCheckCircle, msLock, msReceiptLong, msSchedule, msVerifiedUser } from '@l3/icons/material'
 import { useAutoAdvance } from '../../../shared/prototype'
 import { External } from '../../../shared/ui/External'
@@ -596,32 +804,33 @@ import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import { StageBar } from '../components/StageBar'
+import { t } from '../copy'
 import styles from './Kyc.module.css'
 
 const why = [
-  { icon: msVerifiedUser, label: 'Through CAMSfinserv', description: 'An RBI-regulated account aggregator — Lemonn never sees your bank login' },
-  { icon: msLock, label: 'Read-only, one time', description: 'The last 6 months of statements, only to check your income' },
-  { icon: msSchedule, label: 'About 2 minutes', description: 'Approve it with an OTP on CAMSfinserv' },
-]
+  { icon: msVerifiedUser, id: 'aggregator' },
+  { icon: msLock, id: 'readonly' },
+  { icon: msSchedule, id: 'time' },
+] as const
 
 /** kyc-17 · Why a bank statement is needed for F&O and how it's fetched, before handing off to CAMSfinserv. */
 export function FnoConsent({ onBack, onContinue, onLater }: { onBack?: () => void; onContinue?: () => void; onLater?: () => void }) {
   return (
     <Screen
-      top={<Actionbar title="Activate F&O" onBack={onBack} bottom={<StageBar stage={3} />} />}
+      top={<Actionbar title={t('fno.screenTitle')} onBack={onBack} bottom={<StageBar stage={3} />} />}
       bottom={
-        <ButtonGroup aria-label="Bank statement">
-          <Button onClick={onContinue}>Continue to CAMSfinserv</Button>
-          <Button variant="secondary" onClick={onLater}>Do this later</Button>
+        <ButtonGroup aria-label={t('fno.actionsLabel')}>
+          <Button onClick={onContinue}>{t('fno.continue')}</Button>
+          <Button variant="secondary" onClick={onLater}>{t('fno.later')}</Button>
         </ButtonGroup>
       }
     >
-      <Intro art={<Spot icon={msReceiptLong} tone="discover" size="md" />} title="Share your bank statement" description="SEBI needs proof of income before you can trade futures and options" />
-      <div className={styles.content}>
+      <Intro art={<Spot icon={msReceiptLong} tone="discover" size="md" />} title={t('fno.title')} description={t('fno.description')} />
+      <Section paddingBlock="24" paddingInline="16" gap="24">
         <Card variant="filled">
-          {why.map((w) => <ListCell key={w.label} iconLeft={<Icon icon={w.icon} />} label={w.label} description={w.description} multiline />)}
+          {why.map((w) => <ListCell key={w.id} iconLeft={<Icon icon={w.icon} />} label={t(`fno.why.${w.id}.label`)} description={t(`fno.why.${w.id}.description`)} multiline />)}
         </Card>
-      </div>
+      </Section>
     </Screen>
   )
 }
@@ -630,11 +839,13 @@ export function FnoConsent({ onBack, onContinue, onLater }: { onBack?: () => voi
 export function FnoHandoff({ next, onBack }: { next?: string; onBack?: () => void }) {
   useAutoAdvance(next, 3000)
   return (
-    <Screen top={<Actionbar title="Activate F&O" onBack={onBack} />}>
-      <div className={styles.centre}>
-        <Intro align="center" art={<Loader size="lg" label={null} />} title="Opening CAMSfinserv" description="You’ll come back here once you approve" />
-        <External provider="CAMSfinserv · account aggregator" steps={['Verify the mobile number with a 6-digit OTP', 'Pick the bank account to share', 'Approve sharing the statement']} />
-      </div>
+    <Screen top={<Actionbar title={t('fno.screenTitle')} onBack={onBack} />}>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro align="center" art={<Loader size="lg" label={null} />} title={t('fnoHandoff.title')} description={t('fnoHandoff.description')} />
+          <External provider={t('fnoHandoff.provider')} steps={[t('fnoHandoff.step1'), t('fnoHandoff.step2'), t('fnoHandoff.step3')]} />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -642,15 +853,17 @@ export function FnoHandoff({ next, onBack }: { next?: string; onBack?: () => voi
 /** kyc-19 · Back from CAMSfinserv: statement received, F&O under review. */
 export function FnoReceived({ onContinue }: { onContinue?: () => void }) {
   return (
-    <Screen bottom={<ButtonGroup aria-label="Continue"><Button onClick={onContinue}>Continue</Button></ButtonGroup>}>
-      <div className={styles.centre}>
-        <Intro
-          align="center"
-          art={<Spot icon={msCheckCircle} tone="success" />}
-          title="Bank statement received"
-          description="We’re reviewing it. F&O usually activates within 24–48 hours — we’ll notify you."
-        />
-      </div>
+    <Screen bottom={<ButtonGroup aria-label={t('fnoReceived.actionsLabel')}><Button onClick={onContinue}>{t('fnoReceived.cta')}</Button></ButtonGroup>}>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="24">
+          <Intro
+            align="center"
+            art={<Spot icon={msCheckCircle} tone="success" />}
+            title={t('fnoReceived.title')}
+            description={t('fnoReceived.description')}
+          />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -659,33 +872,11 @@ export function FnoReceived({ onContinue }: { onContinue?: () => void }) {
 ### `src/flows/kyc/screens/Kyc.module.css`
 
 ```css
-/* Shared layout for the account-setup screens. */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-24);
-  padding: var(--l3-spacing-24) var(--l3-spacing-16);
-}
+/* Account-setup screens: layout is L3 Section / Stack; only text styles and what those blocks don't cover live here. */
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-16);
-}
-
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-08);
-}
-
-.centre {
-  display: flex;
+/* The centred status screens: the Stack fills the body so justify="center" centres the Section vertically. */
+.fill {
   flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--l3-spacing-24);
-  padding: var(--l3-spacing-24) var(--l3-spacing-16);
 }
 
 .fine {
@@ -698,6 +889,7 @@ export function FnoReceived({ onContinue }: { onContinue?: () => void }) {
   text-align: center;
 }
 
+/* A bulleted list: a Stack would drop the bullets (it sets list-style: none) and has no left indent for them. */
 .bullets {
   display: flex;
   flex-direction: column;
@@ -706,13 +898,6 @@ export function FnoReceived({ onContinue }: { onContinue?: () => void }) {
   padding-left: var(--l3-spacing-16);
   font: var(--l3-text-description-14);
   color: var(--l3-content-primary);
-}
-
-.sheetBody {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-16);
-  /* The L3 sheet's content slot already brings 16 on every side (24 below). */
 }
 ```
 
@@ -726,12 +911,15 @@ import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Checkbox } from '@l3/components/Checkbox'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
+import { Section } from '@l3/components/Section'
 import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
 import { Tabs } from '@l3/components/Tabs'
 import { Tag } from '@l3/components/Tag'
 import { TextField } from '@l3/components/TextField'
 import { msCalendarMonth } from '@l3/icons/material'
 import { Screen } from '../../../shared/ui/Screen'
+import { t } from '../copy'
 import { nominee, relationships, type Relationship } from '../data'
 import styles from './Kyc.module.css'
 
@@ -753,35 +941,35 @@ export function NomineeForm({ filled = false, sheet, onBack, onDob, onSave, onSk
   const ready = filled && relationship !== ''
   return (
     <Screen
-      top={<Actionbar title="Add a nominee" onBack={onBack} />}
+      top={<Actionbar title={t('nomineeForm.screenTitle')} onBack={onBack} />}
       sheet={sheet}
       bottom={
-        <ButtonGroup aria-label="Nominee" direction="horizontal">
-          <Button variant="secondary" onClick={onSkip}>Skip</Button>
-          <Button disabled={!ready} onClick={onSave}>Save nominee</Button>
+        <ButtonGroup aria-label={t('nomineeForm.actionsLabel')} direction="horizontal">
+          <Button variant="secondary" onClick={onSkip}>{t('nomineeForm.skip')}</Button>
+          <Button disabled={!ready} onClick={onSave}>{t('nomineeForm.save')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.content}>
-        <section className={styles.section}>
-          <SectionHeader title="Who is your nominee?" />
+      <Section paddingBlock="24" paddingInline="16" gap="24">
+        <Stack as="section" gap="16">
+          <SectionHeader title={t('nomineeForm.who')} />
           <Tabs
-            aria-label="Relationship"
+            aria-label={t('nomineeForm.relationshipLabel')}
             appearance="pill"
             emphasis="secondary"
             behavior="toggle"
-            items={relationships.map((r) => ({ value: r, label: r }))}
+            items={relationships.map((r) => ({ value: r, label: t(`relationship.${r}`) }))}
             value={relationship}
             onChange={(v) => setRelationship(v as Relationship)}
           />
-        </section>
-        <section className={styles.section}>
-          <TextField label="Full name" placeholder="As on their ID" defaultValue={filled ? nominee.name : ''} />
-          <TextField label="Date of birth" placeholder="DD MMM YYYY" value={filled ? nominee.dob : ''} readOnly iconRight={<Icon icon={msCalendarMonth} />} onClick={onDob} />
-          <TextField label="Last 4 digits of Aadhaar" placeholder="1234" inputMode="numeric" maxLength={4} defaultValue={filled ? nominee.aadhaarLast4 : ''} helperText="Only for identification — we don’t verify it" />
-          <ListCell variant="card" as="label" multiline label="Same contact details as mine" description="Address, email and phone number" trailing={<Checkbox defaultChecked />} />
-        </section>
-      </div>
+        </Stack>
+        <Stack as="section" gap="16">
+          <TextField label={t('nomineeForm.name')} placeholder={t('nomineeForm.namePlaceholder')} defaultValue={filled ? nominee.name : ''} />
+          <TextField label={t('nomineeForm.dob')} placeholder={t('nomineeForm.dobPlaceholder')} value={filled ? nominee.dob : ''} readOnly iconRight={<Icon icon={msCalendarMonth} />} onClick={onDob} />
+          <TextField label={t('nomineeForm.aadhaar')} placeholder={t('nomineeForm.aadhaarPlaceholder')} inputMode="numeric" maxLength={4} defaultValue={filled ? nominee.aadhaarLast4 : ''} helperText={t('nomineeForm.aadhaarHelper')} />
+          <ListCell variant="card" as="label" multiline label={t('nomineeForm.sameContact')} description={t('nomineeForm.sameContactDescription')} trailing={<Checkbox defaultChecked />} />
+        </Stack>
+      </Section>
     </Screen>
   )
 }
@@ -790,18 +978,18 @@ export function NomineeForm({ filled = false, sheet, onBack, onDob, onSave, onSk
 export function NomineeList({ onBack, onAdd, onDone }: { onBack?: () => void; onAdd?: () => void; onDone?: () => void }) {
   return (
     <Screen
-      top={<Actionbar title="Nominees" onBack={onBack} />}
+      top={<Actionbar title={t('nomineeList.screenTitle')} onBack={onBack} />}
       bottom={
-        <ButtonGroup aria-label="Nominees" direction="horizontal">
-          <Button variant="secondary" onClick={onAdd}>Add another</Button>
-          <Button onClick={onDone}>Done</Button>
+        <ButtonGroup aria-label={t('nomineeList.actionsLabel')} direction="horizontal">
+          <Button variant="secondary" onClick={onAdd}>{t('nomineeList.addAnother')}</Button>
+          <Button onClick={onDone}>{t('nomineeList.done')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.content}>
-        <ListCell variant="card" label={nominee.name} description={`${nominee.relationship} · born ${nominee.dob}`} trailing={<Tag color="neutral">{nominee.share}%</Tag>} />
-        <p className={styles.fine}>You can add up to 10 nominees and split your holdings between them. Change this anytime in Profile.</p>
-      </div>
+      <Section paddingBlock="24" paddingInline="16" gap="24">
+        <ListCell variant="card" label={nominee.name} description={t('nomineeList.summary', { relationship: nominee.relationship, dob: nominee.dob })} trailing={<Tag color="neutral">{nominee.share}%</Tag>} />
+        <p className={styles.fine}>{t('nomineeList.fine')}</p>
+      </Section>
     </Screen>
   )
 }
@@ -814,10 +1002,12 @@ import type { ReactNode } from 'react'
 import { Actionbar } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Section } from '@l3/components/Section'
 import { TextField } from '@l3/components/TextField'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { StageBar } from '../components/StageBar'
+import { t } from '../copy'
 import styles from './Kyc.module.css'
 
 /** kyc-02 / 03 · PAN. A PAN found for the mobile number opens as a sheet first (kyc-02); otherwise type it (kyc-03). */
@@ -825,22 +1015,22 @@ export function Pan({ value = '', sheet, onBack, onSubmit }: { value?: string; s
   const valid = /^[A-Z]{5}\d{4}[A-Z]$/.test(value)
   return (
     <Screen
-      top={<Actionbar title="Verify identity" onBack={onBack} bottom={<StageBar stage={1} />} />}
-      bottom={<ButtonGroup aria-label="Continue"><Button disabled={!valid} onClick={onSubmit}>Continue</Button></ButtonGroup>}
+      top={<Actionbar title={t('pan.screenTitle')} onBack={onBack} bottom={<StageBar stage={1} />} />}
+      bottom={<ButtonGroup aria-label={t('pan.actionsLabel')}><Button disabled={!valid} onClick={onSubmit}>{t('pan.cta')}</Button></ButtonGroup>}
       sheet={sheet}
     >
-      <Intro title="Enter your PAN" description="It links your trading account to your tax records" />
-      <div className={styles.content}>
+      <Intro title={t('pan.title')} description={t('pan.description')} />
+      <Section paddingBlock="24" paddingInline="16" gap="24">
         <TextField
-          label="PAN"
+          label={t('pan.label')}
           value={value}
-          placeholder="ABCDE1234F"
+          placeholder={t('pan.placeholder')}
           readOnly
           autoCapitalize="characters"
-          helperText={value && !valid ? 'A PAN has 5 letters, 4 digits and a letter' : '10 characters, as printed on your PAN card'}
+          helperText={value && !valid ? t('pan.error') : t('pan.helper')}
           status={value && !valid ? 'error' : undefined}
         />
-      </div>
+      </Section>
     </Screen>
   )
 }
@@ -854,10 +1044,12 @@ import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
+import { Section } from '@l3/components/Section'
+import { Steps } from '@l3/components/Steps'
 import { msCheckCircle } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
-import { Steps } from '@l3/components/Steps'
+import { t } from '../copy'
 import { stages } from '../data'
 import styles from './Kyc.module.css'
 
@@ -868,16 +1060,16 @@ import styles from './Kyc.module.css'
 export function Start({ emailVerified = true, onStart }: { emailVerified?: boolean; onStart?: () => void }) {
   return (
     <Screen
-      toast={emailVerified && <Aerobar floating type="success" emphasis="primary" icon={<Icon icon={msCheckCircle} />} heading="Email verified" />}
-      bottom={<ButtonGroup aria-label="Start"><Button onClick={onStart}>Start</Button></ButtonGroup>}
+      toast={emailVerified && <Aerobar floating type="success" emphasis="primary" icon={<Icon icon={msCheckCircle} />} heading={t('start.emailVerified')} />}
+      bottom={<ButtonGroup aria-label={t('start.actionsLabel')}><Button onClick={onStart}>{t('start.cta')}</Button></ButtonGroup>}
     >
-      <Intro title="Let’s open your account" description="3 quick steps, about 5 minutes. Keep your PAN card handy." />
-      <div className={styles.content}>
+      <Intro title={t('start.title')} description={t('start.description')} />
+      <Section paddingBlock="24" paddingInline="16" gap="24">
         <Card>
-          <Steps label="Account setup" steps={stages.map((s, i) => ({ ...s, state: i === 0 ? 'current' : 'todo' }))} />
+          <Steps label={t('start.stepsLabel')} steps={stages.map((s, i) => ({ label: t(`stage.${s}.label`), description: t(`stage.${s}.description`), state: i === 0 ? 'current' : 'todo' }))} />
         </Card>
-        <p className={styles.fine}>Your details are verified with SEBI-registered KRAs and stay encrypted.</p>
-      </div>
+        <p className={styles.fine}>{t('start.trust')}</p>
+      </Section>
     </Screen>
   )
 }
@@ -892,12 +1084,14 @@ import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
 import { Loader } from '@l3/components/Loader'
+import { Stack } from '@l3/components/Stack'
+import { Steps } from '@l3/components/Steps'
 import { msAccountBalance, msCheckCircle } from '@l3/icons/material'
 import { useAutoAdvance } from '../../../shared/prototype'
 import { inr, mask } from '../../../shared/data/format'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { Spot } from '../../../shared/ui/Spot'
-import { Steps } from '@l3/components/Steps'
+import { t } from '../copy'
 import { foundBank, PENNY_DROP } from '../data'
 import styles from '../screens/Kyc.module.css'
 
@@ -908,22 +1102,22 @@ export function BankFoundSheet({ onUse, onOther }: { onUse?: () => void; onOther
     <Sheet
       labelledBy={id}
       onClose={onOther}
-      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msAccountBalance} tone="discover" size="md" />} heading="Use this bank account?" description="We found it linked to your PAN" />}
+      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msAccountBalance} tone="discover" size="md" />} heading={t('bankFound.title')} description={t('bankFound.description')} />}
       footer={
-        <ButtonGroup aria-label="Bank account">
-          <Button onClick={onUse}>Use this account</Button>
-          <Button variant="secondary" onClick={onOther}>Add a different account</Button>
+        <ButtonGroup aria-label={t('bankFound.actionsLabel')}>
+          <Button onClick={onUse}>{t('bankFound.use')}</Button>
+          <Button variant="secondary" onClick={onOther}>{t('bankFound.other')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.sheetBody}>
-        <KeyValueList variant="card" aria-label="Bank account found">
-          <KeyValueRow label="Bank" value={foundBank.bank} />
-          <KeyValueRow label="Account number" value={mask(foundBank.accountNumber, 0, 4)} />
-          <KeyValueRow label="IFSC" value={foundBank.ifsc} />
-          <KeyValueRow label="Type" value={foundBank.type} />
+      <Stack gap="16">
+        <KeyValueList variant="card" aria-label={t('bankFound.listLabel')}>
+          <KeyValueRow label={t('bankFound.bank')} value={foundBank.bank} />
+          <KeyValueRow label={t('bankFound.accountNumber')} value={mask(foundBank.accountNumber, 0, 4)} />
+          <KeyValueRow label={t('bankFound.ifsc')} value={foundBank.ifsc} />
+          <KeyValueRow label={t('bankFound.type')} value={foundBank.type} />
         </KeyValueList>
-      </div>
+      </Stack>
     </Sheet>
   )
 }
@@ -935,9 +1129,9 @@ export function VerifyingBankSheet({ next }: { next?: string }) {
   return (
     <Sheet
       labelledBy={id}
-      header={<BottomSheetHeader size="lg" headingId={id} icon={<Loader size="lg" label={null} />} heading="Verifying your bank account" description={`We’re sending ${inr(PENNY_DROP, 0)} to it. It shows as “Lemonn” in your statement.`} />}
+      header={<BottomSheetHeader size="lg" headingId={id} icon={<Loader size="lg" label={null} />} heading={t('bankVerifying.title')} description={t('bankVerifying.description', { amount: inr(PENNY_DROP, 0) })} />}
     >
-      <p className={`${styles.fine} ${styles.fineCentre}`}>Takes a few seconds — please keep the app open</p>
+      <p className={`${styles.fine} ${styles.fineCentre}`}>{t('bankVerifying.fine')}</p>
     </Sheet>
   )
 }
@@ -948,24 +1142,24 @@ export function BankVerifiedSheet({ onFno, onSkip }: { onFno?: () => void; onSki
   return (
     <Sheet
       labelledBy={id}
-      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msCheckCircle} tone="success" size="md" />} heading="Bank account verified" description={`${foundBank.bank} ${mask(foundBank.accountNumber, 0, 4)}`} />}
+      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msCheckCircle} tone="success" size="md" />} heading={t('bankVerified.title')} description={t('bankVerified.description', { bank: foundBank.bank, account: mask(foundBank.accountNumber, 0, 4) })} />}
       footer={
-        <ButtonGroup aria-label="Next">
-          <Button onClick={onFno}>Activate F&O</Button>
-          <Button variant="secondary" onClick={onSkip}>Skip for now</Button>
+        <ButtonGroup aria-label={t('bankVerified.actionsLabel')}>
+          <Button onClick={onFno}>{t('bankVerified.fno')}</Button>
+          <Button variant="secondary" onClick={onSkip}>{t('bankVerified.skip')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.sheetBody}>
+      <Stack gap="16">
         <Steps
-          label="Account setup"
+          label={t('bankVerified.stepsLabel')}
           steps={[
-            { label: 'Identity verified', state: 'done' },
-            { label: 'Bank account verified', state: 'done' },
-            { label: 'Activate F&O', description: 'Share a bank statement · about 2 min', state: 'current' },
+            { label: t('bankVerified.step.identity'), state: 'done' },
+            { label: t('bankVerified.step.bank'), state: 'done' },
+            { label: t('bankVerified.step.fno'), description: t('bankVerified.step.fnoDescription'), state: 'current' },
           ]}
         />
-      </div>
+      </Stack>
     </Sheet>
   )
 }
@@ -979,7 +1173,9 @@ import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { DatePicker } from '@l3/components/DatePicker'
+import { Stack } from '@l3/components/Stack'
 import { Sheet } from '../../../shared/ui/Sheet'
+import { t } from '../copy'
 import styles from '../screens/Kyc.module.css'
 
 /** kyc-09 · Nominee's date of birth (L3 DatePicker in a sheet; no future dates). */
@@ -990,12 +1186,12 @@ export function DobSheet({ onConfirm, onClose }: { onConfirm?: () => void; onClo
     <Sheet
       labelledBy={id}
       onClose={onClose}
-      header={<BottomSheetHeader headingId={id} heading="Nominee’s date of birth" />}
-      footer={<ButtonGroup aria-label="Date of birth"><Button disabled={!date} onClick={onConfirm}>Confirm</Button></ButtonGroup>}
+      header={<BottomSheetHeader headingId={id} heading={t('dob.title')} />}
+      footer={<ButtonGroup aria-label={t('dob.actionsLabel')}><Button disabled={!date} onClick={onConfirm}>{t('dob.confirm')}</Button></ButtonGroup>}
     >
-      <div className={styles.sheetBody}>
-        <DatePicker label="Date of birth" value={date} onChange={setDate} max={new Date()} initialMonth={new Date(1967, 3, 1)} />
-      </div>
+      <Stack gap="16">
+        <DatePicker label={t('dob.label')} value={date} onChange={setDate} max={new Date()} initialMonth={new Date(1967, 3, 1)} />
+      </Stack>
     </Sheet>
   )
 }
@@ -1009,7 +1205,9 @@ import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { Stack } from '@l3/components/Stack'
 import { Sheet } from '../../../shared/ui/Sheet'
+import { t } from '../copy'
 import { nominee } from '../data'
 import styles from '../screens/Kyc.module.css'
 
@@ -1020,23 +1218,23 @@ export function NomineeSheet({ onClose, onEdit }: { onClose?: () => void; onEdit
     <Sheet
       labelledBy={id}
       onClose={onClose}
-      header={<BottomSheetHeader headingId={id} heading="Nominee details" />}
+      header={<BottomSheetHeader headingId={id} heading={t('nomineeSheet.title')} />}
       footer={
-        <ButtonGroup aria-label="Nominee" direction="horizontal">
-          <Button variant="secondary" onClick={onEdit}>Edit</Button>
-          <Button onClick={onClose}>Done</Button>
+        <ButtonGroup aria-label={t('nomineeSheet.actionsLabel')} direction="horizontal">
+          <Button variant="secondary" onClick={onEdit}>{t('nomineeSheet.edit')}</Button>
+          <Button onClick={onClose}>{t('nomineeSheet.done')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.sheetBody}>
-        <KeyValueList variant="card" aria-label="Nominee">
-          <KeyValueRow label="Name" value={nominee.name} />
-          <KeyValueRow label="Relationship" value={nominee.relationship} />
-          <KeyValueRow label="Date of birth" value={nominee.dob} />
-          <KeyValueRow label="Aadhaar (last 4)" value={nominee.aadhaarLast4} />
-          <KeyValueRow label="Share" value={`${nominee.share}%`} />
+      <Stack gap="16">
+        <KeyValueList variant="card" aria-label={t('nomineeSheet.listLabel')}>
+          <KeyValueRow label={t('nomineeSheet.name')} value={nominee.name} />
+          <KeyValueRow label={t('nomineeSheet.relationship')} value={nominee.relationship} />
+          <KeyValueRow label={t('nomineeSheet.dob')} value={nominee.dob} />
+          <KeyValueRow label={t('nomineeSheet.aadhaar')} value={nominee.aadhaarLast4} />
+          <KeyValueRow label={t('nomineeSheet.share')} value={t('nomineeSheet.shareValue', { share: nominee.share })} />
         </KeyValueList>
-      </div>
+      </Stack>
     </Sheet>
   )
 }
@@ -1050,11 +1248,13 @@ import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { Stack } from '@l3/components/Stack'
 import { msBadge } from '@l3/icons/material'
 import { mask } from '../../../shared/data/format'
 import { user } from '../../../shared/data/user'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { Spot } from '../../../shared/ui/Spot'
+import { t } from '../copy'
 import styles from '../screens/Kyc.module.css'
 
 /** kyc-02 · A PAN is linked to this mobile number: confirm it (masked) or type another. */
@@ -1064,20 +1264,20 @@ export function PanFoundSheet({ onUse, onOther }: { onUse?: () => void; onOther?
     <Sheet
       labelledBy={id}
       onClose={onOther}
-      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msBadge} tone="discover" size="md" />} heading="Is this your PAN?" description="We found a PAN linked to your mobile number" />}
+      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msBadge} tone="discover" size="md" />} heading={t('panFound.title')} description={t('panFound.description')} />}
       footer={
-        <ButtonGroup aria-label="Confirm PAN">
-          <Button onClick={onUse}>Yes, use this PAN</Button>
-          <Button variant="secondary" onClick={onOther}>Enter a different PAN</Button>
+        <ButtonGroup aria-label={t('panFound.actionsLabel')}>
+          <Button onClick={onUse}>{t('panFound.use')}</Button>
+          <Button variant="secondary" onClick={onOther}>{t('panFound.other')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.sheetBody}>
-        <KeyValueList variant="card" aria-label="PAN found">
-          <KeyValueRow label="Name" value={user.name} />
-          <KeyValueRow label="PAN" value={mask(user.pan, 5, 1)} />
+      <Stack gap="16">
+        <KeyValueList variant="card" aria-label={t('panFound.listLabel')}>
+          <KeyValueRow label={t('panFound.name')} value={user.name} />
+          <KeyValueRow label={t('panFound.pan')} value={mask(user.pan, 5, 1)} />
         </KeyValueList>
-      </div>
+      </Stack>
     </Sheet>
   )
 }
@@ -1090,9 +1290,11 @@ import { useId } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Stack } from '@l3/components/Stack'
 import { msWarning } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { Spot } from '../../../shared/ui/Spot'
+import { t } from '../copy'
 import { riskDisclosure } from '../data'
 import styles from '../screens/Kyc.module.css'
 
@@ -1103,19 +1305,46 @@ export function RiskSheet({ onAccept, onClose }: { onAccept?: () => void; onClos
     <Sheet
       labelledBy={id}
       onClose={onClose}
-      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msWarning} tone="warning" size="md" />} heading="Before you trade F&O" description="Risk disclosure on derivatives (SEBI)" />}
-      footer={<ButtonGroup aria-label="Acknowledge"><Button onClick={onAccept}>I understand</Button></ButtonGroup>}
+      header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msWarning} tone="warning" size="md" />} heading={t('risk.title')} description={t('risk.description')} />}
+      footer={<ButtonGroup aria-label={t('risk.actionsLabel')}><Button onClick={onAccept}>{t('risk.accept')}</Button></ButtonGroup>}
     >
-      <div className={styles.sheetBody}>
-        <ul className={styles.bullets}>{riskDisclosure.map((r) => <li key={r}>{r}</li>)}</ul>
-        <p className={styles.fine}>Source: SEBI study, FY 2022–24.</p>
-      </div>
+      <Stack gap="16">
+        <ul className={styles.bullets}>{riskDisclosure.map((r) => <li key={r}>{t(`risk.point.${r}`)}</li>)}</ul>
+        <p className={styles.fine}>{t('risk.source')}</p>
+      </Stack>
     </Sheet>
   )
 }
 ```
 
 ## Source — shared app parts it uses
+
+### `src/shared/copy.ts`
+
+```ts
+/**
+ * UI copy. Every user-facing string of a flow lives in ONE file, `src/flows/<flow-id>/copy.json` — flat keys
+ * ("empty.title") → the text. Screens read it through the flow's `t`:
+ *
+ *   t('empty.title')                       → "No search results found"
+ *   t('group.results', { list, count })    → "Stocks (8)"   ({name} placeholders are filled in)
+ *
+ * Sample data (stock names, prices, watchlists) stays in the flow's data.ts — copy.json is only the words the app
+ * itself says: titles, labels, buttons, empty states, accessible names. Porting a flow: this file is the string
+ * table (Flutter ARB / iOS Localizable.strings).
+ */
+export type CopyVars = Record<string, string | number>
+
+export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
+  return function t(key: keyof Copy & string, vars?: CopyVars): string {
+    const template = copy[key] ?? key
+    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
+    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
+    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
+    return text
+  }
+}
+```
 
 ### `src/shared/data/format.ts`
 

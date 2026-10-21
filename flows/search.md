@@ -1,6 +1,6 @@
 # Flow: Search (`search`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Search stocks, F&O contracts, mutual funds and IPOs; Smart Options & Futures lists; add to watchlist.
 
@@ -127,6 +127,7 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 | Create watchlist | BottomSheet + TextField + ButtonGroup | "Watchlist Name" (typing), Create (primary lg) |
 | Added | Aerobar (floating, primary) | `check` icon, heading, action OK |
 | Keyboard | — | the phone's own keyboard (drawn in the prototype: `src/shared/ui/TextKeyboard`) |
+| Layout | Section · Stack · Inset · Grid (Figma auto-layout frames) | Body: Section `paddingBlock="16" gap="24"`; groups Stack `as="section" gap="12"`; group header Inset `paddingInline="16"` → Stack `direction="horizontal" align="center" justify="between" gap="08"`; chip rows Stack `gap="12"` of horizontal Stacks `gap="12"`; tiles Inset 16 → Grid `columns={2} gap="12"`; watchlist rows Section `paddingInline="16" gap="12"`; results Stack `as="ul"` of horizontal Stack rows. Signals: pill row horizontal Stack `gap="08"`, header horizontal Stack `justify="between"` |
 
 ### Rules & behaviour
 
@@ -170,6 +171,7 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 
 ### Changelog
 
+- 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Section, Stack, Inset, Grid); nothing moved (measured at 392).
 - 2026-10-19 — opened from Market too (`search-24`, back returns to Market).
 - 2026-10-19 — Clear Search back to Small (empty-state action).
 - 2026-10-19 — tiles: 8 radius, like the chips.
@@ -184,14 +186,9 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 ### `src/flows/search/components/GroupHeader.module.css`
 
 ```css
-/* Figma "header": 16 tall, 16 from both screen edges, 8 between the label and its control. */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--l3-spacing-08);
+/* Figma "header": 16 tall, 16 from both screen edges (the Inset), 8 between the label and its control (the Stack). */
+.row {
   min-height: var(--l3-size-16);
-  padding-inline: var(--l3-spacing-16);
 }
 
 /* A header that starts a list straight under the top bar (IPO results, signals): 16 above it. */
@@ -212,7 +209,10 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 import type { ReactNode } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
 import { msChevronRight } from '@l3/icons/material'
+import { t } from '../copy'
 import styles from './GroupHeader.module.css'
 
 /**
@@ -222,18 +222,20 @@ import styles from './GroupHeader.module.css'
  */
 export function GroupHeader({ title, action, inset = false }: { title: string; action?: ReactNode; inset?: boolean }) {
   return (
-    <div className={styles.header} data-inset={inset || undefined}>
-      <h2 className={styles.title}>{title}</h2>
-      {action}
-    </div>
+    <Inset paddingInline="16" paddingBlock="00" className={styles.header} data-inset={inset || undefined}>
+      <Stack direction="horizontal" align="center" justify="between" gap="08" className={styles.row}>
+        <h2 className={styles.title}>{title}</h2>
+        {action}
+      </Stack>
+    </Inset>
   )
 }
 
 /** "View All ›" on a group header: an L3 Ghost Small button with a chevron. */
 export function ViewAll({ onClick, label }: { onClick?: () => void; label: string }) {
   return (
-    <Button variant="ghost" size="sm" iconRight={<Icon icon={msChevronRight} />} aria-label={`View all ${label}`} onClick={onClick}>
-      View All
+    <Button variant="ghost" size="sm" iconRight={<Icon icon={msChevronRight} />} aria-label={t('group.viewAllLabel', { name: label })} onClick={onClick}>
+      {t('group.viewAll')}
     </Button>
   )
 }
@@ -242,17 +244,10 @@ export function ViewAll({ onClick, label }: { onClick?: () => void; label: strin
 ### `src/flows/search/components/ResultList.module.css`
 
 ```css
-.list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Figma "search stock listing": the row (Info) and, on the right, the 56 wide bookmark column (16 · 24 · 16). */
+/* Figma "search stock listing": the row (Info) and, on the right, the 56 wide bookmark column (16 · 24 · 16). The
+   row is a horizontal Stack; it stays positioned for its separator line. */
 .row {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 /* Figma "sepe": a 1px border/light line under each row, 16 in from both edges. */
@@ -276,6 +271,7 @@ export function ViewAll({ onClick, label }: { onClick?: () => void; label: strin
   margin-inline-end: var(--l3-spacing-16);
 }
 
+/* Price over its detail, right-aligned. 2 apart: the layout blocks' spacing steps start at 4. */
 .stack {
   display: flex;
   flex-direction: column;
@@ -298,9 +294,11 @@ import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
 import { PriceChange } from '@l3/components/PriceChange'
+import { Stack } from '@l3/components/Stack'
 import { lmWatchlistAdd, lmWatchlistAdded } from '@l3/icons/lemonnade'
 import { inr } from '../../../shared/data/format'
 import type { SearchResult } from '../data'
+import { t } from '../copy'
 import styles from './ResultList.module.css'
 
 type ResultListProps = {
@@ -326,11 +324,11 @@ type ResultListProps = {
  */
 export function ResultList({ items, label, showVolume, bookmarks = true, saved, onOpen, onBookmark }: ResultListProps) {
   return (
-    <ul className={styles.list} aria-label={label}>
+    <Stack as="ul" aria-label={label}>
       {items.map((item) => {
         const isSaved = saved ? saved.includes(item.id) : Boolean(item.saved)
         return (
-          <li key={item.id} className={styles.row}>
+          <Stack as="li" key={item.id} direction="horizontal" align="center" className={styles.row}>
             <ListCell
               className={styles.cell}
               size="sm"
@@ -347,15 +345,15 @@ export function ResultList({ items, label, showVolume, bookmarks = true, saved, 
                 className={styles.bookmark}
                 variant="ghost"
                 iconLeft={<Icon icon={isSaved ? lmWatchlistAdded : lmWatchlistAdd} />}
-                aria-label={isSaved ? `${item.name} is in a watchlist — change` : `Add ${item.name} to a watchlist`}
+                aria-label={t(isSaved ? 'result.inWatchlist' : 'result.addToWatchlist', { name: item.name })}
                 aria-pressed={isSaved}
                 onClick={() => onBookmark?.(item)}
               />
             )}
-          </li>
+          </Stack>
         )
       })}
-    </ul>
+    </Stack>
   )
 }
 
@@ -377,19 +375,14 @@ function Trailing({ item, showVolume }: { item: SearchResult; showVolume?: boole
 ### `src/flows/search/components/SearchChips.module.css`
 
 ```css
-/* Figma "Section 1 - Past search" / "Sec 2 - Popular search": label, 12, chip rows (12 apart). */
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
-}
+/*
+ * Figma "Section 1 - Past search" / "Sec 2 - Popular search": label, 12, chip rows (12 apart) — L3 Stacks. Only what
+ * they don't cover lives here.
+ */
 
-/* Rows scroll sideways together; the first chip lines up with the 16 page margin. */
+/* Rows scroll sideways together; the first chip lines up with the 16 page margin (padding inside the scroller). */
 .scroll {
   position: relative; /* keeps absolutely placed bits inside the scrolling area */
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   padding-inline: var(--l3-spacing-16);
@@ -402,8 +395,6 @@ function Trailing({ item, showVolume }: { item: SearchResult; showVolume?: boole
 }
 
 .row {
-  display: flex;
-  gap: var(--l3-spacing-12);
   width: max-content;
 }
 
@@ -421,6 +412,7 @@ function Trailing({ item, showVolume }: { item: SearchResult; showVolume?: boole
   box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
+/* The chip's inside: a span (it's inside a button), so not a layout block; 8 / 12 / 8 / 8 padding. */
 .body {
   display: flex;
   align-items: center;
@@ -444,8 +436,10 @@ function Trailing({ item, showVolume }: { item: SearchResult; showVolume?: boole
 ```tsx
 import { Avatar } from '@l3/components/Avatar'
 import { Card } from '@l3/components/Card'
+import { Stack } from '@l3/components/Stack'
 import type { SearchChip } from '../data'
 import { GroupHeader } from './GroupHeader'
+import { t } from '../copy'
 import styles from './SearchChips.module.css'
 
 /**
@@ -455,23 +449,23 @@ import styles from './SearchChips.module.css'
  */
 export function SearchChips({ title, rows, onPick }: { title: string; rows: SearchChip[][]; onPick?: (chip: SearchChip) => void }) {
   return (
-    <section className={styles.section} aria-label={title}>
+    <Stack as="section" gap="12" aria-label={title}>
       <GroupHeader title={title} />
-      <div className={styles.scroll}>
+      <Stack gap="12" className={styles.scroll}>
         {rows.map((row, i) => (
-          <div key={i} className={styles.row}>
+          <Stack key={i} direction="horizontal" gap="12" className={styles.row}>
             {row.map((chip) => (
-              <Card key={chip.label} padding="none" className={styles.chip} aria-label={`Search ${chip.label}`} onClick={() => onPick?.(chip)}>
+              <Card key={chip.label} padding="none" className={styles.chip} aria-label={t('chip.label', { name: chip.label })} onClick={() => onPick?.(chip)}>
                 <span className={styles.body}>
                   <Avatar initials={chip.initials} src={chip.logoUrl} size={24} shape="rounded" />
                   <span className={styles.label}>{chip.label}</span>
                 </span>
               </Card>
             ))}
-          </div>
+          </Stack>
         ))}
-      </div>
-    </section>
+      </Stack>
+    </Stack>
   )
 }
 ```
@@ -479,18 +473,8 @@ export function SearchChips({ title, rows, onPick }: { title: string; rows: Sear
 ### `src/flows/search/components/Tiles.module.css`
 
 ```css
-/* Figma "Container": 2 columns, 12 apart both ways, inside the 16 page margin. */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--l3-spacing-12);
-  padding-inline: var(--l3-spacing-16);
-}
-
-.cell {
-  display: flex;
-}
-
+/* Figma "Container": 2 columns, 12 apart both ways, inside the 16 page margin — an L3 Inset around a Grid. Each cell is
+   a horizontal Stack so the tile fills its height. */
 .tile {
   flex: 1;
 }
@@ -520,6 +504,9 @@ export function SearchChips({ title, rows, onPick }: { title: string; rows: Sear
 
 ```tsx
 import { Card } from '@l3/components/Card'
+import { Grid } from '@l3/components/Grid'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
 import styles from './Tiles.module.css'
 
 /**
@@ -529,34 +516,18 @@ import styles from './Tiles.module.css'
  */
 export function Tiles({ items, label, muted, onPick }: { items: string[]; label: string; muted?: boolean; onPick?: (item: string) => void }) {
   return (
-    <div className={styles.grid} role="list" aria-label={label}>
-      {items.map((item) => (
-        <div key={item} role="listitem" className={styles.cell}>
-          <Card padding="none" className={styles.tile} onClick={() => onPick?.(item)}>
-            <span className={styles.label} data-muted={muted || undefined}>{item}</span>
-          </Card>
-        </div>
-      ))}
-    </div>
+    <Inset paddingInline="16" paddingBlock="00">
+      <Grid columns={2} gap="12" role="list" aria-label={label}>
+        {items.map((item) => (
+          <Stack key={item} direction="horizontal" role="listitem">
+            <Card padding="none" className={styles.tile} onClick={() => onPick?.(item)}>
+              <span className={styles.label} data-muted={muted || undefined}>{item}</span>
+            </Card>
+          </Stack>
+        ))}
+      </Grid>
+    </Inset>
   )
-}
-```
-
-### `src/flows/search/components/WatchlistMatches.module.css`
-
-```css
-/* Figma "watchlist": label, 12, card rows 12 apart inside the 16 page margin. */
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
-}
-
-.rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
-  padding-inline: var(--l3-spacing-16);
 }
 ```
 
@@ -566,10 +537,12 @@ export function Tiles({ items, label, muted, onPick }: { items: string[]; label:
 import { Avatar } from '@l3/components/Avatar'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msChevronRight } from '@l3/icons/material'
 import type { WatchlistMatch } from '../data'
 import { GroupHeader } from './GroupHeader'
-import styles from './WatchlistMatches.module.css'
+import { t } from '../copy'
 
 /**
  * "Your watchlist (n)": the user's watchlists that match the query, above the results. Each is a tappable L3 card row
@@ -578,9 +551,9 @@ import styles from './WatchlistMatches.module.css'
  */
 export function WatchlistMatches({ watchlists, onOpen }: { watchlists: WatchlistMatch[]; onOpen?: (id: string) => void }) {
   return (
-    <section className={styles.section} aria-label="Your watchlists">
-      <GroupHeader title={`Your watchlist (${watchlists.length})`} />
-      <div className={styles.rows}>
+    <Stack as="section" gap="12" aria-label={t('watchlists.label')}>
+      <GroupHeader title={t('watchlists.title', { count: watchlists.length })} />
+      <Section paddingInline="16" gap="12">
         {watchlists.map((w) => (
           <ListCell
             key={w.id}
@@ -589,15 +562,79 @@ export function WatchlistMatches({ watchlists, onOpen }: { watchlists: Watchlist
             as="button"
             iconLeft={<Avatar initials={w.initials} size={32} shape="rounded" />}
             label={w.name}
-            description={w.count === undefined ? undefined : `${w.count} stocks`}
+            description={w.count === undefined ? undefined : t('watchlists.stockCount', { count: w.count })}
             iconRight={<Icon icon={msChevronRight} />}
             onClick={() => onOpen?.(w.id)}
           />
         ))}
-      </div>
-    </section>
+      </Section>
+    </Stack>
   )
 }
+```
+
+### `src/flows/search/copy.json`
+
+```json
+{
+  "tab.stocks": "Stocks",
+  "tab.fno": "F&O",
+  "tab.mf": "MF",
+  "tab.ipo": "IPO",
+  "tab.withCount": "{tab} ({count})",
+  "tabs.label": "Search in",
+  "field.stocks": "Search stocks",
+  "field.fno": "Search contracts",
+  "field.mf": "Search mutual funds",
+  "field.ipo": "Search IPOs",
+  "field.clear": "Clear search",
+  "recent.title": "Recent Searches",
+  "popular.title": "Popular Searches",
+  "chip.label": "Search {name}",
+  "signals.title": "Smart Options & Futures",
+  "signals.tilesLabel": "Smart Options & Futures lists",
+  "collections.title": "Collections",
+  "collections.tilesLabel": "Fund collections",
+  "group.viewAll": "View All",
+  "group.viewAllLabel": "View all {name}",
+  "results.title": "{list} ({count})",
+  "results.returnsPeriod": "Returns period",
+  "results.returns3y": "3Y Returns",
+  "result.inWatchlist": "{name} is in a watchlist — change",
+  "result.addToWatchlist": "Add {name} to a watchlist",
+  "watchlists.label": "Your watchlists",
+  "watchlists.title": "Your watchlist ({count})",
+  "watchlists.stockCount": "{count} stocks",
+  "empty.title": "No search results found",
+  "empty.description": "Make sure you’ve spelled it correctly.",
+  "empty.clear": "Clear Search",
+  "signalsList.switchScope": "Showing {scope}. Switch to {other}",
+  "signalsList.listsLabel": "Signals lists",
+  "signalsList.filter": "Filter",
+  "signalsList.sortPrice": "Price",
+  "signalsList.sortVolume": "Volume",
+  "signalsList.sortLabel": "Sort by {sort}. Switch",
+  "addSheet.title": "Add to watchlist",
+  "addSheet.create": "Create",
+  "addSheet.listsLabel": "Watchlists",
+  "addSheet.save": "Save",
+  "createSheet.title": "Create watchlist",
+  "createSheet.field": "Watchlist Name",
+  "createSheet.placeholder": "e.g. Banking",
+  "createSheet.create": "Create",
+  "toast.added": "Stock added to watchlist successfully",
+  "toast.ok": "OK"
+}
+```
+
+### `src/flows/search/copy.ts`
+
+```ts
+import { makeCopy } from '../../shared/copy'
+import copy from './copy.json'
+
+/** Every user-facing string of Search is in copy.json: t('empty.title'), t('results.title', { list, count }). */
+export const t = makeCopy('search', copy)
 ```
 
 ### `src/flows/search/data.ts`
@@ -607,16 +644,6 @@ export function WatchlistMatches({ watchlists, onOpen }: { watchlists: Watchlist
 
 /** The four search tabs, in order. */
 export type SearchTab = 'stocks' | 'fno' | 'mf' | 'ipo'
-
-export const tabLabels: Record<SearchTab, string> = { stocks: 'Stocks', fno: 'F&O', mf: 'MF', ipo: 'IPO' }
-
-/** What the empty search field says on each tab. */
-export const placeholders: Record<SearchTab, string> = {
-  stocks: 'Search stocks',
-  fno: 'Search contracts',
-  mf: 'Search mutual funds',
-  ipo: 'Search IPOs',
-}
 
 /** A recent or popular search, shown as a chip (max 200 wide; at most 5 recent ones are kept). */
 export type SearchChip = { label: string; initials: string; logoUrl?: string }
@@ -855,8 +882,6 @@ export const signalScopes: Record<SignalScope, { label: string; categories: stri
 /** How a signals list is sorted — the ↕ switcher on the right of the list header. */
 export type SignalSort = 'price' | 'volume'
 
-export const sortLabels: Record<SignalSort, string> = { price: 'Price', volume: 'Volume' }
-
 export const indexSignals: SearchResult[] = [
   { id: 's1', name: 'SENSEX 61000', detail: 'Stock • Fut • 30JUN2026', price: 85.35, changePct: -2.03 },
   { id: 's2', name: 'NIFTY 18250', detail: 'Stock • Call • 30JUN2026', price: 66.4, changePct: 4.12 },
@@ -900,6 +925,7 @@ import { Aerobar } from '@l3/components/Aerobar'
 import { Icon } from '@l3/components/Icon'
 import { msCheck } from '@l3/icons/material'
 import type { Flow } from '../types'
+import { t } from './copy'
 import { allWatchlists, bank, bankNoWatchlist, energy, fewWatchlists, nothing, penny } from './data'
 import { Search } from './screens/Search'
 import { Signals } from './screens/Signals'
@@ -951,7 +977,7 @@ export const search: Flow = {
     // ---- Add to watchlist (from a result's bookmark on search-02)
     { id: 'search-18', section: 'watchlist', name: 'Add to watchlist', figma: '4912:14274', note: 'From HDFC Bank’s bookmark. Nothing ticked yet: Save is off. The keyboard goes down while the sheet is open.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={allWatchlists} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
     { id: 'search-19', section: 'watchlist', name: 'Add to watchlist · 2 ticked', figma: '4912:14811', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={allWatchlists} checked={['Momentum Plays', 'Banking Giants']} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
-    { id: 'search-20', section: 'watchlist', name: 'Added · toast', figma: '4912:15015', note: 'Floating L3 toast with OK; it leaves on its own (L3 timing: 6 s with an action — Figma says 2 s).', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} toast={<Aerobar floating emphasis="primary" icon={<Icon icon={msCheck} />} heading="Stock added to watchlist successfully" action={{ label: 'OK', onClick: () => go('search-21') }} onDismiss={() => go('search-21')} />} /> },
+    { id: 'search-20', section: 'watchlist', name: 'Added · toast', figma: '4912:15015', note: 'Floating L3 toast with OK; it leaves on its own (L3 timing: 6 s with an action — Figma says 2 s).', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} toast={<Aerobar floating emphasis="primary" icon={<Icon icon={msCheck} />} heading={t('toast.added')} action={{ label: t('toast.ok'), onClick: () => go('search-21') }} onDismiss={() => go('search-21')} />} /> },
     { id: 'search-21', section: 'watchlist', name: 'Added · bookmark filled', figma: '4912:15123', note: 'HDFC Bank’s bookmark is now filled with a tick.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} /> },
     { id: 'search-22', section: 'watchlist', name: 'Create watchlist', figma: '4912:14650', note: 'From "+ Create" (or the first time, when there’s no watchlist yet). The keyboard sits under the dock.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<CreateWatchlistSheet name="Banking" onCreate={() => go('search-20')} onClose={() => go('search-18')} />} /> },
     { id: 'search-23', section: 'watchlist', name: 'Add to watchlist · few lists', figma: '4912:14477', note: 'Someone with 4 watchlists: the sheet is only as tall as its rows.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={fewWatchlists} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
@@ -962,37 +988,19 @@ export const search: Flow = {
 ### `src/flows/search/screens/Search.module.css`
 
 ```css
-/* Figma "Body" / "resut": groups 24 apart, 16 above the first and below the last. */
-.body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-24);
-  padding-block: var(--l3-spacing-16);
-}
+/*
+ * Figma "Body" / "resut": groups 24 apart, 16 above the first and below the last. Layout is L3 Section / Stack; only
+ * what those blocks don't cover lives here.
+ */
 
-/* A label over its tiles (Smart Options & Futures, Collections): 12 between. */
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
-}
-
-/* Figma "results": the label sits right on the list — the rows bring their own 16 above. */
-.results {
-  display: flex;
-  flex-direction: column;
-}
-
-/* IPO lists (Most Subscribed, Upcoming IPOs): 8 more above, a bigger break than the chip groups (24 + 8 = 32). */
+/* IPO lists (Most Subscribed, Upcoming IPOs): 8 more above, a bigger break than the chip groups (24 + 8 = 32). The
+   blocks pad both sides of an axis alike, so the extra 8 on top only stays a class. */
 .ipoList {
-  display: flex;
-  flex-direction: column;
   padding-top: var(--l3-spacing-08);
 }
 
 /* No match: the L3 empty state fills the space above the keyboard and centres itself. */
-.empty {
-  display: flex;
+.fill {
   flex: 1;
 }
 ```
@@ -1005,7 +1013,9 @@ import { Actionbar, ActionbarAction } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { EmptyState } from '@l3/components/EmptyState'
 import { Icon } from '@l3/components/Icon'
+import { Section } from '@l3/components/Section'
 import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
 import { Tabs } from '@l3/components/Tabs'
 import { msClose, msDeleteForever } from '@l3/icons/material'
 import { usePreview } from '../../../shared/prototype'
@@ -1017,9 +1027,10 @@ import { SearchChips } from '../components/SearchChips'
 import { Tiles } from '../components/Tiles'
 import { WatchlistMatches } from '../components/WatchlistMatches'
 import {
-  collections, ipoLists, placeholders, popular, recent, search, signalCategories, tabLabels,
+  collections, ipoLists, popular, recent, search, signalCategories,
   type SearchResult, type SearchResults, type SearchTab,
 } from '../data'
+import { t } from '../copy'
 import styles from './Search.module.css'
 
 const TABS: SearchTab[] = ['stocks', 'fno', 'mf', 'ipo']
@@ -1058,7 +1069,7 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
   const [query, setQuery] = useState(startQuery)
   const shown = results && query === startQuery ? results : search(query)
 
-  const tabItems = TABS.map((t) => ({ value: t, label: shown ? `${tabLabels[t]} (${shown.counts[t]})` : tabLabels[t] }))
+  const tabItems = TABS.map((id) => ({ value: id, label: shown ? t('tab.withCount', { tab: t(`tab.${id}`), count: shown.counts[id] }) : t(`tab.${id}`) }))
   const clear = () => setQuery('')
 
   return (
@@ -1066,9 +1077,9 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
       top={
         <Actionbar
           onBack={onBack}
-          search={{ value: query, onChange: setQuery, placeholder: placeholders[tab], label: placeholders[tab], autoFocus: interactive && keyboard }}
-          actions={query ? <ActionbarAction variant="ghost" icon={msClose} label="Clear search" onClick={clear} /> : undefined}
-          bottom={<Tabs size="sm" aria-label="Search in" items={tabItems} value={tab} onChange={(v) => setTab(v as SearchTab)} />}
+          search={{ value: query, onChange: setQuery, placeholder: t(`field.${tab}`), label: t(`field.${tab}`), autoFocus: interactive && keyboard }}
+          actions={query ? <ActionbarAction variant="ghost" icon={msClose} label={t('field.clear')} onClick={clear} /> : undefined}
+          bottom={<Tabs size="sm" aria-label={t('tabs.label')} items={tabItems} value={tab} onChange={(v) => setTab(v as SearchTab)} />}
         />
       }
       bottom={keyboard ? <TextKeyboard onKey={(k) => setQuery((q) => typeText(q, k))} /> : undefined}
@@ -1080,13 +1091,13 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
       ) : shown.tabs[tab] ? (
         <Results tab={tab} results={shown} saved={saved} onBookmark={onBookmark} />
       ) : (
-        <div className={styles.empty}>
+        <Stack direction="horizontal" className={styles.fill}>
           <EmptyState
-            title="No search results found"
-            description="Make sure you’ve spelled it correctly."
-            action={<Button size="sm" iconLeft={<Icon icon={msDeleteForever} />} onClick={clear}>Clear Search</Button>}
+            title={t('empty.title')}
+            description={t('empty.description')}
+            action={<Button size="sm" iconLeft={<Icon icon={msDeleteForever} />} onClick={clear}>{t('empty.clear')}</Button>}
           />
-        </div>
+        </Stack>
       )}
     </Screen>
   )
@@ -1095,29 +1106,29 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
 /** Nothing typed yet. */
 function BeforeTyping({ tab, onSignals }: { tab: SearchTab; onSignals?: (category: string) => void }) {
   return (
-    <div className={styles.body}>
-      <SearchChips title="Recent Searches" rows={[recent[tab]]} />
-      <SearchChips title="Popular Searches" rows={popular[tab]} />
+    <Section paddingBlock="16" gap="24">
+      <SearchChips title={t('recent.title')} rows={[recent[tab]]} />
+      <SearchChips title={t('popular.title')} rows={popular[tab]} />
       {tab === 'fno' && (
-        <section className={styles.group} aria-label="Smart Options & Futures">
-          <GroupHeader title="Smart Options & Futures" action={<ViewAll label="Smart Options & Futures" onClick={() => onSignals?.(signalCategories[0])} />} />
-          <Tiles items={signalCategories} label="Smart Options & Futures lists" onPick={onSignals} />
-        </section>
+        <Stack as="section" gap="12" aria-label={t('signals.title')}>
+          <GroupHeader title={t('signals.title')} action={<ViewAll label={t('signals.title')} onClick={() => onSignals?.(signalCategories[0])} />} />
+          <Tiles items={signalCategories} label={t('signals.tilesLabel')} onPick={onSignals} />
+        </Stack>
       )}
       {tab === 'mf' && (
-        <section className={styles.group} aria-label="Collections">
-          <GroupHeader title="Collections" action={<ViewAll label="collections" />} />
-          <Tiles items={collections} label="Fund collections" muted />
-        </section>
+        <Stack as="section" gap="12" aria-label={t('collections.title')}>
+          <GroupHeader title={t('collections.title')} action={<ViewAll label={t('collections.title')} />} />
+          <Tiles items={collections} label={t('collections.tilesLabel')} muted />
+        </Stack>
       )}
       {tab === 'ipo' &&
         ipoLists.map((list) => (
-          <section key={list.title} className={styles.ipoList} aria-label={list.title}>
+          <Stack as="section" key={list.title} className={styles.ipoList} aria-label={list.title}>
             <GroupHeader title={list.title} action={<ViewAll label={list.title} />} />
             <ResultList items={list.items} label={list.title} />
-          </section>
+          </Stack>
         ))}
-    </div>
+    </Section>
   )
 }
 
@@ -1125,16 +1136,16 @@ function BeforeTyping({ tab, onSignals }: { tab: SearchTab; onSignals?: (categor
 function Results({ tab, results, saved, onBookmark }: { tab: SearchTab; results: SearchResults; saved?: string[]; onBookmark?: (item: SearchResult) => void }) {
   const { watchlists, listTitle, items } = results.tabs[tab]!
   return (
-    <div className={styles.body}>
+    <Section paddingBlock="16" gap="24">
       {watchlists.length > 0 && <WatchlistMatches watchlists={watchlists} />}
-      <section className={styles.results} aria-label={listTitle}>
+      <Stack as="section" aria-label={listTitle}>
         <GroupHeader
-          title={`${listTitle} (${items.length})`}
-          action={tab === 'mf' && items.length > 0 ? <Select size="sm" icon="swap" aria-label="Returns period" onClick={() => {}}>3Y Returns</Select> : undefined}
+          title={t('results.title', { list: listTitle, count: items.length })}
+          action={tab === 'mf' && items.length > 0 ? <Select size="sm" icon="swap" aria-label={t('results.returnsPeriod')} onClick={() => {}}>{t('results.returns3y')}</Select> : undefined}
         />
         <ResultList items={items} label={listTitle} saved={saved} onBookmark={onBookmark} />
-      </section>
-    </div>
+      </Stack>
+    </Section>
   )
 }
 ```
@@ -1142,13 +1153,13 @@ function Results({ tab, results, saved, onBookmark }: { tab: SearchTab; results:
 ### `src/flows/search/screens/Signals.module.css`
 
 ```css
+/* Signals list. Layout is L3 Stack; only what it doesn't cover lives here. */
+
 /* Pill row in the top bar's bottom slot: 12 above and below, the first pill at the 16 page margin, 8 apart; scrolls
-   sideways when the lists don't fit (L3: pill rows at the top of a screen). */
+   sideways when the lists don't fit (L3: pill rows at the top of a screen). The padding stays here: it has to be
+   inside the scrolling row, and a Stack has none. */
 .pills {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--l3-spacing-08);
   padding: var(--l3-spacing-12) var(--l3-spacing-16);
   overflow-x: auto;
   scrollbar-width: none;
@@ -1162,16 +1173,8 @@ function Results({ tab, results, saved, onBookmark }: { tab: SearchTab; results:
   flex: none;
 }
 
-.page {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Figma "header": 16 above, 16 from both edges, Filter left and the sort right. */
+/* Figma "header": 16 above, 16 from both edges (none below), Filter left and the sort right. */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   min-height: var(--l3-size-16);
   padding: var(--l3-spacing-16) var(--l3-spacing-16) 0;
 }
@@ -1185,12 +1188,14 @@ import { Actionbar } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
 import { Tab, Tabs } from '@l3/components/Tabs'
 import { lmSwitchArrowVertical } from '@l3/icons/lemonnade'
 import { msFilterList } from '@l3/icons/material'
 import { Screen } from '../../../shared/ui/Screen'
 import { ResultList } from '../components/ResultList'
-import { indexSignals, signalScopes, sortLabels, stockSignals, type SignalScope, type SignalSort } from '../data'
+import { indexSignals, signalScopes, stockSignals, type SignalScope, type SignalSort } from '../data'
+import { t } from '../copy'
 import styles from './Signals.module.css'
 
 type SignalsProps = {
@@ -1214,48 +1219,49 @@ export function Signals({ scope: initialScope = 'indices', category = 'Top Trade
   const other: SignalScope = scope === 'indices' ? 'stocks' : 'indices'
   const { label, categories } = signalScopes[scope]
   const rows = scope === 'indices' ? indexSignals : stockSignals
+  const sortLabel = sort === 'price' ? t('signalsList.sortPrice') : t('signalsList.sortVolume')
   const sorted = sort === 'volume' ? [...rows].sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0)) : rows
 
   return (
     <Screen
       top={
         <Actionbar
-          title="Smart Options & Futures"
+          title={t('signals.title')}
           onBack={onBack}
           bottom={
-            <div className={styles.pills}>
+            <Stack direction="horizontal" align="center" gap="08" className={styles.pills}>
               <Tab
                 action
                 appearance="pill"
                 iconRight={<Icon icon={lmSwitchArrowVertical} />}
-                aria-label={`Showing ${label}. Switch to ${signalScopes[other].label}`}
+                aria-label={t('signalsList.switchScope', { scope: label, other: signalScopes[other].label })}
                 onClick={() => setScope(other)}
               >
                 {label}
               </Tab>
               <Tabs
                 appearance="pill"
-                aria-label="Signals lists"
+                aria-label={t('signalsList.listsLabel')}
                 items={categories.map((c) => ({ value: c, label: c }))}
                 value={categories.includes(list) ? list : categories[0]}
                 onChange={setList}
               />
-            </div>
+            </Stack>
           }
         />
       }
     >
-      <div className={styles.page}>
-        <div className={styles.header}>
+      <Stack>
+        <Stack direction="horizontal" align="center" justify="between" className={styles.header}>
           <Button variant="ghost" size="sm" iconRight={<Icon icon={msFilterList} />} onClick={() => {}}>
-            Filter
+            {t('signalsList.filter')}
           </Button>
-          <Select size="sm" icon="swap" aria-label={`Sort by ${sortLabels[sort]}. Switch`} onClick={() => setSort(sort === 'price' ? 'volume' : 'price')}>
-            {sortLabels[sort]}
+          <Select size="sm" icon="swap" aria-label={t('signalsList.sortLabel', { sort: sortLabel })} onClick={() => setSort(sort === 'price' ? 'volume' : 'price')}>
+            {sortLabel}
           </Select>
-        </div>
+        </Stack>
         <ResultList items={sorted} label={list} bookmarks={false} showVolume={sort === 'volume'} />
-      </div>
+      </Stack>
     </Screen>
   )
 }
@@ -1264,14 +1270,13 @@ export function Signals({ scope: initialScope = 'indices', category = 'Top Trade
 ### `src/flows/search/sheets/WatchlistSheets.module.css`
 
 ```css
-/* Figma "content slot": 16 under the header (top space), 24 above the dock (bottom space); rows run edge to edge. */
+/* Figma "content slot": 16 under the header (top space), 24 above the dock (bottom space); rows run edge to edge.
+   A Stack with this padding: the blocks pad top and bottom alike. */
 .lists {
-  display: flex;
-  flex-direction: column;
   padding: var(--l3-spacing-16) 0 var(--l3-spacing-24);
 }
 
-/* The field inside the 16 page margin. */
+/* The field inside the 16 page margin (16 / 24 above and below, so not an Inset). */
 .form {
   padding: var(--l3-spacing-16) var(--l3-spacing-16) var(--l3-spacing-24);
 }
@@ -1287,11 +1292,13 @@ import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Checkbox } from '@l3/components/Checkbox'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
+import { Stack } from '@l3/components/Stack'
 import { TextField } from '@l3/components/TextField'
 import { msAdd } from '@l3/icons/material'
 import { usePreview } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
+import { t } from '../copy'
 import styles from './WatchlistSheets.module.css'
 
 type AddProps = {
@@ -1320,17 +1327,17 @@ export function AddToWatchlistSheet({ lists, checked: initial = [], onSave, onCr
       header={
         <BottomSheetHeader
           headingId={id}
-          heading="Add to watchlist"
-          trailing={<Button variant="tertiary" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreate}>Create</Button>}
+          heading={t('addSheet.title')}
+          trailing={<Button variant="tertiary" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreate}>{t('addSheet.create')}</Button>}
         />
       }
       footer={
-        <ButtonGroup aria-label="Add to watchlist">
-          <Button disabled={checked.length === 0} onClick={() => onSave?.(checked)}>Save</Button>
+        <ButtonGroup aria-label={t('addSheet.title')}>
+          <Button disabled={checked.length === 0} onClick={() => onSave?.(checked)}>{t('addSheet.save')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.lists} role="group" aria-label="Watchlists">
+      <Stack className={styles.lists} role="group" aria-label={t('addSheet.listsLabel')}>
         {lists.map((name) => (
           <ListCell
             key={name}
@@ -1339,7 +1346,7 @@ export function AddToWatchlistSheet({ lists, checked: initial = [], onSave, onCr
             label={name}
           />
         ))}
-      </div>
+      </Stack>
     </Sheet>
   )
 }
@@ -1356,18 +1363,18 @@ export function CreateWatchlistSheet({ name: initialName = '', onCreate, onClose
     <Sheet
       labelledBy={id}
       onClose={onClose}
-      header={<BottomSheetHeader headingId={id} heading="Create watchlist" />}
+      header={<BottomSheetHeader headingId={id} heading={t('createSheet.title')} />}
       footer={
         <>
-          <ButtonGroup aria-label="Create watchlist">
-            <Button disabled={!name.trim()} onClick={() => onCreate?.(name.trim())}>Create</Button>
+          <ButtonGroup aria-label={t('createSheet.title')}>
+            <Button disabled={!name.trim()} onClick={() => onCreate?.(name.trim())}>{t('createSheet.create')}</Button>
           </ButtonGroup>
           <TextKeyboard onKey={(k) => setName((n) => typeText(n, k))} />
         </>
       }
     >
       <div className={styles.form}>
-        <TextField label="Watchlist Name" value={name} placeholder="e.g. Banking" autoFocus={interactive} onChange={(e) => setName(e.target.value)} />
+        <TextField label={t('createSheet.field')} value={name} placeholder={t('createSheet.placeholder')} autoFocus={interactive} onChange={(e) => setName(e.target.value)} />
       </div>
     </Sheet>
   )
@@ -1375,6 +1382,33 @@ export function CreateWatchlistSheet({ name: initialName = '', onCreate, onClose
 ```
 
 ## Source — shared app parts it uses
+
+### `src/shared/copy.ts`
+
+```ts
+/**
+ * UI copy. Every user-facing string of a flow lives in ONE file, `src/flows/<flow-id>/copy.json` — flat keys
+ * ("empty.title") → the text. Screens read it through the flow's `t`:
+ *
+ *   t('empty.title')                       → "No search results found"
+ *   t('group.results', { list, count })    → "Stocks (8)"   ({name} placeholders are filled in)
+ *
+ * Sample data (stock names, prices, watchlists) stays in the flow's data.ts — copy.json is only the words the app
+ * itself says: titles, labels, buttons, empty states, accessible names. Porting a flow: this file is the string
+ * table (Flutter ARB / iOS Localizable.strings).
+ */
+export type CopyVars = Record<string, string | number>
+
+export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
+  return function t(key: keyof Copy & string, vars?: CopyVars): string {
+    const template = copy[key] ?? key
+    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
+    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
+    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
+    return text
+  }
+}
+```
 
 ### `src/shared/data/format.ts`
 

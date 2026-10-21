@@ -4,7 +4,7 @@
   "description": "Search stocks, F&O contracts, mutual funds and IPOs; Smart Options & Futures lists; add to watchlist.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "df57857",
+    "commit": "cd84910",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -286,8 +286,9 @@
     "src/flows/search/components/SearchChips.tsx",
     "src/flows/search/components/Tiles.module.css",
     "src/flows/search/components/Tiles.tsx",
-    "src/flows/search/components/WatchlistMatches.module.css",
     "src/flows/search/components/WatchlistMatches.tsx",
+    "src/flows/search/copy.json",
+    "src/flows/search/copy.ts",
     "src/flows/search/data.ts",
     "src/flows/search/index.tsx",
     "src/flows/search/screens/Search.module.css",
@@ -298,6 +299,7 @@
     "src/flows/search/sheets/WatchlistSheets.tsx"
   ],
   "shared": [
+    "src/shared/copy.ts",
     "src/shared/data/format.ts",
     "src/shared/prototype.ts",
     "src/shared/ui/Raised.module.css",

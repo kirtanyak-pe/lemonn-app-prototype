@@ -1,6 +1,6 @@
 # Flow: Stocks (`stocks`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.
 
@@ -97,6 +97,7 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 | Rows that scroll sideways | **Rail** (src/shared/ui) | `visible` = how many show (a fraction lets the next peek); `rows={2}` for movers |
 | Buttons | Button | Invest now / Explore = tertiary · Details = secondary · Buy = `buy` · Explore now = `brand` |
 | Main navbar | BottomNavbar (`MainNav`, src/shared/ui) | `value="stocks"` |
+| Layout | Stack · Section · Inset · Grid (Figma auto-layout frames) | Page: Stack → summary Stack `gap="24"` on surface/secondary, feed Stack `gap="32"` on the rounded sheet; tinted bands Section `paddingBlock="24"`. Each block: Stack `as="section" gap="16"`, heading in an Inset `paddingInline="16"`; index strip a horizontal Stack `gap="16"`; shortcuts Inset 16 → Grid `columns={4} gap="00"`; strategy card body Section `padding="12" gap="12"`; trade-idea buttons Grid `columns={2} gap="12"`; disclosure Section `paddingInline="16" gap="04" align="start"`. Content inside clickable cards stays CSS (spans inside a button) |
 
 ### Rules & behaviour
 
@@ -126,6 +127,7 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 ### Changelog
 
+- 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Stack, Section, Inset, Grid); nothing moved (measured at 392). The home shortcuts sit edge to edge (gap 0).
 - 2026-10-19 — the search field opens the Search flow (`search-01`).
 - 2026-10-17 — first version: Home (7 frames of one page).
 
@@ -139,10 +141,13 @@ import { useState } from 'react'
 import { Avatar } from '@l3/components/Avatar'
 import { Badge } from '@l3/components/Badge'
 import { Card } from '@l3/components/Card'
+import { Grid } from '@l3/components/Grid'
 import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
 import { ListCell } from '@l3/components/ListCell'
 import { PriceChange } from '@l3/components/PriceChange'
 import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
 import { Tabs } from '@l3/components/Tabs'
 import { Tag } from '@l3/components/Tag'
 import { msChevronRight, msCurrencyRupee, msTrendingDown, msTrendingUp } from '@l3/icons/material'
@@ -151,55 +156,58 @@ import { watchlists } from '../../../shared/data/portfolio'
 import { Rail } from '../../../shared/ui/Rail'
 import { Spot } from '../../../shared/ui/Spot'
 import { movers, shortcuts, type MoverList } from '../data'
+import { t } from '../copy'
 import styles from './Home.module.css'
 
 /** "Do more with Lemonn": four feature shortcuts, with a count or "New" where there's something to see. */
 export function Shortcuts({ onOpen }: { onOpen?: (id: string) => void }) {
   return (
-    <section className={styles.section} aria-label="Do more with Lemonn">
-      <div className={styles.head}><SectionHeader title="Do more with Lemonn" /></div>
-      <div className={styles.shortcuts}>
-        {shortcuts.map((s) => (
-          <Card key={s.id} variant="flat" padding="none" onClick={() => onOpen?.(s.id)}>
-            <span className={styles.shortcut}>
-              <span className={styles.shortcutIcon}>
-                <Spot icon={s.icon} tone="success" size="md" />
-                {s.badge?.count !== undefined && (
-                  <span className={styles.overIcon}><Badge count={s.badge.count} color="neutral" label={`${s.badge.count} in your watchlist`} /></span>
-                )}
-                {s.badge?.text && <span className={styles.overIcon}><Tag color="error" variant="primary" size="sm">{s.badge.text}</Tag></span>}
+    <Stack as="section" gap="16" aria-label={t('shortcuts.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('shortcuts.title')} /></Inset>
+      <Inset paddingInline="16" paddingBlock="00">
+        <Grid columns={4} gap="00">
+          {shortcuts.map((s) => (
+            <Card key={s.id} variant="flat" padding="none" onClick={() => onOpen?.(s.id)}>
+              <span className={styles.shortcut}>
+                <span className={styles.shortcutIcon}>
+                  <Spot icon={s.icon} tone="success" size="md" />
+                  {s.badge?.count !== undefined && (
+                    <span className={styles.overIcon}><Badge count={s.badge.count} color="neutral" label={t('shortcuts.watchlistBadge', { count: s.badge.count })} /></span>
+                  )}
+                  {s.badge?.text && <span className={styles.overIcon}><Tag color="error" variant="primary" size="sm">{s.badge.text}</Tag></span>}
+                </span>
+                <span className={styles.shortcutLabel}>{s.label}</span>
               </span>
-              <span className={styles.shortcutLabel}>{s.label}</span>
-            </span>
-          </Card>
-        ))}
-      </div>
-    </section>
+            </Card>
+          ))}
+        </Grid>
+      </Inset>
+    </Stack>
   )
 }
 
-const moverTabs: { value: MoverList; label: string; icon: string }[] = [
-  { value: 'gainers', label: 'Top gainers', icon: msTrendingUp },
-  { value: 'losers', label: 'Top losers', icon: msTrendingDown },
-  { value: 'under-100', label: 'Under ₹100', icon: msCurrencyRupee },
+const moverTabs: { value: MoverList; label: 'movers.gainers' | 'movers.losers' | 'movers.under100'; icon: string }[] = [
+  { value: 'gainers', label: 'movers.gainers', icon: msTrendingUp },
+  { value: 'losers', label: 'movers.losers', icon: msTrendingDown },
+  { value: 'under-100', label: 'movers.under100', icon: msCurrencyRupee },
 ]
 
 /** Top movers: gainers / losers / under ₹100 (chips), as two rows of stock cards that scroll together. */
 export function TopMovers({ initial = 'gainers', onStock, onViewAll }: { initial?: MoverList; onStock?: (symbol: string) => void; onViewAll?: () => void }) {
   const [list, setList] = useState<MoverList>(initial)
   return (
-    <section className={styles.section} aria-label="Top movers">
-      <div className={styles.head}><SectionHeader title="Top movers" action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></div>
-      <div className={styles.inset}>
+    <Stack as="section" gap="16" aria-label={t('movers.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('movers.title')} action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></Inset>
+      <Inset paddingInline="16" paddingBlock="00">
         <Tabs
-          aria-label="Movers"
+          aria-label={t('movers.tabsLabel')}
           appearance="pill"
-          items={moverTabs.map((t) => ({ value: t.value, label: t.label, iconLeft: <Icon icon={t.icon} size={16} /> }))}
+          items={moverTabs.map((tab) => ({ value: tab.value, label: t(tab.label), iconLeft: <Icon icon={tab.icon} size={16} /> }))}
           value={list}
           onChange={(v) => setList(v as MoverList)}
         />
-      </div>
-      <Rail label={moverTabs.find((t) => t.value === list)!.label} visible={2.15} rows={2}>
+      </Inset>
+      <Rail label={t(moverTabs.find((m) => m.value === list)!.label)} visible={2.15} rows={2}>
         {movers[list].map((stock) => (
           <Card key={stock.symbol} onClick={() => onStock?.(stock.symbol)}>
             <span className={styles.cardStack}>
@@ -211,16 +219,16 @@ export function TopMovers({ initial = 'gainers', onStock, onViewAll }: { initial
           </Card>
         ))}
       </Rail>
-    </section>
+    </Stack>
   )
 }
 
 /** The user's watchlists, each opening its list. "New watchlist" creates one. */
 export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void; onCreate?: () => void }) {
   return (
-    <section className={styles.section} aria-label="Watchlist">
-      <div className={styles.head}><SectionHeader title="Watchlist" action={{ type: 'view-all', label: 'New watchlist', onClick: () => onCreate?.() }} /></div>
-      <Rail label="Your watchlists" visible={1.45}>
+    <Stack as="section" gap="16" aria-label={t('watchlists.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('watchlists.title')} action={{ type: 'view-all', label: t('watchlists.new'), onClick: () => onCreate?.() }} /></Inset>
+      <Rail label={t('watchlists.railLabel')} visible={1.45}>
         {watchlists.map((w) => (
           <ListCell
             key={w.id}
@@ -228,13 +236,13 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
             as="button"
             iconLeft={<Avatar initials={w.name.slice(0, 1)} size={40} />}
             label={w.name}
-            description={`${w.count} ${w.count === 1 ? 'stock' : 'stocks'}`}
+            description={t(w.count === 1 ? 'watchlists.one' : 'watchlists.many', { count: w.count })}
             iconRight={<Icon icon={msChevronRight} />}
             onClick={() => onOpen?.(w.id)}
           />
         ))}
       </Rail>
-    </section>
+    </Stack>
   )
 }
 ```
@@ -242,25 +250,16 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 ### `src/flows/stocks/components/Home.module.css`
 
 ```css
-/* Stocks home — the insides of each section (the page layout is screens/Home.module.css). Tokens only. */
+/*
+ * Stocks home — the insides of each section (the page layout is screens/Home.module.css). Tokens only. A section is
+ * a Stack (heading → content 16, DESIGN_SYSTEM 2.3) with the heading in an Inset (the 16 page margin). Most of what
+ * is left here sits inside clickable Cards, which are buttons: only spans go there, and the layout blocks render
+ * block elements only.
+ */
 
-/* ---- A section: heading → content 16 (DESIGN_SYSTEM 2.3); the heading sits in the 16 page margin ---- */
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-16);
-}
-
-.head {
-  padding-inline: var(--l3-spacing-16);
-}
-
-/* ---- Index strip: NIFTY 50 23,146.15 +0.65% › | SENSEX … — scrolls sideways ---- */
+/* ---- Index strip: NIFTY 50 23,146.15 +0.65% › | SENSEX … — scrolls sideways (padding inside the scroller) ---- */
 .indexStrip {
   position: relative; /* keeps absolutely placed bits inside the scrolling strip (see Rail) */
-  display: flex;
-  align-items: center;
-  gap: var(--l3-spacing-16);
   overflow-x: auto;
   padding-inline: var(--l3-spacing-16);
   scrollbar-width: none;
@@ -268,6 +267,12 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 
 .indexStrip::-webkit-scrollbar {
   display: none;
+}
+
+/* One index (divider + card): a horizontal Stack. It keeps its full width in the scrolling strip — a Stack sets
+   min-width: 0, which would let it shrink. */
+.indexItem {
+  flex: none;
 }
 
 .index {
@@ -405,14 +410,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   padding-top: var(--l3-spacing-12);
 }
 
-/* ---- Do more with Lemonn: four shortcuts ---- */
-.shortcuts {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--l3-spacing-08);
-  padding-inline: var(--l3-spacing-16);
-}
-
+/* ---- Do more with Lemonn: four shortcuts (an Inset around a 4-column Grid) ---- */
 .shortcut {
   display: flex;
   flex-direction: column;
@@ -439,23 +437,10 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   font: var(--l3-text-label-12);
 }
 
-/* ---- Top movers ---- */
-.inset {
-  padding-inline: var(--l3-spacing-16);
-}
+/* ---- Smart Invest strategy card: a Section (12 padding, 12 gap); the head is a horizontal Stack ---- */
 
-/* ---- Smart Invest strategy card ---- */
-.strategyBody {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-12);
-  padding: var(--l3-spacing-12);
-}
-
+/* The head's 12 below and its hairline: Section pads both sides alike and has no one-side border. */
 .strategyHead {
-  display: flex;
-  align-items: center;
-  gap: var(--l3-spacing-12);
   padding-bottom: var(--l3-spacing-12);
   border-bottom: 1px solid var(--l3-border-light);
 }
@@ -473,6 +458,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   gap: var(--l3-spacing-02);
 }
 
+/* Three stats: left, centre and right-aligned in auto · 1fr · auto columns (Grid has equal columns only). */
 .stats {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -525,12 +511,9 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   box-shadow: inset 0 0 0 1px var(--l3-border-accent-error-default);
 }
 
+/* The footer's charges + Invest now: a horizontal Stack that fills the footer. */
 .charges {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--l3-spacing-12);
 }
 
 .chargesText {
@@ -622,11 +605,9 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   color: var(--l3-content-secondary);
 }
 
+/* Details · Buy: a 2-column Grid that fills the footer. */
 .ideaActions {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--l3-spacing-12);
 }
 
 /* "Live" — a small pulsing dot before the tag's label. */
@@ -660,14 +641,6 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 /* ---- Disclosure ---- */
-.disclosure {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--l3-spacing-04);
-  padding-inline: var(--l3-spacing-16);
-}
-
 .disclosureText {
   margin: 0;
   font: var(--l3-text-description-12);
@@ -681,31 +654,36 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 import { Avatar } from '@l3/components/Avatar'
 import { Button } from '@l3/components/Button'
 import { Card } from '@l3/components/Card'
+import { Grid } from '@l3/components/Grid'
 import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
 import { ListCell } from '@l3/components/ListCell'
 import { PriceChange } from '@l3/components/PriceChange'
+import { Section } from '@l3/components/Section'
 import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msChevronRight } from '@l3/icons/material'
 import { Rail } from '../../../shared/ui/Rail'
 import { disclosure, ideaBaskets, tradeIdeas } from '../data'
+import { t } from '../copy'
 import styles from './Home.module.css'
 
 /** Trade ideas: research picks, one featured card at a time (neighbours peek). Sits on the discover tint. */
 export function TradeIdeas({ onDetails, onBuy, onViewAll }: { onDetails?: (id: string) => void; onBuy?: (id: string) => void; onViewAll?: () => void }) {
   return (
-    <section className={styles.section} aria-label="Trade ideas">
-      <div className={styles.head}><SectionHeader title="Trade ideas" tag={<Tag color="discover" variant="primary" iconLeft={<span className={styles.liveDot} />}>Live analysis</Tag>} /></div>
-      <Rail label="Trade ideas" visible={1.15} snap="center">
+    <Stack as="section" gap="16" aria-label={t('ideas.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('ideas.title')} tag={<Tag color="discover" variant="primary" iconLeft={<span className={styles.liveDot} />}>{t('ideas.tag')}</Tag>} /></Inset>
+      <Rail label={t('ideas.railLabel')} visible={1.15} snap="center">
         {tradeIdeas.map((idea) => (
           <Card
             key={idea.id}
             onClick={() => onDetails?.(idea.id)}
             footer={
-              <div className={styles.ideaActions}>
-                <Button variant="secondary" fullWidth onClick={() => onDetails?.(idea.id)}>Details</Button>
-                <Button variant="buy" fullWidth onClick={() => onBuy?.(idea.id)}>Buy</Button>
-              </div>
+              <Grid columns={2} gap="12" className={styles.ideaActions}>
+                <Button variant="secondary" fullWidth onClick={() => onDetails?.(idea.id)}>{t('ideas.details')}</Button>
+                <Button variant="buy" fullWidth onClick={() => onBuy?.(idea.id)}>{t('ideas.buy')}</Button>
+              </Grid>
             }
           >
             <span className={styles.idea}>
@@ -713,24 +691,24 @@ export function TradeIdeas({ onDetails, onBuy, onViewAll }: { onDetails?: (id: s
               <span className={styles.ideaSymbol}>{idea.stock.symbol}</span>
               <span className={styles.ideaPotential}>
                 <PriceChange value={idea.potentialPct} size="lg" arrow decimals={0} />
-                <span className={styles.cardMeta}>Potential profit</span>
+                <span className={styles.cardMeta}>{t('ideas.potential')}</span>
               </span>
-              <span className={styles.ideaMoved}>Moved <PriceChange value={idea.movedPct} size="md" /> in {idea.movedIn}</span>
+              <span className={styles.ideaMoved}>{t('ideas.moved')} <PriceChange value={idea.movedPct} size="md" /> {t('ideas.movedIn', { period: idea.movedIn })}</span>
             </span>
           </Card>
         ))}
       </Rail>
-      <ListCell as="button" label="View all recommendations" iconRight={<Icon icon={msChevronRight} />} onClick={onViewAll} />
-    </section>
+      <ListCell as="button" label={t('ideas.viewAll')} iconRight={<Icon icon={msChevronRight} />} onClick={onViewAll} />
+    </Stack>
   )
 }
 
 /** Invest in ideas: curated baskets — their stocks' logos, the name and the count. */
 export function IdeaBaskets({ onOpen }: { onOpen?: (id: string) => void }) {
   return (
-    <section className={styles.section} aria-label="Invest in ideas">
-      <div className={styles.head}><SectionHeader title="Invest in ideas" description="Curated industry-based stock offerings" /></div>
-      <Rail label="Idea baskets" visible={1.15}>
+    <Stack as="section" gap="16" aria-label={t('baskets.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('baskets.title')} description={t('baskets.description')} /></Inset>
+      <Rail label={t('baskets.railLabel')} visible={1.15}>
         {ideaBaskets.map((b) => (
           <Card key={b.id} onClick={() => onOpen?.(b.id)}>
             <span className={styles.cardStack}>
@@ -739,23 +717,23 @@ export function IdeaBaskets({ onOpen }: { onOpen?: (id: string) => void }) {
               </span>
               <span className={styles.basketName}>{b.name}</span>
               <span className={styles.cardRow}>
-                <span className={styles.cardMeta}>{b.stocks.length} stocks</span>
+                <span className={styles.cardMeta}>{t('baskets.count', { count: b.stocks.length })}</span>
                 <span className={styles.chevron}><Icon icon={msChevronRight} /></span>
               </span>
             </span>
           </Card>
         ))}
       </Rail>
-    </section>
+    </Stack>
   )
 }
 
 /** The broker's regulatory line, in full (it's short enough not to need "Read more"). */
 export function Disclosure() {
   return (
-    <div className={styles.disclosure}>
+    <Section paddingInline="16" gap="04" align="start">
       <p className={styles.disclosureText}>{disclosure}</p>
-    </div>
+    </Section>
   )
 }
 ```
@@ -768,22 +746,26 @@ import { BrandLogo } from '@l3/components/BrandLogo'
 import { Button } from '@l3/components/Button'
 import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
 import { PriceChange } from '@l3/components/PriceChange'
+import { Section } from '@l3/components/Section'
 import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msChevronRight, msDeployedCode, msSavings, msShowChart, msVerified } from '@l3/icons/material'
 import { inr } from '../../../shared/data/format'
 import { Rail } from '../../../shared/ui/Rail'
 import { Spot } from '../../../shared/ui/Spot'
 import { announcement, highlights, sectors, strategies } from '../data'
+import { t } from '../copy'
 import styles from './Home.module.css'
 
 /** Smart Invest: managed strategies that buy and sell for you. Sits on the brand tint (screens/Home: tinted). */
 export function SmartInvest({ onInvest, onOpen }: { onInvest?: (id: string) => void; onOpen?: (id: string) => void }) {
   return (
-    <section className={styles.section} aria-label="Smart Invest">
-      <div className={styles.head}><SectionHeader title="Smart Invest" tag={<Tag color="success" iconLeft={<Icon icon={msVerified} size={16} />}>NSE/BSE approved</Tag>} /></div>
-      <Rail label="Strategies" visible={1.08}>
+    <Stack as="section" gap="16" aria-label={t('smartInvest.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('smartInvest.title')} tag={<Tag color="success" iconLeft={<Icon icon={msVerified} size={16} />}>{t('smartInvest.tag')}</Tag>} /></Inset>
+      <Rail label={t('smartInvest.railLabel')} visible={1.08}>
         {strategies.map((s) => (
           <Card
             key={s.id}
@@ -791,75 +773,75 @@ export function SmartInvest({ onInvest, onOpen }: { onInvest?: (id: string) => v
             onClick={() => onOpen?.(s.id)}
             footerFilled
             footer={
-              <div className={styles.charges}>
+              <Stack direction="horizontal" align="center" justify="between" gap="12" className={styles.charges}>
                 <span className={styles.chargesText}>
-                  <span className={styles.cardMeta}>Monthly charges</span>
+                  <span className={styles.cardMeta}>{t('smartInvest.monthlyCharges')}</span>
                   <span className={styles.price}>{inr(s.monthlyCharge, 0)} <span className={styles.was}>{inr(s.monthlyChargeWas, 0)}</span></span>
                 </span>
-                <Button variant="tertiary" onClick={() => onInvest?.(s.id)}>Invest now</Button>
-              </div>
+                <Button variant="tertiary" onClick={() => onInvest?.(s.id)}>{t('smartInvest.investNow')}</Button>
+              </Stack>
             }
           >
-            <div className={styles.strategyBody}>
-              <div className={styles.strategyHead}>
+            <Section padding="12" gap="12">
+              <Stack direction="horizontal" align="center" gap="12" className={styles.strategyHead}>
                 <Avatar icon={<BrandLogo brand="lemonn" variant="icon" size={24} decorative />} size={40} />
                 <span className={styles.strategyName}>{s.name}</span>
                 <span className={styles.strategyDeposit}>
                   <span className={styles.statValue}>{inr(s.minDeposit, 0)}</span>
-                  <span className={styles.cardMeta}>Min. deposit</span>
+                  <span className={styles.cardMeta}>{t('smartInvest.minDeposit')}</span>
                 </span>
-              </div>
+              </Stack>
               <div className={styles.stats}>
                 <span className={styles.stat}>
-                  <span className={styles.cardMeta}>Last week</span>
-                  <span className={styles.days} aria-label={`Last week: ${s.lastWeek.filter((d) => d.result === 'profit').length} profit days of ${s.lastWeek.length}`}>
+                  <span className={styles.cardMeta}>{t('smartInvest.lastWeek')}</span>
+                  <span className={styles.days} aria-label={t('smartInvest.lastWeekLabel', { profit: s.lastWeek.filter((d) => d.result === 'profit').length, total: s.lastWeek.length })}>
                     {s.lastWeek.map((d) => <span key={d.day} className={styles.day} data-result={d.result} aria-hidden="true">{d.day}</span>)}
                   </span>
                 </span>
                 <span className={styles.stat}>
-                  <span className={styles.cardMeta}>AUM</span>
+                  <span className={styles.cardMeta}>{t('smartInvest.aum')}</span>
                   <span className={styles.statValue}>{s.aum}</span>
                 </span>
                 <span className={styles.stat}>
-                  <span className={styles.cardMeta}>Slots left</span>
-                  <span className={styles.statValue}>{s.slotsLeft}/{s.slots}</span>
+                  <span className={styles.cardMeta}>{t('smartInvest.slotsLeft')}</span>
+                  <span className={styles.statValue}>{t('smartInvest.slots', { left: s.slotsLeft, total: s.slots })}</span>
                 </span>
               </div>
-            </div>
+            </Section>
           </Card>
         ))}
       </Rail>
-    </section>
+    </Stack>
   )
 }
 
 /** One announcement — a campaign (the real app shows its artwork; here an illustration slot). */
 export function Announcement({ onOpen }: { onOpen?: () => void }) {
   return (
-    <section className={styles.section} aria-label="Announcements">
-      <div className={styles.head}><SectionHeader title="Announcements" /></div>
-      <div className={styles.inset}>
+    <Stack as="section" gap="16" aria-label={t('announcements.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('announcements.title')} /></Inset>
+      <Inset paddingInline="16" paddingBlock="00">
         <Card onClick={onOpen} footer={<Button variant="brand" fullWidth onClick={onOpen}>{announcement.cta}</Button>}>
           <span className={styles.announcement}>
             <span className={styles.announcementText}>
-              <Tag color="success" size="sm">New</Tag>
+              <Tag color="success" size="sm">{t('announcements.new')}</Tag>
               <span className={styles.announcementTitle}>{announcement.title}</span>
               <span className={styles.cardMeta}>{announcement.description}</span>
             </span>
             <Spot icon={msDeployedCode} tone="brand" size="md" />
           </span>
         </Card>
-      </div>
-    </section>
+      </Inset>
+    </Stack>
   )
 }
 
 /** Sectors: how many stocks each has and how it moved today. */
 export function Sectors({ onOpen, onViewAll }: { onOpen?: (id: string) => void; onViewAll?: () => void }) {
   return (
-    <section className={styles.section} aria-label="Invest in sectors">
-      <div className={styles.head}><SectionHeader title="Invest in sectors" action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></div>
-      <Rail label="Sectors" visible={1.75}>
+    <Stack as="section" gap="16" aria-label={t('sectors.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('sectors.title')} action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></Inset>
+      <Rail label={t('sectors.railLabel')} visible={1.75}>
         {sectors.map((s) => (
           <Card key={s.id} onClick={() => onOpen?.(s.id)}>
             <span className={styles.cardStack}>
@@ -868,23 +850,23 @@ export function Sectors({ onOpen, onViewAll }: { onOpen?: (id: string) => void; 
                 <span className={styles.chevron}><Icon icon={msChevronRight} size={16} /></span>
               </span>
               <span className={styles.cardRow}>
-                <span className={styles.cardMeta}>{s.count} stocks</span>
+                <span className={styles.cardMeta}>{t('sectors.count', { count: s.count })}</span>
                 <PriceChange value={s.changePct} size="sm" arrow />
               </span>
             </span>
           </Card>
         ))}
       </Rail>
-    </section>
+    </Stack>
   )
 }
 
 /** Highlights: product spotlights — mutual funds (tax saving) and F&O (the index today). */
 export function Highlights({ onExplore }: { onExplore?: (id: string) => void }) {
   return (
-    <section className={styles.section} aria-label="Highlights">
-      <div className={styles.head}><SectionHeader title="Highlights" /></div>
-      <Rail label="Highlights" visible={1.3}>
+    <Stack as="section" gap="16" aria-label={t('highlights.title')}>
+      <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('highlights.title')} /></Inset>
+      <Rail label={t('highlights.railLabel')} visible={1.3}>
         {highlights.map((h) => (
           <Card key={h.id} onClick={() => onExplore?.(h.id)} footer={<Button variant="tertiary" onClick={() => onExplore?.(h.id)}>{h.cta}</Button>}>
             <span className={styles.highlightCard}>
@@ -897,7 +879,7 @@ export function Highlights({ onExplore }: { onExplore?: (id: string) => void }) 
           </Card>
         ))}
       </Rail>
-    </section>
+    </Stack>
   )
 }
 ```
@@ -908,6 +890,7 @@ export function Highlights({ onExplore }: { onExplore?: (id: string) => void }) 
 import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
 import { PriceChange } from '@l3/components/PriceChange'
+import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msArrowForward, msChevronRight } from '@l3/icons/material'
 import { indices } from '../../../shared/data/market'
@@ -915,14 +898,15 @@ import { holdings } from '../../../shared/data/portfolio'
 import { inr } from '../../../shared/data/format'
 import { Rail } from '../../../shared/ui/Rail'
 import { products } from '../data'
+import { t } from '../copy'
 import styles from './Home.module.css'
 
 /** NIFTY 50 · SENSEX · … — today's index moves; each opens its chart. Scrolls sideways. */
 export function IndexStrip({ onIndex }: { onIndex?: (id: string) => void }) {
   return (
-    <div className={styles.indexStrip} role="region" aria-label="Market indices">
+    <Stack direction="horizontal" align="center" gap="16" className={styles.indexStrip} role="region" aria-label={t('indices.label')}>
       {indices.map((index, i) => (
-        <div key={index.id} className={styles.index}>
+        <Stack key={index.id} direction="horizontal" align="center" gap="08" className={styles.indexItem}>
           {i > 0 && <span className={styles.divider} aria-hidden="true" />}
           <Card variant="flat" padding="none" onClick={() => onIndex?.(index.id)}>
             <span className={styles.index}>
@@ -932,9 +916,9 @@ export function IndexStrip({ onIndex }: { onIndex?: (id: string) => void }) {
               <span className={styles.chevron}><Icon icon={msChevronRight} size={16} /></span>
             </span>
           </Card>
-        </div>
+        </Stack>
       ))}
-    </div>
+    </Stack>
   )
 }
 
@@ -944,7 +928,7 @@ export function HoldingsSummary({ onOpen }: { onOpen?: () => void }) {
     <Card variant="flat" padding="none" onClick={onOpen}>
       <span className={styles.holdings}>
         <span className={styles.holdingsText}>
-          <span className={styles.holdingsLabel}>Current holdings</span>
+          <span className={styles.holdingsLabel}>{t('holdings.label')}</span>
           <span className={styles.holdingsValue}>
             {inr(holdings.current)}
             <PriceChange value={holdings.returnPct} size="lg" arrow />
@@ -959,11 +943,11 @@ export function HoldingsSummary({ onOpen }: { onOpen?: () => void }) {
 /** Mutual funds · Equity F&O · Commodities — each product's one-line promise. */
 export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }) {
   return (
-    <Rail label="Products" visible={2.15} className={styles.onEdgeRoom}>
+    <Rail label={t('products.label')} visible={2.15} className={styles.onEdgeRoom}>
       {products.map((p) => (
         <Card key={p.id} onClick={() => onProduct?.(p.id)}>
           <span className={styles.cardStack}>
-            {p.isNew && <span className={styles.onEdge}><Tag color="success" size="sm">New</Tag></span>}
+            {p.isNew && <span className={styles.onEdge}><Tag color="success" size="sm">{t('products.new')}</Tag></span>}
             <span className={styles.cardRow}>
               <span className={styles.productTitle}>{p.name}</span>
               <span className={styles.chevron}><Icon icon={msChevronRight} size={16} /></span>
@@ -977,6 +961,74 @@ export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }
     </Rail>
   )
 }
+```
+
+### `src/flows/stocks/copy.json`
+
+```json
+{
+  "search.placeholder": "Search stocks",
+  "search.label": "Search stocks",
+  "top.wallet": "Wallet",
+  "top.profile": "Profile",
+  "indices.label": "Market indices",
+  "holdings.label": "Current holdings",
+  "products.label": "Products",
+  "products.new": "New",
+  "shortcuts.title": "Do more with Lemonn",
+  "shortcuts.watchlistBadge": "{count} in your watchlist",
+  "movers.title": "Top movers",
+  "movers.tabsLabel": "Movers",
+  "movers.gainers": "Top gainers",
+  "movers.losers": "Top losers",
+  "movers.under100": "Under ₹100",
+  "watchlists.title": "Watchlist",
+  "watchlists.new": "New watchlist",
+  "watchlists.railLabel": "Your watchlists",
+  "watchlists.one": "{count} stock",
+  "watchlists.many": "{count} stocks",
+  "smartInvest.title": "Smart Invest",
+  "smartInvest.tag": "NSE/BSE approved",
+  "smartInvest.railLabel": "Strategies",
+  "smartInvest.monthlyCharges": "Monthly charges",
+  "smartInvest.investNow": "Invest now",
+  "smartInvest.minDeposit": "Min. deposit",
+  "smartInvest.lastWeek": "Last week",
+  "smartInvest.lastWeekLabel": "Last week: {profit} profit days of {total}",
+  "smartInvest.aum": "AUM",
+  "smartInvest.slotsLeft": "Slots left",
+  "smartInvest.slots": "{left}/{total}",
+  "announcements.title": "Announcements",
+  "announcements.new": "New",
+  "sectors.title": "Invest in sectors",
+  "sectors.railLabel": "Sectors",
+  "sectors.count": "{count} stocks",
+  "highlights.title": "Highlights",
+  "highlights.railLabel": "Highlights",
+  "ideas.title": "Trade ideas",
+  "ideas.tag": "Live analysis",
+  "ideas.railLabel": "Trade ideas",
+  "ideas.details": "Details",
+  "ideas.buy": "Buy",
+  "ideas.potential": "Potential profit",
+  "ideas.moved": "Moved",
+  "ideas.movedIn": "in {period}",
+  "ideas.viewAll": "View all recommendations",
+  "baskets.title": "Invest in ideas",
+  "baskets.description": "Curated industry-based stock offerings",
+  "baskets.railLabel": "Idea baskets",
+  "baskets.count": "{count} stocks"
+}
+```
+
+### `src/flows/stocks/copy.ts`
+
+```ts
+import { makeCopy } from '../../shared/copy'
+import copy from './copy.json'
+
+/** Every user-facing string of Stocks is in copy.json: t('movers.title'), t('watchlists.count', { count }). */
+export const t = makeCopy('stocks', copy)
 ```
 
 ### `src/flows/stocks/data.ts`
@@ -1114,26 +1166,17 @@ export const stocks: Flow = {
 /*
  * Stocks home — page layout. A grey summary area (indices, holdings, products) and, over its bottom edge, the feed on
  * a rounded sheet (radius 32 at the top), like the live app. The grey area is intentional and high-emphasis (the
- * account summary), so a large surface/secondary block is allowed here (DESIGN_SYSTEM 7.2).
+ * account summary), so a large surface/secondary block is allowed here (DESIGN_SYSTEM 7.2). The layout is L3 Stack /
+ * Section; what those blocks don't cover lives here: uneven padding (16 / 48, 32 / 24), the feed's overlap and
+ * top-only radius, the default surface and the accent tints.
  */
-.home {
-  display: flex;
-  flex-direction: column;
-}
-
 .summary {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-24);
   padding: var(--l3-spacing-16) 0 var(--l3-spacing-48);
   background: var(--l3-surface-secondary);
 }
 
 .feed {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-32);
   margin-top: calc(-1 * var(--l3-spacing-24));
   padding: var(--l3-spacing-32) 0 var(--l3-spacing-24);
   border-radius: var(--l3-radius-32) var(--l3-radius-32) 0 0;
@@ -1141,10 +1184,6 @@ export const stocks: Flow = {
 }
 
 /* Sections on a tint, edge to edge: Smart Invest on the brand tint, Trade ideas on the discover tint. */
-.tinted {
-  padding-block: var(--l3-spacing-24);
-}
-
 .tinted[data-tint='brand'] {
   background: var(--l3-surface-accent-brand-light);
 }
@@ -1164,14 +1203,17 @@ export const stocks: Flow = {
 ```tsx
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Actionbar, ActionbarAction } from '@l3/components/Actionbar'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msAccountBalanceWallet, msAccountCircle } from '@l3/icons/material'
-import { MainNav, type Section } from '../../../shared/ui/MainNav'
+import { MainNav, type Section as NavSection } from '../../../shared/ui/MainNav'
 import { Screen } from '../../../shared/ui/Screen'
 import { Disclosure, IdeaBaskets, TradeIdeas } from '../components/Ideas'
 import { Announcement, Highlights, Sectors, SmartInvest } from '../components/Invest'
 import { HoldingsSummary, IndexStrip, ProductCards } from '../components/Overview'
 import { Shortcuts, TopMovers, Watchlists } from '../components/Discover'
 import type { MoverList } from '../data'
+import { t } from '../copy'
 import styles from './Home.module.css'
 
 /** Where the page is scrolled to — the board shows the long page as several frames, like the live app's screenshots. */
@@ -1182,7 +1224,7 @@ type Props = {
   /** Which Top movers list is picked (board state). */
   movers?: MoverList
   /** The main navbar: go to another tab. */
-  onTab?: (section: Section) => void
+  onTab?: (section: NavSection) => void
   /** Tapping the search field opens the Search screen (search-01), where the typing happens. */
   onSearch?: () => void
 }
@@ -1213,11 +1255,11 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch }: Props) {
         // Focus on the field (a tap) opens Search. The wrapper is display: contents, so the bar's layout is untouched.
         <div className={styles.searchEntry} onFocus={(e) => { if ((e.target as HTMLElement).matches('input[type="search"]')) onSearch?.() }}>
           <Actionbar
-            search={{ value: query, onChange: setQuery, placeholder: 'Search stocks', label: 'Search stocks' }}
+            search={{ value: query, onChange: setQuery, placeholder: t('search.placeholder'), label: t('search.label') }}
             actions={
               <>
-                <ActionbarAction icon={msAccountBalanceWallet} label="Wallet" onClick={() => {}} />
-                <ActionbarAction icon={msAccountCircle} label="Profile" onClick={() => {}} />
+                <ActionbarAction icon={msAccountBalanceWallet} label={t('top.wallet')} onClick={() => {}} />
+                <ActionbarAction icon={msAccountCircle} label={t('top.profile')} onClick={() => {}} />
               </>
             }
           />
@@ -1225,31 +1267,58 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch }: Props) {
       }
       bottom={<MainNav value="stocks" onChange={onTab} />}
     >
-      <div ref={page} className={styles.home}>
-        <div className={styles.summary} data-home="top">
+      <Stack ref={page}>
+        <Stack gap="24" className={styles.summary} data-home="top">
           <IndexStrip />
           <HoldingsSummary />
           <ProductCards />
-        </div>
-        <div className={styles.feed}>
+        </Stack>
+        <Stack gap="32" className={styles.feed}>
           <Shortcuts />
           <div data-home="movers"><TopMovers initial={movers} /></div>
           <Watchlists />
-          <div className={styles.tinted} data-tint="brand" data-home="invest"><SmartInvest /></div>
+          <Section paddingBlock="24" className={styles.tinted} data-tint="brand" data-home="invest"><SmartInvest /></Section>
           <Announcement />
           <div data-home="sectors"><Sectors /></div>
           <Highlights />
-          <div className={styles.tinted} data-tint="discover" data-home="ideas"><TradeIdeas /></div>
+          <Section paddingBlock="24" className={styles.tinted} data-tint="discover" data-home="ideas"><TradeIdeas /></Section>
           <div data-home="more"><IdeaBaskets /></div>
           <Disclosure />
-        </div>
-      </div>
+        </Stack>
+      </Stack>
     </Screen>
   )
 }
 ```
 
 ## Source — shared app parts it uses
+
+### `src/shared/copy.ts`
+
+```ts
+/**
+ * UI copy. Every user-facing string of a flow lives in ONE file, `src/flows/<flow-id>/copy.json` — flat keys
+ * ("empty.title") → the text. Screens read it through the flow's `t`:
+ *
+ *   t('empty.title')                       → "No search results found"
+ *   t('group.results', { list, count })    → "Stocks (8)"   ({name} placeholders are filled in)
+ *
+ * Sample data (stock names, prices, watchlists) stays in the flow's data.ts — copy.json is only the words the app
+ * itself says: titles, labels, buttons, empty states, accessible names. Porting a flow: this file is the string
+ * table (Flutter ARB / iOS Localizable.strings).
+ */
+export type CopyVars = Record<string, string | number>
+
+export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
+  return function t(key: keyof Copy & string, vars?: CopyVars): string {
+    const template = copy[key] ?? key
+    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
+    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
+    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
+    return text
+  }
+}
+```
 
 ### `src/shared/data/format.ts`
 

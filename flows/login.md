@@ -1,6 +1,6 @@
 # Flow: Login (`login`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `df57857` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Welcome, mobile number + OTP, fingerprint, PIN and email — where the app starts.
 
@@ -81,6 +81,7 @@ From `src/shared/data/user.ts` (fictional sample user) and `data.ts`:
 | Use fingerprint | Button | `variant="tertiary"`, Large, icon `fingerprint` |
 | Email Skip | Button in Actionbar actions | `variant="ghost"`, `size="sm"` |
 | Keypad | — | the phone's system number keyboard (not an app component) |
+| Layout | Section · Stack (Figma auto-layout frames) | Form screens: Section `paddingBlock="24" paddingInline="16" gap="16"` under the Intro. Centred moments (fingerprint, email, welcome back): Stack `justify="center"` filling the body → Section 24 / 16, `gap="16" align="center"`. Welcome: hero Stack `align="center" gap="48"` (logo + tagline Stack `gap="08"`, then the art) on the brand panel; slide Section `padding="24" gap="24" align="center"` centred in the space below |
 
 Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/14, secondary.
 
@@ -116,6 +117,8 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
 - **Google sign-in mark:** the official "G" mark is needed for the Google button; a mail icon stands in.
 
 ### Changelog
+
+- 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Section, Stack); nothing moved (measured at 392).
 
 - 2026-10-16 — raised-button experiment; keypad fields never open the phone's keyboard (the drawn keypad is the keyboard).
 
@@ -168,18 +171,94 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
 ### `src/flows/login/components/Dots.tsx`
 
 ```tsx
+import { t } from '../copy'
 import styles from './Dots.module.css'
 
 /** Carousel position dots (local: L3 has no carousel indicator — listed as an L3 gap). */
 export function Dots({ count, index, onPick }: { count: number; index: number; onPick?: (i: number) => void }) {
   return (
-    <div className={styles.dots} role="group" aria-label="Slides">
+    <div className={styles.dots} role="group" aria-label={t('dots.label')}>
       {Array.from({ length: count }, (_, i) => (
-        <button key={i} type="button" className={styles.dot} aria-current={i === index} aria-label={`Slide ${i + 1} of ${count}`} onClick={() => onPick?.(i)} />
+        <button key={i} type="button" className={styles.dot} aria-current={i === index} aria-label={t('dots.slide', { n: i + 1, count })} onClick={() => onPick?.(i)} />
       ))}
     </div>
   )
 }
+```
+
+### `src/flows/login/copy.json`
+
+```json
+{
+  "welcome.tagline": "Stock trading made simple",
+  "welcome.slide1.title": "Analyst ratings",
+  "welcome.slide1.description": "Expert ratings on which stocks to buy and sell",
+  "welcome.slide2.title": "Stocks, F&O and mutual funds",
+  "welcome.slide2.description": "Everything you invest in, in one app",
+  "welcome.slide3.title": "Trade with guardrails",
+  "welcome.slide3.description": "Stop-loss, take-profit and P&L protection built in",
+  "welcome.actionsLabel": "Get started",
+  "welcome.login": "Login & Signup",
+  "welcome.coinswitch": "Continue with CoinSwitch",
+  "welcome.sebi": "SEBI Reg. No. {reg}",
+  "dots.label": "Slides",
+  "dots.slide": "Slide {n} of {count}",
+  "phone.help": "Help",
+  "phone.actionsLabel": "Continue",
+  "phone.submit": "Get OTP",
+  "phone.title": "Enter your mobile number",
+  "phone.description": "We’ll send a 6-digit code to verify it",
+  "phone.label": "Mobile number",
+  "phone.placeholder": "+91 10-digit number",
+  "phone.legalBefore": "By continuing, you agree to our",
+  "phone.terms": "Terms",
+  "phone.legalAnd": "and",
+  "phone.privacy": "Privacy policy",
+  "phone.legalAfter": ".",
+  "otp.title": "Verify your number",
+  "otp.description": "Enter the 6-digit code we sent you by SMS",
+  "otp.label": "OTP",
+  "otp.verifying": "Verifying…",
+  "otp.wrong": "Incorrect OTP. You have 2 attempts left.",
+  "otp.sent": "Sent to +91 {phone}",
+  "otp.edit": "Edit number",
+  "otp.resendIn": "Resend in 0:{seconds}",
+  "otp.resend": "Resend OTP",
+  "biometrics.actionsLabel": "Biometric unlock",
+  "biometrics.allow": "Turn on fingerprint unlock",
+  "biometrics.skip": "Not now",
+  "biometrics.title": "Unlock Lemonn with your fingerprint",
+  "biometrics.description": "Faster than typing your PIN, and only you can open the app. You can change this anytime in Settings.",
+  "pin.createTitle": "Set a 4-digit PIN",
+  "pin.createDescription": "You’ll use it to open the app and approve orders",
+  "pin.confirmTitle": "Confirm your PIN",
+  "pin.confirmDescription": "Type the same PIN again",
+  "pin.newLabel": "New PIN",
+  "pin.confirmLabel": "Confirm PIN",
+  "pin.mismatch": "The PINs didn’t match. Set it again.",
+  "pin.hint": "Avoid 1234 or your birth year",
+  "pin.welcome": "Welcome back, {name}",
+  "pin.enterDescription": "Enter your 4-digit PIN",
+  "pin.label": "PIN",
+  "pin.forgot": "Forgot PIN?",
+  "pin.fingerprint": "Use fingerprint",
+  "email.skip": "Skip",
+  "email.actionsLabel": "Add email",
+  "email.google": "Continue with Google",
+  "email.manual": "Type my email instead",
+  "email.title": "Add your email",
+  "email.description": "We’ll send your contract notes, statements and account alerts here. It also speeds up your KYC."
+}
+```
+
+### `src/flows/login/copy.ts`
+
+```ts
+import { makeCopy } from '../../shared/copy'
+import copy from './copy.json'
+
+/** Every user-facing string of Login is in copy.json: t('otp.title'), t('pin.welcome', { name }). */
+export const t = makeCopy('login', copy)
 ```
 
 ### `src/flows/login/data.ts`
@@ -187,13 +266,13 @@ export function Dots({ count, index, onPick }: { count: number; index: number; o
 ```ts
 import { msCandlestickChart, msQueryStats, msShield } from '@l3/icons/material'
 
-/** Welcome carousel. Slide 1 is the live app's; 2–3 are placeholder copy until product confirms the messages. */
-export type Slide = { icon: string; title: string; description: string }
+/** Welcome carousel art; the slide texts are copy.json welcome.slide<N>.* (slide 1 is the live app's; 2–3 are placeholder copy until product confirms). */
+export type Slide = { id: 'slide1' | 'slide2' | 'slide3'; icon: string }
 
 export const slides: Slide[] = [
-  { icon: msQueryStats, title: 'Analyst ratings', description: 'Expert ratings on which stocks to buy and sell' },
-  { icon: msCandlestickChart, title: 'Stocks, F&O and mutual funds', description: 'Everything you invest in, in one app' },
-  { icon: msShield, title: 'Trade with guardrails', description: 'Stop-loss, take-profit and P&L protection built in' },
+  { id: 'slide1', icon: msQueryStats },
+  { id: 'slide2', icon: msCandlestickChart },
+  { id: 'slide3', icon: msShield },
 ]
 
 /** Login rules. */
@@ -278,31 +357,36 @@ export const login: Flow = {
 ```tsx
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msFingerprint } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import styles from './Form.module.css'
+import { t } from '../copy'
 
 /** login-06 · Offer fingerprint / face unlock right after the number is verified. Either choice moves on to the PIN. */
 export function Biometrics({ onAllow, onSkip }: { onAllow?: () => void; onSkip?: () => void }) {
   return (
     <Screen
       bottom={
-        <ButtonGroup aria-label="Biometric unlock">
-          <Button onClick={onAllow}>Turn on fingerprint unlock</Button>
-          <Button variant="secondary" onClick={onSkip}>Not now</Button>
+        <ButtonGroup aria-label={t('biometrics.actionsLabel')}>
+          <Button onClick={onAllow}>{t('biometrics.allow')}</Button>
+          <Button variant="secondary" onClick={onSkip}>{t('biometrics.skip')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={`${styles.centre} ${styles.fill}`}>
-        <Intro
-          align="center"
-          art={<Spot icon={msFingerprint} tone="brand" />}
-          title="Unlock Lemonn with your fingerprint"
-          description="Faster than typing your PIN, and only you can open the app. You can change this anytime in Settings."
-        />
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="16" align="center">
+          <Intro
+            align="center"
+            art={<Spot icon={msFingerprint} tone="brand" />}
+            title={t('biometrics.title')}
+            description={t('biometrics.description')}
+          />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -315,11 +399,14 @@ import { Actionbar } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Icon } from '@l3/components/Icon'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msMail } from '@l3/icons/material'
 import { Intro } from '../../../shared/ui/Intro'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import styles from './Form.module.css'
+import { t } from '../copy'
 
 /**
  * login-09 · Email (new users). Google fills and verifies it in one tap; typing it is the fallback.
@@ -329,22 +416,24 @@ import styles from './Form.module.css'
 export function Email({ onGoogle, onManual, onSkip }: { onGoogle?: () => void; onManual?: () => void; onSkip?: () => void }) {
   return (
     <Screen
-      top={<Actionbar actions={<Button variant="ghost" size="sm" onClick={onSkip}>Skip</Button>} />}
+      top={<Actionbar actions={<Button variant="ghost" size="sm" onClick={onSkip}>{t('email.skip')}</Button>} />}
       bottom={
-        <ButtonGroup aria-label="Add email">
-          <Button iconLeft={<Icon icon={msMail} />} onClick={onGoogle}>Continue with Google</Button>
-          <Button variant="secondary" onClick={onManual}>Type my email instead</Button>
+        <ButtonGroup aria-label={t('email.actionsLabel')}>
+          <Button iconLeft={<Icon icon={msMail} />} onClick={onGoogle}>{t('email.google')}</Button>
+          <Button variant="secondary" onClick={onManual}>{t('email.manual')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={`${styles.centre} ${styles.fill}`}>
-        <Intro
-          align="center"
-          art={<Spot icon={msMail} tone="discover" />}
-          title="Add your email"
-          description="We’ll send your contract notes, statements and account alerts here. It also speeds up your KYC."
-        />
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="16" align="center">
+          <Intro
+            align="center"
+            art={<Spot icon={msMail} tone="discover" />}
+            title={t('email.title')}
+            description={t('email.description')}
+          />
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -353,13 +442,7 @@ export function Email({ onGoogle, onManual, onSkip }: { onGoogle?: () => void; o
 ### `src/flows/login/screens/Form.module.css`
 
 ```css
-/* Shared by the login form screens: the field area under the intro and the small print. */
-.fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-16);
-  padding: var(--l3-spacing-24) var(--l3-spacing-16);
-}
+/* Login screens: layout is L3 Section / Stack; only text styles and what those blocks don't cover live here. */
 
 .fine {
   margin: 0;
@@ -373,18 +456,10 @@ export function Email({ onGoogle, onManual, onSkip }: { onGoogle?: () => void; o
   text-decoration: none;
 }
 
-.centre {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--l3-spacing-16);
-  padding: var(--l3-spacing-24) var(--l3-spacing-16);
-}
-
-/* Fills the body and centres its content (moments: biometrics, welcome back). */
+/* The centred moments (biometrics, email, welcome back): the Stack fills the body so justify="center" centres the
+   Section vertically. */
 .fill {
   flex: 1;
-  justify-content: center;
 }
 ```
 
@@ -395,6 +470,7 @@ import { useEffect, useState } from 'react'
 import { Actionbar } from '@l3/components/Actionbar'
 import { Loader } from '@l3/components/Loader'
 import { OtpInput } from '@l3/components/OtpInput'
+import { Section } from '@l3/components/Section'
 import { usePreview } from '../../../shared/prototype'
 import { user } from '../../../shared/data/user'
 import { phone } from '../../../shared/data/format'
@@ -403,6 +479,7 @@ import { Keyboard, typeKey, useKeypadFocus } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
 import { OTP_LENGTH, PROTOTYPE_WRONG_OTP, RESEND_AFTER_S } from '../data'
 import styles from './Form.module.css'
+import { t as copy } from '../copy'
 
 type Props = {
   initial?: string
@@ -446,26 +523,26 @@ export function Otp({ initial = '', wrong = false, resendIn = RESEND_AFTER_S, on
   }
 
   const helper = verifying
-    ? <span className={styles.fine}><Loader size="sm" label={null} /> Verifying…</span>
-    : wrong ? 'Incorrect OTP. You have 2 attempts left.' : `Sent to +91 ${phone(user.mobile)}`
+    ? <span className={styles.fine}><Loader size="sm" label={null} /> {copy('otp.verifying')}</span>
+    : wrong ? copy('otp.wrong') : copy('otp.sent', { phone: phone(user.mobile) })
 
   return (
     <Screen top={<Actionbar onBack={onBack} />} bottom={<Keyboard onKey={onKey} />}>
-      <Intro title="Verify your number" description="Enter the 6-digit code we sent you by SMS" />
-      <div ref={boxes} className={styles.fields}>
+      <Intro title={copy('otp.title')} description={copy('otp.description')} />
+      <Section paddingBlock="24" paddingInline="16" gap="16" ref={boxes}>
         <OtpInput
           length={OTP_LENGTH}
-          label="OTP"
+          label={copy('otp.label')}
           value={code}
           onChange={setCode}
           onComplete={complete}
           status={wrong && !verifying ? 'error' : undefined}
           helperText={helper}
-          edit={{ label: 'Edit number', onClick: () => onEdit?.() }}
-          action={{ label: left > 0 ? `Resend in 0:${String(left).padStart(2, '0')}` : 'Resend OTP', disabled: left > 0, onClick: () => setLeft(RESEND_AFTER_S) }}
+          edit={{ label: copy('otp.edit'), onClick: () => onEdit?.() }}
+          action={{ label: left > 0 ? copy('otp.resendIn', { seconds: String(left).padStart(2, '0') }) : copy('otp.resend'), disabled: left > 0, onClick: () => setLeft(RESEND_AFTER_S) }}
           disabled={verifying}
         />
-      </div>
+      </Section>
     </Screen>
   )
 }
@@ -478,6 +555,7 @@ import { useState } from 'react'
 import { Actionbar, ActionbarAction } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Section } from '@l3/components/Section'
 import { TextField } from '@l3/components/TextField'
 import { msHelp } from '@l3/icons/material'
 import { phone } from '../../../shared/data/format'
@@ -486,6 +564,7 @@ import { Intro } from '../../../shared/ui/Intro'
 import { Keyboard, keypadFieldProps, typeKey } from '../../../shared/ui/Keyboard'
 import { Screen } from '../../../shared/ui/Screen'
 import styles from './Form.module.css'
+import { t } from '../copy'
 
 /**
  * login-02 / 03 · Mobile number. The number keypad types into the field; "Get OTP" turns on at 10 digits.
@@ -498,22 +577,22 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
   const ready = digits.length === 10
   return (
     <Screen
-      top={<Actionbar onBack={onBack} actions={<ActionbarAction icon={msHelp} label="Help" onClick={() => {}} />} />}
+      top={<Actionbar onBack={onBack} actions={<ActionbarAction icon={msHelp} label={t('phone.help')} onClick={() => {}} />} />}
       bottom={
         <>
-          <ButtonGroup aria-label="Continue">
-            <Button disabled={!ready} onClick={() => onSubmit?.(digits)}>Get OTP</Button>
+          <ButtonGroup aria-label={t('phone.actionsLabel')}>
+            <Button disabled={!ready} onClick={() => onSubmit?.(digits)}>{t('phone.submit')}</Button>
           </ButtonGroup>
           <Keyboard onKey={(k) => setDigits((d) => typeKey(d, k, 10))} />
         </>
       }
     >
-      <Intro title="Enter your mobile number" description="We’ll send a 6-digit code to verify it" />
-      <div className={styles.fields}>
+      <Intro title={t('phone.title')} description={t('phone.description')} />
+      <Section paddingBlock="24" paddingInline="16" gap="16">
         <TextField
-          label="Mobile number"
+          label={t('phone.label')}
           value={digits ? `+91 ${phone(digits)}` : ''}
-          placeholder="+91 10-digit number"
+          placeholder={t('phone.placeholder')}
           // The keypad is open, so the field is focused: L3's Typing state. Real app: inputMode "numeric" opens the
           // system number keyboard; here the drawn keypad is that keyboard, so the phone's own never opens.
           {...keypadFieldProps()}
@@ -522,10 +601,10 @@ export function Phone({ initial = '', onBack, onSubmit }: { initial?: string; on
           onChange={(e) => setDigits(e.target.value.replace(/^\+91/, '').replace(/\D/g, '').slice(0, 10))}
         />
         <p className={styles.fine}>
-          By continuing, you agree to our <a className={styles.link} href="#terms">Terms</a> and{' '}
-          <a className={styles.link} href="#privacy">Privacy policy</a>.
+          {t('phone.legalBefore')} <a className={styles.link} href="#terms">{t('phone.terms')}</a> {t('phone.legalAnd')}{' '}
+          <a className={styles.link} href="#privacy">{t('phone.privacy')}</a>{t('phone.legalAfter')}
         </p>
-      </div>
+      </Section>
     </Screen>
   )
 }
@@ -539,6 +618,8 @@ import { BrandLogo } from '@l3/components/BrandLogo'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { OtpInput } from '@l3/components/OtpInput'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { msFingerprint, msPassword } from '@l3/icons/material'
 import { usePreview } from '../../../shared/prototype'
 import { user } from '../../../shared/data/user'
@@ -548,6 +629,7 @@ import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import { PIN_LENGTH } from '../data'
 import styles from './Form.module.css'
+import { t } from '../copy'
 
 /**
  * login-07 · New user: set a 4-digit PIN, then type it again to confirm (a mismatch clears it and says so).
@@ -576,20 +658,20 @@ export function CreatePin({ initial = '', onDone }: { initial?: string; onDone?:
     <Screen bottom={<Keyboard onKey={onKey} />}>
       <Intro
         art={<Spot icon={msPassword} tone="brand" size="md" />}
-        title={confirming ? 'Confirm your PIN' : 'Set a 4-digit PIN'}
-        description={confirming ? 'Type the same PIN again' : 'You’ll use it to open the app and approve orders'}
+        title={confirming ? t('pin.confirmTitle') : t('pin.createTitle')}
+        description={confirming ? t('pin.confirmDescription') : t('pin.createDescription')}
       />
-      <div ref={boxes} className={styles.fields}>
+      <Section paddingBlock="24" paddingInline="16" gap="16" ref={boxes}>
         <OtpInput
           length={PIN_LENGTH}
           mask
-          label={confirming ? 'Confirm PIN' : 'New PIN'}
+          label={confirming ? t('pin.confirmLabel') : t('pin.newLabel')}
           value={pin}
           onChange={setPin}
           status={mismatch ? 'error' : undefined}
-          helperText={mismatch ? 'The PINs didn’t match. Set it again.' : 'Avoid 1234 or your birth year'}
+          helperText={mismatch ? t('pin.mismatch') : t('pin.hint')}
         />
-      </div>
+      </Section>
     </Screen>
   )
 }
@@ -609,19 +691,21 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
   }
   return (
     <Screen bottom={<Keyboard onKey={onKey} />}>
-      <div ref={boxes} className={`${styles.centre} ${styles.fill}`}>
-        <BrandLogo brand="lemonn" variant="icon" size={48} decorative />
-        <Intro align="center" title={`Welcome back, ${user.name.split(' ')[0]}`} description="Enter your 4-digit PIN" />
-        <OtpInput
-          length={PIN_LENGTH}
-          mask
-          label="PIN"
-          value={pin}
-          onChange={setPin}
-          action={{ label: 'Forgot PIN?', onClick: () => onForgot?.() }}
-        />
-        <Button variant="tertiary" iconLeft={<Icon icon={msFingerprint} />} onClick={onUnlocked}>Use fingerprint</Button>
-      </div>
+      <Stack justify="center" className={styles.fill}>
+        <Section paddingBlock="24" paddingInline="16" gap="16" align="center" ref={boxes}>
+          <BrandLogo brand="lemonn" variant="icon" size={48} decorative />
+          <Intro align="center" title={t('pin.welcome', { name: user.name.split(' ')[0] })} description={t('pin.enterDescription')} />
+          <OtpInput
+            length={PIN_LENGTH}
+            mask
+            label={t('pin.label')}
+            value={pin}
+            onChange={setPin}
+            action={{ label: t('pin.forgot'), onClick: () => onForgot?.() }}
+          />
+          <Button variant="tertiary" iconLeft={<Icon icon={msFingerprint} />} onClick={onUnlocked}>{t('pin.fingerprint')}</Button>
+        </Section>
+      </Stack>
     </Screen>
   )
 }
@@ -630,18 +714,16 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
 ### `src/flows/login/screens/Welcome.module.css`
 
 ```css
-/* Welcome: a lime hero panel (logo + promise + the slide's art), the slide's message, dots; the dock below. */
+/*
+ * Welcome: a lime hero panel (logo + promise + the slide's art), the slide's message, dots; the dock below. Layout is
+ * L3 Stack / Section; what those blocks don't cover lives here.
+ */
 .page {
-  display: flex;
-  flex-direction: column;
   flex: 1;
 }
 
+/* Section can't do this panel: 32 above but 40 below, only the bottom corners rounded, and the brand tint. */
 .hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--l3-spacing-08);
   padding: var(--l3-spacing-32) var(--l3-spacing-16) var(--l3-spacing-40);
   border-radius: 0 0 var(--l3-radius-32) var(--l3-radius-32);
   background: var(--l3-surface-accent-brand-light);
@@ -653,18 +735,12 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
   color: var(--l3-content-secondary);
 }
 
-.art {
-  margin-top: var(--l3-spacing-40);
+/* The slide's message fills the space under the hero; the Stack's justify="center" centres it there. */
+.fill {
+  flex: 1;
 }
 
 .slide {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--l3-spacing-08);
-  padding: var(--l3-spacing-24);
   text-align: center;
 }
 
@@ -677,10 +753,6 @@ export function EnterPin({ initial = '', onUnlocked, onForgot }: { initial?: str
   margin: 0;
   font: var(--l3-text-description-14);
   color: var(--l3-content-secondary);
-}
-
-.dots {
-  margin-top: var(--l3-spacing-16);
 }
 
 .legal {
@@ -700,10 +772,13 @@ import { useEffect, useState } from 'react'
 import { BrandLogo } from '@l3/components/BrandLogo'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Section } from '@l3/components/Section'
+import { Stack } from '@l3/components/Stack'
 import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
 import { Spot } from '../../../shared/ui/Spot'
 import { Dots } from '../components/Dots'
+import { t as copy } from '../copy'
 import { SEBI_REG, slides } from '../data'
 import styles from './Welcome.module.css'
 
@@ -722,36 +797,67 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
     <Screen
       bottom={
         <>
-          <ButtonGroup aria-label="Get started">
-            <Button onClick={onLogin}>Log in or sign up</Button>
+          <ButtonGroup aria-label={copy('welcome.actionsLabel')}>
+            <Button onClick={onLogin}>{copy('welcome.login')}</Button>
             <Button variant="secondary" iconLeft={<BrandLogo brand="coinswitch" variant="icon" size={24} decorative />} onClick={onCoinSwitch}>
-              Continue with CoinSwitch
+              {copy('welcome.coinswitch')}
             </Button>
           </ButtonGroup>
-          <p className={styles.legal} data-surface="primary">SEBI Reg. No. {SEBI_REG}</p>
+          <p className={styles.legal} data-surface="primary">{copy('welcome.sebi', { reg: SEBI_REG })}</p>
         </>
       }
     >
-      <div className={styles.page}>
-        <div className={styles.hero} data-status-surface="brand">
-          <BrandLogo brand="lemonn" size={32} />
-          <p className={styles.tagline}>Stock trading made simple</p>
-          <div className={styles.art}><Spot icon={slide.icon} tone="plain" /></div>
-        </div>
-        <div className={styles.slide}>
-          <div aria-live="polite">
-            <h1 className={styles.title}>{slide.title}</h1>
-            <p className={styles.description}>{slide.description}</p>
-          </div>
-          <div className={styles.dots}><Dots count={slides.length} index={index} onPick={setIndex} /></div>
-        </div>
-      </div>
+      <Stack className={styles.page}>
+        <Stack align="center" gap="48" className={styles.hero} data-status-surface="brand">
+          <Stack align="center" gap="08">
+            <BrandLogo brand="lemonn" size={32} />
+            <p className={styles.tagline}>{copy('welcome.tagline')}</p>
+          </Stack>
+          <Spot icon={slide.icon} tone="plain" />
+        </Stack>
+        <Stack justify="center" className={styles.fill}>
+          <Section padding="24" gap="24" align="center" className={styles.slide}>
+            <div aria-live="polite">
+              <h1 className={styles.title}>{copy(`welcome.${slide.id}.title`)}</h1>
+              <p className={styles.description}>{copy(`welcome.${slide.id}.description`)}</p>
+            </div>
+            <Dots count={slides.length} index={index} onPick={setIndex} />
+          </Section>
+        </Stack>
+      </Stack>
     </Screen>
   )
 }
 ```
 
 ## Source — shared app parts it uses
+
+### `src/shared/copy.ts`
+
+```ts
+/**
+ * UI copy. Every user-facing string of a flow lives in ONE file, `src/flows/<flow-id>/copy.json` — flat keys
+ * ("empty.title") → the text. Screens read it through the flow's `t`:
+ *
+ *   t('empty.title')                       → "No search results found"
+ *   t('group.results', { list, count })    → "Stocks (8)"   ({name} placeholders are filled in)
+ *
+ * Sample data (stock names, prices, watchlists) stays in the flow's data.ts — copy.json is only the words the app
+ * itself says: titles, labels, buttons, empty states, accessible names. Porting a flow: this file is the string
+ * table (Flutter ARB / iOS Localizable.strings).
+ */
+export type CopyVars = Record<string, string | number>
+
+export function makeCopy<Copy extends Record<string, string>>(flow: string, copy: Copy) {
+  return function t(key: keyof Copy & string, vars?: CopyVars): string {
+    const template = copy[key] ?? key
+    const text = vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
+    // Prototype dev server only (never in a build): lets Edit mode find which key a piece of text came from.
+    if (import.meta.env.DEV) (globalThis as { __copySeen?: (flow: string, key: string, template: string, text: string) => void }).__copySeen?.(flow, key, template, text)
+    return text
+  }
+}
+```
 
 ### `src/shared/data/format.ts`
 

@@ -4,7 +4,7 @@
   "description": "The Market tab — stock lists (all, gainers, losers, under ₹100 / ₹500) and Filters.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "df57857",
+    "commit": "cd84910",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -100,6 +100,8 @@
     "src/flows/market/components/SideTabs.tsx",
     "src/flows/market/components/StockRow.module.css",
     "src/flows/market/components/StockRow.tsx",
+    "src/flows/market/copy.json",
+    "src/flows/market/copy.ts",
     "src/flows/market/data.ts",
     "src/flows/market/index.tsx",
     "src/flows/market/screens/Market.module.css",
@@ -108,6 +110,7 @@
     "src/flows/market/sheets/FilterSheet.tsx"
   ],
   "shared": [
+    "src/shared/copy.ts",
     "src/shared/data/format.ts",
     "src/shared/data/market.ts",
     "src/shared/ui/MainNav.tsx",

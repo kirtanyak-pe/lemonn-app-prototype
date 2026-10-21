@@ -4,7 +4,7 @@
   "description": "Welcome, mobile number + OTP, fingerprint, PIN and email — where the app starts.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "df57857",
+    "commit": "cd84910",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -116,6 +116,8 @@
     "src/flows/login/README.md",
     "src/flows/login/components/Dots.module.css",
     "src/flows/login/components/Dots.tsx",
+    "src/flows/login/copy.json",
+    "src/flows/login/copy.ts",
     "src/flows/login/data.ts",
     "src/flows/login/index.tsx",
     "src/flows/login/screens/Biometrics.tsx",
@@ -128,6 +130,7 @@
     "src/flows/login/screens/Welcome.tsx"
   ],
   "shared": [
+    "src/shared/copy.ts",
     "src/shared/data/format.ts",
     "src/shared/data/user.ts",
     "src/shared/prototype.ts",
