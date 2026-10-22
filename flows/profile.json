@@ -28,50 +28,29 @@
       "id": "profile-02",
       "name": "Settings",
       "figma": "",
-      "note": "Biometric, Dark Mode (live: switches the app theme), and the PM’s Accessibility row after Dark Mode.",
+      "note": "Security · Theme (Light / Dark / Auto cards, live) · Accessibility (text size, darker colours).",
       "goesTo": [
-        "profile-01",
-        "profile-03"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
     {
       "id": "profile-03",
-      "name": "Accessibility",
+      "name": "Settings · large text, darker colours",
       "figma": "",
-      "note": "PM 5a · first visit: Low vision mode off.",
+      "note": "Text size Large: the sample grows. Darker colours on: the ♿ Accessible theme.",
       "goesTo": [
-        "profile-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
     {
       "id": "profile-04",
-      "name": "Accessibility · low vision on",
+      "name": "Settings · couldn’t save",
       "figma": "",
-      "note": "PM 5b · on, phone text size 100 %: the note says how to make text bigger. ♿ Accessible colours.",
+      "note": "A change didn’t save: error toast with Retry at the bottom; the controls show what’s stored.",
       "goesTo": [
-        "profile-02"
-      ],
-      "figmaUrl": ""
-    },
-    {
-      "id": "profile-05",
-      "name": "Accessibility · turning on failed",
-      "figma": "",
-      "note": "PM 7a · the switch is back off; error toast with Retry at the bottom.",
-      "goesTo": [
-        "profile-02"
-      ],
-      "figmaUrl": ""
-    },
-    {
-      "id": "profile-06",
-      "name": "Accessibility · turning off failed",
-      "figma": "",
-      "note": "PM 7b · the switch stays on, low-vision colours stay; error toast with Retry at the bottom.",
-      "goesTo": [
-        "profile-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     }
@@ -79,12 +58,12 @@
   "files": [
     "src/flows/profile/README.md",
     "src/flows/profile/components/CardRow.tsx",
-    "src/flows/profile/components/Group.tsx",
+    "src/flows/profile/components/ThemePreview.module.css",
+    "src/flows/profile/components/ThemePreview.tsx",
     "src/flows/profile/copy.json",
     "src/flows/profile/copy.ts",
     "src/flows/profile/data.ts",
     "src/flows/profile/index.tsx",
-    "src/flows/profile/screens/Accessibility.tsx",
     "src/flows/profile/screens/Profile.module.css",
     "src/flows/profile/screens/Profile.tsx",
     "src/flows/profile/screens/Settings.tsx"

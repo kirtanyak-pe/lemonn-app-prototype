@@ -11,11 +11,9 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/profile · mach
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
 | `profile-01` | Profile | — | `stocks-01`, `profile-02`, `login-01` | The live page 1:1 (scrolls: account, app settings, help, Logout). From the profile icon on Stocks home. |
-| `profile-02` | Settings | — | `profile-01`, `profile-03` | Biometric, Dark Mode (live: switches the app theme), and the PM’s Accessibility row after Dark Mode. |
-| `profile-03` | Accessibility | — | `profile-02` | PM 5a · first visit: Low vision mode off. |
-| `profile-04` | Accessibility · low vision on | — | `profile-02` | PM 5b · on, phone text size 100 %: the note says how to make text bigger. ♿ Accessible colours. |
-| `profile-05` | Accessibility · turning on failed | — | `profile-02` | PM 7a · the switch is back off; error toast with Retry at the bottom. |
-| `profile-06` | Accessibility · turning off failed | — | `profile-02` | PM 7b · the switch stays on, low-vision colours stay; error toast with Retry at the bottom. |
+| `profile-02` | Settings | — | `profile-01` | Security · Theme (Light / Dark / Auto cards, live) · Accessibility (text size, darker colours). |
+| `profile-03` | Settings · large text, darker colours | — | `profile-01` | Text size Large: the sample grows. Darker colours on: the ♿ Accessible theme. |
+| `profile-04` | Settings · couldn’t save | — | `profile-01` | A change didn’t save: error toast with Retry at the bottom; the controls show what’s stored. |
 
 ## Spec (README.md)
 
@@ -35,19 +33,17 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/profile · mach
 | Id | Screen | What it shows / when |
 |---|---|---|
 | `profile-01` | Profile | The live page 1:1. Grey header (back, name, View Details ›, avatar) that stays put; the list scrolls under its rounded top: **Account Information** (Bank Details · Verified, Balance, Get ₹149 instant balance, Tax and P&L Reports) · **App Settings** (Settings, Kill Switch, Auto TP/SL) · **How can we help?** (Help & Support, Follow us on X, Subscribe on YouTube, Follow us on Instagram, Rate Us, About 7.2.38 (3)) · Logout · the broker's line with Read More |
-| `profile-02` | Settings | Biometric (switch) · Dark Mode (switch) · Accessibility › (new, PM proposal: after Dark Mode) |
-| `profile-03` | Accessibility | PM 5a · first visit: Low vision mode off |
-| `profile-04` | Accessibility · low vision on | PM 5b · switch on; note "Your phone's text size is 100% — raise it in your phone's settings and Lemonn will follow, up to 2×"; the screen in ♿ Accessible colours |
-| `profile-05` | Accessibility · turning on failed | PM 7a · the save failed: switch back off; error toast "Couldn't turn on low vision mode" + Retry |
-| `profile-06` | Accessibility · turning off failed | PM 7b · the save failed: switch still on, colours still low-vision; toast "Couldn't turn off low vision mode" + Retry |
+| `profile-02` | Settings | **Security:** Biometric (switch card) · **Theme:** Light / Dark / Auto as three selectable cards, each with a small drawing of the app in that theme (Auto = both, follows the phone) · **Accessibility:** Text size (Default / Large / Largest with a live sample) and Darker colours (switch) |
+| `profile-03` | Settings · large text, darker colours | Text size Large (the sample grows); Darker colours on (♿ Accessible theme) |
+| `profile-04` | Settings · couldn't save | A change didn't save: error toast "Couldn't save your settings" + Retry |
 
 ### Navigation
 
 ```
-stocks-0x ─profile icon─▶ profile-01 ─Settings─▶ profile-02 ─Accessibility─▶ profile-03/04 ─back─▶ profile-02
+stocks-0x ─profile icon─▶ profile-01 ─Settings─▶ profile-02 ─back─▶ profile-01
                           profile-01 ─Logout─▶ login-01 (welcome) · back ─▶ stocks-01
 Every other row (Bank Details, Balance, instant balance, reports, Kill Switch, Auto TP/SL, Help & Support, the social
-links, Rate Us, About, View Details, the accessibility statement) is tappable but goes nowhere in the prototype yet.
+links, Rate Us, About, View Details) is tappable but goes nowhere in the prototype yet.
 ```
 
 ### Data
@@ -55,9 +51,9 @@ links, Rate Us, About, View Details, the accessibility statement) is tappable bu
 From `data.ts` (fictional) and `src/shared/data/user.ts` (the sample user):
 - `user.name` (header; avatar initials), `balance` (₹, may be negative: shown `Balance : −₹245.30`),
   `INSTANT_BALANCE` (₹149), `APP_VERSION` (`7.2.38 (3)`).
-- Accessibility: `MAX_TEXT_SCALE` (2×) and `PHONE_TEXT_SIZE` (the OS text size, %).
-- API: get profile (name, avatar, bank verified, balance); save preferences (biometric, theme, low vision mode) — the
-  save can fail (profile-05 / 06).
+- Settings: `TextSize` (`default` 1×, `large` 1.15×, `largest` 1.3× — `textScale`), `ThemeChoice` (`light` / `dark` / `auto`).
+- API: get profile (name, avatar, bank verified, balance); save preferences (biometric, theme, text size, darker colours) —
+  the save can fail (profile-04).
 - The broker's regulatory line: `src/shared/data/broker.ts` (also on the Stocks home).
 
 ### Copy
@@ -80,29 +76,25 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 | Kill Switch / Auto TP/SL icons | Lemonnade custom icons | `lmKillSwitch`, `lmAutoTpSl` |
 | Logout | Button | `variant="tertiary"`, `lg`, full width |
 | Disclosure | text + Button | Description/12 tertiary, 5 lines; `ghost` `sm` Read More / Read less |
-| Settings rows | ListCell `variant="card"` `as="label"` + Switch | the whole card toggles; Accessibility is a tappable card row with a chevron |
-| Accessibility rows | ListCell (plain) + Switch; SectionHeader "Vision" | `as="label"`, `multiline`; statement row with open-in-new |
-| Low vision note | Aerobar | `floating`, `placement="inline"`, `type="discover"`, `emphasis="secondary"`, icon info |
-| Failed save | Aerobar (toast) | `floating`, `type="danger"`, `emphasis="primary"`, icon error, `action` Retry; auto-dismisses (6 s) |
+| Settings sections | SectionHeader | Security · Theme ("Choose how Lemonn looks") · Accessibility ("Make Lemonn easier to read") |
+| Biometric, Darker colours | ListCell `variant="card"` `as="label"` + Switch | the whole card toggles |
+| Theme cards | Grid `columns={3}` of clickable Card, `selected` on the chosen one | a theme drawing (`components/ThemePreview`, painted with that mode's real tokens) + Label/14 |
+| Text size | Card + Tabs | `appearance="pill-group"`, `behavior="toggle"`, `width="fill"`; a grey sample box above shows the size |
+| Failed save | Aerobar (toast) | `floating`, `type="danger"`, `emphasis="primary"`, icon error, `action` Retry |
 
 ### Rules & behaviour
 
 - **Profile and Settings copy the live app** (layout, order, copy) — only the parts are L3. No redesign yet.
 - **Logout** goes straight to the welcome screen, as in the live app.
-- **Settings apply at once** (switches, no Save). Dark Mode: on = dark, off = light (CS PRO has no light theme → the
-  switch is disabled there). The Accessibility row says "Low vision mode is on" when it's on.
-- **Low vision mode** (stored on this phone):
-  - **Text:** normally the app keeps text at 1× whatever the phone's text size. With low vision mode on, it follows
-    the phone's text size up to 2× (Flutter: `MediaQuery.textScaler` clamped to 1.0 normally, to 2.0 in low vision
-    mode). Layouts must reflow at 2× (no clipped labels; rows grow).
-  - **Colours:** the app switches to L3's ♿ Accessible theme (`data-contrast="accessible"`: stronger secondary /
-    tertiary text, borders and accents). Every screen uses the same semantic tokens, so nothing else changes.
-  - **Landscape:** the app may rotate to landscape (it's portrait-only otherwise).
-  - **The note** shows while it's on and the phone's text size is 100 % (nothing can grow yet): how to raise it.
-  - **Saving fails** (profile-05 / 06): the switch shows what's really stored (turning on failed → off; turning off
-    failed → on, colours stay low-vision), and an error toast at the bottom offers Retry.
-- Prototype only: Dark Mode and Low vision mode change the prototype's real theme (and stay on this browser), so the
-  rest of the app follows. Each Accessibility state also draws its own colours, so the states always look right.
+- **Settings apply at once** (no Save).
+- **Theme:** Light, Dark, or Auto (follows the phone's light / dark setting; "Follows your phone" under the cards).
+  CS PRO has only a dark theme → the picker does nothing there.
+- **Text size:** Default / Large / Largest scale every text style 1× / 1.15× / 1.3× across the app (Flutter:
+  `MediaQuery.textScaler`). Layouts must reflow (rows grow, nothing clipped). The prototype shows it on the sample.
+- **Darker colours:** L3's ♿ Accessible theme (`data-contrast="accessible"`: stronger secondary / tertiary text,
+  borders and accents). Every screen uses semantic tokens, so nothing else changes.
+- **Saving fails:** the controls show what's stored, and an error toast offers Retry.
+- Prototype only: Theme and Darker colours change the prototype's real theme (and stay in this browser).
 
 ### Differences from the live app and the PM proposal
 
@@ -110,10 +102,9 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
   (right side, before the chevron) instead of next to the title — L3's list cell has no tag-after-label slot. The
   avatar is 48 (L3's largest) with initials instead of the large smiley picture. Settings' rounded sticky header
   became the L3 Actionbar.
-- **Accessibility (PM):** the "I have low vision / I don't have low vision" radio pair → one L3 Switch, "Low vision
-  mode" (an on/off setting that applies at once); first visit = off. The red banner at the top → the L3 error toast at
-  the bottom with Retry. "Read our accessibility statement" → a row "Accessibility statement" with open-in-new. The
-  note keeps the PM's copy.
+- **Settings (redesigned, 2026-10-22, at the user's request):** the live Dark Mode switch became a Light / Dark /
+  Auto theme picker; the PM's single "low vision" option became two Accessibility settings: Text size and Darker
+  colours. Sections (Security, Theme, Accessibility) replace the flat list.
 
 ### L3 gaps
 
@@ -122,13 +113,16 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - **Avatar colour / size:** no colour option (its default fill disappears on `surface-secondary`, so the profile
   sets the discover fill locally) and nothing above 48.
 - **Tag next to a list cell's label:** no slot; the Verified tag goes in `trailing`.
-- **Text scale:** L3 has no text-scale token or "follow OS text size up to 2×" setting; the prototype can't show the
-  bigger text (a browser can't read the phone's text size).
+- **Text scale:** L3 has no text-scale tokens; the prototype scales only the sample.
+- **Theme picker:** no L3 component for theme thumbnails (`components/ThemePreview`, local token
+  `--app-size-theme-preview`).
 
 ### Changelog
 
 - 2026-10-22 — first version (6 screens): Profile and Settings replicated from the live app with L3 parts;
   Accessibility (4 states) from the PM proposal.
+- 2026-10-22 — Settings redesigned: Theme picker (Light / Dark / Auto), Accessibility with Text size and Darker
+  colours; the separate Accessibility screen is gone (4 screens total).
 
 
 ## Source — this flow
@@ -176,62 +170,79 @@ export function CardRow({ icon, leading, label, description, trailing, toggle = 
 }
 ```
 
-### `src/flows/profile/components/Group.tsx`
+### `src/flows/profile/components/ThemePreview.module.css`
+
+```css
+/* Theme picker thumbnail — every colour is the theme's own L3 token (set by data-mode on .half). */
+.preview {
+  align-self: stretch; /* fill the card (its Stack centres the label) */
+  display: flex;
+  overflow: hidden;
+  height: var(--app-size-theme-preview);
+  border: 1px solid var(--l3-border-light); /* 1px hairline */
+  border-radius: var(--l3-radius-08);
+}
+
+.half {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-08);
+  background: var(--l3-surface-default);
+}
+
+.bar {
+  height: var(--l3-spacing-08);
+  margin: calc(-1 * var(--l3-spacing-08)) calc(-1 * var(--l3-spacing-08)) var(--l3-spacing-04);
+  background: var(--l3-surface-secondary);
+}
+
+.pill {
+  width: 60%;
+  height: var(--l3-spacing-08);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-brand-default);
+}
+
+.line {
+  width: 100%;
+  height: var(--l3-spacing-04);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-content-tertiary);
+}
+
+.short {
+  width: 70%;
+}
+```
+
+### `src/flows/profile/components/ThemePreview.tsx`
 
 ```tsx
-import type { ReactNode } from 'react'
-import { Icon, type IconSource } from '@l3/components/Icon'
-import { Inset } from '@l3/components/Inset'
-import { ListCell } from '@l3/components/ListCell'
-import { SectionHeader } from '@l3/components/SectionHeader'
-import { Stack } from '@l3/components/Stack'
-import { msChevronRight, msOpenInNew } from '@l3/icons/material'
+import { useTheme } from '@l3/theme'
+import type { ThemeChoice } from '../data'
+import styles from './ThemePreview.module.css'
 
 /**
- * A group of settings rows under a heading (L3 "settings" archetype: SectionHeader + flat ListCell rows).
- * The heading sits on the 16 page margin; the rows are flat (plain) and run edge to edge with their own 16 padding.
- * 8 between heading and rows: the rows bring 8 above their content, so the content sits 16 under the heading.
+ * A tiny drawing of a Lemonn screen in a theme, for the theme picker: a top bar, a brand pill and two text lines,
+ * all painted with the real L3 tokens of that mode (the element carries its own data-product / data-mode).
+ * Auto shows light and dark side by side.
  */
-export function Group({ title, description, children }: { title?: string; description?: string; children: ReactNode }) {
+export function ThemePreview({ choice }: { choice: ThemeChoice }) {
+  const { product } = useTheme()
+  const modes = choice === 'auto' ? (['light', 'dark'] as const) : ([choice] as const)
   return (
-    <Stack gap="08" as="section" aria-label={title}>
-      {title && (
-        <Inset paddingInline="16" paddingBlock="00">
-          <SectionHeader title={title} description={description} />
-        </Inset>
-      )}
-      <Stack>{children}</Stack>
-    </Stack>
-  )
-}
-
-type RowProps = {
-  icon?: IconSource
-  /** Anything that isn't a Material / Lemonnade icon (a brand mark). */
-  leading?: ReactNode
-  label: string
-  description?: string
-  /** A Tag or a value, before the chevron. */
-  trailing?: ReactNode
-  /** A line under a value in `trailing` ("Available"). */
-  caption?: ReactNode
-  /** Opens another app or a web page: the open-in-new icon instead of the chevron. */
-  external?: boolean
-  onClick?: () => void
-}
-
-/** One navigation row: icon · label + description · (tag / value) · chevron. The whole row is the tap target. */
-export function Row({ icon, leading, label, description, trailing, caption, external = false, onClick }: RowProps) {
-  return (
-    <ListCell
-      onClick={onClick ?? (() => {})}
-      iconLeft={leading ?? (icon && <Icon icon={icon} />)}
-      label={label}
-      description={description}
-      trailing={trailing}
-      caption={caption}
-      iconRight={<Icon icon={external ? msOpenInNew : msChevronRight} />}
-    />
+    <div className={styles.preview} aria-hidden="true">
+      {modes.map((mode) => (
+        <div key={mode} className={styles.half} data-product={product} data-mode={mode}>
+          <span className={styles.bar} />
+          <span className={styles.pill} />
+          <span className={styles.line} />
+          <span className={`${styles.line} ${styles.short}`} />
+        </div>
+      ))}
+    </div>
   )
 }
 ```
@@ -278,26 +289,29 @@ export function Row({ icon, leading, label, description, trailing, caption, exte
   "disclosure.more": "Read More",
   "disclosure.less": "Read less",
   "settings.title": "Settings",
+  "settings.security": "Security",
   "settings.biometric": "Biometric",
   "settings.biometricHint": "Login with your fingerprint",
-  "settings.darkMode": "Dark Mode",
-  "settings.darkModeHint": "Switch between dark and light mode",
+  "settings.theme": "Theme",
+  "settings.themeHint": "Choose how Lemonn looks",
+  "settings.themeLight": "Light",
+  "settings.themeDark": "Dark",
+  "settings.themeAuto": "Auto",
+  "settings.themeAutoHint": "Follows your phone",
   "settings.accessibility": "Accessibility",
-  "settings.accessibilityHint": "Make text and screens easier to see",
-  "settings.accessibilityOn": "Low vision mode is on",
-  "a11y.title": "Accessibility",
-  "a11y.intro": "Make Lemonn easier to read if you have low vision. Your choice stays on this phone.",
-  "a11y.vision": "Vision",
-  "a11y.lowVision": "Low vision mode",
-  "a11y.lowVisionHint": "Bigger text, darker hint text and landscape",
-  "a11y.textSizeTitle": "Your phone’s text size is {size}%",
-  "a11y.textSizeText": "Raise it in your phone’s settings and Lemonn will follow, up to {max}×.",
-  "a11y.more": "More",
-  "a11y.statement": "Accessibility statement",
-  "a11y.statementHint": "How we make Lemonn work for everyone",
-  "a11y.onFailed": "Couldn’t turn on low vision mode",
-  "a11y.offFailed": "Couldn’t turn off low vision mode",
-  "a11y.retry": "Retry"
+  "settings.accessibilityHint": "Make Lemonn easier to read",
+  "settings.textSize": "Text size",
+  "settings.textSizeHint": "Changes text across the app",
+  "settings.textSizeLabel": "Text size",
+  "settings.textDefault": "Default",
+  "settings.textLarge": "Large",
+  "settings.textLargest": "Largest",
+  "settings.sampleTitle": "Reliance Industries",
+  "settings.sampleText": "₹2,948.60 · Bought 10 shares",
+  "settings.darker": "Darker colours",
+  "settings.darkerHint": "Stronger text, borders and colours",
+  "settings.saveFailed": "Couldn’t save your settings",
+  "settings.retry": "Retry"
 }
 ```
 
@@ -329,11 +343,12 @@ export const INSTANT_BALANCE = 149
 /** The app version shown under About. */
 export const APP_VERSION = '7.2.38 (3)'
 
-/** Low vision mode: Lemonn follows the phone's text size up to this scale (normally it stays at 1×). */
-export const MAX_TEXT_SCALE = 2
+/** Text size choices in Settings → Accessibility: how much bigger than the default every text style gets. */
+export type TextSize = 'default' | 'large' | 'largest'
+export const textScale: Record<TextSize, number> = { default: 1, large: 1.15, largest: 1.3 }
 
-/** The phone's own text size (from the OS), in %. At 100 % low vision mode can't make text bigger — the screen says so. */
-export const PHONE_TEXT_SIZE = 100
+/** Theme choices: Auto follows the phone's light / dark setting. */
+export type ThemeChoice = 'light' | 'dark' | 'auto'
 
 /** Initials for the avatar: "Rohan Mehta" → "RM". */
 export const initials = (name = user.name) =>
@@ -344,7 +359,6 @@ export const initials = (name = user.name) =>
 
 ```tsx
 import type { Flow } from '../types'
-import { Accessibility } from './screens/Accessibility'
 import { Profile } from './screens/Profile'
 import { Settings } from './screens/Settings'
 
@@ -360,7 +374,6 @@ export const profile: Flow = {
   sections: [
     { id: 'profile', title: 'Profile' },
     { id: 'settings', title: 'Settings' },
-    { id: 'accessibility', title: 'Accessibility' },
   ],
   screens: [
     {
@@ -370,136 +383,20 @@ export const profile: Flow = {
     },
     {
       id: 'profile-02', section: 'settings', name: 'Settings', figma: '',
-      note: 'Biometric, Dark Mode (live: switches the app theme), and the PM’s Accessibility row after Dark Mode.',
-      render: (go) => <Settings onBack={() => go('profile-01')} onAccessibility={() => go('profile-03')} />,
+      note: 'Security · Theme (Light / Dark / Auto cards, live) · Accessibility (text size, darker colours).',
+      render: (go) => <Settings onBack={() => go('profile-01')} />,
     },
     {
-      id: 'profile-03', section: 'accessibility', name: 'Accessibility', figma: '',
-      note: 'PM 5a · first visit: Low vision mode off.',
-      render: (go) => <Accessibility onBack={() => go('profile-02')} />,
+      id: 'profile-03', section: 'settings', name: 'Settings · large text, darker colours', figma: '',
+      note: 'Text size Large: the sample grows. Darker colours on: the ♿ Accessible theme.',
+      render: (go) => <Settings textSize="large" darker onBack={() => go('profile-01')} />,
     },
     {
-      id: 'profile-04', section: 'accessibility', name: 'Accessibility · low vision on', figma: '',
-      note: 'PM 5b · on, phone text size 100 %: the note says how to make text bigger. ♿ Accessible colours.',
-      render: (go) => <Accessibility lowVision onBack={() => go('profile-02')} />,
-    },
-    {
-      id: 'profile-05', section: 'accessibility', name: 'Accessibility · turning on failed', figma: '',
-      note: 'PM 7a · the switch is back off; error toast with Retry at the bottom.',
-      render: (go) => <Accessibility failed="on" onBack={() => go('profile-02')} />,
-    },
-    {
-      id: 'profile-06', section: 'accessibility', name: 'Accessibility · turning off failed', figma: '',
-      note: 'PM 7b · the switch stays on, low-vision colours stay; error toast with Retry at the bottom.',
-      render: (go) => <Accessibility lowVision failed="off" onBack={() => go('profile-02')} />,
+      id: 'profile-04', section: 'settings', name: 'Settings · couldn’t save', figma: '',
+      note: 'A change didn’t save: error toast with Retry at the bottom; the controls show what’s stored.',
+      render: (go) => <Settings saveFailed onBack={() => go('profile-01')} />,
     },
   ],
-}
-```
-
-### `src/flows/profile/screens/Accessibility.tsx`
-
-```tsx
-import { useState } from 'react'
-import { Actionbar } from '@l3/components/Actionbar'
-import { Aerobar } from '@l3/components/Aerobar'
-import { Icon } from '@l3/components/Icon'
-import { Inset } from '@l3/components/Inset'
-import { ListCell } from '@l3/components/ListCell'
-import { Stack } from '@l3/components/Stack'
-import { Switch } from '@l3/components/Switch'
-import { msError, msInfo } from '@l3/icons/material'
-import { useTheme } from '@l3/theme'
-import { usePreview } from '../../../shared/prototype'
-import { Screen } from '../../../shared/ui/Screen'
-import { Group, Row } from '../components/Group'
-import { t } from '../copy'
-import { MAX_TEXT_SCALE, PHONE_TEXT_SIZE } from '../data'
-import styles from './Profile.module.css'
-
-type Props = {
-  /** Low vision mode when the screen opens. */
-  lowVision?: boolean
-  /** A change that just failed to save: 'on' = turning it on failed (switch back off), 'off' = turning it off failed. */
-  failed?: 'on' | 'off'
-  onBack?: () => void
-}
-
-/**
- * profile-06 … 09 · Accessibility (PM proposal, redrawn in L3). One setting: Low vision mode — an L3 Switch row,
- * because it's on/off and applies at once (the proposal's "I have / don't have low vision" radio pair said the same
- * thing in two rows and could be left unanswered). On, it does two things:
- *  - text follows the phone's text size up to 2× (normally the app stays at 1×) — so at 100 % nothing grows, and an
- *    inline note says how to raise it;
- *  - colours switch to L3's ♿ Accessible theme (stronger hint text, borders and accents).
- * A failed save shows the L3 error toast at the bottom with Retry (not a banner at the top), and the switch shows
- * what's really saved: turning on failed → off; turning off failed → still on, still in low-vision colours.
- * Prototype: the switch sets the app's real contrast (L3 ThemeProvider), so every screen follows; this screen also
- * carries the theme attributes itself, so each state shows its own colours.
- */
-export function Accessibility({ lowVision = false, failed, onBack }: Props) {
-  const theme = useTheme()
-  const { interactive } = usePreview()
-  const [on, setOn] = useState(lowVision)
-  const [failure, setFailure] = useState(failed)
-
-  const apply = (next: boolean) => {
-    setOn(next)
-    setFailure(undefined)
-    if (interactive) theme.setContrast(next ? 'accessible' : 'default')
-  }
-
-  return (
-    <div className={styles.scope} data-product={theme.product} data-mode={theme.mode} data-contrast={on ? 'accessible' : undefined}>
-      <Screen
-        top={<Actionbar title={t('a11y.title')} onBack={onBack} />}
-        toast={
-          failure && (
-            <Aerobar
-              floating
-              type="danger"
-              emphasis="primary"
-              icon={<Icon icon={msError} />}
-              heading={failure === 'on' ? t('a11y.onFailed') : t('a11y.offFailed')}
-              action={{ label: t('a11y.retry'), onClick: () => apply(failure === 'on') }}
-              onDismiss={() => setFailure(undefined)}
-            />
-          )
-        }
-      >
-        <Inset paddingBlock="16" paddingInline="00">
-          <Stack gap="24">
-            <Inset paddingInline="16" paddingBlock="00">
-              <p className={styles.text}>{t('a11y.intro')}</p>
-            </Inset>
-            <Group title={t('a11y.vision')}>
-              <ListCell
-                as="label"
-                label={t('a11y.lowVision')}
-                description={t('a11y.lowVisionHint')}
-                multiline
-                trailing={<Switch checked={on} onChange={(e) => apply(e.target.checked)} aria-label={t('a11y.lowVision')} />}
-              />
-              {on && (
-                <Inset paddingInline="16" paddingBlock="08">
-                  <Aerobar
-                    floating
-                    placement="inline"
-                    type="discover"
-                    emphasis="secondary"
-                    icon={<Icon icon={msInfo} />}
-                    heading={t('a11y.textSizeTitle', { size: PHONE_TEXT_SIZE })}
-                    paragraph={t('a11y.textSizeText', { max: MAX_TEXT_SCALE })}
-                  />
-                </Inset>
-              )}
-            </Group>
-            <Row label={t('a11y.statement')} description={t('a11y.statementHint')} external />
-          </Stack>
-        </Inset>
-      </Screen>
-    </div>
-  )
 }
 ```
 
@@ -578,6 +475,42 @@ export function Accessibility({ lowVision = false, failed, onBack }: Props) {
 .avatar.avatar {
   background: var(--l3-surface-accent-discover-default);
   color: var(--l3-content-inverted);
+}
+
+/* Settings — theme card label and the text-size block. */
+.option {
+  font: var(--l3-text-label-14);
+  color: var(--l3-content-secondary);
+}
+
+.optionOn {
+  font: var(--l3-text-label-14);
+  color: var(--l3-content-primary);
+}
+
+.rowLabel {
+  font: var(--l3-text-label-16);
+  color: var(--l3-content-primary);
+}
+
+.rowHint {
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
+
+/* A small grey highlight box (L3: grey only for small elements) showing the chosen text size. */
+.sample {
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-12);
+  border-radius: var(--l3-radius-08);
+  background: var(--l3-surface-secondary);
+}
+
+.sampleTitle {
+  font: var(--l3-text-label-14);
+  color: var(--l3-content-primary);
 }
 ```
 
@@ -707,61 +640,162 @@ export function Profile({ onBack, onSettings, onLogout }: Props) {
 ```tsx
 import { useState } from 'react'
 import { Actionbar } from '@l3/components/Actionbar'
+import { Aerobar } from '@l3/components/Aerobar'
+import { Card } from '@l3/components/Card'
+import { Grid } from '@l3/components/Grid'
+import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
+import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
 import { Switch } from '@l3/components/Switch'
-import { msAccessibilityNew, msDarkMode, msFingerprint } from '@l3/icons/material'
+import { Tabs } from '@l3/components/Tabs'
+import { msContrast, msError, msFingerprint, msTextIncrease } from '@l3/icons/material'
 import { useTheme } from '@l3/theme'
+import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
 import { CardRow } from '../components/CardRow'
+import { ThemePreview } from '../components/ThemePreview'
 import { t } from '../copy'
+import { textScale, type TextSize, type ThemeChoice } from '../data'
+import styles from './Profile.module.css'
+
+type Props = {
+  /** Board states; the prototype otherwise starts from the app's real theme. */
+  textSize?: TextSize
+  darker?: boolean
+  /** A save that just failed: the error toast with Retry. */
+  saveFailed?: boolean
+  onBack?: () => void
+}
+
+const themeChoices: { value: ThemeChoice; label: () => string }[] = [
+  { value: 'light', label: () => t('settings.themeLight') },
+  { value: 'dark', label: () => t('settings.themeDark') },
+  { value: 'auto', label: () => t('settings.themeAuto') },
+]
+
+const textSizes: { value: TextSize; label: string }[] = [
+  { value: 'default', label: t('settings.textDefault') },
+  { value: 'large', label: t('settings.textLarge') },
+  { value: 'largest', label: t('settings.textLargest') },
+]
 
 /**
- * profile-05 · Settings — the live app's page in L3 card rows: Biometric and Dark Mode (switches that apply at once;
- * the whole row toggles), then Accessibility (PM proposal: a row into its own screen; "Low vision mode is on" when on).
- * Prototype: Dark mode and the Accessibility row are live — they read and set the app's real theme (L3 ThemeProvider),
- * like the app's own setting would.
+ * profile-02 … 04 · Settings — three groups:
+ *  - Security: Biometric (a switch card row; the whole card toggles).
+ *  - Theme: Light / Dark / Auto as three selectable cards, each with a small drawing of the app in that theme
+ *    (Auto = light and dark side by side, follows the phone). The chosen card is `selected` (border-dark).
+ *  - Accessibility: Text size (Default / Large / Largest — a pill-group toggle with a live sample above it) and
+ *    Darker colours (a switch: L3's ♿ Accessible theme — stronger text, borders and accents).
+ * Everything applies at once. Prototype: Theme and Darker colours set the app's real theme (L3 ThemeProvider), so
+ * every screen follows; the screen also carries the contrast it shows, so each state looks right.
  */
-export function Settings({ onBack, onAccessibility }: { onBack?: () => void; onAccessibility?: () => void }) {
+export function Settings({ textSize: initialSize = 'default', darker: initialDarker, saveFailed = false, onBack }: Props) {
   const theme = useTheme()
+  const { interactive } = usePreview()
   const [biometric, setBiometric] = useState(true)
-  const dark = theme.mode === 'dark'
-  const lowVision = theme.contrast === 'accessible'
+  const [textSize, setTextSize] = useState<TextSize>(initialSize)
+  const [darker, setDarker] = useState(initialDarker ?? theme.contrast === 'accessible')
+  const [failed, setFailed] = useState(saveFailed)
+  const themeChoice: ThemeChoice = theme.modePreference === 'system' ? 'auto' : theme.modePreference
+  const canPickTheme = theme.availableModes.length > 1
+
+  const changeDarker = (next: boolean) => {
+    setDarker(next)
+    setFailed(false)
+    if (interactive) theme.setContrast(next ? 'accessible' : 'default')
+  }
 
   return (
-    <Screen top={<Actionbar title={t('settings.title')} onBack={onBack} />}>
-      <Inset padding="16">
-        <Stack gap="12">
-        <CardRow
-          toggle
-          icon={msFingerprint}
-          label={t('settings.biometric')}
-          description={t('settings.biometricHint')}
-          trailing={<Switch checked={biometric} onChange={(e) => setBiometric(e.target.checked)} aria-label={t('settings.biometric')} />}
-        />
-        <CardRow
-          toggle
-          icon={msDarkMode}
-          label={t('settings.darkMode')}
-          description={t('settings.darkModeHint')}
-          trailing={
-            <Switch
-              checked={dark}
-              disabled={theme.availableModes.length < 2}
-              onChange={(e) => theme.setModePreference(e.target.checked ? 'dark' : 'light')}
-              aria-label={t('settings.darkMode')}
+    <div className={styles.scope} data-product={theme.product} data-mode={theme.mode} data-contrast={darker ? 'accessible' : undefined}>
+      <Screen
+        top={<Actionbar title={t('settings.title')} onBack={onBack} />}
+        toast={
+          failed && (
+            <Aerobar
+              floating
+              type="danger"
+              emphasis="primary"
+              icon={<Icon icon={msError} />}
+              heading={t('settings.saveFailed')}
+              action={{ label: t('settings.retry'), onClick: () => setFailed(false) }}
+              onDismiss={() => setFailed(false)}
             />
-          }
-        />
-        <CardRow
-          icon={msAccessibilityNew}
-          label={t('settings.accessibility')}
-          description={lowVision ? t('settings.accessibilityOn') : t('settings.accessibilityHint')}
-          onClick={onAccessibility}
-        />
-        </Stack>
-      </Inset>
-    </Screen>
+          )
+        }
+      >
+        <Inset padding="16">
+          <Stack gap="32">
+            <Stack gap="16" as="section" aria-label={t('settings.security')}>
+              <SectionHeader title={t('settings.security')} />
+              <CardRow
+                toggle
+                icon={msFingerprint}
+                label={t('settings.biometric')}
+                description={t('settings.biometricHint')}
+                trailing={<Switch checked={biometric} onChange={(e) => setBiometric(e.target.checked)} aria-label={t('settings.biometric')} />}
+              />
+            </Stack>
+
+            <Stack gap="16" as="section" aria-label={t('settings.theme')}>
+              <SectionHeader title={t('settings.theme')} description={canPickTheme ? t('settings.themeHint') : undefined} />
+              <Grid columns={3} gap="12">
+                {themeChoices.map((c) => (
+                  <Card
+                    key={c.value}
+                    selected={themeChoice === c.value}
+                    aria-label={c.label()}
+                    onClick={() => canPickTheme && theme.setModePreference(c.value === 'auto' ? 'system' : c.value)}
+                  >
+                    <Stack gap="08" align="center">
+                      <ThemePreview choice={c.value} />
+                      <span className={themeChoice === c.value ? styles.optionOn : styles.option}>{c.label()}</span>
+                    </Stack>
+                  </Card>
+                ))}
+              </Grid>
+              {themeChoice === 'auto' && <p className={styles.fine}>{t('settings.themeAutoHint')}</p>}
+            </Stack>
+
+            <Stack gap="16" as="section" aria-label={t('settings.accessibility')}>
+              <SectionHeader title={t('settings.accessibility')} description={t('settings.accessibilityHint')} />
+              <Card>
+                <Stack gap="16">
+                  <Stack direction="horizontal" gap="12" align="center">
+                    <Icon icon={msTextIncrease} />
+                    <Stack gap="04" className={styles.grow}>
+                      <span className={styles.rowLabel}>{t('settings.textSize')}</span>
+                      <span className={styles.rowHint}>{t('settings.textSizeHint')}</span>
+                    </Stack>
+                  </Stack>
+                  {/* Live sample: the text styles at the chosen size. */}
+                  <div className={styles.sample} style={{ zoom: textScale[textSize] }}>
+                    <span className={styles.sampleTitle}>{t('settings.sampleTitle')}</span>
+                    <span className={styles.rowHint}>{t('settings.sampleText')}</span>
+                  </div>
+                  <Tabs
+                    appearance="pill-group"
+                    behavior="toggle"
+                    width="fill"
+                    aria-label={t('settings.textSizeLabel')}
+                    items={textSizes}
+                    value={textSize}
+                    onChange={(v) => { setTextSize(v); setFailed(false) }}
+                  />
+                </Stack>
+              </Card>
+              <CardRow
+                toggle
+                icon={msContrast}
+                label={t('settings.darker')}
+                description={t('settings.darkerHint')}
+                trailing={<Switch checked={darker} onChange={(e) => changeDarker(e.target.checked)} aria-label={t('settings.darker')} />}
+              />
+            </Stack>
+          </Stack>
+        </Inset>
+      </Screen>
+    </div>
   )
 }
 ```
