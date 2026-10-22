@@ -38,7 +38,7 @@
       "id": "profile-03",
       "name": "Settings · accessibility on",
       "figma": "",
-      "note": "Accessibility on: both options ticked — darker colours (♿ Accessible theme) and a bigger font.",
+      "note": "Accessibility on: darker colours (♿ Accessible theme) and a bigger font together; the illustration shows it.",
       "goesTo": [
         "profile-01"
       ],
