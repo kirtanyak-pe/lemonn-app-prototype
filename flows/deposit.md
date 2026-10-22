@@ -621,13 +621,30 @@ export function Intro({ title, description, art, align = 'start', children }: {
   --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
 }
 
-/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
-:root[data-buttons='raised'][data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default'] {
+/*
+ * Secondary and tertiary: only a hint of the effect — no darker bottom (it read as grey), just a faint white light on
+ * top, a soft top highlight and a small drop shadow (no elevation-low). The full effect stays on the filled buttons.
+ */
+:root[data-buttons='raised'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default']:not([data-variant='ghost']) {
   --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-40));
+  --raise-sheen-bottom: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-0));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-50));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
+  box-shadow:
+    inset 0 0 0 var(--btn-border-width) var(--btn-border),
+    inset 0 1px 0 var(--raise-highlight),
+    inset 0 -1px 0 var(--raise-shade),
+    0 1px 2px var(--raise-drop);
+}
+
+/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
+:root[data-buttons='raised'][data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default']:not([data-variant='ghost']) {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-5));
+  --raise-sheen-bottom: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-0));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-5));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
 }
 
 /* Pushed in while pressed: no drop shadow, the bevel turns inward. */

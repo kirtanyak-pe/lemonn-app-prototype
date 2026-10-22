@@ -1,0 +1,269 @@
+{
+  "id": "dash",
+  "title": "DASH AI · Trading rules",
+  "description": "Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "cd84910",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/<screen-id>"
+  },
+  "screens": [
+    {
+      "id": "dash-01",
+      "name": "Intro · coach mark",
+      "figma": "5612:44075",
+      "note": "First visit to F&O home after launch: an L3 coach mark on the DASH pill. Only the top bar is drawn (Figma marks the home \"don’t replicate\").",
+      "goesTo": [
+        "dash-02"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-44075"
+    },
+    {
+      "id": "dash-02",
+      "name": "DASH landing",
+      "figma": "5612:81961",
+      "note": "Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.",
+      "goesTo": [
+        "dash-01",
+        "dash-03",
+        "dash-14"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961"
+    },
+    {
+      "id": "dash-03",
+      "name": "Rules · what to set",
+      "figma": "5612:40261",
+      "note": "Example chips (sideways scroll) send themselves as the message; typing + Send does the same. History opens your rules.",
+      "goesTo": [
+        "dash-02",
+        "dash-14",
+        "dash-04"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261"
+    },
+    {
+      "id": "dash-04",
+      "name": "Thinking",
+      "figma": "5612:40517",
+      "note": "Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).",
+      "goesTo": [
+        "dash-03",
+        "dash-14",
+        "dash-05"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517"
+    },
+    {
+      "id": "dash-05",
+      "name": "DASH asks the limit",
+      "figma": "5612:40650",
+      "note": "The question card takes the input’s place. Any answer (or one typed) builds the preview.",
+      "goesTo": [
+        "dash-03",
+        "dash-14",
+        "dash-06"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650"
+    },
+    {
+      "id": "dash-06",
+      "name": "Rule preview",
+      "figma": "5612:40816",
+      "note": "The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question.",
+      "goesTo": [
+        "dash-03",
+        "dash-14",
+        "dash-05",
+        "dash-07"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40816"
+    },
+    {
+      "id": "dash-07",
+      "name": "Ready · would have saved",
+      "figma": "5612:40971",
+      "note": "Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more.",
+      "goesTo": [
+        "dash-03",
+        "dash-14",
+        "dash-10",
+        "dash-05",
+        "dash-13"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40971"
+    },
+    {
+      "id": "dash-08",
+      "name": "Weak · would have cost profit",
+      "figma": "5612:41698",
+      "note": "Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it.",
+      "goesTo": [
+        "dash-03",
+        "dash-14",
+        "dash-11",
+        "dash-13",
+        "dash-05"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41698"
+    },
+    {
+      "id": "dash-09",
+      "name": "Ready · no backtest data",
+      "figma": "5612:41530",
+      "note": "Not enough trading history to test: a neutral strip.",
+      "goesTo": [
+        "dash-03",
+        "dash-14",
+        "dash-12",
+        "dash-05",
+        "dash-13"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41530"
+    },
+    {
+      "id": "dash-10",
+      "name": "Read more · saved",
+      "figma": "5612:41133",
+      "note": "",
+      "goesTo": [
+        "dash-07"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41133"
+    },
+    {
+      "id": "dash-11",
+      "name": "Read more · cost",
+      "figma": "5612:41268",
+      "note": "Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both.",
+      "goesTo": [
+        "dash-08"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41268"
+    },
+    {
+      "id": "dash-12",
+      "name": "Read more · no data",
+      "figma": "5612:41402",
+      "note": "",
+      "goesTo": [
+        "dash-09"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41402"
+    },
+    {
+      "id": "dash-13",
+      "name": "Rule created",
+      "figma": "5612:41875",
+      "note": "Over the ready screen it was saved from (Figma shows an older card behind it).",
+      "goesTo": [
+        "dash-07",
+        "dash-14"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875"
+    },
+    {
+      "id": "dash-14",
+      "name": "Active rules",
+      "figma": "5612:42076",
+      "note": "Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.",
+      "goesTo": [
+        "dash-02",
+        "dash-15",
+        "dash-03"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
+    },
+    {
+      "id": "dash-15",
+      "name": "Delete rule?",
+      "figma": "5612:42250",
+      "note": "Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).",
+      "goesTo": [
+        "dash-14",
+        "dash-16"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250"
+    },
+    {
+      "id": "dash-16",
+      "name": "Rule deleted",
+      "figma": "5612:42455",
+      "note": "The list behind already has 3 rules.",
+      "goesTo": [
+        "dash-17"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455"
+    },
+    {
+      "id": "dash-17",
+      "name": "Active rules · after delete",
+      "figma": "5612:42076",
+      "note": "Not a Figma frame: the list once the sheet closes (3 rules).",
+      "goesTo": [
+        "dash-02",
+        "dash-15",
+        "dash-03"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
+    }
+  ],
+  "files": [
+    "src/flows/dash/README.md",
+    "src/flows/dash/assets/leaf-back.svg",
+    "src/flows/dash/assets/leaf-front.svg",
+    "src/flows/dash/assets/orb-fill.svg",
+    "src/flows/dash/assets/orb-ring.svg",
+    "src/flows/dash/assets/sparkle.svg",
+    "src/flows/dash/assets/waves.svg",
+    "src/flows/dash/components/BuildOption.module.css",
+    "src/flows/dash/components/BuildOption.tsx",
+    "src/flows/dash/components/Chat.module.css",
+    "src/flows/dash/components/Chat.tsx",
+    "src/flows/dash/components/DashEntry.module.css",
+    "src/flows/dash/components/DashEntry.tsx",
+    "src/flows/dash/components/DashOrb.module.css",
+    "src/flows/dash/components/DashOrb.tsx",
+    "src/flows/dash/components/DashScreen.module.css",
+    "src/flows/dash/components/DashScreen.tsx",
+    "src/flows/dash/components/QuestionCard.module.css",
+    "src/flows/dash/components/QuestionCard.tsx",
+    "src/flows/dash/components/RuleCard.module.css",
+    "src/flows/dash/components/RuleCard.tsx",
+    "src/flows/dash/components/RuleSummary.module.css",
+    "src/flows/dash/components/RuleSummary.tsx",
+    "src/flows/dash/copy.json",
+    "src/flows/dash/copy.ts",
+    "src/flows/dash/data.ts",
+    "src/flows/dash/index.tsx",
+    "src/flows/dash/screens/ActiveRules.module.css",
+    "src/flows/dash/screens/ActiveRules.tsx",
+    "src/flows/dash/screens/Intro.module.css",
+    "src/flows/dash/screens/Intro.tsx",
+    "src/flows/dash/screens/Landing.module.css",
+    "src/flows/dash/screens/Landing.tsx",
+    "src/flows/dash/screens/RuleChat.module.css",
+    "src/flows/dash/screens/RuleChat.tsx",
+    "src/flows/dash/screens/RulesHome.module.css",
+    "src/flows/dash/screens/RulesHome.tsx",
+    "src/flows/dash/sheets/RuleSheets.module.css",
+    "src/flows/dash/sheets/RuleSheets.tsx"
+  ],
+  "shared": [
+    "src/shared/copy.ts",
+    "src/shared/data/format.ts",
+    "src/shared/data/user.ts",
+    "src/shared/prototype.ts",
+    "src/shared/ui/Raised.module.css",
+    "src/shared/ui/Screen.module.css",
+    "src/shared/ui/Screen.tsx",
+    "src/shared/ui/Sheet.module.css",
+    "src/shared/ui/Sheet.tsx",
+    "src/shared/ui/Spot.module.css",
+    "src/shared/ui/Spot.tsx"
+  ]
+}
