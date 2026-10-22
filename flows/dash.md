@@ -1147,9 +1147,9 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
             </div>
             <Stack direction="horizontal" align="center" justify="between" gap="12">
               {state.kind === 'onChart' ? (
-                <Button variant="secondary" size="md" iconLeft={<Icon icon={msCheck} />} disabled>{t('indicator.onChart')}</Button>
+                <Button variant="secondary" fullWidth iconLeft={<Icon icon={msCheck} />} disabled>{t('indicator.onChart')}</Button>
               ) : (
-                <Button variant="brand" size="md" iconLeft={<Icon icon={msAdd} />} loading={state.kind === 'adding'} onClick={onAdd}>
+                <Button variant="primary" fullWidth iconLeft={<Icon icon={msAdd} />} loading={state.kind === 'adding'} onClick={onAdd}>
                   {state.kind === 'adding' ? t('indicator.adding') : t('indicator.addToChart')}
                 </Button>
               )}
