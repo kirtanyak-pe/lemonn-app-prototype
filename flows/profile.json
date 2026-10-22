@@ -57,6 +57,8 @@
   ],
   "files": [
     "src/flows/profile/README.md",
+    "src/flows/profile/components/AccessibilityPreview.module.css",
+    "src/flows/profile/components/AccessibilityPreview.tsx",
     "src/flows/profile/components/CardRow.tsx",
     "src/flows/profile/components/SettingCard.module.css",
     "src/flows/profile/components/SettingCard.tsx",

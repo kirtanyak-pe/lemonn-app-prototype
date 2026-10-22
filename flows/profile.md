@@ -78,7 +78,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 | Disclosure | text + Button | Description/12 tertiary, 5 lines; `ghost` `sm` Read More / Read less |
 | Setting cards | Card (static) — `components/SettingCard` | header: icon 24 · Label/16 (+ Description/12, not on Theme) · Switch (the header is a label: tap anywhere toggles); cards 12 apart |
 | Theme | Tabs | `appearance="pill-group"`, `behavior="toggle"`, `width="fill"`, icons light_mode / dark_mode / brightness_auto |
-| Accessibility options | Checkbox rows + example | under a hairline, the checkbox in the icon column; shown only while Accessibility is on; example = grey box with a stock row (PriceChange `unit="currency"`) |
+| Accessibility options | Checkbox rows + example | under a hairline, the checkbox in the icon column; shown only while Accessibility is on; illustration = `components/AccessibilityPreview` (Avatar, PriceChange `unit="currency"`, abstract lines, discover badge) |
 | Failed save | Aerobar (toast) | `floating`, `type="danger"`, `emphasis="primary"`, icon error, `action` Retry |
 
 ### Rules & behaviour
@@ -88,8 +88,9 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - **Settings apply at once** (no Save).
 - **Theme:** Light, Dark, or Auto (follows the phone's light / dark setting). CS PRO has only a dark theme → the
   toggle does nothing there.
-- **Accessibility:** a switch. On, two options appear, both ticked; off turns both off. Under them an **Example**
-  (a stock row in a small grey box) shows what the ticked options do — darker colours and the bigger font.
+- **Accessibility:** a switch. On, two options appear, both ticked; off turns both off. Under them an **illustration**
+  (a little phone screen with a stock card running off its edge and the accessibility badge on its corner, like
+  Android's settings illustrations) shows what the ticked options do — darker colours and the bigger font.
   - **Make the colours darker:** L3's ♿ Accessible theme (`data-contrast="accessible"`: stronger secondary /
     tertiary text, borders and accents). Every screen uses semantic tokens, so nothing else changes.
   - **Increase the font size:** every text style 1.15× across the app (Flutter: `MediaQuery.textScaler`). Layouts
@@ -127,9 +128,140 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - 2026-10-22 — Settings compacted: three matching setting cards; Theme as a pill toggle; Accessibility = a switch
   that opens two checkboxes (darker colours, bigger font).
 - 2026-10-22 — Accessibility: both options ticked when switched on; an example row shows their effect.
+- 2026-10-22 — the example became an illustration (phone screen + card + badge), after the user's Android reference.
 
 
 ## Source — this flow
+
+### `src/flows/profile/components/AccessibilityPreview.module.css`
+
+```css
+/* Accessibility illustration — tokens only. A small "phone screen" (inverted-depth panel) holding a card that bleeds
+   off its right edge, and a badge over the card's corner (Android-settings style). */
+.screen {
+  position: relative;
+  overflow: hidden;
+  padding: var(--l3-spacing-12) 0 var(--l3-spacing-16) var(--l3-spacing-16);
+  border-radius: var(--l3-radius-16);
+  background: var(--l3-surface-secondary);
+}
+
+.status {
+  display: flex;
+  gap: var(--l3-spacing-08);
+  align-items: center;
+  margin-bottom: var(--l3-spacing-12);
+}
+
+.time {
+  margin-right: var(--l3-spacing-04);
+  font: var(--l3-text-label-12);
+  color: var(--l3-content-primary);
+}
+
+.dot {
+  width: var(--l3-spacing-08);
+  height: var(--l3-spacing-08);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-content-secondary);
+}
+
+/* The card runs off the right edge (no right border / radius), like a notification peeking in. */
+.card {
+  display: flex;
+  gap: var(--l3-spacing-12);
+  align-items: flex-start;
+  margin-right: calc(-1 * var(--l3-spacing-16));
+  padding: var(--l3-spacing-12) var(--l3-spacing-48) var(--l3-spacing-24) var(--l3-spacing-12);
+  border: 1px solid var(--l3-border-light); /* 1px hairline */
+  border-right: 0;
+  border-radius: var(--l3-radius-16) 0 0 var(--l3-radius-16);
+  background: var(--l3-surface-default);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  min-width: 0;
+}
+
+.name {
+  font: var(--l3-text-label-14);
+  color: var(--l3-content-primary);
+  white-space: nowrap;
+}
+
+/* An abstract line, painted in the hint-text colour — it gets stronger with darker colours. */
+.line {
+  width: 80%;
+  height: var(--l3-spacing-08);
+  margin-block: var(--l3-spacing-04);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-content-tertiary);
+}
+
+.price {
+  font: var(--l3-text-label-14);
+  color: var(--l3-content-primary);
+}
+
+/* The feature badge over the card's bottom-right corner. */
+.badge {
+  position: absolute;
+  right: var(--l3-spacing-16);
+  bottom: var(--l3-spacing-08);
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-48);
+  height: var(--l3-size-48);
+  border-radius: var(--l3-radius-16);
+  background: var(--l3-surface-accent-discover-light);
+  color: var(--l3-content-accent-discover-default);
+  box-shadow: var(--l3-shadow-elevation-low);
+}
+```
+
+### `src/flows/profile/components/AccessibilityPreview.tsx`
+
+```tsx
+import { Avatar } from '@l3/components/Avatar'
+import { Icon } from '@l3/components/Icon'
+import { PriceChange } from '@l3/components/PriceChange'
+import { msAccessibilityNew } from '@l3/icons/material'
+import { LARGE_TEXT_SCALE, sample, type AccessibilityOptions } from '../data'
+import styles from './AccessibilityPreview.module.css'
+
+/**
+ * An illustration of what Accessibility does (like Android's settings illustrations): a little phone screen — the
+ * time and a few status shapes — with a stock card running off its right edge (abstract lines + the real name, price
+ * and change), and the accessibility badge on its corner. Painted with the page's tokens, so "darker colours" shows
+ * in it; "bigger font" scales the card's text. Decorative: the checkboxes above say what's on.
+ */
+export function AccessibilityPreview({ options }: { options: AccessibilityOptions }) {
+  return (
+    <div className={styles.screen} aria-hidden="true">
+      <div className={styles.status}>
+        <span className={styles.time}>9:30</span>
+        <span className={styles.dot} />
+        <span className={styles.dot} />
+        <span className={styles.dot} />
+      </div>
+      <div className={styles.card}>
+        <Avatar initials="R" size={40} />
+        <div className={styles.body} style={options.largeText ? { zoom: LARGE_TEXT_SCALE } : undefined}>
+          <span className={styles.name}>{sample.name}</span>
+          <span className={styles.line} />
+          <span className={styles.price}>{sample.price}</span>
+          <PriceChange value={sample.change} unit="currency" percent={sample.changePercent} size="sm" />
+        </div>
+      </div>
+      <span className={styles.badge}><Icon icon={msAccessibilityNew} /></span>
+    </div>
+  )
+}
+```
 
 ### `src/flows/profile/components/CardRow.tsx`
 
@@ -305,9 +437,7 @@ export function SettingCard({ icon, label, description, control, children }: Pro
   "settings.themeLabel": "Theme",
   "settings.darker": "Make the colours darker",
   "settings.largeText": "Increase the font size",
-  "settings.optionsLabel": "Accessibility options",
-  "settings.example": "Example",
-  "settings.exampleLabel": "Example: a stock row with these options"
+  "settings.optionsLabel": "Accessibility options"
 }
 ```
 
@@ -501,32 +631,6 @@ export const profile: Flow = {
   place-items: center;
 }
 
-/* Accessibility example: a small grey box (L3: grey for small highlights) holding a stock row. */
-.example {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-08);
-  padding: var(--l3-spacing-12);
-  border-radius: var(--l3-radius-08);
-  background: var(--l3-surface-secondary);
-}
-
-.exampleTitle {
-  font: var(--l3-text-description-12);
-  color: var(--l3-content-tertiary);
-}
-
-.exampleRow {
-  display: flex;
-  gap: var(--l3-spacing-12);
-  align-items: center;
-}
-
-.sampleName {
-  font: var(--l3-text-label-14);
-  color: var(--l3-content-primary);
-}
-
 .rowHint {
   font: var(--l3-text-description-12);
   color: var(--l3-content-secondary);
@@ -663,7 +767,6 @@ import { Aerobar } from '@l3/components/Aerobar'
 import { Checkbox } from '@l3/components/Checkbox'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
-import { PriceChange } from '@l3/components/PriceChange'
 import { Stack } from '@l3/components/Stack'
 import { Switch } from '@l3/components/Switch'
 import { Tabs } from '@l3/components/Tabs'
@@ -671,9 +774,10 @@ import { msAccessibilityNew, msBrightnessAuto, msDarkMode, msError, msFingerprin
 import { useTheme } from '@l3/theme'
 import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
+import { AccessibilityPreview } from '../components/AccessibilityPreview'
 import { SettingCard } from '../components/SettingCard'
 import { t } from '../copy'
-import { LARGE_TEXT_SCALE, sample, type AccessibilityOptions, type ThemeChoice } from '../data'
+import { type AccessibilityOptions, type ThemeChoice } from '../data'
 import styles from './Profile.module.css'
 
 type Props = {
@@ -696,9 +800,9 @@ const themeChoices: { value: ThemeChoice; label: string; icon: typeof msLightMod
  *  - Theme: Light / Dark / Auto as a pill-group toggle under the header (Auto follows the phone).
  *  - Accessibility: a switch; switched on, two checkbox rows open under it — Make the colours darker (L3's ♿
  *    Accessible theme) and Increase the font size (every text style 1.15×) — both ticked when it's switched on —
- *    and a small example (a stock row) showing their effect. Turning Accessibility off turns both off.
+ *    and an illustration (a little phone screen with a stock card and the accessibility badge) showing their effect. Turning Accessibility off turns both off.
  * Everything applies at once. Prototype: Theme and darker colours set the app's real theme (L3 ThemeProvider); the
- * screen also carries the contrast it shows, and the bigger font is shown on the example.
+ * screen also carries the contrast it shows, and the bigger font is shown in the illustration.
  */
 export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
   const theme = useTheme()
@@ -777,20 +881,7 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
                       <Checkbox checked={options.largeText} onChange={(e) => update({ ...options, largeText: e.target.checked })} />
                       <span>{t('settings.largeText')}</span>
                     </label>
-                    {/* A small example of what the options change: a stock row as it will look. */}
-                    <div className={styles.example} aria-label={t('settings.exampleLabel')} role="img">
-                      <span className={styles.exampleTitle}>{t('settings.example')}</span>
-                      <div className={styles.exampleRow} style={options.largeText ? { zoom: LARGE_TEXT_SCALE } : undefined}>
-                        <Stack gap="04" className={styles.grow}>
-                          <span className={styles.sampleName}>{sample.name}</span>
-                          <span className={styles.rowHint}>{sample.detail}</span>
-                        </Stack>
-                        <Stack gap="04" align="end">
-                          <span className={styles.sampleName}>{sample.price}</span>
-                          <PriceChange value={sample.change} unit="currency" percent={sample.changePercent} size="sm" />
-                        </Stack>
-                      </div>
-                    </div>
+                    <AccessibilityPreview options={options} />
                   </Stack>
                 )}
               </SettingCard>
