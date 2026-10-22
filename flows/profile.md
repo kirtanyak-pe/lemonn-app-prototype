@@ -95,6 +95,9 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
     tertiary text, borders and accents). Every screen uses semantic tokens, so nothing else changes.
   - **Increase the font size:** every text style 1.15× across the app (Flutter: `MediaQuery.textScaler`). Layouts
     must reflow (rows grow, nothing clipped). The prototype shows it on the Settings screen.
+- **Motion:** the Accessibility options slide open / shut (height + fade, motion/duration-medium). A theme or darker-
+  colours change cross-fades the page, and the chosen theme pill slides to its new place (View Transitions;
+  Flutter: `AnimatedSize` + `AnimatedTheme`). None with reduced motion.
 - **Saving fails:** the controls show what's stored, and an error toast offers Retry.
 - Prototype only: Theme and Darker colours change the prototype's real theme (and stay in this browser).
 
@@ -129,6 +132,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
   that opens two checkboxes (darker colours, bigger font).
 - 2026-10-22 — Accessibility: both options ticked when switched on; an example row shows their effect.
 - 2026-10-22 — the example became an illustration (phone screen + card + badge), after the user's Android reference.
+- 2026-10-22 — motion: accessibility options slide open; theme / darker-colour changes cross-fade, the theme pill slides.
 
 
 ## Source — this flow
@@ -337,6 +341,37 @@ label.head {
   font: var(--l3-text-description-12);
   color: var(--l3-content-secondary);
 }
+
+/* Content under the header, 12 below it. */
+.more {
+  padding-top: var(--l3-spacing-12);
+}
+
+/* Opening content: slides open (height 0 → its own) and fades in; reverse when closing. */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--l3-motion-duration-medium) var(--l3-motion-easing-standard),
+    opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+.reveal[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.revealInner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transition: none;
+  }
+}
 ```
 
 ### `src/flows/profile/components/SettingCard.tsx`
@@ -356,17 +391,20 @@ type Props = {
   control?: ReactNode
   /** What the setting opens up underneath (theme choices, accessibility options), 12 below the header. */
   children?: ReactNode
+  /** Content that opens and closes (accessibility options): it slides open / shut instead of appearing. */
+  open?: boolean
 }
 
 /**
  * One setting on the Settings page, all built the same so the page reads as one set: a static L3 Card (12 padding)
- * with a header row — icon · label (Label/16) + description (Description/12) · switch — and optional content below.
+ * with a header row — icon · label (Label/16) + description (Description/12) · switch — and optional content below
+ * (static, or sliding open / shut with `open`).
  */
-export function SettingCard({ icon, label, description, control, children }: Props) {
+export function SettingCard({ icon, label, description, control, children, open }: Props) {
   const Head = control ? 'label' : 'div'
   return (
     <Card>
-      <Stack gap="12">
+      <Stack>
         <Head className={styles.head}>
           <Icon icon={icon} />
           <Stack gap="04" className={styles.text}>
@@ -375,7 +413,13 @@ export function SettingCard({ icon, label, description, control, children }: Pro
           </Stack>
           {control}
         </Head>
-        {children}
+        {children && open === undefined && <div className={styles.more}>{children}</div>}
+        {children && open !== undefined && (
+          // Height animates from 0 to the content's own (grid rows 0fr → 1fr); closed content is inert.
+          <div className={styles.reveal} data-open={open || undefined} inert={!open}>
+            <div className={styles.revealInner}><div className={styles.more}>{children}</div></div>
+          </div>
+        )}
       </Stack>
     </Card>
   )
@@ -635,6 +679,18 @@ export const profile: Flow = {
   font: var(--l3-text-description-12);
   color: var(--l3-content-secondary);
 }
+
+/* Theme change (view transition): the chosen pill slides to its new place while the page's colours cross-fade. */
+.themeTabs [aria-selected='true'] {
+  view-transition-name: theme-pill;
+}
+
+:global(::view-transition-group(theme-pill)),
+:global(::view-transition-old(root)),
+:global(::view-transition-new(root)) {
+  animation-duration: var(--l3-motion-duration-medium);
+  animation-timing-function: var(--l3-motion-easing-standard);
+}
 ```
 
 ### `src/flows/profile/screens/Profile.tsx`
@@ -762,6 +818,7 @@ export function Profile({ onBack, onSettings, onLogout }: Props) {
 
 ```tsx
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Actionbar } from '@l3/components/Actionbar'
 import { Aerobar } from '@l3/components/Aerobar'
 import { Checkbox } from '@l3/components/Checkbox'
@@ -786,6 +843,17 @@ type Props = {
   /** A save that just failed: the error toast with Retry. */
   saveFailed?: boolean
   onBack?: () => void
+}
+
+/**
+ * Theme change, animated: the browser's View Transition cross-fades the old colours into the new ones, and the chosen
+ * pill (view-transition-name in Profile.module.css) slides to its new place. Plain change where it isn't supported or
+ * motion is reduced.
+ */
+const withTransition = (change: () => void) => {
+  const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
+  if (!doc.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return change()
+  doc.startViewTransition(() => flushSync(change))
 }
 
 const themeChoices: { value: ThemeChoice; label: string; icon: typeof msLightMode }[] = [
@@ -815,9 +883,14 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
   const themeChoice: ThemeChoice = theme.modePreference === 'system' ? 'auto' : theme.modePreference
 
   const update = (next: AccessibilityOptions) => {
-    setOptions(next)
-    setFailed(false)
-    if (interactive) theme.setContrast(next.darker ? 'accessible' : 'default')
+    const apply = () => {
+      setOptions(next)
+      setFailed(false)
+      if (interactive) theme.setContrast(next.darker ? 'accessible' : 'default')
+    }
+    // Darker colours change the whole page's colours: cross-fade them like a theme change.
+    if (next.darker !== options.darker) withTransition(apply)
+    else apply()
   }
   const toggle = (next: boolean) => {
     setOn(next)
@@ -861,7 +934,8 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
                   aria-label={t('settings.themeLabel')}
                   items={themeChoices.map((c) => ({ value: c.value, label: c.label, iconLeft: <Icon icon={c.icon} size={16} /> }))}
                   value={themeChoice}
-                  onChange={(v) => theme.availableModes.length > 1 && theme.setModePreference(v === 'auto' ? 'system' : v)}
+                  className={styles.themeTabs}
+                  onChange={(v) => theme.availableModes.length > 1 && withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))}
                 />
               </SettingCard>
 
@@ -870,8 +944,8 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
                 label={t('settings.accessibility')}
                 description={t('settings.accessibilityHint')}
                 control={<Switch checked={on} onChange={(e) => toggle(e.target.checked)} />}
+                open={on}
               >
-                {on && (
                   <Stack gap="16" className={styles.options} role="group" aria-label={t('settings.optionsLabel')}>
                     <label className={styles.check}>
                       <Checkbox checked={options.darker} onChange={(e) => update({ ...options, darker: e.target.checked })} />
@@ -883,7 +957,6 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
                     </label>
                     <AccessibilityPreview options={options} />
                   </Stack>
-                )}
               </SettingCard>
             </Stack>
           </Inset>
