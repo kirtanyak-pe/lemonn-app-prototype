@@ -10,13 +10,13 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machi
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `stocks-01` | Home | — | `search-01` | Top of the page: search, indices, holdings, products, shortcuts. |
-| `stocks-02` | Home · top movers & watchlists | — | `search-01` | Same page, scrolled. |
-| `stocks-03` | Home · top losers | — | `search-01` | The "Top losers" chip picked. |
-| `stocks-04` | Home · Smart Invest | — | `search-01` | Same page, scrolled: managed strategies, then the announcement. |
-| `stocks-05` | Home · sectors & highlights | — | `search-01` | Same page, scrolled. |
-| `stocks-06` | Home · trade ideas | — | `search-01` | Same page, scrolled: featured ideas, neighbours peek. |
-| `stocks-07` | Home · idea baskets & disclosure | — | `search-01` | The end of the page. |
+| `stocks-01` | Home | — | `search-01`, `profile-01` | Top of the page: search, indices, holdings, products, shortcuts. |
+| `stocks-02` | Home · top movers & watchlists | — | `search-01`, `profile-01` | Same page, scrolled. |
+| `stocks-03` | Home · top losers | — | `search-01`, `profile-01` | The "Top losers" chip picked. |
+| `stocks-04` | Home · Smart Invest | — | `search-01`, `profile-01` | Same page, scrolled: managed strategies, then the announcement. |
+| `stocks-05` | Home · sectors & highlights | — | `search-01`, `profile-01` | Same page, scrolled. |
+| `stocks-06` | Home · trade ideas | — | `search-01`, `profile-01` | Same page, scrolled: featured ideas, neighbours peek. |
+| `stocks-07` | Home · idea baskets & disclosure | — | `search-01`, `profile-01` | The end of the page. |
 
 ## Spec (README.md)
 
@@ -1127,9 +1127,8 @@ export const ideaBaskets: IdeaBasket[] = [
   { id: 'oil-and-gas', name: 'Oil & gas', stocks: [stocks.ONGC, stocks.OIL, stocks.IOC, stocks.BPCL, stocks.JINDALSTEL] },
 ]
 
-/** The broker's regulatory line (shortened; "Read more" opens the full text). */
-export const disclosure =
-  'The online broking and mutual fund execution services are provided by NU Investors Technologies Pvt. Ltd. | CIN U67200MH2021PTC364704 | SEBI Registration No. INZ000304837 | SEBI DP Registration No. IN-DP-712-2022 | SEBI Research Analyst Registration No. INH000016764 | NSE member code 90251.'
+/** The broker's regulatory line (shared with Profile). */
+export { disclosure } from '../../shared/data/broker'
 ```
 
 ### `src/flows/stocks/index.tsx`
@@ -1149,13 +1148,13 @@ export const stocks: Flow = {
   description: 'The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.',
   figmaFile: '',
   screens: [
-    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} /> },
-    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="movers" /> },
-    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="movers" movers="losers" /> },
-    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="invest" /> },
-    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="sectors" /> },
-    { id: 'stocks-06', name: 'Home · trade ideas', figma: '', note: 'Same page, scrolled: featured ideas, neighbours peek.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="ideas" /> },
-    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} scrollTo="more" /> },
+    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} /> },
+    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" /> },
+    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" movers="losers" /> },
+    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="invest" /> },
+    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="sectors" /> },
+    { id: 'stocks-06', name: 'Home · trade ideas', figma: '', note: 'Same page, scrolled: featured ideas, neighbours peek.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="ideas" /> },
+    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="more" /> },
   ],
 }
 ```
@@ -1227,6 +1226,8 @@ type Props = {
   onTab?: (section: NavSection) => void
   /** Tapping the search field opens the Search screen (search-01), where the typing happens. */
   onSearch?: () => void
+  /** The profile icon opens Profile & settings (profile-01). */
+  onProfile?: () => void
 }
 
 /**
@@ -1236,7 +1237,7 @@ type Props = {
  * products; and on the rounded sheet over it, the feed: shortcuts, top movers, watchlists, Smart Invest (brand tint),
  * an announcement, sectors, highlights, trade ideas (discover tint), idea baskets and the broker's disclosure.
  */
-export function Home({ scrollTo = 'top', movers, onTab, onSearch }: Props) {
+export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile }: Props) {
   const [query, setQuery] = useState('')
   const page = useRef<HTMLDivElement>(null)
 
@@ -1259,7 +1260,7 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch }: Props) {
             actions={
               <>
                 <ActionbarAction icon={msAccountBalanceWallet} label={t('top.wallet')} onClick={() => {}} />
-                <ActionbarAction icon={msAccountCircle} label={t('top.profile')} onClick={() => {}} />
+                <ActionbarAction icon={msAccountCircle} label={t('top.profile')} onClick={onProfile ?? (() => {})} />
               </>
             }
           />
@@ -1315,6 +1316,16 @@ export function makeCopy<Copy extends Record<string, string>>(flow: string, copy
     return vars ? template.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : template
   }
 }
+```
+
+### `src/shared/data/broker.ts`
+
+```ts
+// The broker behind the Lemonn app — shown wherever the app needs its regulatory line (Stocks home, Profile).
+
+/** The broker's regulatory line, in full. */
+export const disclosure =
+  'The online broking and mutual fund execution services are provided by NU Investors Technologies Pvt. Ltd. | CIN U67200MH2021PTC364704 | SEBI Registration No. INZ000304837 | SEBI DP Registration No. IN-DP-712-2022 | SEBI Research Analyst Registration No. INH000016764 | NSE member code 90251.'
 ```
 
 ### `src/shared/data/format.ts`

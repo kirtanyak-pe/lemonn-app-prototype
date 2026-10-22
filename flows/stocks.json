@@ -18,7 +18,8 @@
       "figma": "",
       "note": "Top of the page: search, indices, holdings, products, shortcuts.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -28,7 +29,8 @@
       "figma": "",
       "note": "Same page, scrolled.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -38,7 +40,8 @@
       "figma": "",
       "note": "The \"Top losers\" chip picked.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -48,7 +51,8 @@
       "figma": "",
       "note": "Same page, scrolled: managed strategies, then the announcement.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -58,7 +62,8 @@
       "figma": "",
       "note": "Same page, scrolled.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -68,7 +73,8 @@
       "figma": "",
       "note": "Same page, scrolled: featured ideas, neighbours peek.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -78,7 +84,8 @@
       "figma": "",
       "note": "The end of the page.",
       "goesTo": [
-        "search-01"
+        "search-01",
+        "profile-01"
       ],
       "figmaUrl": ""
     }
@@ -99,6 +106,7 @@
   ],
   "shared": [
     "src/shared/copy.ts",
+    "src/shared/data/broker.ts",
     "src/shared/data/format.ts",
     "src/shared/data/market.ts",
     "src/shared/data/portfolio.ts",
