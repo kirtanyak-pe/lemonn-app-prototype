@@ -191,6 +191,8 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-23 — Suggestion chips: L3's 14 line height (20) instead of 100% so wrapped text breathes (one line stays 40 tall, text centred); lines balance, and a wrapped chip hugs its longest line (no empty space on its right).
+
 - 2026-10-23 — Landing: Create Custom Indicator moved to the top (indicator · rules · strategy).
 
 - 2026-10-23 — Custom indicator, ready / on chart: scrolling the chat down folds the pinned indicator card to a mini card (small chart preview · name · where it goes · tag, 66 tall instead of 374, 300 ms ease in and out); scrolling back to the top or tapping it opens it. Only the user's own wheel / swipe folds it, never the chat moving to its newest message. The hint under the input (“Ask for changes in plain words…”) is removed for now.
@@ -1990,20 +1992,22 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
 }
 
-/* In the vertical suggestions list: 40 tall, size 14 at 100% line height, 12 / 16 padding (designer's One Canvas
-   edit). Never wider than the list (the screen's 16 margins stay): a long suggestion wraps onto a second line and the
+/* In the vertical suggestions list: 40 tall, size 14 (designer's One Canvas edit) on L3's 14 line height (20), the text
+   centred in the chip, so one line stays 40 and wrapped lines breathe. A wrapped chip hugs its longest line (Chat.tsx). Never wider than the list (the screen's 16 margins stay): a long suggestion wraps onto a second line and the
    chip grows taller, keeping a 20 corner (half its one-line height) instead of a full pill. */
 .promptChip[data-size='lg'] {
   max-width: 100%;
   min-height: var(--l3-size-40);
-  padding: var(--l3-spacing-12) var(--l3-spacing-16);
+  display: flex;
+  align-items: center;
+  padding: var(--l3-spacing-08) var(--l3-spacing-16);
   border-radius: var(--l3-radius-20);
   font: var(--l3-text-label-16);
   font-size: var(--l3-font-size-200);
-  line-height: 100%;
+  line-height: var(--l3-line-height-200);
   white-space: normal;
   text-align: start;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 /* "Top 3 suggestions ✦": Heading/16 in the success green, the DASH sparkle after it. */
@@ -2123,7 +2127,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 ### `src/flows/dash/components/Chat.tsx`
 
 ```tsx
-import { useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
@@ -2235,21 +2239,67 @@ export function PromptChips({ rows, onPick }: { rows: string[][]; onPick?: (prom
  * suggestions ✦" label, then one DASH chip per line, left-aligned. A chip sends itself.
  */
 export function SuggestionList({ items, onPick }: { items: string[]; onPick?: (prompt: string, from: HTMLElement) => void }) {
+  const list = useRef<HTMLElement>(null)
+  useLayoutEffect(() => {
+    const el = list.current
+    if (!el) return
+    const fit = () => hugWrappedChips(el)
+    fit()
+    document.fonts?.ready.then(fit)
+    window.addEventListener('resize', fit)
+    return () => window.removeEventListener('resize', fit)
+  }, [items])
   return (
     <Stack as="section" gap="16" align="start" aria-label={t('examples.label')}>
       <h2 className={styles.topLabel}>
         {t('rulesHome.topSuggestions', { count: items.length })}
         <img src={sparkle} alt="" className={styles.topSparkle} />
       </h2>
-      <Stack gap="12" align="start">
+      <Stack gap="12" align="start" ref={list}>
         {items.map((prompt) => (
           <button key={prompt} type="button" className={styles.promptChip} data-size="lg" onClick={(e) => onPick?.(prompt, e.currentTarget)}>
-            {prompt}
+            <span>{prompt}</span>
           </button>
         ))}
       </Stack>
     </Stack>
   )
+}
+
+/**
+ * A suggestion that wraps onto a second line would keep the full width, leaving a gap after its longest line. This
+ * hugs each wrapped chip to its longest line (+ its padding and edge); one-line chips are left as they are. Measured
+ * from the text's line boxes after resetting every chip, so it settles in one pass (and again on resize / font load).
+ */
+function hugWrappedChips(list: HTMLElement) {
+  const chips = [...list.querySelectorAll<HTMLElement>('button')]
+  chips.forEach((chip) => (chip.style.width = ''))
+  // Balanced lines re-break at the new width, so hug again until nothing narrows (two or three passes).
+  for (let pass = 0; pass < 4; pass++) {
+    const widths = chips.map(longestLineWidth)
+    let narrowed = false
+    chips.forEach((chip, i) => {
+      const w = widths[i]
+      if (w !== null && w < chip.offsetWidth) {
+        chip.style.width = `${w}px`
+        narrowed = true
+      }
+    })
+    if (!narrowed) return
+  }
+}
+
+/** A wrapped chip's width hugging its longest line (+ padding and edge); null for a chip on one line. */
+function longestLineWidth(chip: HTMLElement): number | null {
+  const range = document.createRange()
+  range.selectNodeContents(chip.firstElementChild ?? chip)
+  const lines = [...range.getClientRects()]
+  const tops = new Set(lines.map((r) => Math.round(r.top)))
+  if (tops.size < 2) return null // one line: nothing to hug
+  const longest = Math.max(...lines.map((r) => r.right)) - Math.min(...lines.map((r) => r.left))
+  const cs = getComputedStyle(chip)
+  const sides = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'] as const
+  return Math.ceil(longest + sides.reduce((sum, side) => sum + parseFloat(cs[side]), 0))
 }
 
 /** What the user sent: a grey pill on the right. */
