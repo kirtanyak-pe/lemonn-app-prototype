@@ -51,7 +51,7 @@ links, Rate Us, About, View Details) is tappable but goes nowhere in the prototy
 From `data.ts` (fictional) and `src/shared/data/user.ts` (the sample user):
 - `user.name` (header; avatar initials), `balance` (₹, may be negative: shown `Balance : −₹245.30`),
   `INSTANT_BALANCE` (₹149), `APP_VERSION` (`7.2.38 (3)`).
-- Settings: `ThemeChoice` (`light` / `dark` / `auto`), Accessibility on / off, `LARGE_TEXT_SCALE` (1.15×).
+- Settings: `ThemeChoice` (`light` / `dark` / `auto`), Accessibility on / off, large text = every text style +2px.
 - API: get profile (name, avatar, bank verified, balance); save preferences (biometric, theme, text size, darker colours) —
   the save can fail (profile-04).
 - The broker's regulatory line: `src/shared/data/broker.ts` (also on the Stocks home).
@@ -90,8 +90,9 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - **Accessibility:** ONE switch ("Darker colours and bigger text"). On, both apply together:
   - **Darker colours:** L3's ♿ Accessible theme (`data-contrast="accessible"`: stronger secondary / tertiary text,
     borders and accents). Every screen uses semantic tokens, so nothing else changes.
-  - **Bigger font:** every text style 1.15× across the app (Flutter: `MediaQuery.textScaler`). Layouts must reflow
-    (rows grow, nothing clipped). Not shown in the prototype.
+  - **Bigger font:** every text style 2px bigger across the app, line heights too (L3 base sizes 10 → 12 … 36 → 38;
+    prototype: `html[data-text-size="large"]` in src/local-tokens.css, src/shared/textSize.ts). Layouts must reflow
+    (rows grow, nothing clipped).
 - **Motion:** a theme or Accessibility change cross-fades the page, and the chosen theme pill slides to its new place (View Transitions;
   Flutter: `AnimatedSize` + `AnimatedTheme`). None with reduced motion.
 - **Saving fails:** the controls show what's stored, and an error toast offers Retry.
@@ -114,7 +115,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - **Avatar colour / size:** no colour option (its default fill disappears on `surface-secondary`, so the profile
   sets the discover fill locally) and nothing above 48.
 - **Tag next to a list cell's label:** no slot; the Verified tag goes in `trailing`.
-- **Text scale:** L3 has no text-scale tokens; the prototype doesn't show the bigger font.
+- **Text scale:** L3 has no text-scale tokens; large text is a local override of the base sizes (src/local-tokens.css).
 - **Setting card with options:** no L3 component for a card with a switch header and content below
   (`components/SettingCard`).
 
@@ -130,6 +131,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - 2026-10-22 — motion: accessibility options slide open; theme / darker-colour changes cross-fade, the theme pill slides.
 - 2026-10-22 — Accessibility: one switch for darker colours + bigger text (checkboxes removed).
 - 2026-10-22 — Accessibility illustration removed (user's call).
+- 2026-10-22 — Accessibility on makes every text style 2px bigger across the whole app.
 
 
 ## Source — this flow
@@ -341,9 +343,6 @@ export const INSTANT_BALANCE = 149
 
 /** The app version shown under About. */
 export const APP_VERSION = '7.2.38 (3)'
-
-/** Accessibility on: every text style gets this much bigger (and the colours switch to ♿ Accessible). */
-export const LARGE_TEXT_SCALE = 1.15
 
 
 /** Theme choices: Auto follows the phone's light / dark setting. */
@@ -630,6 +629,7 @@ import { Tabs } from '@l3/components/Tabs'
 import { msAccessibilityNew, msBrightnessAuto, msDarkMode, msError, msFingerprint, msLightMode, msPalette } from '@l3/icons/material'
 import { useTheme } from '@l3/theme'
 import { usePreview } from '../../../shared/prototype'
+import { largeText } from '../../../shared/textSize'
 import { Screen } from '../../../shared/ui/Screen'
 import { SettingCard } from '../components/SettingCard'
 import { t } from '../copy'
@@ -666,16 +666,16 @@ const themeChoices: { value: ThemeChoice; label: string; icon: typeof msLightMod
  *  - Biometric: a switch.
  *  - Theme: Light / Dark / Auto as a pill-group toggle under the header (Auto follows the phone).
  *  - Accessibility: one switch that turns on darker colours (L3's ♿ Accessible theme) and a bigger font (every text
- *    style 1.15×) together.
+ *    style 2px bigger, app-wide) together.
  * Everything applies at once. Prototype: Theme and darker colours set the app's real theme (L3 ThemeProvider); the
- * screen also carries the contrast it shows. (The bigger font isn't shown in the prototype.)
+ * screen also carries the contrast it shows; the bigger text applies to the whole prototype (src/shared/textSize).
  */
 export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
   const theme = useTheme()
   const { interactive } = usePreview()
   const [biometric, setBiometric] = useState(true)
   // One switch: on = darker colours and the bigger font together.
-  const [on, setOn] = useState(lowVision ?? theme.contrast === 'accessible')
+  const [on, setOn] = useState(lowVision ?? (theme.contrast === 'accessible' || largeText.get()))
   const [failed, setFailed] = useState(saveFailed)
   const themeChoice: ThemeChoice = theme.modePreference === 'system' ? 'auto' : theme.modePreference
 
@@ -683,7 +683,10 @@ export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
     const apply = () => {
       setOn(next)
       setFailed(false)
-      if (interactive) theme.setContrast(next ? 'accessible' : 'default')
+      if (interactive) {
+        theme.setContrast(next ? 'accessible' : 'default')
+        largeText.set(next)
+      }
     }
     // The colours of the whole page change: cross-fade them like a theme change.
     withTransition(apply)
@@ -868,6 +871,32 @@ export function useAutoAdvance(next: string | undefined, ms: number) {
 
 /** How long a loader or "Verifying…" state stays up in the prototype. */
 export const LOADING_MS = 1600
+```
+
+### `src/shared/textSize.ts`
+
+```ts
+// Large text (Settings → Accessibility): every text style 2px bigger across the app (src/local-tokens.css,
+// html[data-text-size="large"]). Saved on this phone. In a real app: the app-wide text scale setting.
+const KEY = 'lemonn-app-large-text'
+
+const apply = (on: boolean) => {
+  if (on) document.documentElement.dataset.textSize = 'large'
+  else delete document.documentElement.dataset.textSize
+}
+
+export const largeText = {
+  get: () => {
+    try { return localStorage.getItem(KEY) === '1' } catch { return false }
+  },
+  set: (on: boolean) => {
+    apply(on)
+    try { if (on) localStorage.setItem(KEY, '1'); else localStorage.removeItem(KEY) } catch { /* storage off: this visit only */ }
+  },
+}
+
+/** On app start: put back the saved choice. */
+export const applySavedTextSize = () => apply(largeText.get())
 ```
 
 ### `src/shared/ui/Raised.module.css`
