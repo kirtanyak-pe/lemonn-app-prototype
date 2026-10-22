@@ -10,7 +10,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `stocks-01`, `dash-03`, `dash-14` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
+| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `stocks-01`, `dash-03`, `dash-20`, `dash-14` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
 | `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-04` | The chat’s empty state — the same screen as the conversation. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules. |
 | `dash-04` | Thinking | [5612:40517](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517) | `dash-03`, `dash-14`, `dash-05` | Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies). |
 | `dash-05` | DASH asks the limit | [5612:40650](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650) | `dash-03`, `dash-14`, `dash-06` | The question card takes the input’s place. Any answer (or one typed) builds the preview. |
@@ -26,6 +26,12 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-15` | Delete rule? | [5612:42250](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250) | `dash-14`, `dash-16` | Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it). |
 | `dash-16` | Rule deleted | [5612:42455](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455) | `dash-17` | The list behind already has 3 rules. |
 | `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03` | Not a Figma frame: the list once the sheet closes (3 rules). |
+| `dash-20` | Indicator · what to show | — | `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
+| `dash-21` | Indicator · which chart | — | `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | DASH asks only what the prompt didn’t say: the chart… |
+| `dash-22` | Indicator · which timeframe | — | `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | …and the timeframe. |
+| `dash-23` | Indicator · building | — | `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
+| `dash-24` | Indicator · ready | — | `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | BUY / SELL labels on the preview, notes from testing (fold open), Add to chart (loader → On chart). Ask for changes in plain words: the preview redraws (SELL labels turn orange). |
+| `dash-25` | Indicator · on chart | — | `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | Added: the tag and the button read On chart. |
 
 ## Spec (README.md)
 
@@ -840,6 +846,535 @@ export function DashBar(props: ActionbarProps) {
 }
 ```
 
+### `src/flows/dash/components/IndicatorCard.module.css`
+
+```css
+/* Indicator card — the same shell as the rule card (border-light, radius 12, 12 inside), with the mini chart. */
+.card {
+  overflow: clip;
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-default);
+}
+
+/* Ready: the DASH green edge (wireframe: the ready card is outlined in lime). */
+.card:not([data-state='building']) {
+  border-color: color-mix(in srgb, var(--app-dash-green) 60%, transparent);
+}
+
+.body {
+  padding: var(--l3-spacing-12);
+}
+
+.heading {
+  min-width: 0;
+}
+
+.eyebrow {
+  font: var(--l3-text-label-10);
+  letter-spacing: var(--app-dash-caps-tracking);
+  text-transform: uppercase;
+  color: var(--l3-content-tertiary);
+}
+
+.title {
+  margin: 0;
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+  animation: card-fade var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+.meta {
+  font: var(--l3-text-label-12);
+  color: var(--l3-content-tertiary);
+}
+
+.tag {
+  flex: none;
+  animation: card-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both;
+}
+
+.chart {
+  padding-block: var(--l3-spacing-04);
+}
+
+/* Parts: small pills tinted by what they are (wireframe: lime lines, blue labels). */
+.part {
+  padding: var(--l3-spacing-02) var(--l3-spacing-08);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-success-light);
+  color: var(--l3-content-accent-success-default);
+  font: var(--l3-text-label-12);
+  animation: card-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both;
+}
+
+.part[data-tone='average'] {
+  background: var(--l3-surface-accent-discover-light);
+  color: var(--l3-content-accent-discover-default);
+}
+
+.part[data-tone='buy'] {
+  background: var(--l3-surface-accent-indicator-up-light);
+  color: var(--l3-content-accent-indicator-up-default);
+}
+
+.part[data-tone='sell'] {
+  background: var(--l3-surface-accent-indicator-down-light);
+  color: var(--l3-content-accent-indicator-down-default);
+}
+
+/* Build steps: a spinner on the current one, a tick when done, a ring for the next ones. */
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  font: var(--l3-text-label-12);
+  color: var(--l3-content-tertiary);
+}
+
+.steps li[data-state='now'] {
+  color: var(--l3-content-primary);
+}
+
+.stepMark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--l3-size-16);
+  height: var(--l3-size-16);
+  border: 1.5px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-full);
+}
+
+.steps li[data-state='done'] .stepMark {
+  border-color: transparent;
+  background: var(--l3-content-accent-success-default);
+  color: var(--l3-static-white);
+}
+
+.steps li[data-state='now'] .stepMark {
+  border-color: var(--app-dash-green) transparent var(--app-dash-green) var(--app-dash-green);
+  animation: card-spin var(--l3-motion-duration-spin) linear infinite;
+}
+
+/* Notes: a warning row that folds open (wireframe "2 notes on the conversion"). */
+.notes {
+  border-top: 1px dashed var(--l3-border-light);
+  padding-top: var(--l3-spacing-08);
+}
+
+.notesToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  width: 100%;
+  min-height: var(--l3-size-32);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-accent-warning-default);
+  font: var(--l3-text-label-12);
+  text-align: start;
+  cursor: pointer;
+}
+
+.notesText {
+  flex: 1;
+}
+
+.chevron {
+  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.notesToggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.noteList {
+  margin: 0;
+  padding: 0 0 0 var(--l3-spacing-24);
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+  animation: card-fade var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+.noteList li + li {
+  margin-top: var(--l3-spacing-04);
+}
+
+@keyframes card-fade {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-04));
+  }
+}
+
+@keyframes card-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes card-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .tag,
+  .part,
+  .noteList,
+  .steps li[data-state='now'] .stepMark {
+    animation: none;
+  }
+}
+```
+
+### `src/flows/dash/components/IndicatorCard.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { Stack } from '@l3/components/Stack'
+import { Tag } from '@l3/components/Tag'
+import { msAdd, msCheck, msError, msKeyboardArrowDown } from '@l3/icons/material'
+import { t } from '../copy'
+import { buildSteps, type IndicatorDraft } from '../indicatorData'
+import { MiniChart } from './MiniChart'
+import styles from './IndicatorCard.module.css'
+
+/** Where the indicator is: being built (with the step reached), ready, being added, or on the chart. */
+export type IndicatorCardState = { kind: 'building'; step: 0 | 1 | 2 } | { kind: 'ready' } | { kind: 'adding' } | { kind: 'onChart' }
+
+type IndicatorCardProps = {
+  draft: IndicatorDraft
+  state: IndicatorCardState
+  /** Its name is known (shown from step 1 of the build — "taking shape"). */
+  named?: boolean
+  sellTone?: 'sell' | 'orange'
+  onAdd?: () => void
+}
+
+/**
+ * The indicator being built, pinned above the chat (like the rule card in Trading rules) — but it shows a mini live
+ * chart instead of text (wireframe "AI Indicator"):
+ * - building: "Your indicator" → its name; a wave → candles with the lines drawing in; the parts appear as chips;
+ *   three steps tick through;
+ * - ready: Ready tag, BUY / SELL labels on the chart, where it goes, DASH's notes (fold open), Add to chart;
+ * - adding: the button shows a loader; on chart: the tag and the button turn to "On chart".
+ */
+export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onAdd }: IndicatorCardProps) {
+  const [notesOpen, setNotesOpen] = useState(false)
+  const building = state.kind === 'building'
+  const stage = building ? (state.step === 0 ? 'sketch' : 'candles') : 'ready'
+
+  return (
+    <article className={styles.card} data-state={state.kind} aria-label={named ? draft.name : t('indicator.yourIndicator')}>
+      <Stack gap="12" className={styles.body}>
+        <Stack direction="horizontal" align="start" justify="between" gap="12">
+          <Stack gap="04" className={styles.heading}>
+            {building && <span className={styles.eyebrow}>{t('indicator.building')}</span>}
+            <h2 key={named ? 'named' : 'unnamed'} className={styles.title}>{named ? draft.name : t('indicator.yourIndicator')}</h2>
+            {!building && <span className={styles.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>}
+          </Stack>
+          {!building && (
+            <Tag color="success" size="sm" iconLeft={state.kind === 'onChart' ? <Icon icon={msCheck} size={14} /> : undefined} className={styles.tag}>
+              {state.kind === 'onChart' ? t('indicator.onChart') : t('indicator.ready')}
+            </Tag>
+          )}
+        </Stack>
+
+        <div className={styles.chart}>
+          <MiniChart stage={stage} sellTone={sellTone} />
+        </div>
+
+        {(named || !building) && (
+          <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
+            {draft.parts.map((p, i) => (
+              <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
+                {p.kind === 'line' && building ? t('indicator.linePart', { name: p.label }) : p.label}
+              </span>
+            ))}
+          </Stack>
+        )}
+
+        {building ? (
+          <Stack as="ol" gap="08" className={styles.steps}>
+            {buildSteps.map((label, i) => (
+              <li key={label} data-state={i < state.step ? 'done' : i === state.step ? 'now' : 'next'}>
+                <span className={styles.stepMark} aria-hidden="true">{i < state.step && <Icon icon={msCheck} size={12} />}</span>
+                {label}
+              </li>
+            ))}
+          </Stack>
+        ) : (
+          <>
+            <div className={styles.notes}>
+              <button type="button" className={styles.notesToggle} aria-expanded={notesOpen} onClick={() => setNotesOpen((o) => !o)}>
+                <Icon icon={msError} size={16} />
+                <span className={styles.notesText}>{t('indicator.notes', { count: draft.notes.length })}</span>
+                <Icon icon={msKeyboardArrowDown} size={16} className={styles.chevron} />
+              </button>
+              {notesOpen && (
+                <ul className={styles.noteList}>
+                  {draft.notes.map((n) => <li key={n}>{n}</li>)}
+                </ul>
+              )}
+            </div>
+            <Stack direction="horizontal" align="center" justify="between" gap="12">
+              {state.kind === 'onChart' ? (
+                <Button variant="secondary" size="md" iconLeft={<Icon icon={msCheck} />} disabled>{t('indicator.onChart')}</Button>
+              ) : (
+                <Button variant="brand" size="md" iconLeft={<Icon icon={msAdd} />} loading={state.kind === 'adding'} onClick={onAdd}>
+                  {state.kind === 'adding' ? t('indicator.adding') : t('indicator.addToChart')}
+                </Button>
+              )}
+            </Stack>
+          </>
+        )}
+      </Stack>
+    </article>
+  )
+}
+```
+
+### `src/flows/dash/components/MiniChart.module.css`
+
+```css
+/*
+ * The indicator preview. SVG geometry is artwork (viewBox units); colours are L3 tokens. Motion: candles fade up one
+ * after another, then each line draws itself left to right (stroke-dashoffset 1 → 0), then the labels pop in.
+ */
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* sketch: a faint wave that keeps running while DASH reads the request */
+.sketch {
+  fill: none;
+  stroke: var(--app-dash-glow-1);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.35 0.65;
+  opacity: var(--l3-opacity-60);
+  animation: mini-sketch 1.4s linear infinite;
+}
+
+@keyframes mini-sketch {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.candles g {
+  stroke: var(--l3-content-accent-indicator-down-default);
+  fill: var(--l3-content-accent-indicator-down-default);
+  opacity: var(--l3-opacity-60);
+  animation: mini-candle var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+.candles g[data-up] {
+  stroke: var(--l3-content-accent-indicator-up-default);
+  fill: var(--l3-content-accent-indicator-up-default);
+}
+
+.candles line {
+  stroke-width: 1;
+}
+
+@keyframes mini-candle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.ema,
+.trend {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mini-draw 900ms var(--l3-motion-easing-standard) 500ms forwards;
+}
+
+.ema {
+  stroke: var(--l3-content-accent-discover-default);
+}
+
+.trend {
+  stroke: var(--l3-content-accent-indicator-down-default);
+  stroke-width: 2;
+}
+
+.trend[data-up] {
+  stroke: var(--l3-content-accent-indicator-up-default);
+}
+
+@keyframes mini-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ready: lines already drawn (no replay), labels pop in */
+.chart[data-stage='ready'] .ema,
+.chart[data-stage='ready'] .trend {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+
+.chart[data-stage='ready'] .candles g {
+  animation: none;
+}
+
+.signal {
+  animation: mini-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both;
+}
+
+.signal rect {
+  fill: var(--l3-content-accent-indicator-up-default);
+}
+
+.signal[data-side='sell'] rect {
+  fill: var(--l3-content-accent-indicator-down-default);
+}
+
+.signal[data-side='orange'] rect {
+  fill: var(--l3-content-accent-orange-default);
+}
+
+.signal text {
+  fill: var(--l3-static-white);
+  font: var(--l3-text-heading-10);
+  font-size: 7px; /* viewBox units: the chart scales to ≈ 1.1 × on a 328 card */
+  text-anchor: middle;
+}
+
+@keyframes mini-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sketch,
+  .candles g,
+  .ema,
+  .trend,
+  .signal {
+    animation: none;
+  }
+
+  .ema,
+  .trend {
+    stroke-dashoffset: 0;
+  }
+}
+```
+
+### `src/flows/dash/components/MiniChart.tsx`
+
+```tsx
+import { useMemo } from 'react'
+import { ema, sampleCandles, supertrend } from '../indicatorData'
+import styles from './MiniChart.module.css'
+
+/**
+ * - `sketch`: DASH is still reading — a faint wave runs across (no candles yet);
+ * - `candles`: the candles are in, the indicator lines draw themselves in;
+ * - `ready`: lines drawn, BUY / SELL labels pop in where the Supertrend flips.
+ */
+export type MiniChartStage = 'sketch' | 'candles' | 'ready'
+
+const W = 300 // viewBox units — the SVG scales to the card's width
+const H = 128
+const PAD = 8
+
+/**
+ * The live preview on the indicator card: sample candles with the indicator drawn on them — Supertrend (green while
+ * up, red while down), EMA 20 (blue) and BUY / SELL labels. Decoration for the preview: the card's text says what it is.
+ */
+export function MiniChart({ stage, sellTone = 'sell' }: { stage: MiniChartStage; sellTone?: 'sell' | 'orange' }) {
+  const data = useMemo(() => {
+    const candles = sampleCandles()
+    const avg = ema(candles, 20)
+    const trend = supertrend(candles, 10, 3)
+    const values = candles.flatMap((c) => [c.high, c.low]).concat(trend.line.slice(10))
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const step = (W - PAD * 2) / candles.length
+    const x = (i: number) => PAD + step * (i + 0.5)
+    const y = (v: number) => PAD + (1 - (v - min) / (max - min)) * (H - PAD * 2)
+    const path = (vs: number[], from = 0) => vs.slice(from).map((v, i) => `${i ? 'L' : 'M'}${x(i + from).toFixed(1)},${y(v).toFixed(1)}`).join('')
+    // Supertrend as runs of one direction, so each run takes its colour.
+    const runs: { up: boolean; d: string }[] = []
+    let start = 10
+    for (let i = 11; i <= candles.length; i++) {
+      if (i === candles.length || trend.up[i] !== trend.up[start]) {
+        runs.push({ up: trend.up[start], d: path(trend.line.slice(0, i), start) })
+        start = i
+      }
+    }
+    return { candles, x, y, step, ema: path(avg, 5), runs, signals: trend.signals.filter((s) => s.index > 10) }
+  }, [])
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className={styles.chart} data-stage={stage} aria-hidden="true">
+      {stage === 'sketch' ? (
+        <path className={styles.sketch} d={`M${PAD},${H / 2} C 60,${H / 2 - 30} 100,${H / 2 + 30} 150,${H / 2} S 240,${H / 2 - 30} ${W - PAD},${H / 2}`} pathLength={1} />
+      ) : (
+        <>
+          <g className={styles.candles}>
+            {data.candles.map((c, i) => {
+              const up = c.close >= c.open
+              const bodyTop = data.y(Math.max(c.open, c.close))
+              const bodyH = Math.max(1, Math.abs(data.y(c.open) - data.y(c.close)))
+              return (
+                <g key={i} data-up={up || undefined} style={{ animationDelay: `${i * 8}ms` }}>
+                  <line x1={data.x(i)} x2={data.x(i)} y1={data.y(c.high)} y2={data.y(c.low)} />
+                  <rect x={data.x(i) - data.step * 0.3} width={data.step * 0.6} y={bodyTop} height={bodyH} />
+                </g>
+              )
+            })}
+          </g>
+          <path className={styles.ema} d={data.ema} pathLength={1} />
+          {data.runs.map((r, i) => (
+            <path key={i} className={styles.trend} data-up={r.up || undefined} d={r.d} pathLength={1} />
+          ))}
+          {stage === 'ready' &&
+            data.signals.map((s, i) => {
+              const c = data.candles[s.index]
+              const buy = s.side === 'buy'
+              const cx = data.x(s.index)
+              const cy = buy ? data.y(c.low) + 12 : data.y(c.high) - 12
+              return (
+                <g key={i} className={styles.signal} data-side={buy ? 'buy' : sellTone} style={{ animationDelay: `${i * 70}ms`, transformOrigin: `${cx}px ${cy}px` }}>
+                  <rect x={cx - 13} y={cy - 6} width={26} height={12} rx={3} />
+                  <text x={cx} y={cy + 3}>{buy ? 'BUY' : 'SELL'}</text>
+                </g>
+              )
+            })}
+        </>
+      )}
+    </svg>
+  )
+}
+```
+
 ### `src/flows/dash/components/QuestionCard.module.css`
 
 ```css
@@ -1340,16 +1875,24 @@ import { PromptChips, SparkleHeading } from './Chat'
 import styles from './RulesIntro.module.css'
 
 /**
- * The empty chat (Figma "Rule - Landing screen" 5612:40261): greeting, the orb, example prompts as DASH chips. It's the
+ * The empty chat (Figma "Rule - Landing screen" 5612:40261; the indicator chat uses it too): greeting, the orb, example prompts as DASH chips. It's the
  * first state of the one chat screen — tapping a chip sends it, and this fades away as the conversation starts.
  */
-export function RulesIntro({ onPick }: { onPick?: (prompt: string, from: HTMLElement) => void }) {
+type RulesIntroProps = {
+  onPick?: (prompt: string, from: HTMLElement) => void
+  /** Defaults: Trading rules. The indicator chat passes its own. */
+  title?: string
+  description?: string
+  examples?: string[][]
+}
+
+export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstName }), description = t('rulesHome.description'), examples = examplePrompts }: RulesIntroProps) {
   return (
     <Stack gap="40" justify="between" className={styles.page}>
       <Inset paddingInline="16">
         <Stack gap="12" className={styles.heading}>
-          <h1 className={styles.title}>{t('rulesHome.title', { name: firstName })}</h1>
-          <p className={styles.description}>{t('rulesHome.description')}</p>
+          <h1 className={styles.title}>{title}</h1>
+          <p className={styles.description}>{description}</p>
         </Stack>
       </Inset>
       <Stack align="center">
@@ -1357,7 +1900,7 @@ export function RulesIntro({ onPick }: { onPick?: (prompt: string, from: HTMLEle
       </Stack>
       <Stack as="section" gap="24">
         <SparkleHeading>{t('rulesHome.examples')}</SparkleHeading>
-        <PromptChips rows={examplePrompts} onPick={onPick} />
+        <PromptChips rows={examples} onPick={onPick} />
       </Stack>
     </Stack>
   )
@@ -1711,7 +2254,30 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "delete.yes": "Yes, Delete",
   "deleted.title": "Your rule has been deleted",
   "deleted.description": "DASH has stopped tracking this rule.",
-  "deleted.okay": "Okay"
+  "deleted.okay": "Okay",
+  "landing.indicatorTitle": "Create Custom Indicator",
+  "landing.indicatorDescription": "Describe what your chart should show — DASH draws it.",
+  "indicator.title": "Custom indicator",
+  "indicator.history": "Your indicators",
+  "indicator.emptyTitle": "What should your chart show?",
+  "indicator.emptyDescription": "Describe it in plain words. DASH builds the indicator and draws it on your chart.",
+  "indicator.gotIt": "Got it!",
+  "indicator.fewQuestions": "Two quick questions before I build it.",
+  "indicator.buildingNow": "Building it for {chart} on {timeframe} candles — watch it take shape above.",
+  "indicator.readyTitle": "Your indicator is ready",
+  "indicator.readyText": "Add it to your chart, or tell me what to change.",
+  "indicator.changed": "Done — the preview above is updated.",
+  "indicator.onChartText": "It's on your {chart} chart now. You'll see the BUY / SELL labels as new candles form.",
+  "indicator.changeHint": "Ask for changes in plain words — “make the SELL labels orange”, “add a 50 EMA”.",
+  "indicator.yourIndicator": "Your indicator",
+  "indicator.building": "Building",
+  "indicator.ready": "Ready",
+  "indicator.onChart": "On chart",
+  "indicator.placement": "{place} · checked on {count} candles",
+  "indicator.linePart": "Line · {name}",
+  "indicator.notes": "{count} notes from testing",
+  "indicator.addToChart": "Add to chart",
+  "indicator.adding": "Adding…"
 }
 ```
 
@@ -1818,6 +2384,7 @@ import type { Flow } from '../types'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
 import { Landing } from './screens/Landing'
+import { IndicatorChat } from './screens/IndicatorChat'
 import { RuleChat } from './screens/RuleChat'
 import { DeleteRuleSheet, ReadMoreSheet, RuleCreatedSheet, RuleDeletedSheet } from './sheets/RuleSheets'
 
@@ -1838,10 +2405,11 @@ export const dash: Flow = {
     { id: 'create', title: 'Create a rule' },
     { id: 'result', title: 'Rule ready' },
     { id: 'rules', title: 'Your rules' },
+    { id: 'indicator', title: 'Custom indicator' },
   ],
   screens: [
     // ---- Entry
-    { id: 'dash-02', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <Landing onBack={() => go('stocks-01')} onRules={() => go('dash-03')} onMenu={() => go('dash-14')} /> },
+    { id: 'dash-02', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <Landing onBack={() => go('stocks-01')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onMenu={() => go('dash-14')} /> },
     // ---- Create a rule
     { id: 'dash-03', group: 'chat', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'The chat’s empty state — the same screen as the conversation. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules.', render: (go) => <RuleChat step="empty" onBack={() => go('dash-02')} onHistory={() => go('dash-14')} onSend={() => go('dash-04')} /> },
     { id: 'dash-04', group: 'chat', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <RuleChat step="thinking" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onThought={() => go('dash-05')} /> },
@@ -1860,7 +2428,128 @@ export const dash: Flow = {
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
     { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} /> },
+    // ---- Custom indicator (wireframe "AI Indicator") — ONE chat screen in different states (group 'indicator')
+    { id: 'dash-20', group: 'indicator', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <IndicatorChat step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onAdded={() => go('dash-25')} /> },
+    { id: 'dash-21', group: 'indicator', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart…', render: (go) => <IndicatorChat step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onAdded={() => go('dash-25')} /> },
+    { id: 'dash-22', group: 'indicator', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe.', render: (go) => <IndicatorChat step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onAdded={() => go('dash-25')} /> },
+    { id: 'dash-23', group: 'indicator', section: 'indicator', name: 'Indicator · building', figma: '', note: 'The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <IndicatorChat step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onAdded={() => go('dash-25')} /> },
+    { id: 'dash-24', group: 'indicator', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'BUY / SELL labels on the preview, notes from testing (fold open), Add to chart (loader → On chart). Ask for changes in plain words: the preview redraws (SELL labels turn orange).', render: (go) => <IndicatorChat step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onAdded={() => go('dash-25')} /> },
+    { id: 'dash-25', group: 'indicator', section: 'indicator', name: 'Indicator · on chart', figma: '', note: 'Added: the tag and the button read On chart.', render: (go) => <IndicatorChat step="onChart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onAdded={() => go('dash-25')} /> },
   ],
+}
+```
+
+### `src/flows/dash/indicatorData.ts`
+
+```ts
+// DASH AI · Custom indicators — sample data, the questions DASH asks, and the maths the mini chart draws.
+// The indicator values are really computed (EMA, Supertrend) on sample candles, so the preview looks like the real
+// thing. In the app, the candles come from the chart's own data feed.
+import type { RuleQuestion } from './data'
+
+/** Example prompts on the empty indicator chat (simple, plain words — no formulas). */
+export const indicatorPrompts: string[][] = [
+  ['Supertrend with buy / sell labels and a 20 EMA', 'Show the trend with a 50-day average'],
+  ['Mark the 15-minute opening range', 'Highlight candles with 2× average volume'],
+]
+
+/** What DASH asks before building (only what the prompt didn't say). */
+export const chartQuestion: RuleQuestion = {
+  question: 'Which chart should it go on?',
+  options: ['Nifty 50', 'Bank Nifty', 'Any chart I open'],
+  freeText: false,
+}
+
+export const timeframeQuestion: RuleQuestion = {
+  question: 'Which timeframe?',
+  options: ['5 min', '15 min', '1 hour', '1 day'],
+  freeText: false,
+}
+
+/** The indicator DASH builds from the sample prompt. */
+export type IndicatorDraft = {
+  name: string
+  /** What it draws, as chips: lines and labels. */
+  parts: { kind: 'line' | 'label'; label: string; tone: 'trend' | 'average' | 'buy' | 'sell' }[]
+  /** "On the price chart · checked on 500 candles". */
+  placement: string
+  testedOn: number
+  /** DASH's notes from testing — things worth knowing before using it. */
+  notes: string[]
+}
+
+export const supertrendEma: IndicatorDraft = {
+  name: 'Supertrend (10, 3) with EMA 20',
+  parts: [
+    { kind: 'line', label: 'Supertrend', tone: 'trend' },
+    { kind: 'line', label: 'EMA 20', tone: 'average' },
+    { kind: 'label', label: 'BUY', tone: 'buy' },
+    { kind: 'label', label: 'SELL', tone: 'sell' },
+  ],
+  placement: 'On the price chart',
+  testedOn: 500,
+  notes: [
+    'It gave 14 buy and 13 sell signals on the last 500 candles — about one a day on 15 min.',
+    'In sideways markets the trend flips often; the 20 EMA helps you spot those stretches.',
+  ],
+}
+
+/** The steps DASH shows while it builds. */
+export const buildSteps = ['Reading your request', 'Writing the logic', 'Testing it on 500 candles'] as const
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Sample candles + indicator maths
+
+export type Candle = { open: number; high: number; low: number; close: number }
+
+/** 60 sample 15-min candles around Nifty's level — a deterministic random walk (same every time). */
+export function sampleCandles(count = 60, start = 22650): Candle[] {
+  let seed = 7
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+  const candles: Candle[] = []
+  let close = start
+  for (let i = 0; i < count; i++) {
+    const drift = Math.sin(i / 5) * 9 // gentle swings, so the trend flips a few times
+    const open = close
+    close = open + drift + (rand() - 0.5) * 28
+    const high = Math.max(open, close) + rand() * 12
+    const low = Math.min(open, close) - rand() * 12
+    candles.push({ open, high, low, close })
+  }
+  return candles
+}
+
+/** Exponential moving average of the closes. */
+export function ema(candles: Candle[], period: number): number[] {
+  const k = 2 / (period + 1)
+  const out: number[] = []
+  candles.forEach((c, i) => out.push(i === 0 ? c.close : c.close * k + out[i - 1] * (1 - k)))
+  return out
+}
+
+/** Supertrend (ATR period, multiplier): the line and its direction per candle; a flip is a buy / sell signal. */
+export function supertrend(candles: Candle[], period = 10, multiplier = 3) {
+  const tr = candles.map((c, i) => (i === 0 ? c.high - c.low : Math.max(c.high - c.low, Math.abs(c.high - candles[i - 1].close), Math.abs(c.low - candles[i - 1].close))))
+  const atr: number[] = []
+  tr.forEach((t, i) => atr.push(i === 0 ? t : (atr[i - 1] * (period - 1) + t) / period))
+  const line: number[] = []
+  const up: boolean[] = []
+  let upper = 0
+  let lower = 0
+  candles.forEach((c, i) => {
+    const mid = (c.high + c.low) / 2
+    const bu = mid + multiplier * atr[i]
+    const bl = mid - multiplier * atr[i]
+    const prevClose = i ? candles[i - 1].close : c.close
+    upper = i && (bu < upper || prevClose > upper) ? bu : i ? upper : bu
+    lower = i && (bl > lower || prevClose < lower) ? bl : i ? lower : bl
+    const wasUp = i ? up[i - 1] : true
+    const isUp = wasUp ? c.close >= lower : c.close > upper
+    up.push(isUp)
+    line.push(isUp ? lower : upper)
+  })
+  const signals = up.flatMap((u, i) => (i > 0 && u !== up[i - 1] ? [{ index: i, side: u ? ('buy' as const) : ('sell' as const) }] : []))
+  return { line, up, signals }
 }
 ```
 
@@ -2005,6 +2694,248 @@ function RuleItem({ rule, onDelete }: { rule: SavedRule; onDelete: () => void })
 }
 ```
 
+### `src/flows/dash/screens/IndicatorChat.module.css`
+
+```css
+/* Under the input once the indicator is ready: how to ask for changes (wireframe). */
+.hint {
+  margin: var(--l3-spacing-08) 0 0;
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-label-12);
+}
+```
+
+### `src/flows/dash/screens/IndicatorChat.tsx`
+
+```tsx
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { ActionbarAction } from '@l3/components/Actionbar'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
+import { msHistory } from '@l3/icons/material'
+import { usePreview } from '../../../shared/prototype'
+import { AssistantMessage, ChatInput, Thinking, UserMessage } from '../components/Chat'
+import { DashBar, DashScreen } from '../components/DashScreen'
+import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
+import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
+import { QuestionCard } from '../components/QuestionCard'
+import { RulesIntro } from '../components/RulesIntro'
+import { t } from '../copy'
+import { chartQuestion, indicatorPrompts, supertrendEma, timeframeQuestion } from '../indicatorData'
+// The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
+import styles from './RuleChat.module.css'
+import own from './IndicatorChat.module.css'
+
+/** Where the indicator chat is — ONE screen, these are its states. */
+export type IndicatorStep = 'empty' | 'chart' | 'timeframe' | 'building' | 'ready' | 'onChart'
+
+type IndicatorChatProps = {
+  step: IndicatorStep
+  request?: string
+  onBack?: () => void
+  onHistory?: () => void
+  /** 'empty': a prompt sent — DASH asks which chart. */
+  onSend?: (message: string) => void
+  onChart?: (chart: string) => void
+  onTimeframe?: (timeframe: string) => void
+  /** 'building' finishes by itself (prototype): the indicator is ready. */
+  onBuilt?: () => void
+  /** Add to chart → (loader) → on the chart. */
+  onAdded?: () => void
+}
+
+const THINKING_MS = 1200
+const FLY_MS = 450
+const INTRO_OUT_MS = 300
+/** Each build step (Reading → Writing the logic → Testing). */
+const BUILD_STEP_MS = 1100
+const ADDING_MS = 1200
+
+/**
+ * DASH AI · Custom indicator — one chat screen, like Trading rules (wireframe "AI Indicator"):
+ * empty state with example prompts → the prompt flies up → DASH asks which chart and which timeframe (question cards)
+ * → the indicator card pins at the top and builds itself live (wave → candles → lines drawing in, steps ticking) →
+ * Ready (BUY / SELL labels, notes, Add to chart) → On chart. Changes are asked for in plain words: "make the SELL
+ * labels orange" redraws the preview in place.
+ */
+export function IndicatorChat({ step, request: initialRequest = indicatorPrompts[0][0], onBack, onHistory, onSend, onChart, onTimeframe, onBuilt, onAdded }: IndicatorChatProps) {
+  const { interactive } = usePreview()
+  const [request, setRequest] = useState(initialRequest)
+  const [chart, setChart] = useState(chartQuestion.options[0])
+  const [timeframe, setTimeframe] = useState(timeframeQuestion.options[1])
+  const [pending, setPending] = useState<(() => void) | null>(null)
+  const [buildStep, setBuildStep] = useState<0 | 1 | 2>(0)
+  const [adding, setAdding] = useState(false)
+  /** Plain-words changes asked on the ready card (prototype: SELL labels turn orange). */
+  const [changes, setChanges] = useState<string[]>([])
+  const [changing, setChanging] = useState(false)
+  const [flying, setFlying] = useState<FlyOrigin | null>(null)
+  const [introLeaving, setIntroLeaving] = useState(false)
+  const stage = useRef<HTMLDivElement>(null)
+
+  const send = (text: string, from: HTMLElement) => {
+    setFlying(captureOrigin(from, text))
+    setRequest(text)
+    setIntroLeaving(true)
+    window.setTimeout(() => setIntroLeaving(false), INTRO_OUT_MS)
+    setPending(() => () => onSend?.(text)) // DASH reads the prompt, then asks
+  }
+
+  useLayoutEffect(() => {
+    if (!flying) return
+    const target = stage.current?.querySelector<HTMLElement>('[data-turn="request"] p')
+    const screen = stage.current?.closest<HTMLElement>('[data-glow]')
+    if (target && screen) flyMessage(flying, target, screen, FLY_MS)
+    setFlying(null)
+  }, [flying])
+
+  // DASH thinking between turns.
+  useEffect(() => {
+    if (!pending) return
+    const timer = window.setTimeout(() => {
+      setPending(null)
+      pending()
+    }, THINKING_MS)
+    return () => window.clearTimeout(timer)
+  }, [pending])
+  useEffect(() => setPending(null), [step])
+
+  // Building: the steps tick through, then it's ready.
+  useEffect(() => {
+    if (step !== 'building') return
+    setBuildStep(0)
+    if (!interactive) return
+    const timers = [window.setTimeout(() => setBuildStep(1), BUILD_STEP_MS), window.setTimeout(() => setBuildStep(2), BUILD_STEP_MS * 2), window.setTimeout(() => onBuilt?.(), BUILD_STEP_MS * 3)]
+    return () => timers.forEach(window.clearTimeout)
+  }, [step, interactive, onBuilt])
+
+  const add = () => {
+    setAdding(true)
+    window.setTimeout(() => {
+      setAdding(false)
+      onAdded?.()
+    }, ADDING_MS)
+  }
+
+  const askChange = (text: string) => {
+    setChanges((c) => [...c, text])
+    setChanging(true)
+    window.setTimeout(() => setChanging(false), THINKING_MS)
+  }
+
+  // The empty state shows before sending; while DASH reads the prompt it's already the chat.
+  const empty = step === 'empty' && !pending
+  const chatStarted = step !== 'empty' || pending != null
+  const pinned = step === 'building' || step === 'ready' || step === 'onChart'
+  const cardState: IndicatorCardState =
+    step === 'building' ? { kind: 'building', step: buildStep } : step === 'onChart' ? { kind: 'onChart' } : adding ? { kind: 'adding' } : { kind: 'ready' }
+  const asking = !pending && (step === 'chart' || step === 'timeframe')
+  const sellTone = changes.length ? 'orange' : 'sell'
+
+  useLayoutEffect(() => {
+    const body = stage.current?.parentElement
+    if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
+  }, [step, pending, changes.length, changing])
+
+  const turns: { key: string; node: ReactNode }[] = []
+  if (chatStarted) turns.push({ key: 'request', node: <UserMessage>{request}</UserMessage> })
+  if (step !== 'empty') turns.push({ key: 'got-it', node: <AssistantMessage title={t('indicator.gotIt')}>{t('indicator.fewQuestions')}</AssistantMessage> })
+  const past = ['timeframe', 'building', 'ready', 'onChart'].includes(step) || (step === 'chart' && pending)
+  if (past) {
+    turns.push({ key: 'q-chart', node: <AssistantMessage>{chartQuestion.question}</AssistantMessage> })
+    turns.push({ key: 'a-chart', node: <UserMessage>{chart}</UserMessage> })
+  }
+  if (['building', 'ready', 'onChart'].includes(step) || (step === 'timeframe' && pending)) {
+    turns.push({ key: 'q-timeframe', node: <AssistantMessage>{timeframeQuestion.question}</AssistantMessage> })
+    turns.push({ key: 'a-timeframe', node: <UserMessage>{timeframe}</UserMessage> })
+  }
+  if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
+  if (step === 'ready' || step === 'onChart') turns.push({ key: 'ready', node: <AssistantMessage title={t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
+  changes.forEach((c, i) => {
+    turns.push({ key: `change-${i}`, node: <UserMessage>{c}</UserMessage> })
+    if (!changing || i < changes.length - 1) turns.push({ key: `changed-${i}`, node: <AssistantMessage>{t('indicator.changed')}</AssistantMessage> })
+  })
+  if (step === 'onChart') turns.push({ key: 'on-chart', node: <AssistantMessage>{t('indicator.onChartText', { chart })}</AssistantMessage> })
+
+  const question = step === 'chart' ? chartQuestion : timeframeQuestion
+
+  return (
+    <DashScreen
+      glow={chatStarted ? 'header' : 'bottom'}
+      top={
+        <DashBar
+          title={chatStarted ? <span className={styles.titleIn}>{t('indicator.title')}</span> : undefined}
+          onBack={onBack}
+          actions={<ActionbarAction icon={msHistory} label={t('indicator.history')} onClick={() => onHistory?.()} />}
+          bottom={
+            pinned ? (
+              <div className={styles.pin}>
+                <div className={styles.pinInner}>
+                  <Inset paddingInline="16" paddingBlock="08">
+                    <IndicatorCard draft={supertrendEma} state={cardState} sellTone={sellTone} onAdd={add} />
+                  </Inset>
+                </div>
+              </div>
+            ) : undefined
+          }
+        />
+      }
+      bottom={
+        <div className={styles.dock} data-surface="primary">
+          <Inset paddingInline="16" paddingBlock="16">
+            {asking ? (
+              <div className={styles.rise} key={step}>
+                <QuestionCard
+                  question={question}
+                  onAnswer={(a) => {
+                    if (step === 'chart') {
+                      setChart(a)
+                      setPending(() => () => onChart?.(a))
+                    } else {
+                      setTimeframe(a)
+                      setPending(() => () => onTimeframe?.(a))
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <ChatInput key="input" onSend={empty ? send : step === 'ready' || step === 'onChart' ? askChange : () => {}} />
+            )}
+            {(step === 'ready' || step === 'onChart') && <p className={own.hint}>{t('indicator.changeHint')}</p>}
+          </Inset>
+        </div>
+      }
+    >
+      <div className={styles.stage} ref={stage}>
+        {(empty || introLeaving) && (
+          <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined}>
+            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} />
+          </div>
+        )}
+        {chatStarted && (
+          <div className={styles.panel}>
+            <Inset paddingInline="16" paddingBlock="24">
+              <Stack gap="24">
+                {turns.map((turn) => (
+                  <div key={turn.key} className={turn.key === 'request' ? undefined : styles.appear} data-turn={turn.key}>
+                    {turn.node}
+                  </div>
+                ))}
+                {(pending || changing) && (
+                  <div className={step === 'empty' ? styles.appearAfterSend : styles.appear} key="thinking">
+                    <Thinking>{t('chat.thinking')}</Thinking>
+                  </div>
+                )}
+              </Stack>
+            </Inset>
+          </div>
+        )}
+      </div>
+    </DashScreen>
+  )
+}
+```
+
 ### `src/flows/dash/screens/Landing.module.css`
 
 ```css
@@ -2034,7 +2965,7 @@ function RuleItem({ rule, onDelete }: { rule: SavedRule; onDelete: () => void })
 import { ActionbarAction } from '@l3/components/Actionbar'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
-import { msFunction, msMenu, msPostAdd } from '@l3/icons/material'
+import { msFunction, msMenu, msMonitoring, msPostAdd } from '@l3/icons/material'
 import { BuildOption } from '../components/BuildOption'
 import { SparkleHeading } from '../components/Chat'
 import { DashBar, DashScreen } from '../components/DashScreen'
@@ -2047,6 +2978,7 @@ type LandingProps = {
   onBack?: () => void
   onRules?: () => void
   onStrategy?: () => void
+  onIndicator?: () => void
   onMenu?: () => void
 }
 
@@ -2054,7 +2986,7 @@ type LandingProps = {
  * DASH's home (Figma "Landing screen" 5612:81961): the orb, a greeting, and what DASH can build — trading rules or a
  * custom strategy. ☰ opens the user's rules.
  */
-export function Landing({ onBack, onRules, onStrategy, onMenu }: LandingProps) {
+export function Landing({ onBack, onRules, onStrategy, onIndicator, onMenu }: LandingProps) {
   return (
     <DashScreen glow="landing" top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msMenu} label={t('landing.menu')} onClick={() => onMenu?.()} />} />}>
       <Inset paddingInline="16" paddingBlock="24">
@@ -2070,6 +3002,7 @@ export function Landing({ onBack, onRules, onStrategy, onMenu }: LandingProps) {
             <SparkleHeading>{t('landing.choose')}</SparkleHeading>
             <Stack gap="16">
               <BuildOption icon={msPostAdd} title={t('landing.rulesTitle')} description={t('landing.rulesDescription')} onClick={onRules} />
+              <BuildOption icon={msMonitoring} title={t('landing.indicatorTitle')} description={t('landing.indicatorDescription')} onClick={onIndicator} />
               <BuildOption icon={msFunction} title={t('landing.strategyTitle')} description={t('landing.strategyDescription')} onClick={onStrategy} />
             </Stack>
           </Stack>

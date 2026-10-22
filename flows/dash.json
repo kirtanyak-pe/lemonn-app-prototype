@@ -20,6 +20,7 @@
       "goesTo": [
         "stocks-01",
         "dash-03",
+        "dash-20",
         "dash-14"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961"
@@ -200,6 +201,96 @@
         "dash-03"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
+    },
+    {
+      "id": "dash-20",
+      "name": "Indicator · what to show",
+      "figma": "",
+      "note": "Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.",
+      "goesTo": [
+        "dash-02",
+        "dash-21",
+        "dash-22",
+        "dash-23",
+        "dash-24",
+        "dash-25"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "dash-21",
+      "name": "Indicator · which chart",
+      "figma": "",
+      "note": "DASH asks only what the prompt didn’t say: the chart…",
+      "goesTo": [
+        "dash-02",
+        "dash-21",
+        "dash-22",
+        "dash-23",
+        "dash-24",
+        "dash-25"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "dash-22",
+      "name": "Indicator · which timeframe",
+      "figma": "",
+      "note": "…and the timeframe.",
+      "goesTo": [
+        "dash-02",
+        "dash-21",
+        "dash-22",
+        "dash-23",
+        "dash-24",
+        "dash-25"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "dash-23",
+      "name": "Indicator · building",
+      "figma": "",
+      "note": "The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).",
+      "goesTo": [
+        "dash-02",
+        "dash-21",
+        "dash-22",
+        "dash-23",
+        "dash-24",
+        "dash-25"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "dash-24",
+      "name": "Indicator · ready",
+      "figma": "",
+      "note": "BUY / SELL labels on the preview, notes from testing (fold open), Add to chart (loader → On chart). Ask for changes in plain words: the preview redraws (SELL labels turn orange).",
+      "goesTo": [
+        "dash-02",
+        "dash-21",
+        "dash-22",
+        "dash-23",
+        "dash-24",
+        "dash-25"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "dash-25",
+      "name": "Indicator · on chart",
+      "figma": "",
+      "note": "Added: the tag and the button read On chart.",
+      "goesTo": [
+        "dash-02",
+        "dash-21",
+        "dash-22",
+        "dash-23",
+        "dash-24",
+        "dash-25"
+      ],
+      "figmaUrl": ""
     }
   ],
   "files": [
@@ -212,6 +303,10 @@
     "src/flows/dash/components/Chat.tsx",
     "src/flows/dash/components/DashScreen.module.css",
     "src/flows/dash/components/DashScreen.tsx",
+    "src/flows/dash/components/IndicatorCard.module.css",
+    "src/flows/dash/components/IndicatorCard.tsx",
+    "src/flows/dash/components/MiniChart.module.css",
+    "src/flows/dash/components/MiniChart.tsx",
     "src/flows/dash/components/QuestionCard.module.css",
     "src/flows/dash/components/QuestionCard.tsx",
     "src/flows/dash/components/RuleCard.module.css",
@@ -227,8 +322,11 @@
     "src/flows/dash/copy.ts",
     "src/flows/dash/data.ts",
     "src/flows/dash/index.tsx",
+    "src/flows/dash/indicatorData.ts",
     "src/flows/dash/screens/ActiveRules.module.css",
     "src/flows/dash/screens/ActiveRules.tsx",
+    "src/flows/dash/screens/IndicatorChat.module.css",
+    "src/flows/dash/screens/IndicatorChat.tsx",
     "src/flows/dash/screens/Landing.module.css",
     "src/flows/dash/screens/Landing.tsx",
     "src/flows/dash/screens/RuleChat.module.css",
