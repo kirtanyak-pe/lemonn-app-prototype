@@ -72,8 +72,8 @@ From `src/shared/data/user.ts` (fictional sample user) and `data.ts`:
 | Every screen | SystemStatusbar | (OS bar mock) |
 | Welcome hero | BrandLogo ("L3 → Brand logo") | `brand="lemonn"`, 32 |
 | Welcome slide art, biometrics, PIN, email | **Illustration slot** (`Spot`, src/shared/ui) | lg 96 disc + halo / md 64; replace with artwork |
-| Welcome dock, biometrics, email | ButtonGroup ("L3: Button Dock") | vertical: primary on top, secondary below |
-| Continue with CoinSwitch | Button | `variant="secondary"`, BrandLogo coinswitch icon left |
+| Welcome dock, biometrics, email | ButtonGroup ("L3: Button Dock") | vertical: primary on top, tertiary below |
+| Continue with CoinSwitch | Button | `variant="tertiary"`, BrandLogo coinswitch icon left |
 | Phone / OTP back + Help | Actionbar + ActionbarAction | `onBack`; Help = tertiary icon button (`help`) |
 | Mobile number | TextField ("L3: input field & text Box") | label "Mobile number", value `+91 …`, numeric |
 | OTP | OtpInput | `length={6}`, `edit` (Edit number), `action` (Resend in 0:45 → Resend OTP), `status="error"` |
@@ -100,7 +100,7 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
 ### Differences from Figma
 
 - **Welcome:** the old blue gradient became a lime L3 brand panel. The carousel now has 3 slides with dots.
-  The buttons are an L3 dock: the primary "Log in or sign up" on top, the secondary CoinSwitch button below.
+  The buttons are an L3 dock: the primary "Log in or sign up" on top, the tertiary "Continue with coinswitch" button below.
 - **Phone:** the title says what to do ("Enter your mobile number"), and the old raw number becomes a labelled field.
   A Terms / Privacy line was added.
 - **OTP:** the Verify OTP button was removed, because the code auto-verifies. The wrong-code state is new.
@@ -118,6 +118,7 @@ Headlines are Heading/24 (`--l3-text-heading-24`), supporting lines Description/
 
 ### Changelog
 
+- 2026-10-22 — Designer edits (canvas): Welcome's CoinSwitch button is Tertiary, reads "Continue with coinswitch"; the white slide panel rounds only its top corners.
 - 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Section, Stack); nothing moved (measured at 392).
 
 - 2026-10-16 — raised-button experiment; keypad fields never open the phone's keyboard (the drawn keypad is the keyboard).
@@ -199,7 +200,7 @@ export function Dots({ count, index, onPick }: { count: number; index: number; o
   "welcome.slide3.description": "Stop-loss, take-profit and P&L protection built in",
   "welcome.actionsLabel": "Get started",
   "welcome.login": "Login with Coinswitch",
-  "welcome.coinswitch": "Login & Signup",
+  "welcome.coinswitch": "Continue with coinswitch",
   "welcome.sebi": "SEBI Reg. No. {reg}",
   "dots.label": "Slides",
   "dots.slide": "Slide {n} of {count}",
@@ -801,7 +802,7 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
         <>
           <ButtonGroup aria-label={copy('welcome.actionsLabel')}>
             <Button variant="buy" onClick={onLogin}>{copy('welcome.login')}</Button>
-            <Button variant="secondary" iconLeft={<BrandLogo brand="coinswitch" variant="icon" size={24} decorative />} onClick={onCoinSwitch}>
+            <Button variant="tertiary" iconLeft={<BrandLogo brand="coinswitch" variant="icon" size={24} decorative />} onClick={onCoinSwitch}>
               {copy('welcome.coinswitch')}
             </Button>
           </ButtonGroup>
@@ -817,7 +818,7 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
           </Stack>
           <Spot icon={slide.icon} tone="plain" />
         </Stack>
-        <Stack style={{ borderRadius: 'var(--l3-radius-24)', background: 'var(--l3-surface-primary)' }} justify="center" className={styles.fill}>
+        <Stack style={{ borderTopLeftRadius: 'var(--l3-radius-24)', borderTopRightRadius: 'var(--l3-radius-24)', background: 'var(--l3-surface-primary)' }} justify="center" className={styles.fill}>
           <Section padding="24" gap="24" align="center" className={styles.slide}>
             <div aria-live="polite">
               <h1 className={styles.title}>{copy(`welcome.${slide.id}.title`)}</h1>
