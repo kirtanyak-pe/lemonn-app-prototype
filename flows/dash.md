@@ -11,7 +11,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
 | `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `stocks-01`, `dash-03`, `dash-14` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
-| `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-04` | Example chips (sideways scroll) send themselves as the message; typing + Send does the same. History opens your rules. |
+| `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-04` | The chat’s empty state — the same screen as the conversation. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules. |
 | `dash-04` | Thinking | [5612:40517](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517) | `dash-03`, `dash-14`, `dash-05` | Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies). |
 | `dash-05` | DASH asks the limit | [5612:40650](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650) | `dash-03`, `dash-14`, `dash-06` | The question card takes the input’s place. Any answer (or one typed) builds the preview. |
 | `dash-06` | Rule preview | [5612:40816](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40816) | `dash-03`, `dash-14`, `dash-05`, `dash-07` | The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question. |
@@ -143,8 +143,8 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 
 | Moment | What moves | Timing |
 |---|---|---|
-| Send (rules landing → chat, `dash-03 → 04`) | The landing lifts 32 and fades; then the chat page slides up from the bottom over it | lift 400 ms; rise starts at 350 ms, 600 ms, decelerate (preview `enter: 'rise'`) |
-| Chat steps (`dash-04 … 13`) | One page in different states (preview `group: 'chat'`) — no push between them | — |
+| Send (`dash-03 → 04`, one screen) | The tapped chip — or the typed text — flies up and becomes the user's message; the greeting, orb and examples lift and fade; the panel and the title fade in; the glow glides from the bottom to the header | fly 450 ms; intro out 300 ms; glow + panel 600 ms; the thinking dots wait for the message to land |
+| Chat steps (`dash-03 … 13`) | ONE screen in different states, like ChatGPT / Claude (preview `group: 'chat'`): the empty state, the conversation, the pinned rule preview and the result all change in place — nothing is pushed in | — |
 | A new message | Fades up 8 into place; earlier messages stay (the conversation builds up) and the panel scrolls to the newest | 250 ms, decelerate |
 | DASH thinks | Three dots pulse in turn, after the request and after every answer / Proceed | ~1.6 s in the prototype (live 1.5–3 s) |
 | DASH's question | The card rises 24 out of the input's place | 250 ms, decelerate |
@@ -161,6 +161,8 @@ Not built yet: the live app's DASH mascot with a face and its "Checking 4 rules 
 screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
+
+- 2026-10-23 — The rules landing is the chat's empty state (one screen): the sent message flies up into place, the intro fades, the glow moves up; no page transition inside the chat.
 
 - 2026-10-23 — Motion from the live app's recording: chat rises in, the conversation builds up, thinking between turns, question card rises, rule card pins, backtest unfolds, created-sheet tick + confetti, orb spin, rules list fades in.
 
@@ -519,7 +521,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 ### `src/flows/dash/components/Chat.tsx`
 
 ```tsx
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
@@ -535,9 +537,16 @@ import styles from './Chat.module.css'
  */
 
 /** The message field at the bottom of every DASH chat page: a white pill with the DASH green edge and a round Send. */
-export function ChatInput({ onSend, value: initial = '' }: { onSend?: (text: string) => void; value?: string }) {
+export function ChatInput({ onSend, value: initial = '' }: { onSend?: (text: string, from: HTMLElement) => void; value?: string }) {
   const [value, setValue] = useState(initial)
-  const send = () => onSend?.(value.trim())
+  const field = useRef<HTMLInputElement>(null)
+  /** `from`: where the text was typed — the sent message flies up from there. */
+  const send = () => {
+    const text = value.trim()
+    if (!text || !field.current) return
+    onSend?.(text, field.current)
+    setValue('')
+  }
   return (
     <form
       className={styles.input}
@@ -547,6 +556,7 @@ export function ChatInput({ onSend, value: initial = '' }: { onSend?: (text: str
       }}
     >
       <input
+        ref={field}
         className={styles.field}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -571,14 +581,14 @@ export function SparkleHeading({ children }: { children: ReactNode }) {
 }
 
 /** Example prompts as rows of DASH chips that scroll sideways (Figma: two rows, cut at the screen edges). */
-export function PromptChips({ rows, onPick }: { rows: string[][]; onPick?: (prompt: string) => void }) {
+export function PromptChips({ rows, onPick }: { rows: string[][]; onPick?: (prompt: string, from: HTMLElement) => void }) {
   return (
     <div className={styles.chipScroll} role="group" aria-label={t('examples.label')}>
       <Stack gap="12" className={styles.chipRows}>
         {rows.map((row, i) => (
           <Stack key={i} direction="horizontal" gap="08" className={styles.chipRow} data-row={i}>
             {row.map((prompt) => (
-              <button key={prompt} type="button" className={styles.promptChip} onClick={() => onPick?.(prompt)}>
+              <button key={prompt} type="button" className={styles.promptChip} onClick={(e) => onPick?.(prompt, e.currentTarget)}>
                 {prompt}
               </button>
             ))}
@@ -680,6 +690,11 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
   height: var(--ring);
   opacity: var(--l3-opacity-50);
   filter: blur(var(--app-dash-glow-blur)); /* on the wrapper, so the ring's cut edges blur too */
+  /* The chat starting (bottom → header) glides the ring up rather than jumping. */
+  transition:
+    top var(--app-dash-glow-move) var(--l3-motion-easing-decelerate),
+    width var(--app-dash-glow-move) var(--l3-motion-easing-decelerate),
+    height var(--app-dash-glow-move) var(--l3-motion-easing-decelerate);
   transform: translate(-50%, -50%) rotate(-75.32deg);
   animation: dash-glow-turn 3.08s infinite;
 }
@@ -753,6 +768,10 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
   top: -200cqw; /* −720: the lines cross the header */
 }
 
+.wavesBox {
+  transition: top var(--app-dash-glow-move) var(--l3-motion-easing-decelerate);
+}
+
 .waves {
   flex: none;
   width: 369cqw;
@@ -765,6 +784,13 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
 .bar.bar {
   background: transparent;
   box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow,
+  .wavesBox {
+    transition: none;
+  }
 }
 ```
 
@@ -1274,6 +1300,70 @@ export function RuleSummary({ title, description }: { title: string; description
 }
 ```
 
+### `src/flows/dash/components/RulesIntro.module.css`
+
+```css
+/* Figma: heading 56 below the bar; the examples sit just above the input. */
+.page {
+  flex: 1;
+  padding-block: var(--l3-spacing-48) var(--l3-spacing-24);
+}
+
+.heading {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font: var(--l3-text-heading-20);
+  color: var(--l3-content-primary);
+  white-space: pre-line; /* two lines: the greeting, then the question */
+}
+
+.description {
+  margin: 0;
+  font: var(--l3-text-label-12);
+  color: var(--l3-content-tertiary);
+  text-wrap: balance;
+}
+```
+
+### `src/flows/dash/components/RulesIntro.tsx`
+
+```tsx
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { t } from '../copy'
+import { examplePrompts, firstName } from '../data'
+import { PromptChips, SparkleHeading } from './Chat'
+import styles from './RulesIntro.module.css'
+
+/**
+ * The empty chat (Figma "Rule - Landing screen" 5612:40261): greeting, the orb, example prompts as DASH chips. It's the
+ * first state of the one chat screen — tapping a chip sends it, and this fades away as the conversation starts.
+ */
+export function RulesIntro({ onPick }: { onPick?: (prompt: string, from: HTMLElement) => void }) {
+  return (
+    <Stack gap="40" justify="between" className={styles.page}>
+      <Inset paddingInline="16">
+        <Stack gap="12" className={styles.heading}>
+          <h1 className={styles.title}>{t('rulesHome.title', { name: firstName })}</h1>
+          <p className={styles.description}>{t('rulesHome.description')}</p>
+        </Stack>
+      </Inset>
+      <Stack align="center">
+        <DashOrb size="lg" />
+      </Stack>
+      <Stack as="section" gap="24">
+        <SparkleHeading>{t('rulesHome.examples')}</SparkleHeading>
+        <PromptChips rows={examplePrompts} onPick={onPick} />
+      </Stack>
+    </Stack>
+  )
+}
+```
+
 ### `src/flows/dash/components/SuccessBurst.module.css`
 
 ```css
@@ -1458,6 +1548,109 @@ export function SuccessBurst({ leaving = false }: { leaving?: boolean }) {
 }
 ```
 
+### `src/flows/dash/components/flyMessage.ts`
+
+```ts
+// The sent message flies to its place: the chip that was tapped (or the text that was typed) becomes the user's
+// message at the top of the chat — like ChatGPT / Claude, the screen itself changes state, nothing is pushed in.
+//
+// How: a copy ("ghost") of the source is drawn on top of the screen at the source's place, then moved and reshaped
+// into the message bubble's place and look; the real bubble shows when it lands. Measured, so it works for any chip,
+// any text length and any screen width. If anything goes wrong, the bubble simply shows.
+
+type Look = {
+  left: string
+  top: string
+  width: string
+  height: string
+  borderRadius: string
+  backgroundColor: string
+  borderColor: string
+  fontSize: string
+  lineHeight: string
+  paddingTop: string
+  paddingRight: string
+  paddingBottom: string
+  paddingLeft: string
+}
+
+/** Where something was and how it looked, captured before the screen changes. */
+export type FlyOrigin = { rect: DOMRect; text: string; borderWidth: string; snapshot: Omit<Look, 'left' | 'top' | 'width' | 'height'> }
+
+function lookOf(s: CSSStyleDeclaration): FlyOrigin['snapshot'] {
+  return {
+    borderRadius: s.borderRadius,
+    backgroundColor: s.backgroundColor,
+    borderColor: s.borderTopColor,
+    fontSize: s.fontSize,
+    lineHeight: s.lineHeight,
+    paddingTop: s.paddingTop,
+    paddingRight: s.paddingRight,
+    paddingBottom: s.paddingBottom,
+    paddingLeft: s.paddingLeft,
+  }
+}
+
+export function captureOrigin(el: HTMLElement, text: string): FlyOrigin {
+  // Read now: the source leaves the screen as soon as the message is sent.
+  const style = getComputedStyle(el)
+  return { rect: el.getBoundingClientRect(), text, borderWidth: style.borderTopWidth, snapshot: lookOf(style) }
+}
+
+const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/**
+ * Fly a ghost from `origin` to `target` (the real message bubble, already laid out). `stage` is the positioned element
+ * the ghost is drawn in (the screen). The target is hidden until the ghost lands.
+ */
+export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLElement, durationMs: number) {
+  if (reduced()) return
+  const s = stage.getBoundingClientRect()
+  const to = target.getBoundingClientRect()
+  const targetStyle = getComputedStyle(target)
+  const box = (r: DOMRect) => ({ left: `${r.left - s.left}px`, top: `${r.top - s.top}px`, width: `${r.width}px`, height: `${r.height}px` })
+  const from: Look = { ...box(origin.rect), ...origin.snapshot }
+  const end: Look = { ...box(to), ...lookOf(targetStyle) }
+
+  const ghost = document.createElement('div')
+  ghost.textContent = origin.text
+  ghost.setAttribute('aria-hidden', 'true')
+  ghost.dataset.flyGhost = ''
+  Object.assign(ghost.style, {
+    position: 'absolute',
+    zIndex: '30',
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    borderStyle: 'solid',
+    borderWidth: origin.borderWidth,
+    color: targetStyle.color,
+    fontFamily: targetStyle.fontFamily,
+    fontWeight: targetStyle.fontWeight,
+    whiteSpace: 'nowrap', // one line, like the chip and the bubble (the border would otherwise make it wrap)
+    ...from,
+  })
+
+  const land = () => {
+    target.style.visibility = ''
+    ghost.remove()
+  }
+  try {
+    stage.appendChild(ghost)
+    target.style.visibility = 'hidden'
+    const animation = ghost.animate([from, { ...end, borderColor: 'transparent' }], { duration: durationMs, easing: 'cubic-bezier(0.2, 0, 0, 1)', fill: 'forwards' })
+    animation.onfinish = land
+    animation.oncancel = land
+    // Safety net: never leave the message hidden.
+    window.setTimeout(land, durationMs + 300)
+  } catch {
+    land()
+  }
+}
+```
+
 ### `src/flows/dash/copy.json`
 
 ```json
@@ -1626,7 +1819,6 @@ import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
 import { Landing } from './screens/Landing'
 import { RuleChat } from './screens/RuleChat'
-import { RulesHome } from './screens/RulesHome'
 import { DeleteRuleSheet, ReadMoreSheet, RuleCreatedSheet, RuleDeletedSheet } from './sheets/RuleSheets'
 
 const maxDailyLossRule = activeRules[0]
@@ -1651,8 +1843,8 @@ export const dash: Flow = {
     // ---- Entry
     { id: 'dash-02', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <Landing onBack={() => go('stocks-01')} onRules={() => go('dash-03')} onMenu={() => go('dash-14')} /> },
     // ---- Create a rule
-    { id: 'dash-03', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Example chips (sideways scroll) send themselves as the message; typing + Send does the same. History opens your rules.', render: (go) => <RulesHome onBack={() => go('dash-02')} onHistory={() => go('dash-14')} onSend={() => go('dash-04')} /> },
-    { id: 'dash-04', group: 'chat', enter: 'rise', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <RuleChat step="thinking" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onThought={() => go('dash-05')} /> },
+    { id: 'dash-03', group: 'chat', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'The chat’s empty state — the same screen as the conversation. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules.', render: (go) => <RuleChat step="empty" onBack={() => go('dash-02')} onHistory={() => go('dash-14')} onSend={() => go('dash-04')} /> },
+    { id: 'dash-04', group: 'chat', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <RuleChat step="thinking" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onThought={() => go('dash-05')} /> },
     { id: 'dash-05', group: 'chat', section: 'create', name: 'DASH asks the limit', figma: '5612:40650', note: 'The question card takes the input’s place. Any answer (or one typed) builds the preview.', render: (go) => <RuleChat step="question" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onAnswer={() => go('dash-06')} /> },
     { id: 'dash-06', group: 'chat', section: 'create', name: 'Rule preview', figma: '5612:40816', note: 'The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question.', render: (go) => <RuleChat step="preview" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onRefine={() => go('dash-05')} onProceed={() => go('dash-07')} /> },
     // ---- Rule ready (3 backtest results)
@@ -1895,10 +2087,55 @@ export function Landing({ onBack, onRules, onStrategy, onMenu }: LandingProps) {
  * The chat: a panel over the glow, 24 top corners (Figma 5612:40695), filling the space down to the dock.
  * Motion measured on the live app's recording (2026-10-23, 360 dp): every entrance decelerates (L3 easing).
  */
+/* One screen, two layers: the intro (empty state) and the chat panel. The stage fills the body; while the chat starts
+   the intro sits on top of the panel, fading up and away. */
+.stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.intro {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  animation: dash-appear var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+/* Sent: the greeting, orb and examples lift 24 and fade (300 ms) while the message flies up past them. */
+.intro[data-leaving] {
+  position: absolute;
+  inset: 0; /* same height as before, so nothing inside moves as it fades */
+  z-index: 1;
+  pointer-events: none;
+  animation: dash-intro-out var(--app-dash-intro-out) var(--l3-motion-easing-accelerate) both;
+}
+
+@keyframes dash-intro-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--l3-spacing-24)));
+  }
+}
+
+/* The title arrives with the conversation. */
+.titleIn {
+  animation: dash-appear var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
 .panel {
   flex: 1;
   border-radius: var(--l3-radius-24) var(--l3-radius-24) 0 0;
   background: var(--l3-surface-default);
+  animation: dash-panel-in var(--app-dash-glow-move) var(--l3-motion-easing-decelerate) both;
+}
+
+/* The panel's surface fades in as the glow moves up behind the header (same timing). */
+@keyframes dash-panel-in {
+  from {
+    background-color: transparent;
+  }
 }
 
 /* The input / question dock continues the panel. */
@@ -1909,6 +2146,10 @@ export function Landing({ onBack, onRules, onStrategy, onMenu }: LandingProps) {
 /* A new turn: fades up 8 into place (250 ms). Turns already on the page keep their key, so they don't replay it. */
 .appear {
   animation: dash-appear var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+.appearAfterSend {
+  animation: dash-appear var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) var(--app-dash-fly) both;
 }
 
 @keyframes dash-appear {
@@ -1963,6 +2204,11 @@ export function Landing({ onBack, onRules, onStrategy, onMenu }: LandingProps) {
 
 @media (prefers-reduced-motion: reduce) {
   .appear,
+  .appearAfterSend,
+  .intro,
+  .intro[data-leaving],
+  .titleIn,
+  .panel,
   .rise,
   .inputBack,
   .pin {
@@ -1982,14 +2228,17 @@ import { msHistory } from '@l3/icons/material'
 import { usePreview } from '../../../shared/prototype'
 import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserMessage } from '../components/Chat'
 import { DashBar, DashScreen } from '../components/DashScreen'
+import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
 import { QuestionCard } from '../components/QuestionCard'
 import { RuleCard } from '../components/RuleCard'
+import { RulesIntro } from '../components/RulesIntro'
 import { t } from '../copy'
 import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest } from '../data'
 import styles from './RuleChat.module.css'
 
 /** Where the conversation is. */
 export type RuleChatStep =
+  | 'empty' //      nothing sent yet: greeting, orb, example prompts
   | 'thinking' //   DASH reads the request
   | 'question' //   DASH asks for the limit
   | 'preview' //    the rule, before testing
@@ -2003,6 +2252,8 @@ type RuleChatProps = {
   request?: string
   onBack?: () => void
   onHistory?: () => void
+  /** 'empty': a chip tapped or a message typed — the chat starts (on the same screen). */
+  onSend?: (message: string) => void
   /** 'thinking' moves on by itself after a moment (prototype). */
   onThought?: () => void
   onAnswer?: (answer: string) => void
@@ -2017,21 +2268,51 @@ type RuleChatProps = {
 
 /** How long DASH "thinks" before replying (prototype; the live app takes 1.5–3 s). */
 const THINKING_MS = 1600
+/** The sent message flying from the chip / input up to its place in the chat. */
+const FLY_MS = 450
+/** The intro (greeting, orb, examples) fading out as the chat starts. */
+const INTRO_OUT_MS = 300
 
 /**
- * Trading rules — the conversation with DASH (Figma "Creating the rule" ×3, "Rule created" ×3; motion from the live
- * app's recording, 2026-10-23). All steps are ONE page (the flow's `group: 'chat'`), so moving on animates in place:
+ * Trading rules — ONE chat screen, like ChatGPT or Claude: from the empty state (Figma "Rule - Landing screen") through
+ * the conversation (Figma "Creating the rule" ×3, "Rule created" ×3). Every step is the same page (the flow's
+ * `group: 'chat'`), so moving on changes the screen's state in place:
+ * - sending: the tapped chip (or the typed text) flies up and becomes the user's message; the greeting, orb and
+ *   examples fade up and away; the chat panel fades in; the glow glides from the bottom to the header; the title fades in;
  * - the conversation builds up — every message stays, the new one fades up into place, the panel scrolls to it;
  * - after an answer (or Proceed) DASH thinks first: the three dots, then the reply;
  * - DASH's question card rises out of the input's place; once answered the input comes back;
  * - when DASH has a draft, the rule card opens in the top bar's bottom slot and pushes the chat panel down;
  *   the backtest strip then unfolds under the card.
  */
-export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, sheet }: RuleChatProps) {
+export function RuleChat({ step, request: initialRequest = maxDailyLoss.title, onBack, onHistory, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, sheet }: RuleChatProps) {
   const { interactive } = usePreview()
   /** After an answer or Proceed: DASH thinks on this page before the next step comes (prototype). */
   const [pending, setPending] = useState<(() => void) | null>(null)
   const [answer, setAnswer] = useState(dailyLossQuestion.options[1])
+  /** What the user sent — the chip's text or what they typed (kept as the screen moves on). */
+  const [request, setRequest] = useState(initialRequest)
+  /** Set while the sent message is on its way up; the intro stays on top, fading, until it's gone. */
+  const [flying, setFlying] = useState<FlyOrigin | null>(null)
+  const [introLeaving, setIntroLeaving] = useState(false)
+  const stage = useRef<HTMLDivElement>(null)
+
+  const send = (text: string, from: HTMLElement) => {
+    setFlying(captureOrigin(from, text))
+    setRequest(text)
+    setIntroLeaving(true)
+    window.setTimeout(() => setIntroLeaving(false), INTRO_OUT_MS)
+    onSend?.(text)
+  }
+
+  // The chat has started: fly the message from where it was sent to its place (measured once both exist).
+  useLayoutEffect(() => {
+    if (!flying || step === 'empty') return
+    const target = stage.current?.querySelector<HTMLElement>('[data-turn="request"] p')
+    const screen = stage.current?.closest<HTMLElement>('[data-glow]')
+    if (target && screen) flyMessage(flying, target, screen, FLY_MS)
+    setFlying(null)
+  }, [flying, step])
 
   useEffect(() => {
     if (step !== 'thinking' || !interactive || !onThought) return
@@ -2053,24 +2334,24 @@ export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory
   const thinkThen = (next?: () => void) => () => next && setPending(() => next)
 
   const backtest: Backtest | undefined = step === 'saved' || step === 'cost' || step === 'none' ? backtests[step] : undefined
-  const pinned = step !== 'thinking' && step !== 'question'
+  const empty = step === 'empty'
+  const pinned = !empty && step !== 'thinking' && step !== 'question'
   const thinking = step === 'thinking' || pending != null
   const asking = step === 'question' && !pending
 
   // Keep the newest message in view as the conversation grows.
-  const panel = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => {
-    const body = panel.current?.parentElement
+    const body = stage.current?.parentElement // the screen's scrolling body
     if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
   }, [step, pending])
 
   return (
     <DashScreen
-      glow="header"
+      glow={empty ? 'bottom' : 'header'}
       tone={step === 'cost' ? 'loss' : 'brand'}
       top={
         <DashBar
-          title={t('chat.title')}
+          title={empty ? undefined : <span className={styles.titleIn}>{t('chat.title')}</span>}
           onBack={onBack}
           actions={<ActionbarAction icon={msHistory} label={t('rulesHome.history')} onClick={() => onHistory?.()} />}
           bottom={
@@ -2101,7 +2382,7 @@ export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory
               </div>
             ) : (
               <div className={step === 'question' || step === 'preview' ? styles.inputBack : undefined} key="input">
-                <ChatInput onSend={() => {}} />
+                <ChatInput onSend={empty ? send : () => {}} />
               </div>
             )}
           </Inset>
@@ -2109,23 +2390,33 @@ export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory
       }
       sheet={sheet}
     >
-      <div className={styles.panel} ref={panel}>
-        <Inset paddingInline="16" paddingBlock="24">
-          <Stack gap="24">
-            {conversation(step, request, step === 'question' && pending ? answer : step !== 'thinking' && step !== 'question' ? answer : null, {
-              onRefine,
-              onProceed: thinkThen(onProceed),
-              onSave,
-              onImprove,
-              busy: pending != null,
-            })}
-            {thinking && (
-              <div className={styles.appear} key="thinking">
-                <Thinking>{t('chat.thinking')}</Thinking>
-              </div>
-            )}
-          </Stack>
-        </Inset>
+      <div className={styles.stage} ref={stage}>
+        {(empty || introLeaving) && (
+          <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined}>
+            <RulesIntro onPick={empty ? send : undefined} />
+          </div>
+        )}
+        {!empty && (
+          <div className={styles.panel}>
+            <Inset paddingInline="16" paddingBlock="24">
+              <Stack gap="24">
+                {conversation(step, request, step === 'question' && pending ? answer : step !== 'thinking' && step !== 'question' ? answer : null, {
+                  onRefine,
+                  onProceed: thinkThen(onProceed),
+                  onSave,
+                  onImprove,
+                  busy: pending != null,
+                })}
+                {thinking && (
+                  // Right after sending, the dots wait for the message to land (live app).
+              <div className={step === 'thinking' ? styles.appearAfterSend : styles.appear} key="thinking">
+                    <Thinking>{t('chat.thinking')}</Thinking>
+                  </div>
+                )}
+              </Stack>
+            </Inset>
+          </div>
+        )}
       </div>
     </DashScreen>
   )
@@ -2139,6 +2430,7 @@ type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove'> & { onPr
  */
 function conversation(step: RuleChatStep, request: string, answered: string | null, on: Replies) {
   const turns: { key: string; node: ReactNode }[] = [{ key: 'request', node: <UserMessage>{request}</UserMessage> }]
+  if (step === 'empty') return []
   if (step === 'thinking') return render(turns)
   turns.push({ key: 'got-it', node: <AssistantMessage title={t('chat.gotIt')}>{t('chat.needDetails')}</AssistantMessage> })
   if (answered) {
@@ -2185,94 +2477,11 @@ function conversation(step: RuleChatStep, request: string, answered: string | nu
 
 const render = (turns: { key: string; node: ReactNode }[]) =>
   turns.map((turn) => (
-    <div key={turn.key} className={styles.appear}>
+    // The user's message flies into place (flyMessage) instead of fading up.
+    <div key={turn.key} className={turn.key === 'request' ? undefined : styles.appear} data-turn={turn.key}>
       {turn.node}
     </div>
   ))
-```
-
-### `src/flows/dash/screens/RulesHome.module.css`
-
-```css
-/* Figma: heading 56 below the bar; the examples sit just above the input. */
-.page {
-  flex: 1;
-  padding-block: var(--l3-spacing-48) var(--l3-spacing-24);
-}
-
-.heading {
-  text-align: center;
-}
-
-.title {
-  margin: 0;
-  font: var(--l3-text-heading-20);
-  color: var(--l3-content-primary);
-  white-space: pre-line; /* two lines: the greeting, then the question */
-}
-
-.description {
-  margin: 0;
-  font: var(--l3-text-label-12);
-  color: var(--l3-content-tertiary);
-  text-wrap: balance;
-}
-```
-
-### `src/flows/dash/screens/RulesHome.tsx`
-
-```tsx
-import { ActionbarAction } from '@l3/components/Actionbar'
-import { Inset } from '@l3/components/Inset'
-import { Stack } from '@l3/components/Stack'
-import { msHistory } from '@l3/icons/material'
-import { ChatInput, PromptChips, SparkleHeading } from '../components/Chat'
-import { DashBar, DashScreen } from '../components/DashScreen'
-import { DashOrb } from '../../../shared/ui/dash/DashOrb'
-import { t } from '../copy'
-import { examplePrompts, firstName } from '../data'
-import styles from './RulesHome.module.css'
-
-type RulesHomeProps = {
-  onBack?: () => void
-  onHistory?: () => void
-  /** A chip or a typed message: DASH starts building a rule from it. */
-  onSend?: (message: string) => void
-}
-
-/**
- * Trading rules — the empty chat (Figma "Rule - Landing screen" 5612:40261): greeting, the orb, example prompts as
- * DASH chips, and the chat input. The glow rises from the bottom here.
- */
-export function RulesHome({ onBack, onHistory, onSend }: RulesHomeProps) {
-  return (
-    <DashScreen
-      glow="bottom"
-      top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msHistory} label={t('rulesHome.history')} onClick={() => onHistory?.()} />} />}
-      bottom={
-        <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={(text) => onSend?.(text)} />
-        </Inset>
-      }
-    >
-      <Stack gap="40" justify="between" className={styles.page}>
-        <Inset paddingInline="16">
-          <Stack gap="12" className={styles.heading}>
-            <h1 className={styles.title}>{t('rulesHome.title', { name: firstName })}</h1>
-            <p className={styles.description}>{t('rulesHome.description')}</p>
-          </Stack>
-        </Inset>
-        <Stack align="center">
-          <DashOrb size="lg" />
-        </Stack>
-        <Stack as="section" gap="24">
-          <SparkleHeading>{t('rulesHome.examples')}</SparkleHeading>
-          <PromptChips rows={examplePrompts} onPick={onSend} />
-        </Stack>
-      </Stack>
-    </DashScreen>
-  )
-}
 ```
 
 ### `src/flows/dash/sheets/RuleSheets.module.css`
