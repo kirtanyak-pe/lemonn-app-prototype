@@ -52,7 +52,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 
 | Id | Screen | Figma | What it shows / when |
 |---|---|---|---|
-| `dash-02` | DASH landing | 5612:81961 | Orb, "Hi Rohan!", what DASH can build: Set Trading Rules · Create Custom Strategy; ☰ = your rules |
+| `dash-02` | DASH landing | 5612:81961 | Orb, "Hi Rohan!", what DASH can build, in this order: Create Custom Indicator · Set Trading Rules · Create Custom Strategy; ☰ = your rules |
 | `dash-03` | Rules · what to set | 5612:40261 | Greeting, orb, example prompts (2 rows, scroll sideways), chat input |
 | `dash-04` | Thinking | 5612:40517 | The user's message, "Understanding your request…" with pulsing dots |
 | `dash-05` | DASH asks the limit | 5612:40650 | "Got it!" + a question card (₹2,000 / ₹5,000 / ₹10,000 / type your answer) in the input's place |
@@ -190,6 +190,8 @@ Not built yet: the live app's DASH mascot with a face and its "Checking 4 rules 
 screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
+
+- 2026-10-23 — Landing: Create Custom Indicator moved to the top (indicator · rules · strategy).
 
 - 2026-10-23 — Custom indicator, ready / on chart: scrolling the chat down folds the pinned indicator card to a mini card (small chart preview · name · where it goes · tag, 66 tall instead of 374, 300 ms ease in and out); scrolling back to the top or tapping it opens it. Only the user's own wheel / swipe folds it, never the chat moving to its newest message. The hint under the input (“Ask for changes in plain words…”) is removed for now.
 
@@ -5014,8 +5016,8 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
           <Stack as="section" gap="24">
             <SparkleHeading>{t('landing.choose')}</SparkleHeading>
             <Stack gap="16">
-              <BuildOption icon={msAssignmentAdd} title={t('landing.rulesTitle')} description={t('landing.rulesDescription')} onClick={onRules} />
               <BuildOption icon={msMonitoring} title={t('landing.indicatorTitle')} description={t('landing.indicatorDescription')} onClick={onIndicator} />
+              <BuildOption icon={msAssignmentAdd} title={t('landing.rulesTitle')} description={t('landing.rulesDescription')} onClick={onRules} />
               <BuildOption icon={msFunction} title={t('landing.strategyTitle')} description={t('landing.strategyDescription')} onClick={onStrategy} />
             </Stack>
           </Stack>
