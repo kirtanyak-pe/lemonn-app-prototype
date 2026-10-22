@@ -288,18 +288,18 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
   color: var(--l3-content-primary);
 }
 
-/* DASH: hover and press fill the card with the brand-light surface instead of L3's grey state layer (designer's call,
+/* DASH: hover and press tint the card with the DASH orb green at 10% instead of L3's grey state layer (designer's call,
    2026-10-23). The card keeps its press scale. */
 @media (hover: hover) {
   .option.option:hover {
-    background-image: none;
-    background-color: var(--l3-surface-accent-brand-light);
+    /* the DASH orb green at 10%, laid over the card's own surface */
+    background-image: linear-gradient(color-mix(in srgb, var(--app-dash-glow-1) 10%, transparent), color-mix(in srgb, var(--app-dash-glow-1) 10%, transparent));
   }
 }
 
 .option.option:active {
-  background-image: none;
-  background-color: var(--l3-surface-accent-brand-light);
+  /* the DASH orb green at 10%, laid over the card's own surface */
+  background-image: linear-gradient(color-mix(in srgb, var(--app-dash-glow-1) 10%, transparent), color-mix(in srgb, var(--app-dash-glow-1) 10%, transparent));
 }
 ```
 
