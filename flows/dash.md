@@ -1971,7 +1971,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 /* Figma 36 tall (L3 has 36 only as a spacing step). */
 .promptChip {
   flex: none;
-  min-height: var(--l3-spacing-36);
+  min-height: var(--l3-size-40);
   padding: var(--l3-spacing-08) var(--l3-spacing-12);
   border: 1px solid var(--app-dash-green);
   border-radius: var(--l3-radius-full);
@@ -1981,6 +1981,29 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   white-space: nowrap;
   cursor: pointer;
   transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* In the vertical suggestions list: 48 tall, Label/16, 12 / 16 padding (designer's frame). */
+.promptChip[data-size='lg'] {
+  min-height: var(--l3-size-48);
+  padding: var(--l3-spacing-12) var(--l3-spacing-16);
+  font: var(--l3-text-label-16);
+}
+
+/* "Top 3 suggestions ✦": Heading/16 in the success green, the DASH sparkle after it. */
+.topLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  margin: 0;
+  font: var(--l3-text-heading-16);
+  color: var(--l3-content-accent-success-default);
+  font-size: var(--l3-font-size-200);
+}
+
+.topSparkle {
+  width: var(--l3-size-16);
+  height: var(--l3-size-16);
 }
 
 .promptChip:active {
@@ -2191,6 +2214,28 @@ export function PromptChips({ rows, onPick }: { rows: string[][]; onPick?: (prom
   )
 }
 
+/**
+ * Top suggestions as a vertical list just above the input (primary layout of the empty chat): a green "Top N
+ * suggestions ✦" label, then one DASH chip per line, left-aligned. A chip sends itself.
+ */
+export function SuggestionList({ items, onPick }: { items: string[]; onPick?: (prompt: string, from: HTMLElement) => void }) {
+  return (
+    <Stack as="section" gap="16" align="start" aria-label={t('examples.label')}>
+      <h2 className={styles.topLabel}>
+        {t('rulesHome.topSuggestions', { count: items.length })}
+        <img src={sparkle} alt="" className={styles.topSparkle} />
+      </h2>
+      <Stack gap="12" align="start">
+        {items.map((prompt) => (
+          <button style={{ fontSize: 'var(--l3-font-size-200)', lineHeight: '100%', height: '40px' }} key={prompt} type="button" className={styles.promptChip} data-size="lg" onClick={(e) => onPick?.(prompt, e.currentTarget)}>
+            {prompt}
+          </button>
+        ))}
+      </Stack>
+    </Stack>
+  )
+}
+
 /** What the user sent: a grey pill on the right. */
 export function UserMessage({ children }: { children: ReactNode }) {
   return (
@@ -2329,8 +2374,12 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
   filter: hue-rotate(-115deg) saturate(1.2);
 }
 
-/* The screen is see-through so the background shows; its parts bring their own surfaces. */
+/* The screen is see-through so the background shows; its parts bring their own surfaces. Edge to edge: the background
+   runs under the OS bars, the screen's content stays clear of them (insets from the preview / the phone). */
 .screen.screen {
+  box-sizing: border-box;
+  padding-top: var(--os-inset-top, 0px);
+  padding-bottom: var(--os-inset-bottom, 0px);
   background: transparent;
 }
 
@@ -2377,11 +2426,12 @@ type DashScreenProps = ComponentProps<typeof Screen> & {
  * - a soft white disc over it, blurred, so the middle of the page stays calm;
  * - a fine grid at the top.
  * Everything on it is a normal screen (top bar, body, bottom, sheet). With the keyboard up the background shrinks to
- * end above it (300 ms, ease-in-out). The OS status bar takes brand-light, the nearest L3 surface to the gradient top.
+ * end above it (300 ms, ease-in-out). The page is edge to edge (data-edge-to-edge): it draws under the OS status and
+ * navigation bars, which have no fill on DASH pages, so the gradient and its motion show behind them too.
  */
 export function DashScreen({ tone = 'brand', keyboard = false, className, ...screen }: DashScreenProps) {
   return (
-    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-status-surface="brand" data-dash="">
+    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-edge-to-edge="" data-dash="">
       <div className={styles.background} aria-hidden="true">
         <div className={styles.gradientBox}>
           <img src={gradient} alt="" className={styles.gradient} />
@@ -2964,7 +3014,7 @@ export function MiniChart({ stage, sellTone = 'sell' }: { stage: MiniChartStage;
   border-top: 1px solid var(--l3-border-light);
 }
 
-/* An answer row: 44 tall (Figma), number badge · value · tick. Whole row is the button. */
+/* An answer row: 44 tall (Figma), number badge (a check once picked) · value. Whole row is the button. */
 .option {
   display: flex;
   align-items: center;
@@ -2998,21 +3048,18 @@ export function MiniChart({ stage, sellTone = 'sell' }: { stage: MiniChartStage;
   font: var(--l3-text-label-12);
 }
 
+/* Picked: the number's disc fills (content-primary) and shows a check instead of the number. */
+.number[data-checked] {
+  background: var(--l3-content-primary);
+  color: var(--l3-content-inverted);
+  transition: background-color var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
 .label {
   flex: 1;
   font: var(--l3-text-label-14);
 }
 
-/* Picked: a filled 24 disc with a tick (content-primary, like Figma's black). */
-.tick {
-  display: grid;
-  place-items: center;
-  width: var(--l3-size-24);
-  height: var(--l3-size-24);
-  border-radius: var(--l3-radius-full);
-  background: var(--l3-content-primary);
-  color: var(--l3-content-inverted);
-}
 
 /* "Type your answer": under a dashed line, a pencil and a plain field. */
 .typeRow {
@@ -3064,17 +3111,24 @@ type QuestionCardProps = {
   onClose?: () => void
 }
 
+/** How long the picked answer shows its tick before it's sent (the card then gives way to the next question). */
+const ANSWER_TICK_MS = 700
+
 /**
- * DASH asks a follow-up, docked above the chat input (Figma 5612:40650): the question + ✕, numbered answers (the
- * picked one gets a filled tick), and a last "Type your answer" row for anything else.
+ * DASH asks a follow-up, right under its message in the chat (Figma 5612:40650): the question + ✕, numbered answers,
+ * and a last "Type your answer" row for anything else. Tapping an answer turns its number into a check for 0.7 s,
+ * then sends it — DASH moves on to the next question, or takes the answer. One pick per card.
  */
 export function QuestionCard({ question, selected: initial, onAnswer, onClose }: QuestionCardProps) {
   const id = useId()
   const [selected, setSelected] = useState(initial)
   const [typed, setTyped] = useState('')
+  const [sent, setSent] = useState(false)
   const pick = (answer: string) => {
+    if (sent) return
+    setSent(true)
     setSelected(answer)
-    onAnswer?.(answer)
+    window.setTimeout(() => onAnswer?.(answer), ANSWER_TICK_MS)
   }
   return (
     <section className={styles.card} aria-labelledby={id}>
@@ -3086,13 +3140,11 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
         {question.options.map((option, i) => (
           <li key={option}>
             <button type="button" className={styles.option} aria-pressed={selected === option} onClick={() => pick(option)}>
-              <span className={styles.number} aria-hidden="true">{i + 1}</span>
+              {/* The number turns into a check when this answer is picked. */}
+              <span className={styles.number} data-checked={selected === option || undefined} aria-hidden="true">
+                {selected === option ? <Icon icon={msCheck} size={16} /> : i + 1}
+              </span>
               <span className={styles.label}>{option}</span>
-              {selected === option && (
-                <span className={styles.tick} aria-hidden="true">
-                  <Icon icon={msCheck} size={16} />
-                </span>
-              )}
             </button>
           </li>
         ))}
@@ -3410,6 +3462,18 @@ export function RuleSummary({ title, description }: { title: string; description
   margin-top: var(--l3-spacing-40);
 }
 
+/* The list layout: the suggestions sit at the bottom, just above the input; the heading + orb stay centred in the
+   space above them (auto margins on both). */
+.body:has(> [data-layout='list']) > [data-part='heading'] {
+  margin-top: auto;
+}
+
+.fold[data-part='examples'][data-layout='list'] {
+  margin-top: auto;
+  padding-top: var(--l3-spacing-40);
+  padding-bottom: var(--l3-spacing-16);
+}
+
 .fold[data-gone] {
   grid-template-rows: 0fr;
   opacity: 0;
@@ -3455,7 +3519,7 @@ import { Stack } from '@l3/components/Stack'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { t } from '../copy'
 import { examplePrompts, firstName } from '../data'
-import { PromptChips, SparkleHeading } from './Chat'
+import { PromptChips, SparkleHeading, SuggestionList } from './Chat'
 import styles from './RulesIntro.module.css'
 
 type RulesIntroProps = {
@@ -3466,6 +3530,13 @@ type RulesIntroProps = {
   examples?: string[][]
   /** Typing (Figma "3.1 Manual typing"): the heading and the examples fold away, the logo stays in the middle. */
   typing?: boolean
+  /**
+   * How the suggestions show. 'list' (primary, default): "Top 3 suggestions" as a vertical list just above the
+   * input. 'rows': the earlier example rows drifting sideways under the orb — secondary, kept for later, not used now.
+   */
+  suggestions?: 'list' | 'rows'
+  /** The list's suggestions (default: the first three examples). */
+  top?: string[]
 }
 
 /**
@@ -3474,7 +3545,7 @@ type RulesIntroProps = {
  * screen: a chip sends itself; tapping the input folds the heading and the examples away (300 ms) so the orb sits
  * alone above the keyboard.
  */
-export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstName }), description = t('rulesHome.description'), examples = examplePrompts, typing = false }: RulesIntroProps) {
+export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstName }), description = t('rulesHome.description'), examples = examplePrompts, typing = false, suggestions = 'list', top = examples.flat().slice(0, 3) }: RulesIntroProps) {
   return (
     <Stack align="stretch" justify="center" className={styles.body}>
       <div className={styles.fold} data-part="heading" data-gone={typing || undefined}>
@@ -3490,12 +3561,18 @@ export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstN
       <Stack align="center">
         <DashOrb size="lg" />
       </Stack>
-      <div className={styles.fold} data-part="examples" data-gone={typing || undefined}>
+      <div className={styles.fold} data-part="examples" data-layout={suggestions} data-gone={typing || undefined}>
         <div className={styles.foldInner}>
-          <Stack as="section" gap="24">
-            <SparkleHeading>{t('rulesHome.examples')}</SparkleHeading>
-            <PromptChips rows={examples} onPick={onPick} />
-          </Stack>
+          {suggestions === 'list' ? (
+            <Inset paddingInline="16">
+              <SuggestionList items={top} onPick={onPick} />
+            </Inset>
+          ) : (
+            <Stack as="section" gap="24">
+              <SparkleHeading>{t('rulesHome.examples')}</SparkleHeading>
+              <PromptChips rows={examples} onPick={onPick} />
+            </Stack>
+          )}
         </div>
       </div>
     </Stack>
@@ -3969,7 +4046,8 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "indicator.linePart": "Line · {name}",
   "indicator.notes": "{count} notes from testing",
   "indicator.addToChart": "Add indicator on Chart",
-  "indicator.adding": "Adding…"
+  "indicator.adding": "Adding…",
+  "rulesHome.topSuggestions": "Top {count} suggestions"
 }
 ```
 
@@ -3994,6 +4072,9 @@ import { user } from '../../shared/data/user'
 export const firstName = user.name.split(' ')[0]
 
 /** Example prompts on the rules landing, in two sideways-scrolling rows. Tapping one sends it as the message. */
+/** The top suggestions on the empty chat (primary layout: a vertical list just above the input). */
+export const topSuggestions: string[] = ["Don't let me overtrade", 'Set Max daily loss to save more', 'Cut losing trades automatically']
+
 export const examplePrompts: string[][] = [
   ["Don't let me overtrade", 'Max daily loss', 'Limit my number of trades'],
   ['Limit my position size', 'Cut losing trades automatically', 'Protect my profits'],
@@ -4668,6 +4749,23 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
                     {turn.node}
                   </div>
                 ))}
+                {asking && (
+                  // DASH's question sits right under its message (visible without scrolling to the bottom).
+                  <div className={styles.rise} key={`ask-${step}`}>
+                    <QuestionCard
+                      question={question}
+                      onAnswer={(a) => {
+                        if (step === 'chart') {
+                          setChart(a)
+                          setPending(() => () => onChart?.(a))
+                        } else {
+                          setTimeframe(a)
+                          setPending(() => () => onTimeframe?.(a))
+                        }
+                      }}
+                    />
+                  </div>
+                )}
                 {(pending || changing) && (
                   <div className={step === 'empty' ? styles.appearAfterSend : styles.appear} key="thinking">
                     <Thinking>{t('chat.thinking')}</Thinking>
@@ -4681,32 +4779,15 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
 
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          {asking ? (
-            <div className={styles.rise} key={step}>
-              <QuestionCard
-                question={question}
-                onAnswer={(a) => {
-                  if (step === 'chart') {
-                    setChart(a)
-                    setPending(() => () => onChart?.(a))
-                  } else {
-                    setTimeframe(a)
-                    setPending(() => () => onTimeframe?.(a))
-                  }
-                }}
-              />
-            </div>
-          ) : (
-            <ChatInput
-              key="input"
-              value={draft}
-              onChange={setDraft}
-              typing={keyboardUp}
-              autoFocus={keyboardUp}
-              onFocus={empty ? () => onTyping?.(true) : undefined}
-              onSend={empty ? send : step === 'ready' || step === 'onChart' ? askChange : () => {}}
-            />
-          )}
+          <ChatInput
+            key="input"
+            value={draft}
+            onChange={setDraft}
+            typing={keyboardUp}
+            autoFocus={keyboardUp}
+            onFocus={empty ? () => onTyping?.(true) : undefined}
+            onSend={empty ? send : step === 'ready' || step === 'onChart' ? askChange : () => {}}
+          />
           {(step === 'ready' || step === 'onChart') && <p className={own.hint}>{t('indicator.changeHint')}</p>}
         </Inset>
       </div>
@@ -4991,7 +5072,7 @@ import { QuestionCard } from '../components/QuestionCard'
 import { RuleCard } from '../components/RuleCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { t } from '../copy'
-import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest } from '../data'
+import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions } from '../data'
 import styles from './RuleChat.module.css'
 
 /** Where the conversation is. */
@@ -5127,7 +5208,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
       <div className={styles.scroll} ref={scroller} onClick={keyboardUp ? () => onTyping?.(false) : undefined}>
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} typing={keyboardUp} />
+            <RulesIntro onPick={empty ? send : undefined} typing={keyboardUp} top={topSuggestions} />
           </div>
         )}
         {!empty && (
@@ -5141,6 +5222,18 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
                   onImprove,
                   busy: pending != null,
                 })}
+                {asking && (
+                  // DASH's question sits right under its message (visible without scrolling to the bottom).
+                  <div className={styles.rise} key="ask">
+                    <QuestionCard
+                      question={dailyLossQuestion}
+                      onAnswer={(a) => {
+                        setAnswer(a)
+                        thinkThen(() => onAnswer?.(a))()
+                      }}
+                    />
+                  </div>
+                )}
                 {thinking && (
                   // Right after sending, the dots wait for the message to land (live app).
                   <div className={step === 'thinking' ? styles.appearAfterSend : styles.appear} key="thinking">
@@ -5155,21 +5248,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
 
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          {asking ? (
-            <div className={styles.rise} key="question">
-              <QuestionCard
-                question={dailyLossQuestion}
-                onAnswer={(a) => {
-                  setAnswer(a)
-                  thinkThen(() => onAnswer?.(a))()
-                }}
-              />
-            </div>
-          ) : (
-            <div className={step === 'question' || step === 'preview' ? styles.inputBack : undefined} key="input">
-              <ChatInput value={draft} onChange={setDraft} typing={keyboardUp} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={keyboardUp} onSend={empty ? send : () => {}} />
-            </div>
-          )}
+          <ChatInput value={draft} onChange={setDraft} typing={keyboardUp} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={keyboardUp} onSend={empty ? send : () => {}} />
         </Inset>
       </div>
 
