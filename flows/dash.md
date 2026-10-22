@@ -832,7 +832,8 @@ export function DashEntry({ onClick }: { onClick?: () => void }) {
 .leafFront {
   position: relative;
   flex: none;
-  transform: scaleY(-1) rotate(-108.93deg) skewX(1deg);
+  /* Figma's order: rotate, then skew, then the vertical flip (Tailwind -scale-y-100 rotate-[-108.93deg] skew-x-1) */
+  transform: rotate(-108.93deg) skewX(1deg) scaleY(-1);
 }
 
 .leafBack {
@@ -984,7 +985,26 @@ function OrbArt({ className }: { className?: string }) {
   height: var(--ring);
   opacity: var(--l3-opacity-50);
   filter: blur(var(--app-dash-glow-blur)); /* on the wrapper, so the ring's cut edges blur too */
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) rotate(-75.32deg);
+  animation: dash-glow-turn 3.08s infinite;
+}
+
+/* Figma motion on "Gradient": one full turn (−75.3° → 284.7°), ease-in over the first 75% of 3.08 s, then a pause. */
+@keyframes dash-glow-turn {
+  0% {
+    transform: translate(-50%, -50%) rotate(-75.32deg);
+    animation-timing-function: ease-in;
+  }
+  75.38%,
+  100% {
+    transform: translate(-50%, -50%) rotate(284.68deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow {
+    animation: none;
+  }
 }
 
 .glow::before {
