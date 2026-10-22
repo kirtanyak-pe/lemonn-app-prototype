@@ -10,8 +10,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `dash-01` | Intro · coach mark | [5612:44075](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-44075) | `dash-02` | First visit to F&O home after launch: an L3 coach mark on the DASH pill. Only the top bar is drawn (Figma marks the home "don’t replicate"). |
-| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `dash-01`, `dash-03`, `dash-14` | Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
+| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `stocks-01`, `dash-03`, `dash-14` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
 | `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-04` | Example chips (sideways scroll) send themselves as the message; typing + Send does the same. History opens your rules. |
 | `dash-04` | Thinking | [5612:40517](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517) | `dash-03`, `dash-14`, `dash-05` | Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies). |
 | `dash-05` | DASH asks the limit | [5612:40650](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650) | `dash-03`, `dash-14`, `dash-06` | The question card takes the input’s place. Any answer (or one typed) builds the preview. |
@@ -40,13 +39,12 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
   DASH's **own chat style** (orb, glow background, chat input, chips, rule card), which is different from the rest of
   the app on purpose.
 - **Status:** ✅ · last updated 2026-10-22
-- **Entry:** the DASH pill in the F&O home top bar (first visit: a coach mark points at it) · **Exit:** back → F&O home
+- **Entry:** the DASH pill in the **Stocks home** top bar (`stocks-01`; first visit: the coach mark, `stocks-08`) · **Exit:** back → Stocks home
 
 ### Screens
 
 | Id | Screen | Figma | What it shows / when |
 |---|---|---|---|
-| `dash-01` | Intro · coach mark | 5612:44075 | F&O home's top bar with the DASH pill; an L3 coach mark "DASH AI" + Got it! (rest of F&O home not drawn) |
 | `dash-02` | DASH landing | 5612:81961 | Orb, "Hi Rohan!", what DASH can build: Set Trading Rules · Create Custom Strategy; ☰ = your rules |
 | `dash-03` | Rules · what to set | 5612:40261 | Greeting, orb, example prompts (2 rows, scroll sideways), chat input |
 | `dash-04` | Thinking | 5612:40517 | The user's message, "Understanding your request…" with pulsing dots |
@@ -67,7 +65,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 ### Navigation
 
 ```
-F&O home DASH pill ─▶ dash-01 (first visit) ─Got it / pill─▶ dash-02
+stocks-01 DASH pill ─▶ dash-02 (first visit: stocks-08 coach mark ─Got it / pill─▶ dash-02) · dash-02 back ─▶ stocks-01
 dash-02 Set Trading Rules ─▶ dash-03 ─chip / Send─▶ dash-04 ─(DASH replies)─▶ dash-05 ─answer─▶ dash-06
 dash-06 Proceed ─▶ backtest ─▶ dash-07 (saved) | dash-08 (cost) | dash-09 (no data)     · refine ─▶ dash-05
 dash-07/08/09 rule description ─▶ dash-10/11/12 (Okay ─▶ back) · Yes, save it / No, save as it is ─▶ dash-13
@@ -95,7 +93,7 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 |---|---|---|
 | Top bar | L3 `Actionbar` (see-through on DASH pages: `DashBar`) | Back, title "Trading rules", history (Tertiary action); the draft rule card sits in its **bottom slot** (pinned) |
 | Background | DASH `DashScreen` | A blurred lime ring (angular gradient, 50%, blur 50) + white wave lines; `glow`: header / landing / bottom; `tone="loss"` = red |
-| Mascot | DASH `DashOrb` (lg 96 · md 64 · sm 32) | The Figma vector parts in `assets/` (leaves, fill, ring) + a blurred halo copy |
+| Mascot | shared `DashOrb` (src/shared/ui/dash; lg 96 · md 64 · sm 32 · xs 24) | The Figma vector parts (leaves, fill, ring) + a blurred halo copy |
 | Chat input | DASH `ChatInput` | White pill, 56 tall, 1px DASH green edge, float shadow; Send = L3 Button primary md, icon-only, round |
 | Examples | DASH `SparkleHeading` + `PromptChips` | Caps label 12 tracked 16% between two sparkles; chips 36 tall, DASH green edge, rows scroll sideways |
 | Messages | DASH `UserMessage` · `AssistantMessage` · `Thinking` | User: grey pill on the right, Label/14. DASH: Heading/14 + Description/14, no bubble; earlier text fades to 40% |
@@ -103,8 +101,7 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 | Question | DASH `QuestionCard` | Radius 16 card: question + ✕ (L3 Ghost), numbered rows (24 disc), the pick gets a filled tick, dashed "Type your answer" row |
 | Rule card | DASH `RuleCard` + `BacktestStrip` | Orb sm + name, dashed line, value chip (preview) or 2-line description + chevron (→ read more); strip tinted by result |
 | Landing options | DASH `BuildOption` | Icon tile 56 (grey), name Heading/14, one line Label/12, chevron; DASH green edge at 50% |
-| Entry pill | DASH `DashEntry` | Orb + "DASH", green ring + glow, in the F&O home top bar |
-| Coach mark | L3 `CoachMark` | Heading "DASH AI", one sentence, Got it! |
+| Entry pill | shared `DashEntry` (src/shared/ui/dash) | Orb + "DASH" on a white-to-lime fill, green-to-lime edge; lives in the Stocks home top bar |
 | Sheets | L3 `BottomSheet` (via `Sheet`), `BottomSheetHeader`, `ButtonGroup` (horizontal for 2) | Read more · Rule created (L3 Spot success + confetti) · Delete? · Deleted |
 | Rules list | L3 `Card` (filled footer) + `ListCell` + `Avatar` (initial) + `Switch`; Delete = Tertiary Small | Create New = Large primary in the dock |
 
@@ -129,7 +126,7 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
   limit…" → the full sentence (cut at 2 lines); "I would suggest you to improve" → "I would suggest you improve";
   "Let me know what would you like…" → "what you would like…".
 - **One loss number:** the card says ₹22,390, Figma's sheet ₹22,300 → ₹22,390 in both.
-- **Intro:** only F&O home's top bar is drawn (Figma marks the home "don't replicate"); its body is a skeleton.
+- **Entry:** the DASH pill and its first-visit coach mark live on the Stocks home (`stocks-01`, `stocks-08`), not in this flow; `dash-01` was removed (2026-10-22). Ids start at `dash-02`.
 - **Status bar:** takes L3 brand-light on pages with the glow at the top (the nearest surface to the glow); Figma draws
   the glow under the status bar.
 - The white 10% blur glass layer over the glow is left out (no visible difference).
@@ -144,92 +141,13 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 
 ### Changelog
 
+- 2026-10-22 — Entry moved to the Stocks home top bar (DASH pill + coach mark there); `dash-01` removed; the orb and the pill are shared (`src/shared/ui/dash`).
+
 - 2026-10-22 — First build: 17 screens from "DASH AI - main flow", DASH chat style as flow components, verified
   against every Figma frame at 392 wide.
 
 
 ## Source — this flow
-
-### `src/flows/dash/assets/leaf-back.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="58.2771" height="56.2179" viewBox="0 0 58.2771 56.2179" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Group 1000006113" filter="url(#filter0_f_0_282)">
-<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M11.1805 6.4948L10.2325 8.23984C7.21698 13.7241 6.07176 19.8031 6.63218 25.5588C7.5941 35.2352 13.3302 44.2732 22.6694 49.2476L23.6172 47.5025C27.4934 40.6061 28.2232 32.8573 26.4785 25.7606C24.3978 17.9116 19.1614 10.7108 11.1805 6.4948Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
-<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M51.7823 38.3919C48.9397 43.4603 44.4029 47.018 39.1965 48.6543C33.6484 50.4553 27.3477 50.0009 21.8287 47.1335C24.6713 42.065 29.2933 38.5078 34.4997 36.8715C39.9626 35.07 46.2638 35.4411 51.7823 38.3919Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
-</g>
-<defs>
-<filter id="filter0_f_0_282" x="-7.45058e-08" y="2.2538e-07" width="58.2771" height="56.2179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feGaussianBlur stdDeviation="3.2474" result="effect1_foregroundBlur_0_282"/>
-</filter>
-</defs>
-</svg>
-```
-
-### `src/flows/dash/assets/leaf-front.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40.0692" height="39.5257" viewBox="0 0 40.0692 39.5257" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Group 1000006112">
-<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M40.0554 29.6165C37.5947 34.0042 33.6673 37.084 29.1603 38.5005C24.3574 40.0595 18.9031 39.6661 14.1254 37.1839C16.5862 32.7963 20.5873 29.7169 25.0943 28.3004C29.8234 26.7409 35.2782 27.0621 40.0554 29.6165Z" fill="url(#paint0_linear_0_409)"/>
-<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M4.19434 0.0243672L3.37396 1.5349C0.764101 6.28215 -0.226587 11.5445 0.259219 16.5271C1.09303 24.9038 6.05968 32.7283 14.1449 37.0356L14.9652 35.525C18.3199 29.5554 18.9507 22.8476 17.4396 16.704C15.6376 9.90912 11.1037 3.67494 4.19434 0.0243672Z" fill="url(#paint1_linear_0_409)"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear_0_409" x1="21.3968" y1="29.3938" x2="22.0238" y2="39.1604" gradientUnits="userSpaceOnUse">
-<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
-<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
-</linearGradient>
-<linearGradient id="paint1_linear_0_409" x1="5.24577" y1="6.42552" x2="13.4379" y2="33.8372" gradientUnits="userSpaceOnUse">
-<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
-<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
-</linearGradient>
-</defs>
-</svg>
-```
-
-### `src/flows/dash/assets/orb-fill.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="57.6624" height="59.2824" viewBox="0 0 57.6624 59.2824" fill="none" xmlns="http://www.w3.org/2000/svg">
-<mask id="stroke0_0_416" fill="white">
-<path d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z"/>
-</mask>
-<path id="Ellipse 8" d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z" stroke-width="16.8671" stroke="url(#paint0_linear_0_416)" mask="url(#stroke0_0_416)"/>
-<defs>
-<linearGradient id="paint0_linear_0_416" x1="17.0104" y1="56.2094" x2="43.5226" y2="4.92706" gradientUnits="userSpaceOnUse">
-<stop stop-color="#72E780" style="stop-color:#72E780;stop-color:color(display-p3 0.4476 0.9047 0.5009);stop-opacity:1;"/>
-<stop offset="1" stop-color="#FDFFB5" style="stop-color:#FDFFB5;stop-color:color(display-p3 0.9903 1.0000 0.7091);stop-opacity:1;"/>
-</linearGradient>
-</defs>
-</svg>
-```
-
-### `src/flows/dash/assets/orb-ring.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="72.0446" height="73.8103" viewBox="0 0 72.0446 73.8103" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="circleGroup">
-<g id="Ellipse 9" filter="url(#filter0_f_0_407)">
-<mask id="stroke0_0_407" fill="white">
-<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z"/>
-</mask>
-<mask id="stroke1_0_407">
-<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="white" mask="url(#stroke0_0_407)"/>
-</mask>
-<g clip-path="url(#paint0_angular_0_407_clip_path)" data-figma-skip-parse="true" mask="url(#stroke1_0_407)"><g transform="matrix(0.01625 -0.02375 0.0230642 0.0166474 37.0963 36.713)"><foreignObject x="-3827.82" y="-3827.82" width="7655.64" height="7655.64"><div xmlns="http://www.w3.org/1999/xhtml" style="background:conic-gradient(from 90deg,rgba(121, 234, 105, 1) 0deg,rgba(246, 253, 38, 1) 124.615deg,rgba(52, 177, 33, 1) 238.846deg,rgba(122, 235, 105, 1) 360deg);height:100%;width:100%;opacity:1"></div></foreignObject></g></g><path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="black" stroke-opacity="0" data-figma-gradient-stroke="{&#34;type&#34;:&#34;GRADIENT_ANGULAR&#34;,&#34;stops&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;transform&#34;:{&#34;m00&#34;:32.500003814697266,&#34;m01&#34;:46.128456115722656,&#34;m02&#34;:-2.2179441452026367,&#34;m10&#34;:-47.500007629394531,&#34;m11&#34;:33.294700622558594,&#34;m12&#34;:43.815639495849609},&#34;opacity&#34;:1.0,&#34;blendMode&#34;:&#34;NORMAL&#34;,&#34;stopsVar&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;visible&#34;:true}" mask="url(#stroke0_0_407)"/>
-</g>
-</g>
-<defs>
-<filter id="filter0_f_0_407" x="0" y="0" width="72.0446" height="73.8103" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feGaussianBlur stdDeviation="2.29814" result="effect1_foregroundBlur_0_407"/>
-</filter>
-<clipPath id="paint0_angular_0_407_clip_path"><rect x="-41.3666" y="-41.3666" width="154.778" height="156.543"/></clipPath></defs>
-</svg>
-```
 
 ### `src/flows/dash/assets/sparkle.svg`
 
@@ -693,238 +611,6 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
         </button>
       ))}
     </Stack>
-  )
-}
-```
-
-### `src/flows/dash/components/DashEntry.module.css`
-
-```css
-/* Figma DASH pill: 32 tall, full radius, white, a 2px DASH green ring and a soft green glow. */
-.entry {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--l3-spacing-04);
-  height: var(--l3-size-32);
-  padding: 0 var(--l3-spacing-12) 0 var(--l3-spacing-04);
-  border: 2px solid var(--app-dash-glow-1);
-  border-radius: var(--l3-radius-full);
-  background: var(--l3-surface-default);
-  box-shadow: 0 0 var(--l3-spacing-12) var(--app-dash-glow-1); /* the glow (Figma outer glow 12) */
-  color: var(--l3-content-accent-success-default);
-  cursor: pointer;
-}
-
-.entry > span:first-child {
-  --orb-box: var(--l3-size-24);
-}
-
-.label {
-  font: var(--l3-text-heading-12);
-}
-
-.entry:focus-visible {
-  outline: 2px solid var(--l3-content-primary);
-  outline-offset: 2px;
-}
-```
-
-### `src/flows/dash/components/DashEntry.tsx`
-
-```tsx
-import { t } from '../copy'
-import { DashOrb } from './DashOrb'
-import styles from './DashEntry.module.css'
-
-/**
- * The way into DASH from the F&O home top bar: a white pill with the orb and "DASH", glowing in the DASH green
- * (Figma "Intro", 5612:44075).
- */
-export function DashEntry({ onClick }: { onClick?: () => void }) {
-  return (
-    <button type="button" className={styles.entry} onClick={onClick} aria-label={t('entry.label')}>
-      <DashOrb size="sm" halo={false} />
-      <span className={styles.label}>{t('entry.title')}</span>
-    </button>
-  )
-}
-```
-
-### `src/flows/dash/components/DashOrb.module.css`
-
-```css
-/*
- * The orb artwork is the Figma vector component: every part keeps the exact Figma box (px inside a 100 × 100 frame —
- * artwork geometry, not layout), and the whole thing scales to the slot. Sizes come from L3 size tokens.
- */
-.orb {
-  --orb-box: var(--l3-size-96);
-  position: relative;
-  display: inline-block;
-  flex: none;
-  width: var(--orb-box);
-  height: var(--orb-box);
-}
-
-.orb[data-size='lg'] { --orb-box: var(--l3-size-96); }
-.orb[data-size='md'] { --orb-box: var(--l3-size-64); }
-.orb[data-size='sm'] { --orb-box: var(--l3-size-32); }
-
-/* The art is drawn at 100 and scaled to the box. */
-.scale {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100px;
-  height: 100px;
-  transform: scale(calc(var(--orb-box) / 100px));
-  transform-origin: 0 0;
-}
-
-.art {
-  position: absolute;
-  inset: 0;
-}
-
-/* Figma: the halo copy sits 8 right / 10 down, layer blur 23.35. */
-.halo {
-  transform: translate(8px, 10px);
-  filter: blur(var(--app-dash-orb-halo-blur));
-}
-
-.art img {
-  display: block;
-  max-width: none;
-}
-
-/* "Group 1000006113" (back leaf, blurred glow): box 55.5 × 57.8, bottom 49.7, centre +17.2. */
-.leafBackBox,
-.leafFrontBox {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(-50%);
-}
-
-.leafBackBox {
-  bottom: 49.71px;
-  left: calc(50% + 17.24px);
-  width: 55.526px;
-  height: 57.791px;
-}
-
-.leafBack,
-.leafFront {
-  position: relative;
-  flex: none;
-  /* Figma's order: rotate, then skew, then the vertical flip (Tailwind -scale-y-100 rotate-[-108.93deg] skew-x-1) */
-  transform: rotate(-108.93deg) skewX(1deg) scaleY(-1);
-}
-
-.leafBack {
-  width: 45.469px;
-  height: 43.372px;
-}
-
-.leafBackImg {
-  position: absolute;
-  inset: -14.91% -14.25% -14.71% -13.92%;
-  width: auto;
-  height: auto;
-}
-
-/* "Group 1000006112" (front leaves). */
-.leafFrontBox {
-  bottom: 50.97px;
-  left: calc(50% + 17.61px);
-  width: 50.159px;
-  height: 51.373px;
-}
-
-.leafFront {
-  width: 40.069px;
-  height: 39.526px;
-}
-
-.leafFront img {
-  width: 100%;
-  height: 100%;
-}
-
-/* "Ellipse 8": the ring's soft inner fill. */
-.fill {
-  position: absolute;
-  top: 30.85px;
-  left: 10.38px;
-  width: 57.662px;
-  height: 59.282px;
-}
-
-/* "circleGroup": the angular-gradient ring. */
-.ringBox {
-  position: absolute;
-  top: 27.88px;
-  left: 7.5px;
-  width: 62.852px;
-  height: 64.618px;
-}
-
-.ring {
-  position: absolute;
-  inset: -7.11% -7.31%;
-  width: auto;
-  height: auto;
-}
-```
-
-### `src/flows/dash/components/DashOrb.tsx`
-
-```tsx
-import leafBack from '../assets/leaf-back.svg'
-import leafFront from '../assets/leaf-front.svg'
-import orbFill from '../assets/orb-fill.svg'
-import orbRing from '../assets/orb-ring.svg'
-import styles from './DashOrb.module.css'
-
-export type DashOrbSize = 'sm' | 'md' | 'lg'
-
-/**
- * DASH's mascot — the lime ring with two leaves (Figma "Logo" / "BotIcon", the 100 × 100 vector component), drawn from
- * its own vector parts in the Figma positions, with the soft halo behind it (a blurred copy).
- * Sizes: lg 100 (landing pages), md 64 (sheet headers, on a soft disc), sm 32 (the rule card's icon).
- * Decorative: screen readers skip it — the text next to it says what it is.
- */
-export function DashOrb({ size = 'lg', halo = true }: { size?: DashOrbSize; halo?: boolean }) {
-  return (
-    <span className={styles.orb} data-size={size} aria-hidden="true">
-      <span className={styles.scale}>
-        {halo && <OrbArt className={styles.halo} />}
-        <OrbArt />
-      </span>
-    </span>
-  )
-}
-
-/** The artwork at its Figma size (100 × 100); the parent scales it. */
-function OrbArt({ className }: { className?: string }) {
-  return (
-    <span className={[styles.art, className].filter(Boolean).join(' ')}>
-      <span className={styles.leafBackBox}>
-        <span className={styles.leafBack}>
-          <img src={leafBack} alt="" className={styles.leafBackImg} />
-        </span>
-      </span>
-      <span className={styles.leafFrontBox}>
-        <span className={styles.leafFront}>
-          <img src={leafFront} alt="" />
-        </span>
-      </span>
-      <img src={orbFill} alt="" className={styles.fill} />
-      <span className={styles.ringBox}>
-        <img src={orbRing} alt="" className={styles.ring} />
-      </span>
-    </span>
   )
 }
 ```
@@ -1424,7 +1110,7 @@ import { Stack } from '@l3/components/Stack'
 import { msChevronRight, msError, msTrendingDown, msTrendingUp } from '@l3/icons/material'
 import { t } from '../copy'
 import { rupees, type Backtest, type DraftRule } from '../data'
-import { DashOrb } from './DashOrb'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import styles from './RuleCard.module.css'
 
 type RuleCardProps = {
@@ -1526,15 +1212,6 @@ export function RuleSummary({ title, description }: { title: string; description
 
 ```json
 {
-  "entry.title": "DASH",
-  "entry.label": "Open DASH AI",
-  "intro.searchPlaceholder": "Search for stocks",
-  "intro.wallet": "Wallet",
-  "intro.heading": "DASH AI",
-  "intro.body": "DASH helps you build your rules and strategies.",
-  "intro.gotIt": "Got it!",
-  "intro.restOfHome": "F&O home (not part of this flow)",
-
   "landing.menu": "Your rules",
   "landing.greeting": "Hi {name}!",
   "landing.title": "Let me know what you would like to do today?",
@@ -1543,18 +1220,15 @@ export function RuleSummary({ title, description }: { title: string; description
   "landing.rulesDescription": "Build trading habits that protect your capital.",
   "landing.strategyTitle": "Create Custom Strategy",
   "landing.strategyDescription": "Describe your strategy and let DASH build it for you.",
-
   "rulesHome.history": "Rule history",
   "rulesHome.title": "Hello, {name}!\nWhat rules do you want to set?",
   "rulesHome.description": "Describe your trading habits, and I'll turn them into personalised rules.",
   "rulesHome.examples": "Here are some examples",
   "examples.label": "Example rules",
-
   "input.placeholder": "Type here",
   "input.label": "Message DASH",
   "input.send": "Send",
   "replies.label": "Quick replies",
-
   "chat.title": "Trading rules",
   "chat.thinking": "Understanding your request…",
   "chat.gotIt": "Got it!",
@@ -1569,32 +1243,26 @@ export function RuleSummary({ title, description }: { title: string; description
   "chat.weakText": "I would suggest you improve your rule.",
   "chat.saveAnyway": "No, save as it is",
   "chat.improve": "Yes, improve my rule",
-
   "question.close": "Close",
   "question.typePlaceholder": "Type your answer",
   "question.typeLabel": "Your own answer",
-
   "rule.readMore": "Read more",
   "backtest.savedBefore": "Would have saved you ",
   "backtest.savedAfter": " in {months} months",
   "backtest.costBefore": "Would’ve cost ",
   "backtest.costAfter": " of profit in {months} months",
   "backtest.none": "Couldn’t test this, not enough history yet",
-
   "readMore.okay": "Okay",
-
   "created.title": "Your rule is created",
   "created.description": "Trade as normal. I’ll step in only at the line you set.",
   "created.cancel": "Cancel",
   "created.viewRules": "View Rules",
-
   "rules.title": "Trading rules",
   "rules.active": "Active rules ({count})",
   "rules.delete": "Delete",
   "rules.deleteLabel": "Delete {name}",
   "rules.toggleLabel": "{name} on",
   "rules.createNew": "Create New",
-
   "delete.title": "Are you sure you want to delete this rule?",
   "delete.no": "No",
   "delete.yes": "Yes, Delete",
@@ -1706,7 +1374,6 @@ export const rupees = (n: number) => inr(n, 0)
 import type { Flow } from '../types'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
-import { Intro } from './screens/Intro'
 import { Landing } from './screens/Landing'
 import { RuleChat } from './screens/RuleChat'
 import { RulesHome } from './screens/RulesHome'
@@ -1732,8 +1399,7 @@ export const dash: Flow = {
   ],
   screens: [
     // ---- Entry
-    { id: 'dash-01', section: 'entry', name: 'Intro · coach mark', figma: '5612:44075', note: 'First visit to F&O home after launch: an L3 coach mark on the DASH pill. Only the top bar is drawn (Figma marks the home "don’t replicate").', render: (go) => <Intro onOpen={() => go('dash-02')} /> },
-    { id: 'dash-02', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <Landing onBack={() => go('dash-01')} onRules={() => go('dash-03')} onMenu={() => go('dash-14')} /> },
+    { id: 'dash-02', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <Landing onBack={() => go('stocks-01')} onRules={() => go('dash-03')} onMenu={() => go('dash-14')} /> },
     // ---- Create a rule
     { id: 'dash-03', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Example chips (sideways scroll) send themselves as the message; typing + Send does the same. History opens your rules.', render: (go) => <RulesHome onBack={() => go('dash-02')} onHistory={() => go('dash-14')} onSend={() => go('dash-04')} /> },
     { id: 'dash-04', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <RuleChat step="thinking" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onThought={() => go('dash-05')} /> },
@@ -1897,65 +1563,6 @@ function RuleItem({ rule, onDelete }: { rule: SavedRule; onDelete: () => void })
 }
 ```
 
-### `src/flows/dash/screens/Intro.module.css`
-
-```css
-/* The rest of F&O home isn't part of this flow: shown as L3 skeletons. */
-.placeholder {
-  opacity: var(--l3-opacity-60);
-}
-```
-
-### `src/flows/dash/screens/Intro.tsx`
-
-```tsx
-import { Actionbar, ActionbarAction } from '@l3/components/Actionbar'
-import { Inset } from '@l3/components/Inset'
-import { Skeleton } from '@l3/components/Skeleton'
-import { Stack } from '@l3/components/Stack'
-import { CoachMark } from '@l3/components/Tooltip'
-import { msAccountBalanceWallet } from '@l3/icons/material'
-import { Screen } from '../../../shared/ui/Screen'
-import { DashEntry } from '../components/DashEntry'
-import { t } from '../copy'
-import styles from './Intro.module.css'
-
-/**
- * First time on F&O home after DASH launches: an L3 coach mark points at the DASH pill in the top bar.
- * Only the top bar is drawn — the rest of F&O home belongs to the F&O flow (Figma marks it "don't replicate"), so the
- * body is a placeholder.
- */
-export function Intro({ onOpen }: { onOpen?: () => void }) {
-  return (
-    <Screen
-      top={
-        <Actionbar
-          search={{ value: '', onChange: () => {}, placeholder: t('intro.searchPlaceholder') }}
-          actions={
-            <Stack direction="horizontal" align="center" gap="12">
-              <CoachMark open heading={t('intro.heading')} body={t('intro.body')} nextLabel={t('intro.gotIt')} onNext={() => onOpen?.()} autoFocus={false}>
-                <DashEntry onClick={onOpen} />
-              </CoachMark>
-              <ActionbarAction icon={msAccountBalanceWallet} label={t('intro.wallet')} onClick={() => {}} />
-            </Stack>
-          }
-        />
-      }
-    >
-      <Inset padding="16">
-        <Stack gap="16" aria-label={t('intro.restOfHome')} className={styles.placeholder}>
-          <Skeleton shape="box" />
-          <Skeleton shape="line" width="60%" />
-          <Skeleton shape="box" height="var(--l3-size-128)" />
-          <Skeleton shape="line" width="40%" />
-          <Skeleton shape="box" />
-        </Stack>
-      </Inset>
-    </Screen>
-  )
-}
-```
-
 ### `src/flows/dash/screens/Landing.module.css`
 
 ```css
@@ -1989,7 +1596,7 @@ import { msFunction, msMenu, msPostAdd } from '@l3/icons/material'
 import { BuildOption } from '../components/BuildOption'
 import { SparkleHeading } from '../components/Chat'
 import { DashBar, DashScreen } from '../components/DashScreen'
-import { DashOrb } from '../components/DashOrb'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { t } from '../copy'
 import { firstName } from '../data'
 import styles from './Landing.module.css'
@@ -2227,7 +1834,7 @@ import { Stack } from '@l3/components/Stack'
 import { msHistory } from '@l3/icons/material'
 import { ChatInput, PromptChips, SparkleHeading } from '../components/Chat'
 import { DashBar, DashScreen } from '../components/DashScreen'
-import { DashOrb } from '../components/DashOrb'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { t } from '../copy'
 import { examplePrompts, firstName } from '../data'
 import styles from './RulesHome.module.css'
@@ -2368,7 +1975,7 @@ import { Stack } from '@l3/components/Stack'
 import { msCheck } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { Spot } from '../../../shared/ui/Spot'
-import { DashOrb } from '../components/DashOrb'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { BacktestStrip } from '../components/RuleCard'
 import { RuleSummary } from '../components/RuleSummary'
 import { t } from '../copy'
@@ -2992,4 +2599,265 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
     </span>
   )
 }
+```
+
+### `src/shared/ui/dash/DashOrb.module.css`
+
+```css
+/*
+ * The orb artwork is the Figma vector component: every part keeps the exact Figma box (px inside a 100 × 100 frame —
+ * artwork geometry, not layout), and the whole thing scales to the slot. Sizes come from L3 size tokens.
+ */
+.orb {
+  --orb-box: var(--l3-size-96);
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--orb-box);
+  height: var(--orb-box);
+}
+
+.orb[data-size='lg'] { --orb-box: var(--l3-size-96); }
+.orb[data-size='md'] { --orb-box: var(--l3-size-64); }
+.orb[data-size='sm'] { --orb-box: var(--l3-size-32); }
+
+/* The art is drawn at 100 and scaled to the box. */
+.scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  transform: scale(calc(var(--orb-box) / 100px));
+  transform-origin: 0 0;
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+}
+
+/* Figma: the halo copy sits 8 right / 10 down, layer blur 23.35. */
+.halo {
+  transform: translate(8px, 10px);
+  filter: blur(var(--app-dash-orb-halo-blur));
+}
+
+.art img {
+  display: block;
+  max-width: none;
+}
+
+/* "Group 1000006113" (back leaf, blurred glow): box 55.5 × 57.8, bottom 49.7, centre +17.2. */
+.leafBackBox,
+.leafFrontBox {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+.leafBackBox {
+  bottom: 49.71px;
+  left: calc(50% + 17.24px);
+  width: 55.526px;
+  height: 57.791px;
+}
+
+.leafBack,
+.leafFront {
+  position: relative;
+  flex: none;
+  /* Figma's order: rotate, then skew, then the vertical flip (Tailwind -scale-y-100 rotate-[-108.93deg] skew-x-1) */
+  transform: rotate(-108.93deg) skewX(1deg) scaleY(-1);
+}
+
+.leafBack {
+  width: 45.469px;
+  height: 43.372px;
+}
+
+.leafBackImg {
+  position: absolute;
+  inset: -14.91% -14.25% -14.71% -13.92%;
+  width: auto;
+  height: auto;
+}
+
+/* "Group 1000006112" (front leaves). */
+.leafFrontBox {
+  bottom: 50.97px;
+  left: calc(50% + 17.61px);
+  width: 50.159px;
+  height: 51.373px;
+}
+
+.leafFront {
+  width: 40.069px;
+  height: 39.526px;
+}
+
+.leafFront img {
+  width: 100%;
+  height: 100%;
+}
+
+/* "Ellipse 8": the ring's soft inner fill. */
+.fill {
+  position: absolute;
+  top: 30.85px;
+  left: 10.38px;
+  width: 57.662px;
+  height: 59.282px;
+}
+
+/* "circleGroup": the angular-gradient ring. */
+.ringBox {
+  position: absolute;
+  top: 27.88px;
+  left: 7.5px;
+  width: 62.852px;
+  height: 64.618px;
+}
+
+.ring {
+  position: absolute;
+  inset: -7.11% -7.31%;
+  width: auto;
+  height: auto;
+}
+```
+
+### `src/shared/ui/dash/DashOrb.tsx`
+
+```tsx
+import leafBack from './assets/leaf-back.svg'
+import leafFront from './assets/leaf-front.svg'
+import orbFill from './assets/orb-fill.svg'
+import orbRing from './assets/orb-ring.svg'
+import styles from './DashOrb.module.css'
+
+export type DashOrbSize = 'sm' | 'md' | 'lg'
+
+/**
+ * DASH's mascot — the lime ring with two leaves (Figma "Logo" / "BotIcon", the 100 × 100 vector component), drawn from
+ * its own vector parts in the Figma positions, with the soft halo behind it (a blurred copy).
+ * Sizes: lg 96 (landing pages), md 64 (sheet headers, on a soft disc), sm 32 (the rule card's icon). The DASH pill sets its own
+ * box (21.8). Shared: DASH flows and the home's entry pill use the same artwork.
+ * Decorative: screen readers skip it — the text next to it says what it is.
+ */
+export function DashOrb({ size = 'lg', halo = true }: { size?: DashOrbSize; halo?: boolean }) {
+  return (
+    <span className={styles.orb} data-size={size} aria-hidden="true">
+      <span className={styles.scale}>
+        {halo && <OrbArt className={styles.halo} />}
+        <OrbArt />
+      </span>
+    </span>
+  )
+}
+
+/** The artwork at its Figma size (100 × 100); the parent scales it. */
+function OrbArt({ className }: { className?: string }) {
+  return (
+    <span className={[styles.art, className].filter(Boolean).join(' ')}>
+      <span className={styles.leafBackBox}>
+        <span className={styles.leafBack}>
+          <img src={leafBack} alt="" className={styles.leafBackImg} />
+        </span>
+      </span>
+      <span className={styles.leafFrontBox}>
+        <span className={styles.leafFront}>
+          <img src={leafFront} alt="" />
+        </span>
+      </span>
+      <img src={orbFill} alt="" className={styles.fill} />
+      <span className={styles.ringBox}>
+        <img src={orbRing} alt="" className={styles.ring} />
+      </span>
+    </span>
+  )
+}
+```
+
+### `src/shared/ui/dash/assets/leaf-back.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="58.2771" height="56.2179" viewBox="0 0 58.2771 56.2179" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1000006113" filter="url(#filter0_f_0_282)">
+<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M11.1805 6.4948L10.2325 8.23984C7.21698 13.7241 6.07176 19.8031 6.63218 25.5588C7.5941 35.2352 13.3302 44.2732 22.6694 49.2476L23.6172 47.5025C27.4934 40.6061 28.2232 32.8573 26.4785 25.7606C24.3978 17.9116 19.1614 10.7108 11.1805 6.4948Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
+<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M51.7823 38.3919C48.9397 43.4603 44.4029 47.018 39.1965 48.6543C33.6484 50.4553 27.3477 50.0009 21.8287 47.1335C24.6713 42.065 29.2933 38.5078 34.4997 36.8715C39.9626 35.07 46.2638 35.4411 51.7823 38.3919Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
+</g>
+<defs>
+<filter id="filter0_f_0_282" x="-7.45058e-08" y="2.2538e-07" width="58.2771" height="56.2179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3.2474" result="effect1_foregroundBlur_0_282"/>
+</filter>
+</defs>
+</svg>
+```
+
+### `src/shared/ui/dash/assets/leaf-front.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40.0692" height="39.5257" viewBox="0 0 40.0692 39.5257" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1000006112">
+<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M40.0554 29.6165C37.5947 34.0042 33.6673 37.084 29.1603 38.5005C24.3574 40.0595 18.9031 39.6661 14.1254 37.1839C16.5862 32.7963 20.5873 29.7169 25.0943 28.3004C29.8234 26.7409 35.2782 27.0621 40.0554 29.6165Z" fill="url(#paint0_linear_0_409)"/>
+<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M4.19434 0.0243672L3.37396 1.5349C0.764101 6.28215 -0.226587 11.5445 0.259219 16.5271C1.09303 24.9038 6.05968 32.7283 14.1449 37.0356L14.9652 35.525C18.3199 29.5554 18.9507 22.8476 17.4396 16.704C15.6376 9.90912 11.1037 3.67494 4.19434 0.0243672Z" fill="url(#paint1_linear_0_409)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_409" x1="21.3968" y1="29.3938" x2="22.0238" y2="39.1604" gradientUnits="userSpaceOnUse">
+<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
+<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_409" x1="5.24577" y1="6.42552" x2="13.4379" y2="33.8372" gradientUnits="userSpaceOnUse">
+<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
+<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
+</linearGradient>
+</defs>
+</svg>
+```
+
+### `src/shared/ui/dash/assets/orb-fill.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="57.6624" height="59.2824" viewBox="0 0 57.6624 59.2824" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="stroke0_0_416" fill="white">
+<path d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z"/>
+</mask>
+<path id="Ellipse 8" d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z" stroke-width="16.8671" stroke="url(#paint0_linear_0_416)" mask="url(#stroke0_0_416)"/>
+<defs>
+<linearGradient id="paint0_linear_0_416" x1="17.0104" y1="56.2094" x2="43.5226" y2="4.92706" gradientUnits="userSpaceOnUse">
+<stop stop-color="#72E780" style="stop-color:#72E780;stop-color:color(display-p3 0.4476 0.9047 0.5009);stop-opacity:1;"/>
+<stop offset="1" stop-color="#FDFFB5" style="stop-color:#FDFFB5;stop-color:color(display-p3 0.9903 1.0000 0.7091);stop-opacity:1;"/>
+</linearGradient>
+</defs>
+</svg>
+```
+
+### `src/shared/ui/dash/assets/orb-ring.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="72.0446" height="73.8103" viewBox="0 0 72.0446 73.8103" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="circleGroup">
+<g id="Ellipse 9" filter="url(#filter0_f_0_407)">
+<mask id="stroke0_0_407" fill="white">
+<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z"/>
+</mask>
+<mask id="stroke1_0_407">
+<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="white" mask="url(#stroke0_0_407)"/>
+</mask>
+<g clip-path="url(#paint0_angular_0_407_clip_path)" data-figma-skip-parse="true" mask="url(#stroke1_0_407)"><g transform="matrix(0.01625 -0.02375 0.0230642 0.0166474 37.0963 36.713)"><foreignObject x="-3827.82" y="-3827.82" width="7655.64" height="7655.64"><div xmlns="http://www.w3.org/1999/xhtml" style="background:conic-gradient(from 90deg,rgba(121, 234, 105, 1) 0deg,rgba(246, 253, 38, 1) 124.615deg,rgba(52, 177, 33, 1) 238.846deg,rgba(122, 235, 105, 1) 360deg);height:100%;width:100%;opacity:1"></div></foreignObject></g></g><path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="black" stroke-opacity="0" data-figma-gradient-stroke="{&#34;type&#34;:&#34;GRADIENT_ANGULAR&#34;,&#34;stops&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;transform&#34;:{&#34;m00&#34;:32.500003814697266,&#34;m01&#34;:46.128456115722656,&#34;m02&#34;:-2.2179441452026367,&#34;m10&#34;:-47.500007629394531,&#34;m11&#34;:33.294700622558594,&#34;m12&#34;:43.815639495849609},&#34;opacity&#34;:1.0,&#34;blendMode&#34;:&#34;NORMAL&#34;,&#34;stopsVar&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;visible&#34;:true}" mask="url(#stroke0_0_407)"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_407" x="0" y="0" width="72.0446" height="73.8103" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2.29814" result="effect1_foregroundBlur_0_407"/>
+</filter>
+<clipPath id="paint0_angular_0_407_clip_path"><rect x="-41.3666" y="-41.3666" width="154.778" height="156.543"/></clipPath></defs>
+</svg>
 ```

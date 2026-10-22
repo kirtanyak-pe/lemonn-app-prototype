@@ -13,22 +13,12 @@
   },
   "screens": [
     {
-      "id": "dash-01",
-      "name": "Intro · coach mark",
-      "figma": "5612:44075",
-      "note": "First visit to F&O home after launch: an L3 coach mark on the DASH pill. Only the top bar is drawn (Figma marks the home \"don’t replicate\").",
-      "goesTo": [
-        "dash-02"
-      ],
-      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-44075"
-    },
-    {
       "id": "dash-02",
       "name": "DASH landing",
       "figma": "5612:81961",
-      "note": "Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.",
+      "note": "From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.",
       "goesTo": [
-        "dash-01",
+        "stocks-01",
         "dash-03",
         "dash-14"
       ],
@@ -214,20 +204,12 @@
   ],
   "files": [
     "src/flows/dash/README.md",
-    "src/flows/dash/assets/leaf-back.svg",
-    "src/flows/dash/assets/leaf-front.svg",
-    "src/flows/dash/assets/orb-fill.svg",
-    "src/flows/dash/assets/orb-ring.svg",
     "src/flows/dash/assets/sparkle.svg",
     "src/flows/dash/assets/waves.svg",
     "src/flows/dash/components/BuildOption.module.css",
     "src/flows/dash/components/BuildOption.tsx",
     "src/flows/dash/components/Chat.module.css",
     "src/flows/dash/components/Chat.tsx",
-    "src/flows/dash/components/DashEntry.module.css",
-    "src/flows/dash/components/DashEntry.tsx",
-    "src/flows/dash/components/DashOrb.module.css",
-    "src/flows/dash/components/DashOrb.tsx",
     "src/flows/dash/components/DashScreen.module.css",
     "src/flows/dash/components/DashScreen.tsx",
     "src/flows/dash/components/QuestionCard.module.css",
@@ -242,8 +224,6 @@
     "src/flows/dash/index.tsx",
     "src/flows/dash/screens/ActiveRules.module.css",
     "src/flows/dash/screens/ActiveRules.tsx",
-    "src/flows/dash/screens/Intro.module.css",
-    "src/flows/dash/screens/Intro.tsx",
     "src/flows/dash/screens/Landing.module.css",
     "src/flows/dash/screens/Landing.tsx",
     "src/flows/dash/screens/RuleChat.module.css",
@@ -264,6 +244,12 @@
     "src/shared/ui/Sheet.module.css",
     "src/shared/ui/Sheet.tsx",
     "src/shared/ui/Spot.module.css",
-    "src/shared/ui/Spot.tsx"
+    "src/shared/ui/Spot.tsx",
+    "src/shared/ui/dash/DashOrb.module.css",
+    "src/shared/ui/dash/DashOrb.tsx",
+    "src/shared/ui/dash/assets/leaf-back.svg",
+    "src/shared/ui/dash/assets/leaf-front.svg",
+    "src/shared/ui/dash/assets/orb-fill.svg",
+    "src/shared/ui/dash/assets/orb-ring.svg"
   ]
 }

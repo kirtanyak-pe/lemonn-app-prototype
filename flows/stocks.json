@@ -19,7 +19,8 @@
       "note": "Top of the page: search, indices, holdings, products, shortcuts.",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     },
@@ -30,7 +31,8 @@
       "note": "Same page, scrolled.",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     },
@@ -41,7 +43,8 @@
       "note": "The \"Top losers\" chip picked.",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     },
@@ -52,7 +55,8 @@
       "note": "Same page, scrolled: managed strategies, then the announcement.",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     },
@@ -63,7 +67,8 @@
       "note": "Same page, scrolled.",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     },
@@ -74,7 +79,8 @@
       "note": "Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     },
@@ -85,7 +91,20 @@
       "note": "The end of the page: the disclosure, four lines and Read More.",
       "goesTo": [
         "search-01",
-        "profile-01"
+        "profile-01",
+        "dash-02"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-08",
+      "name": "Home · DASH coach mark",
+      "figma": "5612:44075",
+      "note": "First visit after DASH launches: an L3 coach mark on the DASH pill (Figma \"Intro\" in DASH AI main flow). Got it! or the pill opens DASH.",
+      "goesTo": [
+        "search-01",
+        "profile-01",
+        "dash-02"
       ],
       "figmaUrl": ""
     }
@@ -98,6 +117,8 @@
     "src/flows/stocks/components/Ideas.tsx",
     "src/flows/stocks/components/Invest.tsx",
     "src/flows/stocks/components/Overview.tsx",
+    "src/flows/stocks/components/TopBar.module.css",
+    "src/flows/stocks/components/TopBar.tsx",
     "src/flows/stocks/copy.json",
     "src/flows/stocks/copy.ts",
     "src/flows/stocks/data.ts",
@@ -132,7 +153,13 @@
     "src/shared/ui/Screen.tsx",
     "src/shared/ui/Sheet.module.css",
     "src/shared/ui/Sheet.tsx",
-    "src/shared/ui/Spot.module.css",
-    "src/shared/ui/Spot.tsx"
+    "src/shared/ui/dash/DashEntry.module.css",
+    "src/shared/ui/dash/DashEntry.tsx",
+    "src/shared/ui/dash/DashOrb.module.css",
+    "src/shared/ui/dash/DashOrb.tsx",
+    "src/shared/ui/dash/assets/leaf-back.svg",
+    "src/shared/ui/dash/assets/leaf-front.svg",
+    "src/shared/ui/dash/assets/orb-fill.svg",
+    "src/shared/ui/dash/assets/orb-ring.svg"
   ]
 }

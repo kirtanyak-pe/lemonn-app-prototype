@@ -10,13 +10,14 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machi
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `stocks-01` | Home | — | `search-01`, `profile-01` | Top of the page: search, indices, holdings, products, shortcuts. |
-| `stocks-02` | Home · top movers & watchlists | — | `search-01`, `profile-01` | Same page, scrolled. |
-| `stocks-03` | Home · top losers | — | `search-01`, `profile-01` | The "Top losers" chip picked. |
-| `stocks-04` | Home · Smart Invest | — | `search-01`, `profile-01` | Same page, scrolled: managed strategies, then the announcement. |
-| `stocks-05` | Home · sectors & highlights | — | `search-01`, `profile-01` | Same page, scrolled. |
-| `stocks-06` | Home · highlights & idea baskets | — | `search-01`, `profile-01` | Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.) |
-| `stocks-07` | Home · idea baskets & disclosure | — | `search-01`, `profile-01` | The end of the page: the disclosure, four lines and Read More. |
+| `stocks-01` | Home | — | `search-01`, `profile-01`, `dash-02` | Top of the page: search, indices, holdings, products, shortcuts. |
+| `stocks-02` | Home · top movers & watchlists | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
+| `stocks-03` | Home · top losers | — | `search-01`, `profile-01`, `dash-02` | The "Top losers" chip picked. |
+| `stocks-04` | Home · Smart Invest | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled: managed strategies, then the announcement. |
+| `stocks-05` | Home · sectors & highlights | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
+| `stocks-06` | Home · highlights & idea baskets | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.) |
+| `stocks-07` | Home · idea baskets & disclosure | — | `search-01`, `profile-01`, `dash-02` | The end of the page: the disclosure, four lines and Read More. |
+| `stocks-08` | Home · DASH coach mark | [5612:44075]() | `search-01`, `profile-01`, `dash-02` | First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH. |
 
 ## Spec (README.md)
 
@@ -44,11 +45,15 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 | `stocks-04` | Home · Smart Invest | Strategies on the brand tint · the announcement · sectors |
 | `stocks-05` | Home · sectors & highlights | Sectors · Highlights (Mutual funds, F&O) |
 | `stocks-06` | Home · highlights & idea baskets | Highlights (Mutual Funds, F&O) · Invest in Ideas |
+| `stocks-08` | Home · DASH coach mark | First visit after DASH launches: "DASH AI" coach mark on the DASH pill (Figma 5612:44075) |
 | `stocks-07` | Home · idea baskets & disclosure | Invest in ideas (baskets) · the broker's regulatory line |
 
 ### Page structure (top to bottom)
 
-1. **Top bar (sticky):** profile initials (left, opens Profile) · search ("Search stocks") · Wallet. Tapping the search field opens Search
+1. **Top bar (sticky, this screen's own — not the L3 Actionbar):** profile initials (34, opens Profile) · search pill
+   (38, opens Search) · **DASH pill** (opens DASH AI, `dash-02`; Figma "Dash entry point" 11492:7740) · Wallet (38).
+   16 at the sides, 12 between (Figma home with DASH). First visit after DASH launches: an L3 coach mark on the pill
+   (`stocks-08`). Tapping the search field opens Search
    (`search-01`, the Search flow: Stocks tab, keyboard up); nothing is typed on Home. Back on Search returns here.
 2. **Summary area** (grey, `surface/secondary`):
    - **Index strip** (scrolls sideways): NIFTY 50 / SENSEX / NIFTY BANK — value, day change; each opens its chart.
@@ -142,6 +147,10 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
   without "+"), logo sizes (L3 Avatar max 48; live ~60 / ~80), Spot discs on the shortcuts (live: outlined circles),
   the Mutual Funds highlight's badge artwork and the baskets' dark-blue card fill.
 - The second idea basket only peeks in on the live app; its name ("High Growth Media") and stocks are a guess.
+- Same day, second pass (designer's calls): the top bar is plain elements (no L3 Actionbar), with the DASH pill copied
+  from Figma; **no card shadows on this screen** (a one-off, not a rule — `screens/Home.module.css` flatCards); sizes
+  re-measured at 360 dp from the live capture: section titles 16, card / summary text 12, shortcut circles 40, card
+  widths (products 2.55 visible, movers 2.39, watchlists 1.6, sectors 2.07, highlights 1.67, baskets 1.19).
 
 
 
@@ -419,7 +428,6 @@ import { msChevronRight, msCurrencyRupee, msTrendingDown, msTrendingUp } from '@
 import { inr } from '../../../shared/data/format'
 import { watchlists } from '../../../shared/data/portfolio'
 import { Rail } from '../../../shared/ui/Rail'
-import { Spot } from '../../../shared/ui/Spot'
 import { movers, shortcuts, type MoverList } from '../data'
 import { t } from '../copy'
 import styles from './Home.module.css'
@@ -435,7 +443,7 @@ export function Shortcuts({ onOpen }: { onOpen?: (id: string) => void }) {
             <Card key={s.id} variant="flat" padding="none" onClick={() => onOpen?.(s.id)}>
               <span className={styles.shortcut}>
                 <span className={styles.shortcutIcon}>
-                  <Spot icon={s.icon} tone="success" size="md" />
+                  <span className={styles.shortcutCircle} aria-hidden="true"><Icon icon={s.icon} size={24} /></span>
                   {s.badge?.count !== undefined && (
                     <span className={styles.overIcon}><Badge count={s.badge.count} color="neutral" label={t('shortcuts.watchlistBadge', { count: s.badge.count })} /></span>
                   )}
@@ -472,7 +480,7 @@ export function TopMovers({ initial = 'gainers', onStock, onViewAll }: { initial
           onChange={(v) => setList(v as MoverList)}
         />
       </Inset>
-      <Rail label={t(moverTabs.find((m) => m.value === list)!.label)} visible={2.15} rows={2}>
+      <Rail label={t(moverTabs.find((m) => m.value === list)!.label)} visible={2.39} rows={2}>
         {movers[list].map((stock) => (
           <Card key={stock.symbol} onClick={() => onStock?.(stock.symbol)}>
             <span className={styles.cardStack}>
@@ -493,7 +501,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   return (
     <Stack as="section" gap="16" aria-label={t('watchlists.title')}>
       <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('watchlists.title')} action={{ type: 'view-all', label: t('watchlists.new'), onClick: () => onCreate?.() }} /></Inset>
-      <Rail label={t('watchlists.railLabel')} visible={1.45}>
+      <Rail label={t('watchlists.railLabel')} visible={1.6}>
         {watchlists.map((w) => (
           <ListCell
             key={w.id}
@@ -548,12 +556,12 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 .indexName {
-  font: var(--l3-text-label-14);
+  font: var(--l3-text-label-12); /* live app at 360 dp: 12 */
   color: var(--l3-content-secondary);
 }
 
 .indexValue {
-  font: var(--l3-text-label-14);
+  font: var(--l3-text-label-12);
 }
 
 .divider {
@@ -579,7 +587,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 .holdingsLabel {
-  font: var(--l3-text-description-14);
+  font: var(--l3-text-description-12); /* live app at 360 dp: 12 */
   color: var(--l3-content-secondary);
 }
 
@@ -619,29 +627,30 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 }
 
 .cardTitle {
+  display: -webkit-box;
   overflow: hidden;
-  font: var(--l3-text-label-16);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* live app: long sector names wrap to two lines */
+  font: var(--l3-text-label-14);
 }
 
 .productTitle {
   overflow: hidden;
-  font: var(--l3-text-label-14);
+  font: var(--l3-text-label-12); /* live app at 360 dp: 12 */
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cardSymbol {
   overflow: hidden;
-  font: var(--l3-text-label-14);
+  font: var(--l3-text-label-12); /* live app at 360 dp: 12 */
   color: var(--l3-content-secondary);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cardPrice {
-  font: var(--l3-text-label-16);
+  font: var(--l3-text-label-12);
 }
 
 .cardMeta {
@@ -649,12 +658,18 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   color: var(--l3-content-secondary);
 }
 
+/* Product cards (live app): the chevron right after the name, 4 apart. */
+.cardRow:has(> .productTitle) {
+  justify-content: flex-start;
+  gap: var(--l3-spacing-04);
+}
+
 .cardRow > .cardMeta {
   white-space: nowrap;
 }
 
 .highlight {
-  font: var(--l3-text-label-16);
+  font: var(--l3-text-label-12);
   color: var(--l3-content-accent-success-default);
 }
 
@@ -681,6 +696,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   flex-direction: column;
   align-items: center;
   gap: var(--l3-spacing-08);
+  padding-top: var(--l3-spacing-12); /* room for the count / "New" that sits 8 over the icon (the card clips) */
   text-align: center;
 }
 
@@ -713,7 +729,7 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
 .strategyName {
   flex: 1;
   min-width: 0;
-  font: var(--l3-text-heading-16);
+  font: var(--l3-text-heading-14); /* live app at 360 dp: one line */
 }
 
 .strategyDeposit {
@@ -860,6 +876,17 @@ export function Watchlists({ onOpen, onCreate }: { onOpen?: (id: string) => void
   height: auto;
   border-radius: var(--l3-radius-12);
 }
+
+/* Shortcut icon, live app at 360 dp: a 40 circle with a 1px edge and the icon in the success green. */
+.shortcutCircle {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-40);
+  height: var(--l3-size-40);
+  border-radius: var(--l3-radius-full);
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px edge */
+  color: var(--l3-content-accent-success-default);
+}
 ```
 
 ### `src/flows/stocks/components/Ideas.tsx`
@@ -884,7 +911,7 @@ export function IdeaBaskets({ onOpen }: { onOpen?: (id: string) => void }) {
   return (
     <Stack as="section" gap="16" aria-label={t('baskets.title')}>
       <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('baskets.title')} description={t('baskets.description')} /></Inset>
-      <Rail label={t('baskets.railLabel')} visible={1.15}>
+      <Rail label={t('baskets.railLabel')} visible={1.19}>
         {ideaBaskets.map((b) => (
           <Card key={b.id} onClick={() => onOpen?.(b.id)}>
             <span className={styles.cardStack}>
@@ -964,7 +991,7 @@ export function SmartInvest({ onInvest, onOpen }: { onInvest?: (id: string) => v
   return (
     <Stack as="section" gap="16" aria-label={t('smartInvest.title')}>
       <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('smartInvest.title')} tag={<SmartInvestTag />} /></Inset>
-      <Rail label={t('smartInvest.railLabel')} visible={1.08}>
+      <Rail label={t('smartInvest.railLabel')} visible={1.07}>
         {strategies.map((s) => (
           <Card
             key={s.id}
@@ -1033,7 +1060,7 @@ export function Sectors({ onOpen, onViewAll }: { onOpen?: (id: string) => void; 
   return (
     <Stack as="section" gap="16" aria-label={t('sectors.title')}>
       <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('sectors.title')} action={{ type: 'view-all', onClick: () => onViewAll?.() }} /></Inset>
-      <Rail label={t('sectors.railLabel')} visible={1.75}>
+      <Rail label={t('sectors.railLabel')} visible={2.07}>
         {sectors.map((s) => (
           <Card key={s.id} onClick={() => onOpen?.(s.id)}>
             <span className={styles.cardStack}>
@@ -1058,7 +1085,7 @@ export function Highlights({ onExplore }: { onExplore?: (id: string) => void }) 
   return (
     <Stack as="section" gap="16" aria-label={t('highlights.title')}>
       <Inset paddingInline="16" paddingBlock="00"><SectionHeader title={t('highlights.title')} /></Inset>
-      <Rail label={t('highlights.railLabel')} visible={1.3}>
+      <Rail label={t('highlights.railLabel')} visible={1.67}>
         {highlights.map((h) => (
           <Card key={h.id} onClick={() => onExplore?.(h.id)} footer={<Button variant="tertiary" onClick={() => onExplore?.(h.id)}>{h.cta}</Button>}>
             <span className={styles.highlightCard}>
@@ -1103,7 +1130,7 @@ export function IndexStrip({ onIndex }: { onIndex?: (id: string) => void }) {
             <span className={styles.index}>
               <span className={styles.indexName}>{index.name}</span>
               <span className={styles.indexValue}>{index.value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-              <PriceChange value={index.changePct} size="md" />
+              <PriceChange value={index.changePct} size="sm" />
               <span className={styles.chevron}><Icon icon={msChevronRight} size={16} /></span>
             </span>
           </Card>
@@ -1134,7 +1161,7 @@ export function HoldingsSummary({ onOpen }: { onOpen?: () => void }) {
 /** Mutual funds · Equity F&O · Commodities — each product's one-line promise. */
 export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }) {
   return (
-    <Rail label={t('products.label')} visible={2.15} className={styles.onEdgeRoom}>
+    <Rail label={t('products.label')} visible={2.55} className={styles.onEdgeRoom}>
       {products.map((p) => (
         <Card key={p.id} onClick={() => onProduct?.(p.id)}>
           <span className={styles.cardStack}>
@@ -1150,6 +1177,145 @@ export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }
         </Card>
       ))}
     </Rail>
+  )
+}
+```
+
+### `src/flows/stocks/components/TopBar.module.css`
+
+```css
+/*
+ * Stocks home top bar. Sizes measured on the live app at 360 dp (2026-10-22): avatar 34, search pill and wallet 38 with
+ * a 1px edge, 16 above, 6 below (the summary's own 16 makes the 22 down to the index strip). With the DASH pill the
+ * spacing follows Figma's home (DASH AI main flow): 16 at the sides, 12 between; the DASH pill keeps its own Figma
+ * size (≈ 32, centred).
+ * The bar takes the summary area's surface/secondary, the pill and the wallet surface/default.
+ */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-12);
+  padding: var(--l3-spacing-16) var(--l3-spacing-16) var(--l3-spacing-06);
+  background: var(--l3-surface-secondary);
+}
+
+.bar > :is(.profile, .search, .wallet) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: var(--app-stocks-topbar-control);
+  padding: 0;
+  border: 0;
+  color: var(--l3-content-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.bar > :is(.profile, .search, .wallet):active {
+  transform: scale(var(--l3-motion-scale-press-default));
+}
+
+.bar > :is(.profile, .search, .wallet):focus-visible {
+  outline: 2px solid var(--l3-content-primary);
+  outline-offset: 2px;
+}
+
+/* Initials on an indigo disc with a 1px indigo ring. */
+.bar .profile {
+  width: var(--app-stocks-topbar-avatar);
+  height: var(--app-stocks-topbar-avatar);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-indigo-light);
+  box-shadow: inset 0 0 0 1px var(--l3-border-accent-indigo-default); /* 1px ring */
+  font: var(--l3-text-label-14);
+}
+
+.bar .profile {
+  color: var(--l3-content-accent-indigo-default);
+}
+
+/* The search pill fills the space between the two circles. */
+.bar .search {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  gap: var(--l3-spacing-08);
+  padding-inline: var(--l3-spacing-12);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-default);
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px edge */
+}
+
+.placeholder {
+  overflow: hidden;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-14);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wallet {
+  width: var(--app-stocks-topbar-control);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-default);
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px edge */
+}
+```
+
+### `src/flows/stocks/components/TopBar.tsx`
+
+```tsx
+import { Icon } from '@l3/components/Icon'
+import { CoachMark } from '@l3/components/Tooltip'
+import { msAccountBalanceWallet, msSearch } from '@l3/icons/material'
+import { DashEntry } from '../../../shared/ui/dash/DashEntry'
+import { t } from '../copy'
+import styles from './TopBar.module.css'
+
+type TopBarProps = {
+  /** The profile's initials ("RM"). */
+  initials: string
+  onProfile?: () => void
+  /** The search pill is a button: it opens the Search screen, where the typing happens. */
+  onSearch?: () => void
+  onWallet?: () => void
+  /** The DASH pill opens DASH AI (dash-02). */
+  onDash?: () => void
+  /** First visit after DASH launches: an L3 coach mark points at the pill (Figma "Intro" 5612:44075). */
+  dashIntro?: boolean
+  onDashIntroDone?: () => void
+}
+
+/**
+ * Stocks home's own top bar, as in the live app (a one-off for this screen — not the L3 Actionbar):
+ * profile initials (indigo circle) · a search pill ("Search stocks", opens Search) · the DASH pill (opens DASH AI —
+ * Figma "Home page", DASH AI main flow) · the wallet.
+ * The bar sits on the summary area's grey; the pill and the wallet are on surface/default.
+ */
+export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIntro = false, onDashIntroDone }: TopBarProps) {
+  const dash = <DashEntry label={t('top.dash')} ariaLabel={t('top.dashLabel')} onClick={onDash} />
+  return (
+    <header className={styles.bar}>
+      <button type="button" className={styles.profile} aria-label={t('top.profile')} onClick={onProfile}>
+        {initials}
+      </button>
+      <button type="button" className={styles.search} onClick={onSearch}>
+        <Icon icon={msSearch} size={20} />
+        <span className={styles.placeholder}>{t('search.placeholder')}</span>
+      </button>
+      {dashIntro ? (
+        <CoachMark open heading={t('dashIntro.heading')} body={t('dashIntro.body')} nextLabel={t('dashIntro.gotIt')} onNext={() => onDashIntroDone?.()} autoFocus={false}>
+          {dash}
+        </CoachMark>
+      ) : (
+        dash
+      )}
+      <button type="button" className={styles.wallet} aria-label={t('top.wallet')} onClick={onWallet}>
+        <Icon icon={msAccountBalanceWallet} size={20} />
+      </button>
+    </header>
   )
 }
 ```
@@ -1202,7 +1368,12 @@ export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }
   "baskets.count": "{count} Stocks",
   "smartInvest.tagAuto": "Auto Buy & Sell",
   "disclosure.readMore": "Read More",
-  "disclosure.readLess": "Read Less"
+  "disclosure.readLess": "Read Less",
+  "top.dash": "DASH",
+  "top.dashLabel": "Open DASH AI",
+  "dashIntro.heading": "DASH AI",
+  "dashIntro.body": "DASH helps you build your rules and strategies.",
+  "dashIntro.gotIt": "Got it!"
 }
 ```
 
@@ -1326,13 +1497,14 @@ export const stocks: Flow = {
   description: 'The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.',
   figmaFile: '',
   screens: [
-    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} /> },
-    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" /> },
-    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" movers="losers" /> },
-    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="invest" /> },
-    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="sectors" /> },
-    { id: 'stocks-06', name: 'Home · highlights & idea baskets', figma: '', note: 'Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="highlights" /> },
-    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page: the disclosure, four lines and Read More.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="more" /> },
+    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} /> },
+    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" /> },
+    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" movers="losers" /> },
+    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="invest" /> },
+    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="sectors" /> },
+    { id: 'stocks-06', name: 'Home · highlights & idea baskets', figma: '', note: 'Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="highlights" /> },
+    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page: the disclosure, four lines and Read More.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="more" /> },
+    { id: 'stocks-08', name: 'Home · DASH coach mark', figma: '5612:44075', note: 'First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} dashIntro onDashIntroDone={() => go('dash-02')} /> },
   ],
 }
 ```
@@ -1365,47 +1537,38 @@ export const stocks: Flow = {
   background: var(--l3-surface-accent-brand-light);
 }
 
-/* Top bar, live app: profile initials on the left, then the search field and the wallet (the L3 Actionbar). */
-.topBar {
-  background: var(--l3-surface-default);
+/*
+ * Designer's one-off call for this screen (2026-10-22), not a rule: cards have no shadow — only their 1px edge.
+ * Clickable L3 Cards and card-style ListCells normally add elevation-low.
+ */
+.flatCards.flatCards [data-interactive][data-variant='default'] {
+  box-shadow: var(--card-border);
 }
 
-.topBar > .searchEntry > * {
-  flex: 1;
-  min-width: 0;
+.flatCards.flatCards [data-interactive][data-variant='card'] {
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
-.profile {
-  flex: none;
-  margin-inline-start: var(--l3-spacing-16); /* the Actionbar brings the 16 after it */
-  padding: 0;
-  border: 0;
-  border-radius: var(--l3-radius-full);
-  background: none;
-  cursor: pointer;
-}
 
-/* Wraps the top bar only to catch a tap on its search field (opens Search); adds no box of its own. */
-.searchEntry {
-  display: contents;
+/* Live app at 360 dp: section titles are 16 (L3 SectionHeader is 14) — part of the same one-off for this screen. */
+.flatCards.flatCards h2 {
+  font: var(--l3-text-label-16);
 }
 ```
 
 ### `src/flows/stocks/screens/Home.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, useState } from 'react'
-import { Actionbar, ActionbarAction } from '@l3/components/Actionbar'
+import { useLayoutEffect, useRef } from 'react'
 import { Section } from '@l3/components/Section'
 import { Stack } from '@l3/components/Stack'
-import { Avatar } from '@l3/components/Avatar'
-import { msAccountBalanceWallet } from '@l3/icons/material'
 import { user } from '../../../shared/data/user'
 import { MainNav, type Section as NavSection } from '../../../shared/ui/MainNav'
 import { Screen } from '../../../shared/ui/Screen'
 import { Disclosure, IdeaBaskets } from '../components/Ideas'
 import { Announcement, Highlights, Sectors, SmartInvest } from '../components/Invest'
 import { HoldingsSummary, IndexStrip, ProductCards } from '../components/Overview'
+import { TopBar } from '../components/TopBar'
 import { Shortcuts, TopMovers, Watchlists } from '../components/Discover'
 import type { MoverList } from '../data'
 import { t } from '../copy'
@@ -1424,17 +1587,22 @@ type Props = {
   onSearch?: () => void
   /** The profile icon opens Profile & settings (profile-01). */
   onProfile?: () => void
+  /** The DASH pill in the top bar opens DASH AI. */
+  onDash?: () => void
+  /** First visit after DASH launches: the coach mark on the DASH pill. */
+  dashIntro?: boolean
+  onDashIntroDone?: () => void
 }
 
 /**
  * stocks-01 … 07 · Stocks home — the app's first L1 screen (the Stocks tab).
- * Top bar: profile initials, search, wallet (sticky) — as in the live app. The search field is the way into Search: tapping it opens the Search
+ * Top bar: the screen's own (components/TopBar) — profile initials, a search pill, the wallet — as in the live app.
+ * Cards on this screen have no shadow (designer's one-off call, 2026-10-22: screens/Home.module.css flatCards). The search field is the way into Search: tapping it opens the Search
  * screen (stocks tab, keyboard up) — nothing is typed here. Then, on a grey summary area: today's indices, the holdings and the
  * products; and on the rounded sheet over it, the feed: shortcuts, top movers, watchlists, Smart Invest (brand tint),
  * an announcement (the campaign's artwork), sectors, highlights, idea baskets and the broker's disclosure.
  */
-export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile }: Props) {
-  const [query, setQuery] = useState('')
+export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile, onDash, dashIntro, onDashIntroDone }: Props) {
   const page = useRef<HTMLDivElement>(null)
 
   // Board frames: open the page scrolled to a part (the screen's body is this page's scroll container).
@@ -1448,24 +1616,10 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile }: P
 
   return (
     <Screen
-      top={
-        // Live app: the profile initials on the left, then the search field and the wallet (an L3 Actionbar).
-        // Focus on the field (a tap) opens Search; the wrapper only catches that focus.
-        <Stack direction="horizontal" align="center" className={styles.topBar}>
-          <button type="button" className={styles.profile} aria-label={t('top.profile')} onClick={onProfile}>
-            <Avatar initials={initials(user.name)} size={40} />
-          </button>
-          <div className={styles.searchEntry} onFocus={(e) => { if ((e.target as HTMLElement).matches('input[type="search"]')) onSearch?.() }}>
-            <Actionbar
-              search={{ value: query, onChange: setQuery, placeholder: t('search.placeholder'), label: t('search.label') }}
-              actions={<ActionbarAction icon={msAccountBalanceWallet} label={t('top.wallet')} onClick={() => {}} />}
-            />
-          </div>
-        </Stack>
-      }
+      top={<TopBar initials={initials(user.name)} onProfile={onProfile} onSearch={onSearch} onDash={onDash} dashIntro={dashIntro} onDashIntroDone={onDashIntroDone} />}
       bottom={<MainNav value="stocks" onChange={onTab} />}
     >
-      <Stack ref={page}>
+      <Stack ref={page} className={styles.flatCards}>
         <Stack gap="24" className={styles.summary} data-home="top">
           <IndexStrip />
           <HoldingsSummary />
@@ -2676,80 +2830,335 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 }
 ```
 
-### `src/shared/ui/Spot.module.css`
+### `src/shared/ui/dash/DashEntry.module.css`
 
 ```css
 /*
- * Illustration slot: a large icon on a soft accent disc with a faint outer ring. Stands in for artwork L3 doesn't have
- * yet (lemon mascot, PAN card, bank, coin …) — swap the whole <Spot> for the illustration when it exists.
+ * DASH pill — Figma "Dash entry point" (DASH AI main flow, 11492:7740), copied as drawn: hugs its content (4 / 8
+ * padding, 2 between the orb and the word), full radius, a 1px green-300 edge, a 176° fill from surface/primary
+ * (37.5%) into the brand-light lime (93.4%), the orb at 21.8 without its halo, "DASH" in Heading/10, success green.
  */
-.spot {
-  position: relative;
+.entry {
   display: inline-flex;
   flex: none;
   align-items: center;
-  justify-content: center;
+  gap: var(--l3-spacing-02);
+  padding: var(--l3-spacing-04) var(--l3-spacing-08);
+  border: 1px solid var(--l3-base-hue-green-300); /* 1px: Figma stroke */
   border-radius: var(--l3-radius-full);
-  background: var(--spot-surface);
-  color: var(--spot-content);
+  background: linear-gradient(176deg, var(--l3-surface-primary) 37.508%, var(--l3-surface-accent-brand-light) 93.358%);
+  color: var(--l3-content-accent-success-default);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
 }
 
-.spot[data-size='md'] {
-  width: var(--l3-size-64);
-  height: var(--l3-size-64);
+.entry:active {
+  transform: scale(var(--l3-motion-scale-press-default));
 }
 
-.spot[data-size='lg'] {
-  width: var(--l3-size-96);
-  height: var(--l3-size-96);
+.entry:focus-visible {
+  outline: 2px solid var(--l3-content-primary);
+  outline-offset: 2px;
 }
 
-/* The halo: one hairline ring 12 outside the disc, in the same accent (lg only — the hero moments). */
-.spot[data-size='lg']::after {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--l3-spacing-12));
-  border: 1px solid var(--spot-surface);
-  border-radius: var(--l3-radius-full);
+/* Figma "logo": 21.818 (local token — no L3 size). */
+.entry > span:first-child {
+  --orb-box: var(--app-dash-orb-pill);
 }
 
-.glyph {
-  width: var(--l3-size-32);
-  height: var(--l3-size-32);
+.label {
+  font: var(--l3-text-heading-10);
+  text-align: center;
+  white-space: nowrap;
 }
-
-.spot[data-size='lg'] .glyph {
-  width: var(--l3-size-48);
-  height: var(--l3-size-48);
-}
-
-.spot[data-tone='brand'] { --spot-surface: var(--l3-surface-accent-brand-light); --spot-content: var(--l3-content-primary); }
-.spot[data-tone='discover'] { --spot-surface: var(--l3-surface-accent-discover-light); --spot-content: var(--l3-content-accent-discover-default); }
-.spot[data-tone='success'] { --spot-surface: var(--l3-surface-accent-success-light); --spot-content: var(--l3-content-accent-success-default); }
-.spot[data-tone='warning'] { --spot-surface: var(--l3-surface-accent-warning-light); --spot-content: var(--l3-content-accent-warning-default); }
-.spot[data-tone='error'] { --spot-surface: var(--l3-surface-accent-error-light); --spot-content: var(--l3-content-accent-error-default); }
-.spot[data-tone='plain'] { --spot-surface: var(--l3-surface-default); --spot-content: var(--l3-content-primary); }
-.spot[data-tone='neutral'] { --spot-surface: var(--l3-surface-secondary); --spot-content: var(--l3-content-primary); }
 ```
 
-### `src/shared/ui/Spot.tsx`
+### `src/shared/ui/dash/DashEntry.tsx`
 
 ```tsx
-import { Icon } from '@l3/components/Icon'
-import styles from './Spot.module.css'
+import { DashOrb } from './DashOrb'
+import styles from './DashEntry.module.css'
 
-export type SpotTone = 'brand' | 'discover' | 'success' | 'warning' | 'error' | 'neutral' | 'plain'
+type DashEntryProps = {
+  /** The visible word ("DASH"), from the caller's copy file. */
+  label: string
+  /** What a screen reader says ("Open DASH AI"). */
+  ariaLabel: string
+  onClick?: () => void
+}
 
 /**
- * ILLUSTRATION SLOT — a large icon on a soft accent disc (md 64 / lg 96 with a halo). Used where the app has artwork
- * (mascot, PAN card, bank, coin) until L3 has an illustration set; replace the <Spot> with the artwork 1:1.
- * Tone by meaning: brand = welcome moments, plain = on a brand panel, discover = info / in progress, success / warning / error = outcomes.
+ * The way into DASH AI — a pill in the Stocks home top bar (Figma "Dash entry point", DASH AI main flow 11492:7740):
+ * the orb and "DASH" on a white-into-lime fill with a thin green edge. It hugs its content (≈ 32 tall).
  */
-export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone?: SpotTone; size?: 'md' | 'lg' }) {
+export function DashEntry({ label, ariaLabel, onClick }: DashEntryProps) {
   return (
-    <span className={styles.spot} data-tone={tone} data-size={size} aria-hidden="true" data-illustration-slot="">
-      <Icon icon={icon} className={styles.glyph} />
+    <button type="button" className={styles.entry} onClick={onClick} aria-label={ariaLabel}>
+      <DashOrb size="sm" halo={false} />
+      <span className={styles.label} aria-hidden="true">{label}</span>
+    </button>
+  )
+}
+```
+
+### `src/shared/ui/dash/DashOrb.module.css`
+
+```css
+/*
+ * The orb artwork is the Figma vector component: every part keeps the exact Figma box (px inside a 100 × 100 frame —
+ * artwork geometry, not layout), and the whole thing scales to the slot. Sizes come from L3 size tokens.
+ */
+.orb {
+  --orb-box: var(--l3-size-96);
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--orb-box);
+  height: var(--orb-box);
+}
+
+.orb[data-size='lg'] { --orb-box: var(--l3-size-96); }
+.orb[data-size='md'] { --orb-box: var(--l3-size-64); }
+.orb[data-size='sm'] { --orb-box: var(--l3-size-32); }
+
+/* The art is drawn at 100 and scaled to the box. */
+.scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  transform: scale(calc(var(--orb-box) / 100px));
+  transform-origin: 0 0;
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+}
+
+/* Figma: the halo copy sits 8 right / 10 down, layer blur 23.35. */
+.halo {
+  transform: translate(8px, 10px);
+  filter: blur(var(--app-dash-orb-halo-blur));
+}
+
+.art img {
+  display: block;
+  max-width: none;
+}
+
+/* "Group 1000006113" (back leaf, blurred glow): box 55.5 × 57.8, bottom 49.7, centre +17.2. */
+.leafBackBox,
+.leafFrontBox {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+.leafBackBox {
+  bottom: 49.71px;
+  left: calc(50% + 17.24px);
+  width: 55.526px;
+  height: 57.791px;
+}
+
+.leafBack,
+.leafFront {
+  position: relative;
+  flex: none;
+  /* Figma's order: rotate, then skew, then the vertical flip (Tailwind -scale-y-100 rotate-[-108.93deg] skew-x-1) */
+  transform: rotate(-108.93deg) skewX(1deg) scaleY(-1);
+}
+
+.leafBack {
+  width: 45.469px;
+  height: 43.372px;
+}
+
+.leafBackImg {
+  position: absolute;
+  inset: -14.91% -14.25% -14.71% -13.92%;
+  width: auto;
+  height: auto;
+}
+
+/* "Group 1000006112" (front leaves). */
+.leafFrontBox {
+  bottom: 50.97px;
+  left: calc(50% + 17.61px);
+  width: 50.159px;
+  height: 51.373px;
+}
+
+.leafFront {
+  width: 40.069px;
+  height: 39.526px;
+}
+
+.leafFront img {
+  width: 100%;
+  height: 100%;
+}
+
+/* "Ellipse 8": the ring's soft inner fill. */
+.fill {
+  position: absolute;
+  top: 30.85px;
+  left: 10.38px;
+  width: 57.662px;
+  height: 59.282px;
+}
+
+/* "circleGroup": the angular-gradient ring. */
+.ringBox {
+  position: absolute;
+  top: 27.88px;
+  left: 7.5px;
+  width: 62.852px;
+  height: 64.618px;
+}
+
+.ring {
+  position: absolute;
+  inset: -7.11% -7.31%;
+  width: auto;
+  height: auto;
+}
+```
+
+### `src/shared/ui/dash/DashOrb.tsx`
+
+```tsx
+import leafBack from './assets/leaf-back.svg'
+import leafFront from './assets/leaf-front.svg'
+import orbFill from './assets/orb-fill.svg'
+import orbRing from './assets/orb-ring.svg'
+import styles from './DashOrb.module.css'
+
+export type DashOrbSize = 'sm' | 'md' | 'lg'
+
+/**
+ * DASH's mascot — the lime ring with two leaves (Figma "Logo" / "BotIcon", the 100 × 100 vector component), drawn from
+ * its own vector parts in the Figma positions, with the soft halo behind it (a blurred copy).
+ * Sizes: lg 96 (landing pages), md 64 (sheet headers, on a soft disc), sm 32 (the rule card's icon). The DASH pill sets its own
+ * box (21.8). Shared: DASH flows and the home's entry pill use the same artwork.
+ * Decorative: screen readers skip it — the text next to it says what it is.
+ */
+export function DashOrb({ size = 'lg', halo = true }: { size?: DashOrbSize; halo?: boolean }) {
+  return (
+    <span className={styles.orb} data-size={size} aria-hidden="true">
+      <span className={styles.scale}>
+        {halo && <OrbArt className={styles.halo} />}
+        <OrbArt />
+      </span>
     </span>
   )
 }
+
+/** The artwork at its Figma size (100 × 100); the parent scales it. */
+function OrbArt({ className }: { className?: string }) {
+  return (
+    <span className={[styles.art, className].filter(Boolean).join(' ')}>
+      <span className={styles.leafBackBox}>
+        <span className={styles.leafBack}>
+          <img src={leafBack} alt="" className={styles.leafBackImg} />
+        </span>
+      </span>
+      <span className={styles.leafFrontBox}>
+        <span className={styles.leafFront}>
+          <img src={leafFront} alt="" />
+        </span>
+      </span>
+      <img src={orbFill} alt="" className={styles.fill} />
+      <span className={styles.ringBox}>
+        <img src={orbRing} alt="" className={styles.ring} />
+      </span>
+    </span>
+  )
+}
+```
+
+### `src/shared/ui/dash/assets/leaf-back.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="58.2771" height="56.2179" viewBox="0 0 58.2771 56.2179" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1000006113" filter="url(#filter0_f_0_282)">
+<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M11.1805 6.4948L10.2325 8.23984C7.21698 13.7241 6.07176 19.8031 6.63218 25.5588C7.5941 35.2352 13.3302 44.2732 22.6694 49.2476L23.6172 47.5025C27.4934 40.6061 28.2232 32.8573 26.4785 25.7606C24.3978 17.9116 19.1614 10.7108 11.1805 6.4948Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
+<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M51.7823 38.3919C48.9397 43.4603 44.4029 47.018 39.1965 48.6543C33.6484 50.4553 27.3477 50.0009 21.8287 47.1335C24.6713 42.065 29.2933 38.5078 34.4997 36.8715C39.9626 35.07 46.2638 35.4411 51.7823 38.3919Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
+</g>
+<defs>
+<filter id="filter0_f_0_282" x="-7.45058e-08" y="2.2538e-07" width="58.2771" height="56.2179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3.2474" result="effect1_foregroundBlur_0_282"/>
+</filter>
+</defs>
+</svg>
+```
+
+### `src/shared/ui/dash/assets/leaf-front.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40.0692" height="39.5257" viewBox="0 0 40.0692 39.5257" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1000006112">
+<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M40.0554 29.6165C37.5947 34.0042 33.6673 37.084 29.1603 38.5005C24.3574 40.0595 18.9031 39.6661 14.1254 37.1839C16.5862 32.7963 20.5873 29.7169 25.0943 28.3004C29.8234 26.7409 35.2782 27.0621 40.0554 29.6165Z" fill="url(#paint0_linear_0_409)"/>
+<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M4.19434 0.0243672L3.37396 1.5349C0.764101 6.28215 -0.226587 11.5445 0.259219 16.5271C1.09303 24.9038 6.05968 32.7283 14.1449 37.0356L14.9652 35.525C18.3199 29.5554 18.9507 22.8476 17.4396 16.704C15.6376 9.90912 11.1037 3.67494 4.19434 0.0243672Z" fill="url(#paint1_linear_0_409)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_409" x1="21.3968" y1="29.3938" x2="22.0238" y2="39.1604" gradientUnits="userSpaceOnUse">
+<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
+<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_409" x1="5.24577" y1="6.42552" x2="13.4379" y2="33.8372" gradientUnits="userSpaceOnUse">
+<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
+<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
+</linearGradient>
+</defs>
+</svg>
+```
+
+### `src/shared/ui/dash/assets/orb-fill.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="57.6624" height="59.2824" viewBox="0 0 57.6624 59.2824" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="stroke0_0_416" fill="white">
+<path d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z"/>
+</mask>
+<path id="Ellipse 8" d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z" stroke-width="16.8671" stroke="url(#paint0_linear_0_416)" mask="url(#stroke0_0_416)"/>
+<defs>
+<linearGradient id="paint0_linear_0_416" x1="17.0104" y1="56.2094" x2="43.5226" y2="4.92706" gradientUnits="userSpaceOnUse">
+<stop stop-color="#72E780" style="stop-color:#72E780;stop-color:color(display-p3 0.4476 0.9047 0.5009);stop-opacity:1;"/>
+<stop offset="1" stop-color="#FDFFB5" style="stop-color:#FDFFB5;stop-color:color(display-p3 0.9903 1.0000 0.7091);stop-opacity:1;"/>
+</linearGradient>
+</defs>
+</svg>
+```
+
+### `src/shared/ui/dash/assets/orb-ring.svg`
+
+```tsx
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="72.0446" height="73.8103" viewBox="0 0 72.0446 73.8103" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="circleGroup">
+<g id="Ellipse 9" filter="url(#filter0_f_0_407)">
+<mask id="stroke0_0_407" fill="white">
+<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z"/>
+</mask>
+<mask id="stroke1_0_407">
+<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="white" mask="url(#stroke0_0_407)"/>
+</mask>
+<g clip-path="url(#paint0_angular_0_407_clip_path)" data-figma-skip-parse="true" mask="url(#stroke1_0_407)"><g transform="matrix(0.01625 -0.02375 0.0230642 0.0166474 37.0963 36.713)"><foreignObject x="-3827.82" y="-3827.82" width="7655.64" height="7655.64"><div xmlns="http://www.w3.org/1999/xhtml" style="background:conic-gradient(from 90deg,rgba(121, 234, 105, 1) 0deg,rgba(246, 253, 38, 1) 124.615deg,rgba(52, 177, 33, 1) 238.846deg,rgba(122, 235, 105, 1) 360deg);height:100%;width:100%;opacity:1"></div></foreignObject></g></g><path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="black" stroke-opacity="0" data-figma-gradient-stroke="{&#34;type&#34;:&#34;GRADIENT_ANGULAR&#34;,&#34;stops&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;transform&#34;:{&#34;m00&#34;:32.500003814697266,&#34;m01&#34;:46.128456115722656,&#34;m02&#34;:-2.2179441452026367,&#34;m10&#34;:-47.500007629394531,&#34;m11&#34;:33.294700622558594,&#34;m12&#34;:43.815639495849609},&#34;opacity&#34;:1.0,&#34;blendMode&#34;:&#34;NORMAL&#34;,&#34;stopsVar&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;visible&#34;:true}" mask="url(#stroke0_0_407)"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_407" x="0" y="0" width="72.0446" height="73.8103" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2.29814" result="effect1_foregroundBlur_0_407"/>
+</filter>
+<clipPath id="paint0_angular_0_407_clip_path"><rect x="-41.3666" y="-41.3666" width="154.778" height="156.543"/></clipPath></defs>
+</svg>
 ```
