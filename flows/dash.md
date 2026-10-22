@@ -287,6 +287,20 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
   flex: none;
   color: var(--l3-content-primary);
 }
+
+/* DASH: hover and press fill the card with the brand-light surface instead of L3's grey state layer (designer's call,
+   2026-10-23). The card keeps its press scale. */
+@media (hover: hover) {
+  .option.option:hover {
+    background-image: none;
+    background-color: var(--l3-surface-accent-brand-light);
+  }
+}
+
+.option.option:active {
+  background-image: none;
+  background-color: var(--l3-surface-accent-brand-light);
+}
 ```
 
 ### `src/flows/dash/components/BuildOption.tsx`
