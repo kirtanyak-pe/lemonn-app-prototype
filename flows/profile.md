@@ -213,32 +213,6 @@ label.head {
 .more {
   padding-top: var(--l3-spacing-12);
 }
-
-/* Opening content: slides open (height 0 → its own) and fades in; reverse when closing. */
-.reveal {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition:
-    grid-template-rows var(--l3-motion-duration-medium) var(--l3-motion-easing-standard),
-    opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
-}
-
-.reveal[data-open] {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-
-.revealInner {
-  overflow: hidden;
-  min-height: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    transition: none;
-  }
-}
 ```
 
 ### `src/flows/profile/components/SettingCard.tsx`
@@ -258,16 +232,13 @@ type Props = {
   control?: ReactNode
   /** What the setting opens up underneath (theme choices, accessibility options), 12 below the header. */
   children?: ReactNode
-  /** Content that opens and closes (accessibility options): it slides open / shut instead of appearing. */
-  open?: boolean
 }
 
 /**
  * One setting on the Settings page, all built the same so the page reads as one set: a static L3 Card (12 padding)
  * with a header row — icon · label (Label/16) + description (Description/12) · switch — and optional content below
- * (static, or sliding open / shut with `open`).
  */
-export function SettingCard({ icon, label, description, control, children, open }: Props) {
+export function SettingCard({ icon, label, description, control, children }: Props) {
   const Head = control ? 'label' : 'div'
   return (
     <Card>
@@ -280,13 +251,7 @@ export function SettingCard({ icon, label, description, control, children, open 
           </Stack>
           {control}
         </Head>
-        {children && open === undefined && <div className={styles.more}>{children}</div>}
-        {children && open !== undefined && (
-          // Height animates from 0 to the content's own (grid rows 0fr → 1fr); closed content is inert.
-          <div className={styles.reveal} data-open={open || undefined} inert={!open}>
-            <div className={styles.revealInner}><div className={styles.more}>{children}</div></div>
-          </div>
-        )}
+        {children && <div className={styles.more}>{children}</div>}
       </Stack>
     </Card>
   )
