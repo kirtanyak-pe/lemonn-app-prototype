@@ -2290,7 +2290,7 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "indicator.placement": "{place} · checked on {count} candles",
   "indicator.linePart": "Line · {name}",
   "indicator.notes": "{count} notes from testing",
-  "indicator.addToChart": "Add to chart",
+  "indicator.addToChart": "Add indicator on Chart",
   "indicator.adding": "Adding…"
 }
 ```
