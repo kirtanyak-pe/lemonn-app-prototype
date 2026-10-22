@@ -1,6 +1,6 @@
 # Flow: Market (`market`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cd84910` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 The Market tab — stock lists (all, gainers, losers, under ₹100 / ₹500) and Filters.
 
@@ -1178,116 +1178,6 @@ p���˗�޽��/	�_WBr�e�� Ud'��*��/��nݻK�>}
 ����ҥK������U��",�#�M&,4�V;��� {��҂q�~�� Y�p��9Rm�j�j�}��F�Ԕ?���_�ߑ 7J��"d�2������ �ŶT �R c�P�Krc+�Ww�Y�%�&M�ٳg��ѣ�>�Z���fgg�&���n"�>��"�s�G^5�t$�%#�kpr��ЏIO��u`W�r����'�d��ǭS�d�E���Ȇd�����G�[L%�A�eA�,��E��j���?��\��    IEND�B`�
 ```
 
-### `src/shared/assets/logos/ongc.png`
-
-```tsx
-�PNG
-
-   IHDR   x   x   9d6�   gAMA  ���a    cHRM  z&  ��  �   ��  u0  �`  :�  p��Q<   DeXIfMM *    �i            �       �       x�       x    �U�  �iTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
-   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-      <rdf:Description rdf:about=""
-            xmlns:exif="http://ns.adobe.com/exif/1.0/">
-         <exif:ColorSpace>1</exif:ColorSpace>
-         <exif:PixelXDimension>190</exif:PixelXDimension>
-         <exif:PixelYDimension>190</exif:PixelYDimension>
-      </rdf:Description>
-   </rdf:RDF>
-</x:xmpmeta>
-�I�  !�IDATx�]|TU�?�LzBz/	-RT:�,��bw���/
-���~�]D�"��ػ����g[�)�H�J@:$@zB�����'1ɴ7�As~�̛���{�=��s��Jl_&n�Ji�&�i���2����I�V�$""B�{���B�	������P����ȑ#RUU%���R^)R\R)�RQY<׍#� �B
-��$�^���gam.Qv�*���$�߿����Oz�쩟��}'99i����+a���eǎ�v�ZY�b�dddHXU��FEȱ�*�+,��
-�~$e��^J��J	�N�	{���K�cT�^�!1"v{�t��I(�]v�t��]����iG�^` //O֭['����,Y�ҳTJ+m�_X.�e`m�Gڙ�T�>#�2�	b"�%���MNJ�	'ʹ瞫��x��Ca�ﾓ�^zI/^�*�I^1�vQ�QIϰh���J�n�F\�]�&D���d��Qr뭷��'��L�x���8=w�\y���СC�mr$���Y=rs5��.͚`@//�	&�Dpnll,_i���ҥK宻����Jy�]疀11��V��d���18���\n��v�����f��`���*_7�|�l۶M�l r�,^���4�k�N��\	����������T�9s�t��U¥B�%FI�������-<cn�T��]tQ#�>MQô�4�={�t����Ji!���	�9��c)P�Fʴi�$::�4�}4k�L:v�(,�r0�K�*16\���ʤI�$!!!�[�X�:10j�(��%%%b�8>���T���:�۷o�/6>8~0@�k͚5b��M9<�
-�.2f̘��5�-[����ǋ->�*p�رc�M�6���������ѣ�����x7n��U���z�{4A&%%y�k�*̗�>l��\4^[���cc$�I�󵗖�*����-�:,�6R�h2i��a���Pz\s�~|��e��!��������$n�=��%3�Z�h�#pQ�Fz��4� �i�_���8���쉉�B��x6��dX=Qh[�����Ni^�TbnH�EEJdD��޼��4+��A|��7<&���o�*Q���ٚ�Xq�D���wl/1pj=�%v|��v��,�����˯��2X��zFl��dp@ѡLٿp��c2W���={�p��3���`��C���:������]ƁzNN��b�!�e�y�5�ܻ�~��ڈz�p6���;	$lL�Vժմ�$���{���*�zk��- �~����ˡ�KY~��fpv���j����NG9~B@.�`�K�;uT.m1`�ts���jBqf�m�.s\�L��&t�(a�@P����_r,+K9������:.Ƕj)����i�B�H��")ص[�_y]|���/�E�p44��o{m�F(U�K�K�*��;G:�=Z�z��V�cG�������K Bm �)���N�47OR/��c�n�m����3�q��9\)�����6��l���k�b^	]:�������!9�j5��3ٍOEI):����j�Џ��t�
-�5[�arY�O�vqm.S�
-��f�\%��/�g���DS�"���ePx�6M�޷N��ϿhT�`�K�x��nۮ��L(��KQ����U�1\Z���$���9K;�~��4{��n�T���3�JC�6�0[w����%��\,�ݺ��WѸ�B����R�{7�#ʙ$���Δ����E$�g�=�f�)��ӏ0���F��XWB�&���Od�'��{�t8�Ҭoi�*!ڎ���4P,�F6���X����D�3�����V5T\�5�;���͸��)��M/�,{>�\r��-��،�<�>��s~��mt|uM�q�f�p}�N@�����r�G���Dis�pt�����g�y,?ZZ$��|G6�yE��Y�6��Z�A�2�,-�/��G�]1NE#�OD���7${�f�4r�+�Շ'�ቩ)լ�*ifZ���'J��g���̃QD�@l����]��_͗��+i7� M���h��>�n���I���a��S�ut���Գ� 0����0^ڞ6J�Jݷ`��{�9�f�NM�J���8^�{4bD&'z-N)9�;Q���~ �}'i7^/=0e����#�����>(�>��)m���eI�DC_���c���0�I\��>,�o/G֭ǜK�.c���W#=�;�~��
-Ĭ	�%5sJ�`������!Y��#���{�k�O4\g�Ϟ%�{D����u	~��`f�#����2�՗0F���dB��E�$��WT��e=�l�0Ib̬�#��)B)	8�o}��v�Dٌ��I�r�9eƓ��5i�}��hsn;h�#g�)�i9J�Mي��F�)Q]�qw�b>1����u��t�"�
-������LY��Crt�F�أ�Qw� m��X������:D����yQ[�V�Sf>�$.��5Ӧ��)���
-�j��T�E�fm��S�~'ILsxm(7�#d�)As6�k��/<OO{Z\P99�G����>➫/��b�S$��7UA!��������&{�B4�ֽ�e����~(���q�ȠiS�Xա4�z���e�^�\<VR.�U���ɖ7�T���Ӊ��
-9�O7��|�b���i�/�VݹC<�Hс��w�B����PN����CH�!hf��e�ׄ[�M���?*[�|s���Y&�J��0�I�;���y��oѪ��9�:M�����!2��'$�mk]r[~�=jڳ�C��S����4dФ/w�Գ;̡�&6I�|غ����c	��	��g��u�����<��R�5ڮ�����cA�{H��j�!�rm�k��S�&)���,���=_|���X�
-�{<<�c��]-}{PS�PD�b���Ƅ,���1�k~�I[!<5g2;�� I\��6o}�]��?��m�5�����2B  �F�[�+0�<��Kn�C�w�rښ�(v�HX�t��ai7]o�=L�S2j� �iO@��A�h1���6Eͩ�X��ɽ�m�J�)J����-�{���'y��L�;O!
-����7���� �}�E�����@|��9gK��N�x0SK�v��ҤKg�����w�8Y;WBJ�jˍ�_��s�k�4�8Щ`��(Q���Ϸ�Vsq@\�Ppz\w�����҉�jCFm�Pw�w��דkK�z��� A��` �Hw�1ڎ��a�3@`!-Uto�x��������	e{
-\��TI��x���k�c�Jrrt�S%���"q�譴rYN`�Ƿo�+6���A�������D��q��ΰNy;�n�q��ZL�ZO�dYY+Vʡe�k�����B;������L�F�����:�&��ܛ��|x0�P�v(>����Y�` �)բ7�1�0�!"��BZTK	̞�]i�o�Jr���?2��9��4���ꚹ|��<h>�����urd�&u�����`�=BM�N��m~w�����R���Mg9:���9�E뭞4��YR��pt�$��_�w�[@�3�,�tX�.��;�i0-^��[5[J`�6�06�����OJ1�Z�I`�4h1���u�鶿7WqO��`�c�?V1Ͳ[
-��N�n?+c����9�����ë�u��B���:��#�'���`�M��?UDk�(��o<Z��[KӾ�-��YC`���f�?�t�^����ϗ�l�
-�xf���k�d��{��5��[0wF&'��{�ܾea��n>$4q��gZ�;k�hg4|��R3����Biy	X����^�vׂ�A%�9�}!��V���c�k�@^S�"������W�G��CKL�9��Άh��>�g�53/�QAj9x��b�>!O�aֳ��\n, ��Ρ��f�Iɵ�؟�����-㰧m�5Sܴ��̜މ��'p�4]UQz'x�L#M���[=�S����b�3F�C��U�Q>�F%G��k�k9dHh�b�	�w�b%�s��t,h�pr/�>��@WN4�_[�؆�}�T9��>&+���W�=){��JJsr����-�`*܈E�y;A$f�#�P8��j*x��������������b��X��'z�
-��:�no�GJ}�]�,!0����*�͕����Ġ��ؑ��NVS�f���r�J����H�u�,Z$�	�����nM��I�L:��&Bh9r��aՂ��Y$$G"�a7隢�ه=�ܱ�
-�k}��jr��j���^��%	���?���O\�M`�Frӡ��6{��I�SS<�ˇ�_��M�������쳌a�O�+��A����/һ��?�Y �`j�[�x[��5�ܸ��e�{^�3/o	��T�F�@�����$t�k��
-L�|k�R:7���.�-�d��E.�1Ҏ/D6ߡٕ�X���S�ڵ��di9�M�Wi����\"�M��%QpL�7�֯(l9��pCtV�������7ז؛­J˝mN�Df��\�x5�̧ە��NȆլ��� 0��ӹx�$�����eB��3�w������Ԝi��e>	���s_-Qa.q�����?i���r�'B0@ 0���.:�QM�5�NX[��3�ֈ�l/g�q�kG5��Z�ho�ئ�O�&�>tS��n��^{�sВ��X�7�D���h�s�3͖ܰX�\p��:�b�<4�֧���UL����l
-bq.n���3O�c�����[� W#�'�X���w;vb���/y�O` �4�@�4��B$�R��ީ�{�	��/����UH;� ���N�������`��T���N~��6ƭr�ۥ�jM�6{�t��1N��&*s�nsztp�ni�#_g��\�c鴘z��B;gC�uf�L�r'!w��D}.\f%�"6>6�iplc0 <*��]��]�>��%�+|,�of�ܸ�����m�>����w���m!�im2�Q{�.F�����I`%��"F�bOk�{:2	6�DD8��������9��RQT�#��	4PJ0�/�+	������&��O��n�
-s�:��]��.rf���S�ⷿ�Z�!�2X��6�׮��s6�xܴͧ�t����U�%S�ϝt�3�i��s�6�[��1�����	�J4�=��Y���U`�0g�V%0Wu=6k%8"; @��v��
-g���/���0����)�\LH��C�GJ�Q#Y����2���XB`V�
-�.��׺	}n�q��0�c*��y�ɐ�'e]�R*0r;cI���OՕ< �-�N
-��ӎ�z�_�0��Ph�� �Oz��`0��B��T�#p�-��[6t���g[�5��4{s���VT̗<x����e�r�������şwJ�s��w��'/�D4+�qk�����]*G���(��&&j\׻��|��%��(�K&�&�8o��J��:Ҽ��eKXg�	�#n�V����h���(��O�0V(YD����A3p�L(�\�<�/ߖ�`��Mb�ơ�3>T���(?&��$����_|��0���E�P�������Zn�,�˳���7E�S��\VK�y�ִ�K/v[D2湝�=ۘ�#8*;I\�6Т'�X� x����]d�Se�Qo���ST!0K� ��'����/�6���N�!��B��m_|���ke�����a�BFr?���WkŞ6�!�B<zӎ�����ZީB`6�DލJ��i�c×7ͭ;-��Tr�=W�O��Kypd��o��xH��a����Ւ����3E�2/xqw8�׶[��b�/�܎Hh��6�_�ؐ؆k%���F��}�-��X��ʲR=��[n5����U��َ�L�ϖ��x���n	\t�zN��E2cH!!{^���j�E�>��Xq��pt�7� ?���6�@(��#�#��n�Q�a|癆� j|tl�t �z���������m���浙��o�c�W-�9t���w�ݙgȉwLRGz��`e��~<���BN`��Rt���2�����Y3O�;�GP3�[\�M5���9O�N�tܤ�ǇFZ���N�%l�(	�N�Ҥg�����o��Z����b����	b�4�����.��zט��I0���u#�<p��	��n��:vd�`Tt�}D���O���+�\C<�`���?�}���'N����[j����r�����N�BT���0��{�X�u!.	K�%".V#��Y���nK�����4���r`�����͎<9�zh���`ک���.�D���� 49R���Dڝ~�$e�d�e�y��A@�VS����Q�����8�kҞj�̋�T��2揲B󸟣�6(��q\�6����|�������w�.C��=�qI�LD:�YTH�"��T�>5���@�u٤���a�&ѨB%����v�,�:[����2�B";C����u���XOO���_�2�i�c8�D��q��g��3�ЊCBND�`����҈{I_/���*�i�Yw ΅��+γ��S���+!��u}�m�!�&O��K�9��dq��r�`�dN�L���=P?���Ӄ��T�f=�N�lG(@h����_'�?��kD���G���ՄGRk�?�>삿
-b����-�_]|�̿�����Qo݌Y��ڛ䇻�W�L](��ܟ4��J���s���#'C�o{���#gV���z�����4?�$��1N�]����	i�1�c.��q�����1�D$9|�Ȋ{'��]��{���q% T�ۋV�E��$?N{��mu�=��;�qQA�u��f��`2_8a�M�'����0C��)��I����a�l�R�Ep�ʤ�U��t�_u�b���Ztݍ��=C��a�u��ET2�R�M7(�y����q(��cT�c���f=��S_RZO-�~�����םC�(ܻ�0Nz_FC��f�����o���;:�Y�`~�W�{�b�n4a˛� yp<s�
-U�����z�P&P��v�=pK�D(:9�c�	��7 "������*'���0�g#x�Sm��'y/��f��\cf�fOTs�j<a��ٺU��Qτ��/�F��&)�g������
-{qM ����jn+T����[�L�C��8��ֿ�f�� �ðg������Y���/C��c�e��!P�S"p\6�Rि��P�PG�Z=u�d9:;	M����u>m��� 0�3��)C�2��RL�x,�)F����O �.q�jNc��2}n�����<���i��cdW*S�G�
-��J��P[�޴Y�<�8,c�ɡɽ���j\�z2 �g���67����_A���]�<$�`Nu����g4�>E�j�b����0�׵O��q��D�N@�M��M����_��ce�A�z."����lza���3��V.O��8�<�!���V���rg��Jd>��.V�	ֆ IԌ��|p�R�[��szrs9�*J�ɡ%˪m4clʤ����&nJ��;u�S�#5�Y*x�WsL�B�	i��։�9��D:z`2^6�{�ܶ��y��檝z�>�I�5���cOe�U6�~[e��la��2�1L݄�t�|7��g&���.�:1��ޯ�;�lw�(��͎�Po�ař��.l��%����7 ��fʽ�\U2;(�L��ݨQ~7����+N w"��z��������*����s��b � �gDa���Mri�X9e�r������"��.g�X3��e9^l3|����04`�O 3
-��_!y;w*a]�ǫ!�e'�\R5��2�P*[\�׹��LJ�rf�U����X���9XR�ř�sa�݇
-7u��`q��gG�YMt:Jར����SQ�O���	�V C�^jMB7홙��e��ӧ��ՂX�ܐ�ar�w�_v�%U	��e*́�iع,��(�|��[�NƎ뵨���{镘���Ҙ/8ޡy���|��9,55��[�n����K"~5¯6HY�
-C��y�~]-kl�b�������W8�b#�z0���-�<�a*/���7*'�z��ؒ��Ol�P�
-�	���>��a���,Z�H��I>L
-�����`��;w��ߺ�x���dƌB+�[+�-����hy�T\��qt�6�D�>}��_�^g�k:N��h.((���,�4i�l߾��m�o��ngϞ-���T@"�����`�tu	����Ȑ[n�E�8V�o�P���駟��{N�0�E(�28E���쓙!���ⱰP����˗�	���k����̙3e֬Y�s��Q����� 0��&W|�_TxLbẚ����WJJ�����2�O<!s����$�\H\s�P	�U7��K����^�`�zIi�,\�P�(ѫW/�s�:z��m�h���r��w�_|�?�������'�(=m�(���qSS��Ԯ��&Is|ʰ�ޡCU�ƌ��uF�6�*� �1g;��R�R��?�	K�#����h�?°j�    IEND�B`�
-```
-
-### `src/shared/assets/logos/reliance.png`
-
-```tsx
-�PNG
-
-   IHDR   x   x   9d6�   gAMA  ���a    cHRM  z&  ��  �   ��  u0  �`  :�  p��Q<   DeXIfMM *    �i            �       �       x�       x    �U�  �iTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
-   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-      <rdf:Description rdf:about=""
-            xmlns:exif="http://ns.adobe.com/exif/1.0/">
-         <exif:ColorSpace>1</exif:ColorSpace>
-         <exif:PixelXDimension>190</exif:PixelXDimension>
-         <exif:PixelYDimension>190</exif:PixelYDimension>
-      </rdf:Description>
-   </rdf:RDF>
-</x:xmpmeta>
-�I�  $�IDATx�}ip]Ǖ����}���E�ZH��o�f[5�8��Qd'3S.���q4�r��ϕ�\5N)�H5�SS��g$�3�(y4�(R)�"	�I����/������ ���h���׷o����9}���_Uc��p`��N����P]��	��q$	���`��p:�p�\(--+��{w�@����B�������ǃh<��H�X�Tw�M�݂V��}�2S[�u���"�) �@��F�ٳ�w�ƺu�v�Z���Cyyy����D)�������|�2>��#�8q���p���R������Š�R���J��^fb����y<NT�y�q�ə%r8�'�x����cMn��J�d2���~���x饗p��i2��(��@ǓdP�Y���A���@��qlE�ir�u�����c߾}�jr����g?�.]�H��&��6 ��ls��}�)��f0�*���O�M���O���&��J��E��������+� N](I�/���-0].�V�kݳ�������>�,*++s�c>n) L<�=꣝H�/v"c�k��_UCZ��N��2�ߖ�?�)>l'�?�`
-9r���w��=�~��?J@Y`b����^P�K�n*Tn����'?�	y�EχY@�U�VaŊx�#p9�YX����|��q����[�c�L}�k_�՚/b64\]���I�K�i�H��f\C�����韚>7�����C����CC�cǎBL+�����)�;�m۷�駟�=��/iN
-����A������f��{�ym9'�fW�����������3�������gWM�K;*���k�P�DNَ�z�y���}74�}��G���s�Ν��anQ@Y�:%����ܪ�]_���*<���pܼy3�dɒ�� s� �^tp�03�0�8_'�ḟ�L�y��2���{�׏VY�@셬�H�$�J�B��a� ��G	�#2p��"1�z�t �G4Cҙ@"@����e~��*�����b	�����U�_^��Z�s�Y�dE#}hm9���m��X?M�N�ȩn��	x�rl��ő���>�0�x��6��Y��)�~o)j˖�]� ��eXܰ	�5���lD|��LD��y�]�=n\}�H�	��,!H^�D��)��.y9��o���)5��Z��؎3^�WZ��4�C	6'�"M��.چ��C��(�\4�p�5 ���r�#�6��H�U$cA8��J<$�� T��r)}{9��.�濴��`�QGN	"�������Hs��M)rvҕ��ڢH���u���r�,\���c_>�Ì8���3o���
-��G��K�)v���D���Yd&R�An��O���;��VbY�á�t�K����yGLw���#G�h,�����b��Q�l����0c�D�h�x��������u����c^�C`n�i��]���`c�4hJ���4�T�`�jB
-�����ۃ�"QVmxkwB͢�J:��Z����o�y���+V��#i�,�HaCw��o%䲃�-TuG��օ��İ��"�t)����J"ۼ��X)��Yq�d}� �e5X��_a��G�/)�p��(��>9�O����(u&�]���Mp���,��)B�����,W!��a)��o�aTؑ �-���R�F	*}q��ʗ��=�,^7Z�)��1 �u��������>���GQ��"�vP��p���V��P_��#7��Lb�M�eܐ6Ϙ��A`�sM��W��
-����_
-�/��4d0��V�M{���f-/��0# ni>�o�5�I�]n8�I���������� 
-6gq�� ��e�-�WZ6*栧�P�4��X�C����M��䗢`�o����T��"�����i�=%����b�N���#8u�x]Q�p5E���&�,�����RZ���ICx.[e���A�}�" $jm��H��l@ҴA�y,��;�&�R��7�3B�N��9��p'�ރ}���~y�V�L+�>z��i:tӂD@iJ4P�PA�J�����^zM��,B��q!�e4^����=��uS)td�g�˼�p>3���|��:�I��*C�s��$i7����އ�3Ter��������7�}g�ye���#n���dy��"���1y\q����]s�ǭۙ�BJ�x�wX���O������I!�U��Uz��U~'t�e�����8�����YL��l�L٫/��5>>�?Q[�����flJ
-�4��,�@Y�!pD�`�(�&���$Y�fEf$�͹S���� �_j@�-��ڄos��ϤWt��{y��q�q��A����);�FS>��#�}�W�g���P	;aLʨ4�\�\Z���Y/��Ħ�W���\�rõ�l���9SY�k�2��`K�����׺� ������gcU�B�z
-g���1#r�f*�L)�}]�q潗Q��C�'�k32����&�M�*�Φ�lģ2R]�J�|se�T
-�)w��ʕҎ�����,����d��|�K4����G��{� ��8��_!�/'�O)X `]I�����1bS0�\#����lpo��<:m\.7�8}��_���SV�)8�aå�!�u�2�ҜL�W�6q�i_":M��ߌN�`�&���f�I K��<�T�3Aw�Î~Vґ�֔��sv����NNf��zE)'I�8Cu���C"�΢h�S�K�q��oP�m�I���e�!7�(2?�hj�e���ms��!sӾ72�i���Z	9�[M�t�uk�P��H��>x�
-Q?婆2VhkF�N	;�A3)^{�F]d�#{MI���q���q��8��X��L@/|��J+U5�/��ŉ�Z%��h�*������YU�|5�R=��T�U�?���.��4>>�*}�"E-N�$�yG��Kh>�6�]M�I���93�Js��9[I�H)��v_�����Y�+G��"���]Q�\4�����p&\T���Ƭ���DI�͙I��E�������q�+���� R<��h ��6���cn����Ԑi��Aߩ~xP4��&�w�؞	by�M��/C��כώ�Ѽ���3Gh��v�ۚ��|�-��Ԅ�i;�Ӗ�yy�$������5��1�pw��4G�_�ʸo��rqk����X5QͽԨ�gq��ѱ�N�^Q ni:?b�f��oE�'q}�Y�Ҕn^΃_���q�-4)
-N�(gL�?;C�A(Y���C�Թ�;�aWG3z:��N4�؂����{�r揊g��4�Z���n�H�پ���\S��Li�F�4jw��mFO4�;���c��n�Ȭ��â.M�����E\ L�06mJ	9ԉX�Rl\�D��������T4�ϥ.}� E���&��$`�[�xY��OϚ2M˜���,XH��r��hm�"��= ߧ�]��e23%�%��KȘ�)������-�OT�1�'�A��AD	�Ý�U)ʕ�Nx��V:��w�O���-��nQ��v�����噢� �w!q���bH\م��(�W%KVA9_<��j,����=������kDY�Rnu�2P-5���"�[-�q㓣�QʍX����4_&���ik�� ����g��5u$;Io ��)F�%�Lǟ|K4N�K���l�FniG���0Vo����Yo�1�=��(��E��X��\9��O�%���1���{��rTWR�@˞�Ơ��KX��������iE����r�!�.�0A��J ���,:�|Y?��q�>\u+>�-{��k��~vxBʪ���?B�����{�����fN
-8�b�[���n]��6�B�
-�4ڮ������A_cO�_j!�ў��y2�yR��\.��`�ާ�������I�`�:�y�YT5�Ϗ`��܎ך�V3-nH�?��5ΉPu��` �RIn���&`��s	���I蓙�#q��y"\��1�E�U�������`��Z(��ý_|eu��Mܬ�@.6�B�I�p�C�?u�B� �kF�['����x6E��$WR'�fGh
-PI牼T�_,y�y�cσ�E�ꍅ��m�xhx��'��d@��Rz9�Ko(Z 8H/�����U�0Z�|���R�~�EP�����hŹz�\\'J5�8�䤣��3,]�9g
-YS�u�w J;��7(Hjc���@�^W0��� �=J땠��1*���:�̺d�%��
-��A�v�?������Mc%/�=mϰr�~na9�I�6�μ��d*ث��C��Y<U�����h�	i4d�L�?��:��C��e�1t��+5q~�/���p��=�'*bL���t5Z�X\��k�q�,|�l@8��%�[A�������g��,*\��]�*�bۃO��.�����pz��QdʬY��fc<\���МV0��<���P���y�:�O.���J��?�<Q��{fIO�9��9X)�+;���}/�k�5Y)����S)T(�.����0�&䖓-���_l-��F�(]��6�����T9�j��,Ս�	�z�^g��7���9	���0��2`-�t��5�\�Kc��Č��}��#i,��M�ӳ�Ve�6O�v�6�@�o	nk*��
-\튘���p��T����Z��S(�dZ�0��M��\~N,[�gRd���ip����L�U���~�"��j-ʁS�.�*T�P0�=��j=�UIٟ-�L��l���y/��
-c��P9�P��Lp�D�w�@ ��`C����d��6o����+�v�_3᳿t!��J%,m�4�	���E��Wl�;���()�q�����8�O��"��3!m���aνH���|x���GJ����Y�	q���W`��bi�rTT,��%j�q�}my��'aO�%���"$��S�\�I��iJ��
-9K�O���д+��0�=���@�]ܿ�[��3=��J{VX"{XU���v�T�ײ%�;�F{�q���C���V��|�-��c�nJ8+fm�'KJ��Y�l`�_ס�h�,��:��::*nHh7ǡ7M�ʁ���W/�͑�������gʧ��r���a�X9�b��!�ݭc%׽.�A�q��G���TE�!�܏x��J��osD.M�j�6x�5��L(�� ��+ͪ9����d�'��2����eR*Νwʫ�~���}�W��~� �d����W8
-q�.k�?ŉ�� �mX���YJ��j8J��(>�u\��_Ar4/*(�/�JB��I�]k�J�&��-���[񍦏�t���_���vE�p�đ���v�R�l+�%�j3T���J��,C� f� ��:܉�X;�y�� .S�Zv����/�J�ܴ��.���ŹYwו�%���"��2�\{�y����׸��,V5�4L+�5a�Æ�2�&rb&�d�e��a"9��LAv҃��a?��V΁��Y����7���:����~#n���{�S${�������^>��fYy�H>jT�����_�3n>^R^F�_��N����۶�� e�8t0F���Է侑��D,C���(�̯a����؂:쬫�lF�7X�85P���λ�8L���
-���k~o�����AQ��9q�K@:n^ƒe[�"�y���z�14��'8B��,����C��ų����B�����F�dC�8��cV*�f�^�d��"DM�q��Mxl	�N9��vsG �p-��9.#�mn�z��o�H�$Ǫ*h�/�G��`	(���C�׫]�������\�z
-m����~��O{7�wJ�[q��	Z�	���w~�Q��G�@N��n�����]�Pp�KJ�P�p5����CQ��wЮ�fo@k�[F{���D{o���۴��rL�K����kg?n}t3�߃������@�)���(g����	_e%����hU*#reaװO�P�(lP���KH���R����#w>��t�KG*�e&�2aE#�����T���=��@qp�9i��p�69p��t�¥���"F`c]�(�XAǺJR<�
-�\��K,k]��t+�pt�+.�Y�B����S���q.=�ni<//
-��סl�V�s���ۼ��;?u㳏����]?E���zJ�V�v���#�BJx����Ş��M��:ĘP[��F�b�gҼn�leLBS"hh�=E��LXO�9��5��S��+vL6���`�i�/�Y������Qv��nK-8ۦ=x?s!��k��GU��Ɣ2Z����xv�J�]���{�]�� ���B\�{u�O�r�r��H뗛�L�R��a�T_R3}��
-H���ո��(�I����A���*�|j|Ɋ����7"F������؁��7]~��k�캉��QF�ȸ�R˕��9"���p.��6�b���8����Q��"| ��Pm�&(��+�ID+�l�&]B�Û`ݷ�z�$d�#trwW.Ê_��[��Kw炸=~~S�0��i00Vk�x�'�	�'J��P)��{���|��zw��"�����Z�8Iy777�{�)�w��m%���:֐k,oIK���~T�c	rù��'�����!��x�Sf��Ŭ�c���`�dź����8�&A�+�z�ˑ��@΄�`.��-?@;7���R}�|��bS�ËTX��wv�x[>N1v���^��H�`�X6�uR���3�I�e����g][C0�W��9��������3�Р����|��(*��
-���*�:�SQ�Qd�i��s/���~����R���C���k,�4IX��A.�I��Ae���*���9������_�Z�Z���e�yi�Z���K�6�y) �уq�� i�ے$�w�`�z�`�_/�;�
-��Y�h���CXo)4w$��;����si\��]n��OTy�3����NM�QA�)�eI��t5#�mr���Z.��\��	r?]��և6��hԤ�Ub�l�H�D��h5"�"ݜǮ��A0�B��/�q��\�*h\�Vi7p��b����fj�Z�b���,�P���|dH�D�p?jhw�PY�V�HK���rL!O�∘>bn���ʿz�*<��_��h�Q�� �l}c�e�C�?�[/�9ټQ���<��� �?ֱc��l���6�B_M	��e���78	Q�O��n,�C(Vg��	��P�������pqg�9� �9-E���f�k &����������Ф�r��j.�������A?7lIIV3���l�R���kajޭ�W�й��u�L�k8���s�_� ��,n܂{=�������e��\�*�)Z�����$���v��6���4����s(2�����>�ن�۱��7ї(7���]Zi�v;�d��P
-��{
-K���T�)XZ��~���Uj�!�Dd_6�{�F��
-���P|�GQ�CM�t���4":��Z�8I���y�F�5�wa�^�/@.��&�K+W+d�K���k�����rㆇ��ƽY7�9� ��[�}+6�R���r2Sںp�2��0���ź��+�^Y�R����>P}Zv��g�`%��^o����J�i��h����6)r�֖~eg����?����8��r�Vl��߲a�"6ua��0�[���,'C���D��\FC-Z�~r�(^��X���fj0-1<V ��:��܌�
-kVi���=9-�>��m�?M�Xӯ�w�|�C&�^�� �?�<<%�7�;�)�S���/r�>�m4��"��ݝ9���n\���i��i���pe�28��0N�aK�1V>�uS�VV7R�o�F�$����h�\@�P
-�������Yf7M�M�=C��NQ�r��z�~�i W����b��;�1�mz=�&h�6�$C1���c��h�zR�����w������� �ב����&-]5�It?WV���S�T�&��f�C�%3i�:�n��߫��	6��`�V}��Jz�LS�6�U_7A�����=����uPdS���"m\}J����7�q��д��[��4�[��>\�YA�r��X�R,hܐug|�5�p���E�Q��db�qe�v�6�Θ�;��}��'ڙ������V�U'�l���]�&���T��`?L�FO�U�t7z�ԭĊ59V֞ �W�p�E��PL�")l��%�L�fUu�Է���/�E�K��<��}��9��=Ї~Nfl������?�ۯl2�ӳ��
-���k�=���\2�	�4rĒA�1�p:[.���H����B�\l[��D�-h��٬�I����/|�&͕4�$�x���e/}�ص�]}�5-��{����Wl�z���J�O���ѹ
-����_�&�F��U���<�����������q���E�u��͆�$7S~�ʟ��~m�WL8.I'�����<���9�J��ba#/����λX�8�������p��8�z�>��v���w������
-~�S[�r_�M�>�ͻ����9#Dt.��.^�{��g���T����{�v:��W��{(���۰x�^Z�Ov������@�νO��
-�w�G�%�rd�P�o����=������w�� ؆(�m��D����d'e���~䭻�����Fj����}��3��
-�<� s�'7���m>�E
-[�ѣG�b���D
-[�k��6O�9J��_����78w�����[���������������K�9Z�W_}W�\����B\<�Ͻ͇�A���^�����?g��8w�,~�󟏘W����j!�Yප�W#gw��Sx饗p��黍s��gΜ1Xj��Ͷ8#��`(�/}���?��9ϹZ�%�q�~���\��á��B��(+����455�СCF~�%t��x�������S��C=��������m���hnn�y�A.p����⭷�2>n�]�v�C�4s���H0"Lo�Jn)�t�2�]��ݻw��w֞e����
-�����QC~`���H6��dV}������.��VUU��ŋ8y�$��ك���P�Z���R@�����=���\(�Fk['��G萏�����鴖�"�p8������ގ#G��E^[�l�1���5�K/b��_�~��
-I �;n�n�lE��S@s-��L'	`E�Z�/^��@�M��m�L��v�2���LN�:�_|���U����\:�3��k����� +�C�    IEND�B`�
-```
-
 ### `src/shared/assets/logos/sagility.png`
 
 ```tsx
@@ -1421,6 +1311,7 @@ export const mask = (s: string, keepStart: number, keepEnd: number) =>
 ```ts
 // Market data more than one flow uses (Stocks home, Market, F&O). Sample values, from the live app on 2026-10-17
 // (indices and today's top gainers updated from the live app on 2026-10-22).
+import { companyLogo } from '@l3/assets/company-logos'
 import asahiindiaLogo from '../assets/logos/asahiindia.png'
 import crisilLogo from '../assets/logos/crisil.png'
 import hoecLogo from '../assets/logos/hoec.png'
@@ -1428,8 +1319,6 @@ import igilLogo from '../assets/logos/igil.png'
 import jindrillLogo from '../assets/logos/jindrill.png'
 import jublingreaLogo from '../assets/logos/jublingrea.png'
 import oilLogo from '../assets/logos/oil.png'
-import ongcLogo from '../assets/logos/ongc.png'
-import relianceLogo from '../assets/logos/reliance.png'
 import sagilityLogo from '../assets/logos/sagility.png'
 import ttmlLogo from '../assets/logos/ttml.png'
 
@@ -1443,11 +1332,12 @@ export const indices: MarketIndex[] = [
 
 /**
  * A stock as lists show it. `logoUrl` comes from the API (the company logo); until it loads — and in this prototype —
- * the L3 Avatar shows `initials`. Logos in src/shared/assets/logos are cut from the live app's screens (prototype only).
+ * the L3 Avatar shows `initials`. Every stock with a logo in the design system (@l3/assets/company-logos — 50 large
+ * caps) gets it automatically; a few others use logos cut from the live app's screens (src/shared/assets/logos).
  */
 export type Stock = { symbol: string; name: string; price: number; changePct: number; initials: string; logoUrl?: string }
 
-const stock = (symbol: string, name: string, price: number, changePct: number, initials: string, logoUrl?: string): Stock => ({ symbol, name, price, changePct, initials, logoUrl })
+const stock = (symbol: string, name: string, price: number, changePct: number, initials: string, logoUrl?: string): Stock => ({ symbol, name, price, changePct, initials, logoUrl: logoUrl ?? companyLogo(symbol) })
 
 export const stocks = {
   HBLENGINE: stock('HBLENGINE', 'HBL Engineering', 833.15, 17.27, 'HB'),
@@ -1471,7 +1361,7 @@ export const stocks = {
   NTPC: stock('NTPC', 'NTPC', 331.2, 0.62, 'NT'),
   COALINDIA: stock('COALINDIA', 'Coal India', 381.45, 0.45, 'CI'),
   HAL: stock('HAL', 'Hindustan Aeronautics', 4120.3, 1.08, 'HA'),
-  ONGC: stock('ONGC', 'ONGC', 236.9, -0.33, 'ON', ongcLogo),
+  ONGC: stock('ONGC', 'ONGC', 236.9, -0.33, 'ON'),
   SBIN: stock('SBIN', 'State Bank of India', 742.15, 0.27, 'SB'),
   JINDALSTEL: stock('JINDALSTEL', 'Jindal Steel & Power', 862.4, 1.46, 'JS'),
   COHANCE: stock('COHANCE', 'Cohance Lifesciences', 1084.6, 4.97, 'CL'),
@@ -1488,7 +1378,7 @@ export const stocks = {
   // "Oil Price Dependents" basket
   JINDRILL: stock('JINDRILL', 'Jindal Drilling & Industries', 642.3, 1.12, 'JD', jindrillLogo),
   HINDOILEXP: stock('HINDOILEXP', 'Hindustan Oil Exploration', 171.85, -0.64, 'HO', hoecLogo),
-  RELIANCE: stock('RELIANCE', 'Reliance Industries', 1302.4, 0.21, 'RE', relianceLogo),
+  RELIANCE: stock('RELIANCE', 'Reliance Industries', 1302.4, 0.21, 'RE'),
   TVTODAY: stock('TVTODAY', 'TV Today Network', 168.9, 0.48, 'TV'),
 } satisfies Record<string, Stock>
 ```
