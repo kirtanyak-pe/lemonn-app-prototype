@@ -347,7 +347,6 @@
     "src/flows/dash/screens/ActiveRules.module.css",
     "src/flows/dash/screens/ActiveRules.tsx",
     "src/flows/dash/screens/DashAI.tsx",
-    "src/flows/dash/screens/IndicatorChat.module.css",
     "src/flows/dash/screens/IndicatorChat.tsx",
     "src/flows/dash/screens/Landing.module.css",
     "src/flows/dash/screens/Landing.tsx",

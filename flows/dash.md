@@ -164,6 +164,9 @@ Inside a chat scene (`RuleScene`, `IndicatorScene`): pinned card · scrolling co
   down, top corners 32) dissolves in (300 ms); the message flies up into its bubble.
 - Example prompts drift sideways endlessly (row 1 left, row 2 right, 40 s per loop), pausing under a finger.
 - Input states: default (border-light, Send off until there's text) · typing (DASH green edge, Send on).
+- **Indicator card → mini** (ready / on chart): the user scrolls the chat down → chart, chips, notes and button fold
+  away and an 80 × 40 chart preview slides in beside the name (300 ms, ease in and out). Back at the top (scroll up)
+  or a tap on it → it opens again. Programmatic scrolling (to the newest message) never folds it.
 
 ### Motion (from the live app's recording, 2026-10-23, measured at 360 dp)
 
@@ -187,6 +190,8 @@ Not built yet: the live app's DASH mascot with a face and its "Checking 4 rules 
 screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
+
+- 2026-10-23 — Custom indicator, ready / on chart: scrolling the chat down folds the pinned indicator card to a mini card (small chart preview · name · where it goes · tag, 66 tall instead of 374, 300 ms ease in and out); scrolling back to the top or tapping it opens it. Only the user's own wheel / swipe folds it, never the chat moving to its newest message. The hint under the input (“Ask for changes in plain words…”) is removed for now.
 
 - 2026-10-23 — Restructured to Figma “DASH AI - better layout & structure”: one DashAI screen (persistent background + bar, scenes swap under them), new background, typing state with keyboard (`dash-26`), drifting example rows, new input states, option cards (radius 16, green edge, tinted tile).
 
@@ -1983,11 +1988,20 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
 }
 
-/* In the vertical suggestions list: 48 tall, Label/16, 12 / 16 padding (designer's frame). */
+/* In the vertical suggestions list: 40 tall, size 14 at 100% line height, 12 / 16 padding (designer's One Canvas
+   edit). Never wider than the list (the screen's 16 margins stay): a long suggestion wraps onto a second line and the
+   chip grows taller, keeping a 20 corner (half its one-line height) instead of a full pill. */
 .promptChip[data-size='lg'] {
-  min-height: var(--l3-size-48);
+  max-width: 100%;
+  min-height: var(--l3-size-40);
   padding: var(--l3-spacing-12) var(--l3-spacing-16);
+  border-radius: var(--l3-radius-20);
   font: var(--l3-text-label-16);
+  font-size: var(--l3-font-size-200);
+  line-height: 100%;
+  white-space: normal;
+  text-align: start;
+  text-wrap: pretty;
 }
 
 /* "Top 3 suggestions ✦": Heading/16 in the success green, the DASH sparkle after it. */
@@ -2227,7 +2241,7 @@ export function SuggestionList({ items, onPick }: { items: string[]; onPick?: (p
       </h2>
       <Stack gap="12" align="start">
         {items.map((prompt) => (
-          <button style={{ fontSize: 'var(--l3-font-size-200)', lineHeight: '100%', height: '40px' }} key={prompt} type="button" className={styles.promptChip} data-size="lg" onClick={(e) => onPick?.(prompt, e.currentTarget)}>
+          <button key={prompt} type="button" className={styles.promptChip} data-size="lg" onClick={(e) => onPick?.(prompt, e.currentTarget)}>
             {prompt}
           </button>
         ))}
@@ -2470,10 +2484,88 @@ export function DashBar(props: ActionbarProps) {
 }
 
 .body {
-  padding: var(--l3-spacing-12);
+  padding: var(--l3-spacing-12) var(--l3-spacing-12) 0;
+  transition: padding-bottom var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+/* Everything under the header folds away in the mini card (its height closes, 300 ms ease in and out). The 12 under
+   the content lives inside the fold, so a raised button's shadow isn't clipped; the mini card brings its own 12. */
+.fold {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--app-dash-scene) var(--app-dash-scene-easing),
+    opacity var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+.foldBody {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The padding sits one level in: a folded grid row can't shrink below its own child's padding. */
+.foldContent {
+  padding-block: var(--l3-spacing-12);
+}
+
+.card[data-compact] .fold {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.card[data-compact] .body {
+  padding-bottom: var(--l3-spacing-12);
+}
+
+/* Mini card: a small preview of the chart slides in beside the name (80 × 40, the card's corner language). */
+.thumb {
+  flex: none;
+  width: 0;
+  height: var(--l3-size-40);
+  margin-inline-end: calc(-1 * var(--l3-spacing-12)); /* no gap while it's closed */
+  overflow: clip;
+  opacity: 0;
+  transition:
+    width var(--app-dash-scene) var(--app-dash-scene-easing),
+    margin var(--app-dash-scene) var(--app-dash-scene-easing),
+    opacity var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+.thumbChart {
+  display: grid;
+  align-items: center;
+  box-sizing: border-box;
+  width: var(--l3-size-80);
+  height: 100%;
+  padding: var(--l3-spacing-04);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-08);
+}
+
+.card[data-compact] {
+  cursor: pointer;
+}
+
+.card[data-compact] .thumb {
+  width: var(--l3-size-80);
+  margin-inline-end: 0;
+  opacity: 1;
+}
+
+.card[data-compact] .title,
+.card[data-compact] .meta {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--l3-content-primary);
+  outline-offset: 2px;
 }
 
 .heading {
+  flex: 1;
   min-width: 0;
 }
 
@@ -2643,13 +2735,19 @@ export function DashBar(props: ActionbarProps) {
   .steps li[data-state='now'] .stepMark {
     animation: none;
   }
+
+  .body,
+  .fold,
+  .thumb {
+    transition: none;
+  }
 }
 ```
 
 ### `src/flows/dash/components/IndicatorCard.tsx`
 
 ```tsx
-import { useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
@@ -2670,6 +2768,10 @@ type IndicatorCardProps = {
   named?: boolean
   sellTone?: 'sell' | 'orange'
   onAdd?: () => void
+  /** Mini: the user scrolled the chat — only a small preview, the name and the tag stay (the rest folds away). */
+  compact?: boolean
+  /** Tapping the mini card opens it again. */
+  onExpand?: () => void
 }
 
 /**
@@ -2678,17 +2780,33 @@ type IndicatorCardProps = {
  * - building: "Your indicator" → its name; a wave → candles with the lines drawing in; the parts appear as chips;
  *   three steps tick through;
  * - ready: Ready tag, BUY / SELL labels on the chart, where it goes, DASH's notes (fold open), Add to chart;
- * - adding: the button shows a loader; on chart: the tag and the button turn to "On chart".
+ * - adding: the button shows a loader; on chart: the tag and the button turn to "On chart";
+ * - mini (compact, ready or on chart): while the user scrolls the chat, the chart, chips, notes and button fold away
+ *   and a small preview slides in beside the name (300 ms, ease in and out) — the chat gets the room. Tap to open.
  */
-export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onAdd }: IndicatorCardProps) {
+export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onAdd, compact = false, onExpand }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
   const building = state.kind === 'building'
   const stage = building ? (state.step === 0 ? 'sketch' : 'candles') : 'ready'
+  const mini = compact && !building
 
   return (
-    <article className={styles.card} data-state={state.kind} aria-label={named ? draft.name : t('indicator.yourIndicator')}>
-      <Stack gap="12" className={styles.body}>
-        <Stack direction="horizontal" align="start" justify="between" gap="12">
+    <article
+      className={styles.card}
+      data-state={state.kind}
+      data-compact={mini || undefined}
+      aria-label={named ? draft.name : t('indicator.yourIndicator')}
+      {...(mini && { role: 'button', tabIndex: 0, 'aria-expanded': false, onClick: onExpand, onKeyDown: (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && onExpand?.() })}
+    >
+      <div className={styles.body}>
+        <Stack direction="horizontal" align={mini ? 'center' : 'start'} justify="between" gap="12">
+          {!building && (
+            <div className={styles.thumb} aria-hidden="true">
+              <div className={styles.thumbChart}>
+                <MiniChart stage="ready" sellTone={sellTone} />
+              </div>
+            </div>
+          )}
           <Stack gap="04" className={styles.heading}>
             {building && <span className={styles.eyebrow}>{t('indicator.building')}</span>}
             <h2 key={named ? 'named' : 'unnamed'} className={styles.title}>{named ? draft.name : t('indicator.yourIndicator')}</h2>
@@ -2701,55 +2819,61 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           )}
         </Stack>
 
-        <div className={styles.chart}>
-          <MiniChart stage={stage} sellTone={sellTone} />
-        </div>
+        <div className={styles.fold} inert={mini || undefined}>
+          <div className={styles.foldBody}>
+            <Stack gap="12" className={styles.foldContent}>
+              <div className={styles.chart}>
+                <MiniChart stage={stage} sellTone={sellTone} />
+              </div>
 
-        {(named || !building) && (
-          <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
-            {draft.parts.map((p, i) => (
-              <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
-                {p.kind === 'line' && building ? t('indicator.linePart', { name: p.label }) : p.label}
-              </span>
-            ))}
-          </Stack>
-        )}
-
-        {building ? (
-          <Stack as="ol" gap="08" className={styles.steps}>
-            {buildSteps.map((label, i) => (
-              <li key={label} data-state={i < state.step ? 'done' : i === state.step ? 'now' : 'next'}>
-                <span className={styles.stepMark} aria-hidden="true">{i < state.step && <Icon icon={msCheck} size={12} />}</span>
-                {label}
-              </li>
-            ))}
-          </Stack>
-        ) : (
-          <>
-            <div className={styles.notes}>
-              <button type="button" className={styles.notesToggle} aria-expanded={notesOpen} onClick={() => setNotesOpen((o) => !o)}>
-                <Icon icon={msError} size={16} />
-                <span className={styles.notesText}>{t('indicator.notes', { count: draft.notes.length })}</span>
-                <Icon icon={msKeyboardArrowDown} size={16} className={styles.chevron} />
-              </button>
-              {notesOpen && (
-                <ul className={styles.noteList}>
-                  {draft.notes.map((n) => <li key={n}>{n}</li>)}
-                </ul>
+              {(named || !building) && (
+                <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
+                  {draft.parts.map((p, i) => (
+                    <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
+                      {p.kind === 'line' && building ? t('indicator.linePart', { name: p.label }) : p.label}
+                    </span>
+                  ))}
+                </Stack>
               )}
-            </div>
-            <Stack direction="horizontal" align="center" justify="between" gap="12">
-              {state.kind === 'onChart' ? (
-                <Button variant="secondary" fullWidth iconLeft={<Icon icon={msCheck} />} disabled>{t('indicator.onChart')}</Button>
+
+              {building ? (
+                <Stack as="ol" gap="08" className={styles.steps}>
+                  {buildSteps.map((label, i) => (
+                    <li key={label} data-state={i < state.step ? 'done' : i === state.step ? 'now' : 'next'}>
+                      <span className={styles.stepMark} aria-hidden="true">{i < state.step && <Icon icon={msCheck} size={12} />}</span>
+                      {label}
+                    </li>
+                  ))}
+                </Stack>
               ) : (
-                <Button variant="primary" fullWidth iconLeft={<Icon icon={msAdd} />} loading={state.kind === 'adding'} onClick={onAdd}>
-                  {state.kind === 'adding' ? t('indicator.adding') : t('indicator.addToChart')}
-                </Button>
+                <>
+                  <div className={styles.notes}>
+                    <button type="button" className={styles.notesToggle} aria-expanded={notesOpen} onClick={() => setNotesOpen((o) => !o)}>
+                      <Icon icon={msError} size={16} />
+                      <span className={styles.notesText}>{t('indicator.notes', { count: draft.notes.length })}</span>
+                      <Icon icon={msKeyboardArrowDown} size={16} className={styles.chevron} />
+                    </button>
+                    {notesOpen && (
+                      <ul className={styles.noteList}>
+                        {draft.notes.map((n) => <li key={n}>{n}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                  <Stack direction="horizontal" align="center" justify="between" gap="12">
+                    {state.kind === 'onChart' ? (
+                      <Button variant="secondary" fullWidth iconLeft={<Icon icon={msCheck} />} disabled>{t('indicator.onChart')}</Button>
+                    ) : (
+                      <Button variant="primary" fullWidth iconLeft={<Icon icon={msAdd} />} loading={state.kind === 'adding'} onClick={onAdd}>
+                        {state.kind === 'adding' ? t('indicator.adding') : t('indicator.addToChart')}
+                      </Button>
+                    )}
+                  </Stack>
+                </>
               )}
             </Stack>
-          </>
-        )}
-      </Stack>
+          </div>
+        </div>
+      </div>
     </article>
   )
 }
@@ -4037,7 +4161,6 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "indicator.readyText": "Add it to your chart, or tell me what to change.",
   "indicator.changed": "Done — the preview above is updated.",
   "indicator.onChartText": "It's on your {chart} chart now. You'll see the BUY / SELL labels as new candles form.",
-  "indicator.changeHint": "Ask for changes in plain words — “make the SELL labels orange”, “add a 50 EMA”.",
   "indicator.yourIndicator": "Your indicator",
   "indicator.building": "Building",
   "indicator.ready": "Ready",
@@ -4547,17 +4670,6 @@ export function DashAI(props: DashAIProps) {
 }
 ```
 
-### `src/flows/dash/screens/IndicatorChat.module.css`
-
-```css
-/* Under the input once the indicator is ready: how to ask for changes (wireframe). */
-.hint {
-  margin: var(--l3-spacing-08) 0 0;
-  color: var(--l3-content-tertiary);
-  font: var(--l3-text-label-12);
-}
-```
-
 ### `src/flows/dash/screens/IndicatorChat.tsx`
 
 ```tsx
@@ -4575,7 +4687,6 @@ import { t } from '../copy'
 import { chartQuestion, indicatorPrompts, supertrendEma, timeframeQuestion } from '../indicatorData'
 // The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
 import styles from './RuleChat.module.css'
-import own from './IndicatorChat.module.css'
 
 /** Where the indicator chat is — ONE screen, these are its states. */
 export type IndicatorStep = 'empty' | 'chart' | 'timeframe' | 'building' | 'ready' | 'onChart'
@@ -4602,6 +4713,8 @@ const INTRO_OUT_MS = 300
 /** Each build step (Reading → Writing the logic → Testing). */
 const BUILD_STEP_MS = 1100
 const ADDING_MS = 1200
+/** How far a finger moves before the swipe counts as a scroll (folds or opens the mini card). */
+const SWIPE_PX = 8
 
 /**
  * DASH AI · Custom indicator — a scene of the one DASH screen (DashAI), built like Trading rules (wireframe
@@ -4628,6 +4741,10 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
   const scroller = useRef<HTMLDivElement>(null)
   const keyboard = useRef<HTMLDivElement>(null)
   const [draft, setDraft] = useState('')
+  // The mini card: scrolling the chat down folds the pinned card; scrolling back to the top (or a tap) opens it.
+  // Driven by the user's own wheel / swipe — never by the chat moving itself to its newest message.
+  const [compactWanted, setCompactWanted] = useState(false)
+  const touchY = useRef<number | null>(null)
 
   const send = (text: string, from: HTMLElement) => {
     setFlying(captureOrigin(from, text))
@@ -4689,6 +4806,13 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
   const asking = !pending && (step === 'chart' || step === 'timeframe')
   const keyboardUp = empty && typing
   const sellTone = changes.length ? 'orange' : 'sell'
+  const compact = compactWanted && (step === 'ready' || step === 'onChart')
+  const userScroll = (down: boolean) => {
+    const el = scroller.current
+    if (!el) return
+    if (down && el.scrollHeight > el.clientHeight) setCompactWanted(true)
+    else if (!down && el.scrollTop <= 0) setCompactWanted(false)
+  }
 
   useLayoutEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' })
@@ -4728,13 +4852,26 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
         <div className={styles.pin}>
           <div className={styles.pinInner}>
             <Inset paddingInline="16" paddingBlock="08">
-              <IndicatorCard draft={supertrendEma} state={cardState} sellTone={sellTone} onAdd={add} />
+              <IndicatorCard draft={supertrendEma} state={cardState} sellTone={sellTone} onAdd={add} compact={compact} onExpand={() => setCompactWanted(false)} />
             </Inset>
           </div>
         </div>
       )}
 
-      <div className={styles.scroll} ref={scroller} onClick={keyboardUp ? () => onTyping?.(false) : undefined}>
+      <div
+        className={styles.scroll}
+        ref={scroller}
+        onClick={keyboardUp ? () => onTyping?.(false) : undefined}
+        onWheel={(e) => e.deltaY && userScroll(e.deltaY > 0)}
+        onTouchStart={(e) => (touchY.current = e.touches[0].clientY)}
+        onTouchMove={(e) => {
+          if (touchY.current === null) return
+          const moved = touchY.current - e.touches[0].clientY // > 0: the finger goes up, the chat scrolls down
+          if (Math.abs(moved) < SWIPE_PX) return
+          userScroll(moved > 0)
+          touchY.current = e.touches[0].clientY
+        }}
+      >
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined}>
             <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} typing={keyboardUp} />
@@ -4788,7 +4925,6 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
             onFocus={empty ? () => onTyping?.(true) : undefined}
             onSend={empty ? send : step === 'ready' || step === 'onChart' ? askChange : () => {}}
           />
-          {(step === 'ready' || step === 'onChart') && <p className={own.hint}>{t('indicator.changeHint')}</p>}
         </Inset>
       </div>
 
