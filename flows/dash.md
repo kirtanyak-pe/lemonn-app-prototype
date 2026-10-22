@@ -301,29 +301,9 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 ### `src/flows/dash/components/BuildOption.module.css`
 
 ```css
-/* Figma option card (5612:81961): 12 padding, 16 between parts, radius 12, 1px DASH green edge at 50%. */
+/* An L3 clickable Card (12 padding, radius 12, lift); DASH swaps its 1px edge for the DASH green at 50%. */
 .option {
-  display: flex;
-  align-items: center;
-  gap: var(--l3-spacing-16);
-  width: 100%;
-  padding: var(--l3-spacing-12) var(--l3-spacing-16) var(--l3-spacing-12) var(--l3-spacing-12);
-  border: 1px solid color-mix(in srgb, var(--app-dash-green) 50%, transparent);
-  border-radius: var(--l3-radius-12);
-  background: var(--l3-surface-default);
-  color: var(--l3-content-primary);
-  text-align: start;
-  cursor: pointer;
-  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
-}
-
-.option:active {
-  transform: scale(var(--l3-motion-scale-press-l));
-}
-
-.option:focus-visible {
-  outline: 2px solid var(--l3-content-primary);
-  outline-offset: 2px;
+  --card-border: inset 0 0 0 1px color-mix(in srgb, var(--app-dash-green) 50%, transparent); /* 1px: Figma stroke */
 }
 
 /* Icon tile: 56, radius 8, grey (a small highlight — L3 grey-surface rule), DASH green glyph. */
@@ -341,10 +321,12 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 .text {
   flex: 1;
   min-width: 0;
+  text-align: start;
 }
 
 .title {
   font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
 }
 
 .description {
@@ -354,12 +336,14 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 
 .chevron {
   flex: none;
+  color: var(--l3-content-primary);
 }
 ```
 
 ### `src/flows/dash/components/BuildOption.tsx`
 
 ```tsx
+import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { msChevronRight } from '@l3/icons/material'
@@ -373,21 +357,23 @@ type BuildOptionProps = {
 }
 
 /**
- * "Choose what to build" on the DASH landing: one option per card — an icon tile, the name, one line on what it does,
- * a chevron. DASH style: the soft DASH green edge (Figma: lime 1px stroke).
+ * "Choose what to build" on the DASH landing: one option per L3 clickable Card — an icon tile, the name, one line on
+ * what it does, a chevron. DASH style on the card: its edge in the DASH green at 50% (Figma: lime 1px stroke).
  */
 export function BuildOption({ icon, title, description, onClick }: BuildOptionProps) {
   return (
-    <button type="button" className={styles.option} onClick={onClick}>
-      <span className={styles.tile} aria-hidden="true">
-        <Icon icon={icon} size={24} />
-      </span>
-      <Stack gap="04" className={styles.text}>
-        <span className={styles.title}>{title}</span>
-        <span className={styles.description}>{description}</span>
+    <Card onClick={onClick} className={styles.option}>
+      <Stack direction="horizontal" align="center" gap="16">
+        <span className={styles.tile} aria-hidden="true">
+          <Icon icon={icon} size={24} />
+        </span>
+        <Stack gap="04" className={styles.text}>
+          <span className={styles.title}>{title}</span>
+          <span className={styles.description}>{description}</span>
+        </Stack>
+        <Icon icon={msChevronRight} size={24} className={styles.chevron} />
       </Stack>
-      <Icon icon={msChevronRight} size={24} className={styles.chevron} />
-    </button>
+    </Card>
   )
 }
 ```
