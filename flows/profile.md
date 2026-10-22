@@ -76,7 +76,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 | Kill Switch / Auto TP/SL icons | Lemonnade custom icons | `lmKillSwitch`, `lmAutoTpSl` |
 | Logout | Button | `variant="tertiary"`, `lg`, full width |
 | Disclosure | text + Button | Description/12 tertiary, 5 lines; `ghost` `sm` Read More / Read less |
-| Setting cards | Card (static) — `components/SettingCard` | header: icon 24 · Label/16 + Description/12 · Switch (the header is a label: tap anywhere toggles); cards 12 apart |
+| Setting cards | Card (static) — `components/SettingCard` | header: icon 24 · Label/16 (+ Description/12, not on Theme) · Switch (the header is a label: tap anywhere toggles); cards 12 apart |
 | Theme | Tabs | `appearance="pill-group"`, `behavior="toggle"`, `width="fill"`, icons light_mode / dark_mode / brightness_auto |
 | Accessibility options | Checkbox rows | under a hairline, the checkbox in the icon column; shown only while Accessibility is on |
 | Failed save | Aerobar (toast) | `floating`, `type="danger"`, `emphasis="primary"`, icon error, `action` Retry |
@@ -217,7 +217,7 @@ import styles from './SettingCard.module.css'
 type Props = {
   icon: IconSource
   label: string
-  description: string
+  description?: string
   /** A Switch on the right. The header is then a <label>: tapping anywhere on it toggles the switch. */
   control?: ReactNode
   /** What the setting opens up underneath (theme choices, accessibility options), 12 below the header. */
@@ -237,7 +237,7 @@ export function SettingCard({ icon, label, description, control, children }: Pro
           <Icon icon={icon} />
           <Stack gap="04" className={styles.text}>
             <span className={styles.label}>{label}</span>
-            <span className={styles.description}>{description}</span>
+            {description && <span className={styles.description}>{description}</span>}
           </Stack>
           {control}
         </Head>
@@ -293,7 +293,6 @@ export function SettingCard({ icon, label, description, control, children }: Pro
   "settings.biometric": "Biometric",
   "settings.biometricHint": "Login with your fingerprint",
   "settings.theme": "Theme",
-  "settings.themeHint": "Choose how Lemonn looks",
   "settings.themeLight": "Light",
   "settings.themeDark": "Dark",
   "settings.themeAuto": "Auto",
@@ -475,7 +474,7 @@ export const profile: Flow = {
 /* Settings → Accessibility options: checkbox rows under the header, a hairline above, text aligned with the
    header's label (the checkbox sits in the icon column). */
 .options {
-  padding-top: var(--l3-spacing-04);
+  padding-top: var(--l3-spacing-12);
   border-top: 1px solid var(--l3-border-light); /* 1px hairline */
 }
 
@@ -483,8 +482,7 @@ export const profile: Flow = {
   display: flex;
   gap: var(--l3-spacing-12);
   align-items: center;
-  min-height: var(--l3-size-48);
-  font: var(--l3-text-label-14);
+  font: var(--l3-text-label-14); /* rows hug; the checkbox brings its own 48 × 48 touch area */
   color: var(--l3-content-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -710,7 +708,7 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
                 control={<Switch checked={biometric} onChange={(e) => setBiometric(e.target.checked)} />}
               />
 
-              <SettingCard icon={msPalette} label={t('settings.theme')} description={t('settings.themeHint')}>
+              <SettingCard icon={msPalette} label={t('settings.theme')}>
                 <Tabs
                   appearance="pill-group"
                   behavior="toggle"
@@ -729,7 +727,7 @@ export function Settings({ accessibility, saveFailed = false, onBack }: Props) {
                 control={<Switch checked={on} onChange={(e) => toggle(e.target.checked)} />}
               >
                 {on && (
-                  <Stack gap="04" className={styles.options} role="group" aria-label={t('settings.optionsLabel')}>
+                  <Stack gap="16" className={styles.options} role="group" aria-label={t('settings.optionsLabel')}>
                     <label className={styles.check}>
                       <Checkbox checked={options.darker} onChange={(e) => update({ ...options, darker: e.target.checked })} />
                       <span>{t('settings.darker')}</span>
