@@ -34,7 +34,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/profile · mach
 |---|---|---|
 | `profile-01` | Profile | The live page 1:1. Grey header (back, name, View Details ›, avatar) that stays put; the list scrolls under its rounded top: **Account Information** (Bank Details · Verified, Balance, Get ₹149 instant balance, Tax and P&L Reports) · **App Settings** (Settings, Kill Switch, Auto TP/SL) · **How can we help?** (Help & Support, Follow us on X, Subscribe on YouTube, Follow us on Instagram, Rate Us, About 7.2.38 (3)) · Logout · the broker's line with Read More |
 | `profile-02` | Settings | Three matching setting cards: **Biometric** (switch) · **Theme** (Light / Dark / Auto pill toggle) · **Accessibility** (switch, off) |
-| `profile-03` | Settings · accessibility on | Accessibility on: darker colours and bigger text together; an illustration slides open under it showing the effect |
+| `profile-03` | Settings · accessibility on | Accessibility on: darker colours and bigger text together (the screen shows the darker colours) |
 | `profile-04` | Settings · couldn't save | A change didn't save: error toast "Couldn't save your settings" + Retry |
 
 ### Navigation
@@ -78,7 +78,6 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 | Disclosure | text + Button | Description/12 tertiary, 5 lines; `ghost` `sm` Read More / Read less |
 | Setting cards | Card (static) — `components/SettingCard` | header: icon 24 · Label/16 (+ Description/12, not on Theme) · Switch (the header is a label: tap anywhere toggles); cards 12 apart |
 | Theme | Tabs | `appearance="pill-group"`, `behavior="toggle"`, `width="fill"`, icons light_mode / dark_mode / brightness_auto |
-| Accessibility illustration | `components/AccessibilityPreview` | slides open under the header while Accessibility is on: a little phone screen, a stock card (Avatar, PriceChange `unit="currency"`, abstract line) and a discover badge |
 | Failed save | Aerobar (toast) | `floating`, `type="danger"`, `emphasis="primary"`, icon error, `action` Retry |
 
 ### Rules & behaviour
@@ -92,11 +91,8 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
   - **Darker colours:** L3's ♿ Accessible theme (`data-contrast="accessible"`: stronger secondary / tertiary text,
     borders and accents). Every screen uses semantic tokens, so nothing else changes.
   - **Bigger font:** every text style 1.15× across the app (Flutter: `MediaQuery.textScaler`). Layouts must reflow
-    (rows grow, nothing clipped). The prototype shows it in the illustration.
-  - Under the switch an **illustration** (a little phone screen with a stock card and the accessibility badge, like
-    Android's settings illustrations) shows the effect.
-- **Motion:** the Accessibility illustration slides open / shut (height + fade, motion/duration-medium). A theme or Accessibility
-  change cross-fades the page, and the chosen theme pill slides to its new place (View Transitions;
+    (rows grow, nothing clipped). Not shown in the prototype.
+- **Motion:** a theme or Accessibility change cross-fades the page, and the chosen theme pill slides to its new place (View Transitions;
   Flutter: `AnimatedSize` + `AnimatedTheme`). None with reduced motion.
 - **Saving fails:** the controls show what's stored, and an error toast offers Retry.
 - Prototype only: Theme and Darker colours change the prototype's real theme (and stay in this browser).
@@ -109,7 +105,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
   became the L3 Actionbar.
 - **Settings (redesigned, 2026-10-22, at the user's request):** three matching cards. The live Dark Mode switch
   became a Light / Dark / Auto toggle; the PM's "low vision" option became one Accessibility switch that turns on
-  darker colours and bigger text together, with an illustration of the effect.
+  darker colours and bigger text together.
 
 ### L3 gaps
 
@@ -118,7 +114,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - **Avatar colour / size:** no colour option (its default fill disappears on `surface-secondary`, so the profile
   sets the discover fill locally) and nothing above 48.
 - **Tag next to a list cell's label:** no slot; the Verified tag goes in `trailing`.
-- **Text scale:** L3 has no text-scale tokens; the prototype scales only the sample.
+- **Text scale:** L3 has no text-scale tokens; the prototype doesn't show the bigger font.
 - **Setting card with options:** no L3 component for a card with a switch header and content below
   (`components/SettingCard`).
 
@@ -128,145 +124,15 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
   Accessibility (4 states) from the PM proposal.
 - 2026-10-22 — Settings redesigned: Theme picker (Light / Dark / Auto), Accessibility with Text size and Darker
   colours; the separate Accessibility screen is gone (4 screens total).
-- 2026-10-22 — Settings compacted: three matching setting cards; Theme as a pill toggle; Accessibility = a switch
-  that opens two checkboxes (darker colours, bigger font).
+- 2026-10-22 — Settings compacted: three matching setting cards; Theme as a pill toggle; Accessibility = a switch.
 - 2026-10-22 — Accessibility: both options ticked when switched on; an example row shows their effect.
 - 2026-10-22 — the example became an illustration (phone screen + card + badge), after the user's Android reference.
 - 2026-10-22 — motion: accessibility options slide open; theme / darker-colour changes cross-fade, the theme pill slides.
 - 2026-10-22 — Accessibility: one switch for darker colours + bigger text (checkboxes removed).
+- 2026-10-22 — Accessibility illustration removed (user's call).
 
 
 ## Source — this flow
-
-### `src/flows/profile/components/AccessibilityPreview.module.css`
-
-```css
-/* Accessibility illustration — tokens only. A small "phone screen" (inverted-depth panel) holding a card that bleeds
-   off its right edge, and a badge over the card's corner (Android-settings style). */
-.screen {
-  position: relative;
-  overflow: hidden;
-  padding: var(--l3-spacing-12) 0 var(--l3-spacing-16) var(--l3-spacing-16);
-  border-radius: var(--l3-radius-16);
-  background: var(--l3-surface-secondary);
-}
-
-.status {
-  display: flex;
-  gap: var(--l3-spacing-08);
-  align-items: center;
-  margin-bottom: var(--l3-spacing-12);
-}
-
-.time {
-  margin-right: var(--l3-spacing-04);
-  font: var(--l3-text-label-12);
-  color: var(--l3-content-primary);
-}
-
-.dot {
-  width: var(--l3-spacing-08);
-  height: var(--l3-spacing-08);
-  border-radius: var(--l3-radius-full);
-  background: var(--l3-content-secondary);
-}
-
-/* The card runs off the right edge (no right border / radius), like a notification peeking in. */
-.card {
-  display: flex;
-  gap: var(--l3-spacing-12);
-  align-items: flex-start;
-  margin-right: calc(-1 * var(--l3-spacing-16));
-  padding: var(--l3-spacing-12) var(--l3-spacing-48) var(--l3-spacing-24) var(--l3-spacing-12);
-  border: 1px solid var(--l3-border-light); /* 1px hairline */
-  border-right: 0;
-  border-radius: var(--l3-radius-16) 0 0 var(--l3-radius-16);
-  background: var(--l3-surface-default);
-}
-
-.body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--l3-spacing-04);
-  min-width: 0;
-}
-
-.name {
-  font: var(--l3-text-label-14);
-  color: var(--l3-content-primary);
-  white-space: nowrap;
-}
-
-/* An abstract line, painted in the hint-text colour — it gets stronger with darker colours. */
-.line {
-  width: 80%;
-  height: var(--l3-spacing-08);
-  margin-block: var(--l3-spacing-04);
-  border-radius: var(--l3-radius-full);
-  background: var(--l3-content-tertiary);
-}
-
-.price {
-  font: var(--l3-text-label-14);
-  color: var(--l3-content-primary);
-}
-
-/* The feature badge over the card's bottom-right corner. */
-.badge {
-  position: absolute;
-  right: var(--l3-spacing-16);
-  bottom: var(--l3-spacing-08);
-  display: grid;
-  place-items: center;
-  width: var(--l3-size-48);
-  height: var(--l3-size-48);
-  border-radius: var(--l3-radius-16);
-  background: var(--l3-surface-accent-discover-light);
-  color: var(--l3-content-accent-discover-default);
-  box-shadow: var(--l3-shadow-elevation-low);
-}
-```
-
-### `src/flows/profile/components/AccessibilityPreview.tsx`
-
-```tsx
-import { Avatar } from '@l3/components/Avatar'
-import { Icon } from '@l3/components/Icon'
-import { PriceChange } from '@l3/components/PriceChange'
-import { msAccessibilityNew } from '@l3/icons/material'
-import { LARGE_TEXT_SCALE, sample } from '../data'
-import styles from './AccessibilityPreview.module.css'
-
-/**
- * An illustration of what Accessibility does (like Android's settings illustrations): a little phone screen — the
- * time and a few status shapes — with a stock card running off its right edge (abstract lines + the real name, price
- * and change), and the accessibility badge on its corner. Painted with the page's tokens, so the darker colours show
- * in it, and its text is drawn at the bigger size. Decorative: the switch above says what's on.
- */
-export function AccessibilityPreview({ on }: { on: boolean }) {
-  return (
-    <div className={styles.screen} aria-hidden="true">
-      <div className={styles.status}>
-        <span className={styles.time}>9:30</span>
-        <span className={styles.dot} />
-        <span className={styles.dot} />
-        <span className={styles.dot} />
-      </div>
-      <div className={styles.card}>
-        <Avatar initials="R" size={40} />
-        <div className={styles.body} style={on ? { zoom: LARGE_TEXT_SCALE } : undefined}>
-          <span className={styles.name}>{sample.name}</span>
-          <span className={styles.line} />
-          <span className={styles.price}>{sample.price}</span>
-          <PriceChange value={sample.change} unit="currency" percent={sample.changePercent} size="sm" />
-        </div>
-      </div>
-      <span className={styles.badge}><Icon icon={msAccessibilityNew} /></span>
-    </div>
-  )
-}
-```
 
 ### `src/flows/profile/components/CardRow.tsx`
 
@@ -513,9 +379,6 @@ export const APP_VERSION = '7.2.38 (3)'
 
 /** Accessibility on: every text style gets this much bigger (and the colours switch to ♿ Accessible). */
 export const LARGE_TEXT_SCALE = 1.15
-
-/** The stock card in the Accessibility illustration (shows the darker colours and the bigger font). */
-export const sample = { name: 'Reliance Industries', detail: 'NSE · 10 shares', price: '₹2,948.60', change: 34.9, changePercent: 1.2 }
 
 
 /** Theme choices: Auto follows the phone's light / dark setting. */
@@ -803,7 +666,6 @@ import { msAccessibilityNew, msBrightnessAuto, msDarkMode, msError, msFingerprin
 import { useTheme } from '@l3/theme'
 import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
-import { AccessibilityPreview } from '../components/AccessibilityPreview'
 import { SettingCard } from '../components/SettingCard'
 import { t } from '../copy'
 import { type ThemeChoice } from '../data'
@@ -839,10 +701,9 @@ const themeChoices: { value: ThemeChoice; label: string; icon: typeof msLightMod
  *  - Biometric: a switch.
  *  - Theme: Light / Dark / Auto as a pill-group toggle under the header (Auto follows the phone).
  *  - Accessibility: one switch that turns on darker colours (L3's ♿ Accessible theme) and a bigger font (every text
- *    style 1.15×) together; on, an illustration (a little phone screen with a stock card and the accessibility badge)
- *    slides open showing the effect.
+ *    style 1.15×) together.
  * Everything applies at once. Prototype: Theme and darker colours set the app's real theme (L3 ThemeProvider); the
- * screen also carries the contrast it shows, and the bigger font is shown in the illustration.
+ * screen also carries the contrast it shows. (The bigger font isn't shown in the prototype.)
  */
 export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
   const theme = useTheme()
@@ -909,10 +770,7 @@ export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
                 label={t('settings.accessibility')}
                 description={t('settings.accessibilityHint')}
                 control={<Switch checked={on} onChange={(e) => toggle(e.target.checked)} />}
-                open={on}
-              >
-                <AccessibilityPreview on={on} />
-              </SettingCard>
+              />
             </Stack>
           </Inset>
         </div>
