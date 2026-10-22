@@ -28,7 +28,7 @@
       "id": "profile-02",
       "name": "Settings",
       "figma": "",
-      "note": "Security · Theme (Light / Dark / Auto cards, live) · Accessibility (text size, darker colours).",
+      "note": "Three setting cards: Biometric, Theme (Light / Dark / Auto, live), Accessibility (off).",
       "goesTo": [
         "profile-01"
       ],
@@ -36,9 +36,9 @@
     },
     {
       "id": "profile-03",
-      "name": "Settings · large text, darker colours",
+      "name": "Settings · accessibility on",
       "figma": "",
-      "note": "Text size Large: the sample grows. Darker colours on: the ♿ Accessible theme.",
+      "note": "Accessibility on: both options ticked — darker colours (♿ Accessible theme) and a bigger font.",
       "goesTo": [
         "profile-01"
       ],
@@ -58,8 +58,8 @@
   "files": [
     "src/flows/profile/README.md",
     "src/flows/profile/components/CardRow.tsx",
-    "src/flows/profile/components/ThemePreview.module.css",
-    "src/flows/profile/components/ThemePreview.tsx",
+    "src/flows/profile/components/SettingCard.module.css",
+    "src/flows/profile/components/SettingCard.tsx",
     "src/flows/profile/copy.json",
     "src/flows/profile/copy.ts",
     "src/flows/profile/data.ts",
