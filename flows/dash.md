@@ -139,7 +139,30 @@ dash-02 ☰ and the history action on every chat page ─▶ dash-14
 - A **tracked caps** label style (Figma 1.92 = 16%) · a float shadow `0 4 6 / 6% + 0 1 1 / 4%`.
 - Avatar with **coloured initials** (Figma: teal, indigo, yellow, purple).
 
+### Motion (from the live app's recording, 2026-10-23, measured at 360 dp)
+
+| Moment | What moves | Timing |
+|---|---|---|
+| Send (rules landing → chat, `dash-03 → 04`) | The landing lifts 32 and fades; then the chat page slides up from the bottom over it | lift 400 ms; rise starts at 350 ms, 600 ms, decelerate (preview `enter: 'rise'`) |
+| Chat steps (`dash-04 … 13`) | One page in different states (preview `group: 'chat'`) — no push between them | — |
+| A new message | Fades up 8 into place; earlier messages stay (the conversation builds up) and the panel scrolls to the newest | 250 ms, decelerate |
+| DASH thinks | Three dots pulse in turn, after the request and after every answer / Proceed | ~1.6 s in the prototype (live 1.5–3 s) |
+| DASH's question | The card rises 24 out of the input's place | 250 ms, decelerate |
+| Answered | The question and the answer join the chat; the input drops back from where the card was | 150 ms |
+| Draft ready | The rule card opens in the top bar's bottom slot and pushes the chat down | 300 ms (grid rows 0 → 1, fade) |
+| Backtest back | The strip unfolds under the card; the description fades in | 300 ms / 250 ms |
+| Rule created | Sheet up; green disc pops in (slight overshoot), the tick draws itself, confetti (green · yellow · white/lime) bursts out and drifts down | pop 400 ms from 150 ms; tick 250 ms from 350 ms; confetti 1.6 s |
+| View Rules | The tick turns away like a coin, then the rules list cross-fades in (`enter: 'fade'`) | 150 ms + 250 ms |
+| The orb (everywhere) | The ring's highlight goes round clockwise, steady; the leaves stay | 1 s per turn, linear |
+| The glow | Turns once every 3.08 s (Figma motion on "Gradient") | ease-in, then a pause |
+
+All of it is off with reduced motion. Values L3 doesn't have are local tokens (`--app-dash-*-duration`, …).
+Not built yet: the live app's DASH mascot with a face and its "Checking 4 rules for you" bubble on the trading
+screen (needs the mascot artwork), and the live landing's active-rules carousel.
+
 ### Changelog
+
+- 2026-10-23 — Motion from the live app's recording: chat rises in, the conversation builds up, thinking between turns, question card rises, rule card pins, backtest unfolds, created-sheet tick + confetti, orb spin, rules list fades in.
 
 - 2026-10-22 — Entry moved to the Stocks home top bar (DASH pill + coach mark there); `dash-01` removed; the orb and the pill are shared (`src/shared/ui/dash`).
 
@@ -1100,6 +1123,42 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
 .amount {
   color: var(--tone);
 }
+
+/* The backtest strip unfolds (height + fade, 300 ms) when DASH's backtest comes back; the description fades in. */
+.unfold {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: rule-unfold var(--app-dash-pin-duration) var(--l3-motion-easing-decelerate) both;
+}
+
+.unfoldInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@keyframes rule-unfold {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.description {
+  animation: rule-fade var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes rule-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unfold,
+  .description {
+    animation: none;
+  }
+}
 ```
 
 ### `src/flows/dash/components/RuleCard.tsx`
@@ -1146,7 +1205,14 @@ export function RuleCard({ rule, backtest, onOpen }: RuleCardProps) {
           <span className={styles.valueChip}>{rule.value}</span>
         )}
       </Stack>
-      {backtest && <BacktestStrip backtest={backtest} />}
+      {backtest && (
+        // Unfolds under the card when the backtest comes back (same page, so it plays once).
+        <div className={styles.unfold}>
+          <div className={styles.unfoldInner}>
+            <BacktestStrip backtest={backtest} />
+          </div>
+        </div>
+      )}
     </article>
   )
 }
@@ -1204,6 +1270,190 @@ export function RuleSummary({ title, description }: { title: string; description
     <div className={styles.box}>
       <ListCell iconLeft={<Avatar initials={title.charAt(0)} size={40} />} label={title} description={<span className={styles.oneLine}>{description}</span>} />
     </div>
+  )
+}
+```
+
+### `src/flows/dash/components/SuccessBurst.module.css`
+
+```css
+/*
+ * "Your rule is created" — timings from the live recording (2026-10-23): the sheet is up at ~0.25 s; the disc pops
+ * 0.15 → 0.55 s (slight overshoot), the tick draws 0.35 → 0.6 s, confetti bursts with the pop and falls for 1.6 s.
+ * Confetti px values are artwork geometry (set per piece in SuccessBurst.tsx).
+ */
+.burst {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-48);
+  height: var(--l3-size-48);
+}
+
+.tick {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-48);
+  height: var(--l3-size-48);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-content-accent-success-default);
+  color: var(--l3-static-white);
+  animation: tick-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) 150ms both;
+}
+
+@keyframes tick-pop {
+  from {
+    transform: scale(0);
+  }
+}
+
+/* View Rules: the tick turns away like a coin (live: 28.5 → 28.8 s) before the list fades in. */
+.tick[data-leaving] {
+  animation: tick-flip var(--l3-motion-duration-short) var(--l3-motion-easing-accelerate) both;
+}
+
+@keyframes tick-flip {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.check {
+  width: var(--l3-size-28);
+  height: var(--l3-size-28);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3; /* artwork stroke, in the 24 viewBox */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: tick-draw var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) 350ms forwards;
+}
+
+@keyframes tick-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Confetti: every piece starts at the tick, bursts out to (dx, dy), then drifts down and fades. */
+.confetti {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  pointer-events: none;
+}
+
+.confetti span {
+  position: absolute;
+  width: var(--l3-size-04);
+  height: var(--l3-size-04);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-content-accent-success-default);
+  opacity: 0;
+  animation: confetti var(--app-dash-confetti-duration) cubic-bezier(0.15, 0.7, 0.4, 1) calc(150ms + var(--delay)) forwards;
+}
+
+.confetti span[data-tone='1'] {
+  background: var(--l3-base-hue-yellow-200);
+}
+
+.confetti span[data-tone='2'] {
+  background: var(--l3-base-hue-brand-lemonn-400); /* lime in light mode … */
+}
+
+:root[data-mode='dark'] .confetti span[data-tone='2'] {
+  background: var(--l3-base-neutral-white-base); /* … white in dark, as in the live app */
+}
+
+.confetti span[data-long] {
+  width: var(--l3-size-08);
+  height: var(--l3-spacing-02);
+  border-radius: var(--l3-radius-02);
+}
+
+@keyframes confetti {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  8% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(var(--dx), var(--dy)) rotate(calc(var(--turn) / 3)) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--dy) + var(--fall))) rotate(var(--turn)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tick,
+  .tick[data-leaving],
+  .check path,
+  .confetti span {
+    animation: none;
+  }
+
+  .check path {
+    stroke-dashoffset: 0;
+  }
+}
+```
+
+### `src/flows/dash/components/SuccessBurst.tsx`
+
+```tsx
+import type { CSSProperties } from 'react'
+import styles from './SuccessBurst.module.css'
+
+/** Confetti pieces. Positions are spread with the golden angle, so they look random but render the same every time. */
+const PIECES = Array.from({ length: 36 }, (_, i) => {
+  const angle = (i * 137.5 * Math.PI) / 180
+  const reach = 48 + ((i * 53) % 132) // 48 … 180 out from the tick
+  return {
+    dx: Math.round(Math.cos(angle) * reach * 1.3), // wider than tall, like the live burst
+    dy: Math.round(Math.sin(angle) * reach * 0.55 - 24), // biased upwards
+    fall: 90 + ((i * 37) % 70), // then drifts down 90 … 160
+    turn: (i * 71) % 360,
+    delay: (i % 6) * 30,
+    tone: i % 3, // green · yellow · white
+    long: i % 4 === 0, // a few strips among the dots
+  }
+})
+
+/**
+ * The success moment on "Your rule is created" (live app recording, 2026-10-23): a green disc pops in with a slight
+ * overshoot, the tick draws itself, and confetti bursts out of it and drifts down for ~1.6 s.
+ * `leaving` flips the tick away (a coin turn, 200 ms) before the next screen. Decoration only: the heading says it.
+ */
+export function SuccessBurst({ leaving = false }: { leaving?: boolean }) {
+  return (
+    <span className={styles.burst} aria-hidden="true">
+      <span className={styles.confetti}>
+        {PIECES.map((p, i) => (
+          <span
+            key={i}
+            data-tone={p.tone}
+            data-long={p.long || undefined}
+            style={{ '--dx': `${p.dx}px`, '--dy': `${p.dy}px`, '--fall': `${p.fall}px`, '--turn': `${p.turn}deg`, '--delay': `${p.delay}ms` } as CSSProperties}
+          />
+        ))}
+      </span>
+      <span className={styles.tick} data-leaving={leaving || undefined}>
+        <svg viewBox="0 0 24 24" className={styles.check}>
+          <path d="M6 12.5l4 4 8-9" pathLength={1} />
+        </svg>
+      </span>
+    </span>
   )
 }
 ```
@@ -1402,19 +1652,19 @@ export const dash: Flow = {
     { id: 'dash-02', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <Landing onBack={() => go('stocks-01')} onRules={() => go('dash-03')} onMenu={() => go('dash-14')} /> },
     // ---- Create a rule
     { id: 'dash-03', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Example chips (sideways scroll) send themselves as the message; typing + Send does the same. History opens your rules.', render: (go) => <RulesHome onBack={() => go('dash-02')} onHistory={() => go('dash-14')} onSend={() => go('dash-04')} /> },
-    { id: 'dash-04', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <RuleChat step="thinking" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onThought={() => go('dash-05')} /> },
-    { id: 'dash-05', section: 'create', name: 'DASH asks the limit', figma: '5612:40650', note: 'The question card takes the input’s place. Any answer (or one typed) builds the preview.', render: (go) => <RuleChat step="question" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onAnswer={() => go('dash-06')} /> },
-    { id: 'dash-06', section: 'create', name: 'Rule preview', figma: '5612:40816', note: 'The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question.', render: (go) => <RuleChat step="preview" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onRefine={() => go('dash-05')} onProceed={() => go('dash-07')} /> },
+    { id: 'dash-04', group: 'chat', enter: 'rise', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <RuleChat step="thinking" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onThought={() => go('dash-05')} /> },
+    { id: 'dash-05', group: 'chat', section: 'create', name: 'DASH asks the limit', figma: '5612:40650', note: 'The question card takes the input’s place. Any answer (or one typed) builds the preview.', render: (go) => <RuleChat step="question" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onAnswer={() => go('dash-06')} /> },
+    { id: 'dash-06', group: 'chat', section: 'create', name: 'Rule preview', figma: '5612:40816', note: 'The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question.', render: (go) => <RuleChat step="preview" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onRefine={() => go('dash-05')} onProceed={() => go('dash-07')} /> },
     // ---- Rule ready (3 backtest results)
-    { id: 'dash-07', section: 'result', name: 'Ready · would have saved', figma: '5612:40971', note: 'Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more.', render: (go) => <RuleChat step="saved" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onReadMore={() => go('dash-10')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
-    { id: 'dash-08', section: 'result', name: 'Weak · would have cost profit', figma: '5612:41698', note: 'Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it.', render: (go) => <RuleChat step="cost" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onReadMore={() => go('dash-11')} onSave={() => go('dash-13')} onImprove={() => go('dash-05')} /> },
-    { id: 'dash-09', section: 'result', name: 'Ready · no backtest data', figma: '5612:41530', note: 'Not enough trading history to test: a neutral strip.', render: (go) => <RuleChat step="none" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onReadMore={() => go('dash-12')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
-    { id: 'dash-10', section: 'result', name: 'Read more · saved', figma: '5612:41133', render: (go) => <RuleChat step="saved" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.saved} onClose={() => go('dash-07')} />} /> },
-    { id: 'dash-11', section: 'result', name: 'Read more · cost', figma: '5612:41268', note: 'Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both.', render: (go) => <RuleChat step="cost" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.cost} onClose={() => go('dash-08')} />} /> },
-    { id: 'dash-12', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <RuleChat step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
-    { id: 'dash-13', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <RuleChat step="saved" sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-07')} onViewRules={() => go('dash-14')} />} /> },
+    { id: 'dash-07', group: 'chat', section: 'result', name: 'Ready · would have saved', figma: '5612:40971', note: 'Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more.', render: (go) => <RuleChat step="saved" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onReadMore={() => go('dash-10')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
+    { id: 'dash-08', group: 'chat', section: 'result', name: 'Weak · would have cost profit', figma: '5612:41698', note: 'Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it.', render: (go) => <RuleChat step="cost" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onReadMore={() => go('dash-11')} onSave={() => go('dash-13')} onImprove={() => go('dash-05')} /> },
+    { id: 'dash-09', group: 'chat', section: 'result', name: 'Ready · no backtest data', figma: '5612:41530', note: 'Not enough trading history to test: a neutral strip.', render: (go) => <RuleChat step="none" onBack={() => go('dash-03')} onHistory={() => go('dash-14')} onReadMore={() => go('dash-12')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
+    { id: 'dash-10', group: 'chat', section: 'result', name: 'Read more · saved', figma: '5612:41133', render: (go) => <RuleChat step="saved" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.saved} onClose={() => go('dash-07')} />} /> },
+    { id: 'dash-11', group: 'chat', section: 'result', name: 'Read more · cost', figma: '5612:41268', note: 'Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both.', render: (go) => <RuleChat step="cost" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.cost} onClose={() => go('dash-08')} />} /> },
+    { id: 'dash-12', group: 'chat', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <RuleChat step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
+    { id: 'dash-13', group: 'chat', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <RuleChat step="saved" sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-07')} onViewRules={() => go('dash-14')} />} /> },
     // ---- Your rules
-    { id: 'dash-14', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} /> },
+    { id: 'dash-14', enter: 'fade', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} /> },
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
     { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} /> },
@@ -1641,23 +1891,90 @@ export function Landing({ onBack, onRules, onStrategy, onMenu }: LandingProps) {
 ### `src/flows/dash/screens/RuleChat.module.css`
 
 ```css
-/* The chat: a white panel over the glow, 24 top corners (Figma 5612:40695), filling the space down to the dock. */
+/*
+ * The chat: a panel over the glow, 24 top corners (Figma 5612:40695), filling the space down to the dock.
+ * Motion measured on the live app's recording (2026-10-23, 360 dp): every entrance decelerates (L3 easing).
+ */
 .panel {
   flex: 1;
   border-radius: var(--l3-radius-24) var(--l3-radius-24) 0 0;
   background: var(--l3-surface-default);
 }
 
-/* The input / question dock continues the white panel. */
+/* The input / question dock continues the panel. */
 .dock {
   background: var(--l3-surface-default);
+}
+
+/* A new turn: fades up 8 into place (250 ms). Turns already on the page keep their key, so they don't replay it. */
+.appear {
+  animation: dash-appear var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes dash-appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-08));
+  }
+}
+
+/* DASH's question card rises out of the input's place: 24 up and in, 250 ms (live: 17.9 → 18.15 s). */
+.rise {
+  animation: dash-rise var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes dash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-24));
+  }
+}
+
+/* Answered: the input drops back from where the card was (live: 150 ms down from the card's top). */
+.inputBack {
+  animation: dash-input-back var(--l3-motion-duration-short) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes dash-input-back {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--app-dash-input-return)));
+  }
+}
+
+/* The pinned rule card opens in the top bar's bottom slot and pushes the chat down (live: 300 ms, 22.6 → 22.9 s). */
+.pin {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: dash-pin var(--app-dash-pin-duration) var(--l3-motion-easing-decelerate) both;
+}
+
+.pinInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@keyframes dash-pin {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appear,
+  .rise,
+  .inputBack,
+  .pin {
+    animation: none;
+  }
 }
 ```
 
 ### `src/flows/dash/screens/RuleChat.tsx`
 
 ```tsx
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ActionbarAction } from '@l3/components/Actionbar'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
@@ -1698,23 +2015,54 @@ type RuleChatProps = {
   sheet?: ReactNode
 }
 
+/** How long DASH "thinks" before replying (prototype; the live app takes 1.5–3 s). */
 const THINKING_MS = 1600
 
 /**
- * Trading rules — the conversation with DASH (Figma "Creating the rule" ×3, "Rule created" ×3). The rule being built
- * stays pinned in the top bar's bottom slot once DASH has a draft; the chat is a white panel with a 24 top radius;
- * the input (or DASH's question) docks at the bottom.
+ * Trading rules — the conversation with DASH (Figma "Creating the rule" ×3, "Rule created" ×3; motion from the live
+ * app's recording, 2026-10-23). All steps are ONE page (the flow's `group: 'chat'`), so moving on animates in place:
+ * - the conversation builds up — every message stays, the new one fades up into place, the panel scrolls to it;
+ * - after an answer (or Proceed) DASH thinks first: the three dots, then the reply;
+ * - DASH's question card rises out of the input's place; once answered the input comes back;
+ * - when DASH has a draft, the rule card opens in the top bar's bottom slot and pushes the chat panel down;
+ *   the backtest strip then unfolds under the card.
  */
 export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, sheet }: RuleChatProps) {
   const { interactive } = usePreview()
+  /** After an answer or Proceed: DASH thinks on this page before the next step comes (prototype). */
+  const [pending, setPending] = useState<(() => void) | null>(null)
+  const [answer, setAnswer] = useState(dailyLossQuestion.options[1])
+
   useEffect(() => {
     if (step !== 'thinking' || !interactive || !onThought) return
     const timer = window.setTimeout(onThought, THINKING_MS)
     return () => window.clearTimeout(timer)
   }, [step, interactive, onThought])
 
+  useEffect(() => {
+    if (!pending) return
+    const timer = window.setTimeout(() => {
+      setPending(null)
+      pending()
+    }, THINKING_MS)
+    return () => window.clearTimeout(timer)
+  }, [pending])
+  // A new step has arrived: DASH has replied.
+  useEffect(() => setPending(null), [step])
+
+  const thinkThen = (next?: () => void) => () => next && setPending(() => next)
+
   const backtest: Backtest | undefined = step === 'saved' || step === 'cost' || step === 'none' ? backtests[step] : undefined
   const pinned = step !== 'thinking' && step !== 'question'
+  const thinking = step === 'thinking' || pending != null
+  const asking = step === 'question' && !pending
+
+  // Keep the newest message in view as the conversation grows.
+  const panel = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const body = panel.current?.parentElement
+    if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
+  }, [step, pending])
 
   return (
     <DashScreen
@@ -1727,9 +2075,13 @@ export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory
           actions={<ActionbarAction icon={msHistory} label={t('rulesHome.history')} onClick={() => onHistory?.()} />}
           bottom={
             pinned ? (
-              <Inset paddingInline="16" paddingBlock="08">
-                <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} />
-              </Inset>
+              <div className={styles.pin}>
+                <div className={styles.pinInner}>
+                  <Inset paddingInline="16" paddingBlock="08">
+                    <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} />
+                  </Inset>
+                </div>
+              </div>
             ) : undefined
           }
         />
@@ -1737,64 +2089,106 @@ export function RuleChat({ step, request = maxDailyLoss.title, onBack, onHistory
       bottom={
         <div className={styles.dock} data-surface="primary">
           <Inset paddingInline="16" paddingBlock="16">
-            {step === 'question' ? <QuestionCard question={dailyLossQuestion} onAnswer={onAnswer} /> : <ChatInput onSend={() => {}} />}
+            {asking ? (
+              <div className={styles.rise} key="question">
+                <QuestionCard
+                  question={dailyLossQuestion}
+                  onAnswer={(a) => {
+                    setAnswer(a)
+                    thinkThen(() => onAnswer?.(a))()
+                  }}
+                />
+              </div>
+            ) : (
+              <div className={step === 'question' || step === 'preview' ? styles.inputBack : undefined} key="input">
+                <ChatInput onSend={() => {}} />
+              </div>
+            )}
           </Inset>
         </div>
       }
       sheet={sheet}
     >
-      <div className={styles.panel}>
+      <div className={styles.panel} ref={panel}>
         <Inset paddingInline="16" paddingBlock="24">
-          <Stack gap="32">{messages(step, request, { onRefine, onProceed, onSave, onImprove })}</Stack>
+          <Stack gap="24">
+            {conversation(step, request, step === 'question' && pending ? answer : step !== 'thinking' && step !== 'question' ? answer : null, {
+              onRefine,
+              onProceed: thinkThen(onProceed),
+              onSave,
+              onImprove,
+              busy: pending != null,
+            })}
+            {thinking && (
+              <div className={styles.appear} key="thinking">
+                <Thinking>{t('chat.thinking')}</Thinking>
+              </div>
+            )}
+          </Stack>
         </Inset>
       </div>
     </DashScreen>
   )
 }
 
-/** The conversation so far, for each step. Once the rule is pinned, only DASH's latest turn shows (Figma). */
-function messages(step: RuleChatStep, request: string, on: Pick<RuleChatProps, 'onRefine' | 'onProceed' | 'onSave' | 'onImprove'>) {
-  switch (step) {
-    case 'thinking':
-      return (
-        <>
-          <UserMessage>{request}</UserMessage>
-          <Thinking>{t('chat.thinking')}</Thinking>
-        </>
-      )
-    case 'question':
-      return (
-        <>
-          <UserMessage>{request}</UserMessage>
-          <AssistantMessage title={t('chat.gotIt')}>{t('chat.needDetails')}</AssistantMessage>
-        </>
-      )
-    case 'preview':
-      return (
-        <>
-          <AssistantMessage faded>{t('chat.needDetails')}</AssistantMessage>
-          <Stack gap="16">
-            <AssistantMessage title={t('chat.previewTitle')}>{maxDailyLoss.description}</AssistantMessage>
-            <ReplyChips options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.proceed'), onClick: on.onProceed, suggested: true }]} />
-          </Stack>
-        </>
-      )
-    case 'cost':
-      return (
+type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove'> & { onProceed: () => void; busy: boolean }
+
+/**
+ * The conversation so far — every turn stays, like the live app. Each turn has a stable key, so when the page moves on
+ * only the new turns play their entrance (fade up).
+ */
+function conversation(step: RuleChatStep, request: string, answered: string | null, on: Replies) {
+  const turns: { key: string; node: ReactNode }[] = [{ key: 'request', node: <UserMessage>{request}</UserMessage> }]
+  if (step === 'thinking') return render(turns)
+  turns.push({ key: 'got-it', node: <AssistantMessage title={t('chat.gotIt')}>{t('chat.needDetails')}</AssistantMessage> })
+  if (answered) {
+    turns.push({ key: 'asked', node: <AssistantMessage>{dailyLossQuestion.question}</AssistantMessage> })
+    turns.push({ key: 'answer', node: <UserMessage>{answered}</UserMessage> })
+  }
+  if (step === 'question') return render(turns)
+
+  const tested = step === 'saved' || step === 'cost' || step === 'none'
+  turns.push({
+    key: 'preview',
+    node: (
+      <Stack gap="16">
+        <AssistantMessage title={t('chat.previewTitle')}>{maxDailyLoss.description}</AssistantMessage>
+        {!tested && !on.busy && (
+          <ReplyChips options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.proceed'), onClick: on.onProceed, suggested: true }]} />
+        )}
+      </Stack>
+    ),
+  })
+  if (step === 'cost') {
+    turns.push({
+      key: 'weak',
+      node: (
         <Stack gap="16">
           <AssistantMessage title={t('chat.weakTitle')}>{t('chat.weakText')}</AssistantMessage>
           <ReplyChips options={[{ label: t('chat.saveAnyway'), onClick: on.onSave }, { label: t('chat.improve'), onClick: on.onImprove, suggested: true }]} />
         </Stack>
-      )
-    default:
-      return (
+      ),
+    })
+  } else if (tested) {
+    turns.push({
+      key: 'ready',
+      node: (
         <Stack gap="16">
           <AssistantMessage title={t('chat.readyTitle')}>{t('chat.readyText')}</AssistantMessage>
           <ReplyChips options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.save'), onClick: on.onSave, suggested: true }]} />
         </Stack>
-      )
+      ),
+    })
   }
+  return render(turns)
 }
+
+const render = (turns: { key: string; node: ReactNode }[]) =>
+  turns.map((turn) => (
+    <div key={turn.key} className={styles.appear}>
+      {turn.node}
+    </div>
+  ))
 ```
 
 ### `src/flows/dash/screens/RulesHome.module.css`
@@ -1933,50 +2327,20 @@ export function RulesHome({ onBack, onHistory, onSend }: RulesHomeProps) {
   border-radius: var(--l3-radius-full);
   background: radial-gradient(circle, var(--l3-surface-default) 55%, color-mix(in srgb, var(--app-dash-glow-1) 15%, var(--l3-surface-default)));
 }
-
-/* ---- Confetti: 24 small pieces in L3 accent hues, scattered over the top of the sheet */
-.celebrate {
-  position: relative;
-}
-
-.confetti {
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--l3-size-96);
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.confetti span {
-  position: absolute;
-  top: calc(mod(var(--i) * 29, 80) * 1%);
-  left: calc(mod(var(--i) * 41, 96) * 1% + 2%);
-  width: var(--l3-size-08);
-  height: var(--l3-size-04);
-  border-radius: var(--l3-radius-02);
-  background: var(--l3-base-hue-purple-400);
-  transform: rotate(calc(var(--i) * 47deg));
-}
-
-.confetti span:nth-child(5n + 1) { background: var(--l3-base-hue-blue-400); }
-.confetti span:nth-child(5n + 2) { background: var(--l3-base-hue-yellow-300); }
-.confetti span:nth-child(5n + 3) { background: var(--l3-base-hue-green-400); }
-.confetti span:nth-child(5n + 4) { background: var(--l3-base-hue-red-400); }
 ```
 
 ### `src/flows/dash/sheets/RuleSheets.tsx`
 
 ```tsx
-import { useId, type CSSProperties } from 'react'
+import { useId, useState } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Stack } from '@l3/components/Stack'
-import { msCheck } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
-import { Spot } from '../../../shared/ui/Spot'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { BacktestStrip } from '../components/RuleCard'
+import { SuccessBurst } from '../components/SuccessBurst'
 import { RuleSummary } from '../components/RuleSummary'
 import { t } from '../copy'
 import type { Backtest, DraftRule } from '../data'
@@ -2016,9 +2380,18 @@ export function ReadMoreSheet({ rule, backtest, onClose }: { rule: DraftRule; ba
   )
 }
 
-/** Saved (Figma "Rule saved" 5612:41875): a tick and confetti, what happens now, the rule, Cancel / View Rules. */
+/** How long the tick's coin-turn runs before View Rules moves on (= motion/duration-short). */
+const TICK_FLIP_MS = 150
+
+/** Saved (Figma "Rule saved" 5612:41875): the tick pops in with confetti (live app motion), what happens now, the rule, Cancel / View Rules. */
 export function RuleCreatedSheet({ rule, onCancel, onViewRules }: { rule: DraftRule; onCancel?: () => void; onViewRules?: () => void }) {
   const id = useId()
+  // View Rules: the tick turns away first (150 ms), then the rules list fades in (live app).
+  const [leaving, setLeaving] = useState(false)
+  const viewRules = () => {
+    setLeaving(true)
+    window.setTimeout(() => onViewRules?.(), TICK_FLIP_MS)
+  }
   return (
     <Sheet
       labelledBy={id}
@@ -2026,15 +2399,14 @@ export function RuleCreatedSheet({ rule, onCancel, onViewRules }: { rule: DraftR
       footer={
         <ButtonGroup aria-label={t('created.title')} direction="horizontal">
           <Button variant="secondary" onClick={onCancel}>{t('created.cancel')}</Button>
-          <Button onClick={onViewRules}>{t('created.viewRules')}</Button>
+          <Button onClick={viewRules}>{t('created.viewRules')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.celebrate}>
-        <Confetti />
+      <div>
         <Stack gap="24" align="stretch" className={styles.content}>
           <Stack gap="16" align="center" className={styles.centre}>
-            <Spot icon={msCheck} tone="success" size="md" />
+            <SuccessBurst leaving={leaving} />
             <Stack gap="08" align="center">
               <h2 id={id} className={styles.title}>{t('created.title')}</h2>
               <p className={styles.description}>{t('created.description')}</p>
@@ -2087,17 +2459,6 @@ export function RuleDeletedSheet({ onOkay }: { onOkay?: () => void }) {
         <p className={styles.description}>{t('deleted.description')}</p>
       </Stack>
     </Sheet>
-  )
-}
-
-/** Confetti over the success tick (Figma: scattered pieces in the L3 accent hues). Decoration only. */
-function Confetti() {
-  return (
-    <span className={styles.confetti} aria-hidden="true">
-      {Array.from({ length: 24 }, (_, i) => (
-        <span key={i} style={{ '--i': i } as CSSProperties} />
-      ))}
-    </span>
   )
 }
 ```
@@ -2523,84 +2884,6 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 }
 ```
 
-### `src/shared/ui/Spot.module.css`
-
-```css
-/*
- * Illustration slot: a large icon on a soft accent disc with a faint outer ring. Stands in for artwork L3 doesn't have
- * yet (lemon mascot, PAN card, bank, coin …) — swap the whole <Spot> for the illustration when it exists.
- */
-.spot {
-  position: relative;
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--l3-radius-full);
-  background: var(--spot-surface);
-  color: var(--spot-content);
-}
-
-.spot[data-size='md'] {
-  width: var(--l3-size-64);
-  height: var(--l3-size-64);
-}
-
-.spot[data-size='lg'] {
-  width: var(--l3-size-96);
-  height: var(--l3-size-96);
-}
-
-/* The halo: one hairline ring 12 outside the disc, in the same accent (lg only — the hero moments). */
-.spot[data-size='lg']::after {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--l3-spacing-12));
-  border: 1px solid var(--spot-surface);
-  border-radius: var(--l3-radius-full);
-}
-
-.glyph {
-  width: var(--l3-size-32);
-  height: var(--l3-size-32);
-}
-
-.spot[data-size='lg'] .glyph {
-  width: var(--l3-size-48);
-  height: var(--l3-size-48);
-}
-
-.spot[data-tone='brand'] { --spot-surface: var(--l3-surface-accent-brand-light); --spot-content: var(--l3-content-primary); }
-.spot[data-tone='discover'] { --spot-surface: var(--l3-surface-accent-discover-light); --spot-content: var(--l3-content-accent-discover-default); }
-.spot[data-tone='success'] { --spot-surface: var(--l3-surface-accent-success-light); --spot-content: var(--l3-content-accent-success-default); }
-.spot[data-tone='warning'] { --spot-surface: var(--l3-surface-accent-warning-light); --spot-content: var(--l3-content-accent-warning-default); }
-.spot[data-tone='error'] { --spot-surface: var(--l3-surface-accent-error-light); --spot-content: var(--l3-content-accent-error-default); }
-.spot[data-tone='plain'] { --spot-surface: var(--l3-surface-default); --spot-content: var(--l3-content-primary); }
-.spot[data-tone='neutral'] { --spot-surface: var(--l3-surface-secondary); --spot-content: var(--l3-content-primary); }
-```
-
-### `src/shared/ui/Spot.tsx`
-
-```tsx
-import { Icon } from '@l3/components/Icon'
-import styles from './Spot.module.css'
-
-export type SpotTone = 'brand' | 'discover' | 'success' | 'warning' | 'error' | 'neutral' | 'plain'
-
-/**
- * ILLUSTRATION SLOT — a large icon on a soft accent disc (md 64 / lg 96 with a halo). Used where the app has artwork
- * (mascot, PAN card, bank, coin) until L3 has an illustration set; replace the <Spot> with the artwork 1:1.
- * Tone by meaning: brand = welcome moments, plain = on a brand panel, discover = info / in progress, success / warning / error = outcomes.
- */
-export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone?: SpotTone; size?: 'md' | 'lg' }) {
-  return (
-    <span className={styles.spot} data-tone={tone} data-size={size} aria-hidden="true" data-illustration-slot="">
-      <Icon icon={icon} className={styles.glyph} />
-    </span>
-  )
-}
-```
-
 ### `src/shared/ui/dash/DashOrb.module.css`
 
 ```css
@@ -2726,6 +3009,28 @@ export function Spot({ icon, tone = 'brand', size = 'lg' }: { icon: string; tone
   inset: -7.11% -7.31%;
   width: auto;
   height: auto;
+}
+
+/*
+ * Idle motion (live app, 2026-10-23): the ring's yellow highlight goes round clockwise once a second, at a steady
+ * speed — the ring and its soft fill turn on their own centres; the leaves stay still. Off for reduced motion.
+ */
+.ringBox,
+.fill {
+  animation: dash-orb-spin var(--app-dash-orb-spin) linear infinite;
+}
+
+@keyframes dash-orb-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ringBox,
+  .fill {
+    animation: none;
+  }
 }
 ```
 
