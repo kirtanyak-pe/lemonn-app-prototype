@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-10-22T14:25:23.757Z",
+ "fetchedAt": "2026-10-22T14:30:26.748Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -7395,8 +7395,8 @@
      "close": 130.98
     }
    ],
-   "sector": null,
-   "industry": null
+   "sector": "Energy",
+   "industry": "Oil & Gas Refining & Marketing"
   },
   "ITC": {
    "price": 258.9,
