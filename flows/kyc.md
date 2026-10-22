@@ -1,6 +1,6 @@
 # Flow: Account setup (`kyc`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 KYC after login: PAN, details and declarations, nominee, bank account and F&O activation.
 
@@ -630,7 +630,7 @@ export function Details({ withNominee = false, agreed: initialAgreed = false, to
       top={<Actionbar title={t('details.screenTitle')} onBack={onBack} bottom={<StageBar stage={1} />} />}
       toast={toast}
       sheet={sheet}
-      bottom={<ButtonGroup aria-label={t('details.actionsLabel')}><Button disabled={!agreed} onClick={onConfirm}>{t('details.cta')}</Button></ButtonGroup>}
+      bottom={<ButtonGroup aria-label={t('details.actionsLabel')}><Button variant="secondary" disabled={!agreed} onClick={onConfirm}>{t('details.cta')}</Button></ButtonGroup>}
     >
       <Section paddingBlock="24" paddingInline="16" gap="24">
         <Stack as="section" gap="16">
@@ -1016,7 +1016,7 @@ export function Pan({ value = '', sheet, onBack, onSubmit }: { value?: string; s
   return (
     <Screen
       top={<Actionbar title={t('pan.screenTitle')} onBack={onBack} bottom={<StageBar stage={1} />} />}
-      bottom={<ButtonGroup aria-label={t('pan.actionsLabel')}><Button disabled={!valid} onClick={onSubmit}>{t('pan.cta')}</Button></ButtonGroup>}
+      bottom={<ButtonGroup aria-label={t('pan.actionsLabel')}><Button fullWidth variant="buy" disabled={!valid} onClick={onSubmit}>{t('pan.cta')}</Button></ButtonGroup>}
       sheet={sheet}
     >
       <Intro title={t('pan.title')} description={t('pan.description')} />
@@ -1306,7 +1306,7 @@ export function RiskSheet({ onAccept, onClose }: { onAccept?: () => void; onClos
       labelledBy={id}
       onClose={onClose}
       header={<BottomSheetHeader size="lg" headingId={id} icon={<Spot icon={msWarning} tone="warning" size="md" />} heading={t('risk.title')} description={t('risk.description')} />}
-      footer={<ButtonGroup aria-label={t('risk.actionsLabel')}><Button onClick={onAccept}>{t('risk.accept')}</Button></ButtonGroup>}
+      footer={<ButtonGroup aria-label={t('risk.actionsLabel')}><Button fullWidth onClick={onAccept}>{t('risk.accept')}</Button></ButtonGroup>}
     >
       <Stack gap="16">
         <ul className={styles.bullets}>{riskDisclosure.map((r) => <li key={r}>{t(`risk.point.${r}`)}</li>)}</ul>

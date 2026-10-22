@@ -1,6 +1,6 @@
 # Flow: Profile & settings (`profile`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Your account, app settings (biometric, dark mode, accessibility), help, and logout.
 
@@ -246,7 +246,7 @@ export function SettingCard({ icon, label, description, control, children }: Pro
     <Card>
       <Stack>
         <Head className={styles.head}>
-          <Icon icon={icon} />
+          <Icon size={20} icon={icon} />
           <Stack gap="04" className={styles.text}>
             <span className={styles.label}>{label}</span>
             {description && <span className={styles.description}>{description}</span>}

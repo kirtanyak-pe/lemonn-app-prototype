@@ -1,6 +1,6 @@
 # Flow: First deposit (`deposit`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Add money over UPI after account setup: amount, UPI app, confirmation, receipt or failure.
 
@@ -348,7 +348,7 @@ export function Success({ onStart }: { onStart?: () => void }) {
   return (
     <Screen bottom={<ButtonGroup aria-label={t('success.groupLabel')}><Button onClick={onStart}>{t('success.cta')}</Button></ButtonGroup>}>
       <Stack justify="center" className={styles.fill}>
-        <Section paddingBlock="24" paddingInline="16" gap="24">
+        <Section style={{ width: '100%' }} paddingBlock="24" paddingInline="16" gap="24">
           <Intro align="center" art={<Spot icon={msCheckCircle} tone="success" />} title={t('success.title', { amount: inr(defaultAmount, 0) })} description={t('success.description')} />
           <KeyValueList variant="card" aria-label={t('success.receiptLabel')}>
             <KeyValueRow label={t('success.paidWith')} value={`${upiApp.name} · ${upiApp.detail}`} />
@@ -373,7 +373,7 @@ export function Failed({ onRetry, onChange }: { onRetry?: () => void; onChange?:
       }
     >
       <Stack justify="center" className={styles.fill}>
-        <Section paddingBlock="24" paddingInline="16" gap="24">
+        <Section style={{ width: '100%' }} paddingBlock="24" paddingInline="16" gap="24">
           <Intro align="center" art={<Spot icon={msError} tone="error" />} title={t('failed.title')} description={t('failed.description')} />
         </Section>
       </Stack>

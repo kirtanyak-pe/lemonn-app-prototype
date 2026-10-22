@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Market snapshot — fetches today's quote and 3 months of daily closes for every company in the catalogue from
-// Yahoo Finance's public chart endpoint (no key), plus each company's sector / industry, and writes
-// src/shared/data/market-snapshot.json. The prototype reads that file, so prices look real without a live feed.
+// Yahoo Finance's public chart endpoint (no key), plus each company's sector / industry, and today's value of the
+// market indices (INDICES below — the Stocks home's index strip), and writes src/shared/data/market-snapshot.json.
+// The prototype reads that file, so prices look real without a live feed.
 //
 //   npm run market:snapshot          (all companies — about a minute; Yahoo is asked one symbol at a time)
 //
@@ -11,7 +12,9 @@
 // Why a file and not a live call: Yahoo sends no CORS header, so a page on GitHub Pages can't call it from the
 // browser. The build publishes this file next to the page (market-snapshot.json) and the app re-reads it at runtime,
 // so a scheduled job on the site repo can refresh prices without a rebuild (.github/workflows/market-snapshot.yml).
-// A symbol that fails keeps its previous numbers; if every symbol fails, nothing is written.
+// A symbol or index that fails keeps its previous numbers; if every company fails, nothing is written.
+// Indices are listed here, not read from the file, so an older published file without `indices` gains them on its next
+// refresh. They go under their own `indices` key (by the app's index id), so `symbols` / `quotes` stay companies only.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -24,13 +27,16 @@ const symbols = process.argv[2]
   ? previous.symbols ?? Object.keys(previous.quotes)
   : [...readFileSync(cataloguePath, 'utf8').matchAll(/^ {2}'?([A-Z&-]+)'?: company\(/gm)].map((m) => m[1])
 
+// App index id → Yahoo symbol (indices have no ".NS" suffix). The id matches src/shared/data/market.ts `indices`.
+const INDICES = { 'nifty-50': '^NSEI', sensex: '^BSESN', 'nifty-bank': '^NSEBANK' }
+
 const UA = { 'User-Agent': 'Mozilla/5.0' }
 const yahoo = (symbol) => encodeURIComponent(`${symbol}.NS`)
 const round = (n) => (n == null ? null : Math.round(n * 100) / 100)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
-async function quote(symbol) {
-  const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${yahoo(symbol)}?range=3mo&interval=1d`, { headers: UA })
+async function quote(symbol, ticker = yahoo(symbol)) {
+  const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=3mo&interval=1d`, { headers: UA })
   if (!res.ok) throw new Error(`chart ${res.status}`)
   const r = (await res.json()).chart.result?.[0]
   if (!r) throw new Error('no chart result')
@@ -38,7 +44,10 @@ async function quote(symbol) {
   const closes = r.timestamp
     .map((t, i) => ({ date: new Date(t * 1000).toISOString().slice(0, 10), close: round(r.indicators.quote[0].close[i]) }))
     .filter((p) => p.close != null)
-  const prevClose = closes.length > 1 ? closes[closes.length - 2].close : m.chartPreviousClose
+  // Yesterday's close = the last daily close dated before today's session. Yahoo often leaves today's daily bar (and
+  // sometimes a recent index bar) empty, so "the second-to-last close" can land a day too early.
+  const session = new Date(m.regularMarketTime * 1000).toISOString().slice(0, 10)
+  const prevClose = closes.findLast((p) => p.date < session)?.close ?? m.chartPreviousClose
   const price = round(m.regularMarketPrice)
   return {
     price,
@@ -80,7 +89,22 @@ if (!Object.keys(quotes).length) {
 }
 // Failed symbols keep the last numbers we had for them.
 for (const symbol of symbols) if (!quotes[symbol] && previous.quotes[symbol]) quotes[symbol] = previous.quotes[symbol]
-const snapshot = { source: 'Yahoo Finance (public chart + search endpoints)', fetchedAt: new Date().toISOString(), symbols, quotes }
+
+// Indices: today's value and change only (the strip shows no chart), so the 3 months of closes are dropped.
+const indices = {}
+const failedIndices = []
+for (const [id, ticker] of Object.entries(INDICES)) {
+  try {
+    const { closes, volume, longName, ...q } = await quote(id, encodeURIComponent(ticker))
+    indices[id] = { symbol: ticker, ...q }
+  } catch (e) {
+    failedIndices.push(`${id} (${e.message})`)
+    if (previous.indices?.[id]) indices[id] = previous.indices[id]
+  }
+  await sleep(250)
+}
+
+const snapshot = { source: 'Yahoo Finance (public chart + search endpoints)', fetchedAt: new Date().toISOString(), symbols, quotes, indices }
 writeFileSync(out, JSON.stringify(snapshot, null, 1) + '\n')
-console.log(`\n${symbols.length - failed.length}/${symbols.length} companies refreshed → ${out.replace(root + '/', '')}`)
-if (failed.length) console.log('Failed (kept previous):', failed.join(', '))
+console.log(`\n${symbols.length - failed.length}/${symbols.length} companies, ${Object.keys(INDICES).length - failedIndices.length}/${Object.keys(INDICES).length} indices refreshed → ${out.replace(root + '/', '')}`)
+if (failed.length || failedIndices.length) console.log('Failed (kept previous):', [...failed, ...failedIndices].join(', '))

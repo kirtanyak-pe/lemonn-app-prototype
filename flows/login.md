@@ -1,6 +1,6 @@
 # Flow: Login (`login`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Welcome, mobile number + OTP, fingerprint, PIN and email — where the app starts.
 
@@ -199,8 +199,8 @@ export function Dots({ count, index, onPick }: { count: number; index: number; o
   "welcome.slide3.title": "Trade with guardrails",
   "welcome.slide3.description": "Stop-loss, take-profit and P&L protection built in",
   "welcome.actionsLabel": "Get started",
-  "welcome.login": "Login with Coinswitch",
-  "welcome.coinswitch": "Continue with coinswitch",
+  "welcome.login": "Login with Phone Number",
+  "welcome.coinswitch": "Login with coinswitch",
   "welcome.sebi": "SEBI Reg. No. {reg}",
   "dots.label": "Slides",
   "dots.slide": "Slide {n} of {count}",
@@ -801,7 +801,7 @@ export function Welcome({ onLogin, onCoinSwitch }: { onLogin?: () => void; onCoi
       bottom={
         <>
           <ButtonGroup aria-label={copy('welcome.actionsLabel')}>
-            <Button variant="buy" onClick={onLogin}>{copy('welcome.login')}</Button>
+            <Button variant="brand" onClick={onLogin}>{copy('welcome.login')}</Button>
             <Button variant="tertiary" iconLeft={<BrandLogo brand="coinswitch" variant="icon" size={24} decorative />} onClick={onCoinSwitch}>
               {copy('welcome.coinswitch')}
             </Button>

@@ -1,6 +1,6 @@
 # Flow: Stocks (`stocks`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.
 
@@ -132,14 +132,14 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 ### L3 gaps
 
-- **Company logos** for IDEA, YESBANK, SOUTHBANK, SUZLON, NHPC, IRFC (`@l3/assets/company-logos` has the other 50) —
-  the Avatar shows initials.
 - **Rail / carousel:** no sideways-scrolling row in L3 — `Rail` (src/shared/ui) stands in.
 - **Actionbar leading avatar** (profile on the left of the search field).
 - **Illustrations** for shortcuts, highlights and campaigns — `Spot` slots stand in.
 
 ### Changelog
 
+- 2026-10-23 — the six Under ₹100 stocks (IDEA, YESBANK, SOUTHBANK, SUZLON, NHPC, IRFC) show their real logos — added
+  to the design system (`@l3/assets/company-logos`, now 56), so no movers fall back to initials.
 - 2026-10-23 — Top movers show real Indian stock data: gainers / losers / under ₹100 come from the company catalogue
   (real Yahoo Finance snapshot, DS logos) instead of hand-typed prices, and update when the snapshot refreshes. Six
   cheap stocks (IDEA, YESBANK, SOUTHBANK, SUZLON, NHPC, IRFC) joined the catalogue for Under ₹100 — they show
@@ -1211,8 +1211,17 @@ export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }
   display: flex;
   align-items: center;
   gap: var(--l3-spacing-12);
-  padding: var(--l3-spacing-16) var(--l3-spacing-16) var(--l3-spacing-06);
+  padding-right: var(--l3-spacing-16);
+  padding-left: var(--l3-spacing-16);
   background: var(--l3-surface-secondary);
+  position: sticky;
+  height: 64px;
+  transition: background-color var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* Scrolled: the bar leaves the summary's grey for surface/primary. */
+.bar[data-scrolled] {
+  background: var(--l3-surface-primary);
 }
 
 .bar > :is(.profile, .search, .wallet) {
@@ -1302,6 +1311,8 @@ type TopBarProps = {
   /** First visit after DASH launches: an L3 coach mark points at the pill (Figma "Intro" 5612:44075). */
   dashIntro?: boolean
   onDashIntroDone?: () => void
+  /** The page is scrolled: the bar turns surface/primary. */
+  scrolled?: boolean
 }
 
 /**
@@ -1310,10 +1321,10 @@ type TopBarProps = {
  * Figma "Home page", DASH AI main flow) · the wallet.
  * The bar sits on the summary area's grey; the pill and the wallet are on surface/default.
  */
-export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIntro = false, onDashIntroDone }: TopBarProps) {
+export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIntro = false, onDashIntroDone, scrolled = false }: TopBarProps) {
   const dash = <DashEntry label={t('top.dash')} ariaLabel={t('top.dashLabel')} onClick={onDash} />
   return (
-    <header className={styles.bar}>
+    <header className={styles.bar} data-scrolled={scrolled || undefined}>
       <button type="button" className={styles.profile} aria-label={t('top.profile')} onClick={onProfile}>
         {initials}
       </button>
@@ -1596,7 +1607,7 @@ export const stocks: Flow = {
 ### `src/flows/stocks/screens/Home.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Section } from '@l3/components/Section'
 import { Stack } from '@l3/components/Stack'
 import { user } from '../../../shared/data/user'
@@ -1642,6 +1653,17 @@ type Props = {
 export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile, onDash, dashIntro, onDashIntroDone }: Props) {
   const page = useRef<HTMLDivElement>(null)
 
+  // Scrolled past the top: the top bar turns surface/primary (TopBar `scrolled`).
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const body = page.current?.parentElement
+    if (!body) return
+    const onScroll = () => setScrolled(body.scrollTop > 0)
+    onScroll()
+    body.addEventListener('scroll', onScroll, { passive: true })
+    return () => body.removeEventListener('scroll', onScroll)
+  }, [])
+
   // Board frames: open the page scrolled to a part (the screen's body is this page's scroll container).
   useLayoutEffect(() => {
     const root = page.current
@@ -1653,7 +1675,7 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile, onD
 
   return (
     <Screen
-      top={<TopBar initials={initials(user.name)} onProfile={onProfile} onSearch={onSearch} onDash={onDash} dashIntro={dashIntro} onDashIntroDone={onDashIntroDone} />}
+      top={<TopBar scrolled={scrolled} initials={initials(user.name)} onProfile={onProfile} onSearch={onSearch} onDash={onDash} dashIntro={dashIntro} onDashIntroDone={onDashIntroDone} />}
       bottom={<MainNav value="stocks" onChange={onTab} />}
     >
       <Stack ref={page} className={styles.flatCards}>

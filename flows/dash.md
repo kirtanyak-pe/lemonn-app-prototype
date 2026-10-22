@@ -1,6 +1,6 @@
 # Flow: DASH AI · Trading rules (`dash`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `8d10ac0` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.
 
@@ -1817,13 +1817,6 @@ export function BacktestStrip({ backtest, shape = 'strip' }: { backtest: Backtes
 ### `src/flows/dash/components/RuleSummary.module.css`
 
 ```css
-/* Figma: 1px border-light, radius 12, 12 inside. */
-.box {
-  padding-inline: var(--l3-spacing-12);
-  border: 1px solid var(--l3-border-light);
-  border-radius: var(--l3-radius-12);
-}
-
 .oneLine {
   display: block;
   overflow: hidden;
@@ -1839,13 +1832,9 @@ import { Avatar } from '@l3/components/Avatar'
 import { ListCell } from '@l3/components/ListCell'
 import styles from './RuleSummary.module.css'
 
-/** A rule in one bordered row (created / delete sheets): its initial on an Avatar, the name, one line of what it does. */
+/** A rule as one L3 card row (created / delete sheets): its initial on an Avatar, the name, one line of what it does. */
 export function RuleSummary({ title, description }: { title: string; description: string }) {
-  return (
-    <div className={styles.box}>
-      <ListCell iconLeft={<Avatar initials={title.charAt(0)} size={40} />} label={title} description={<span className={styles.oneLine}>{description}</span>} />
-    </div>
-  )
+  return <ListCell variant="card" iconLeft={<Avatar initials={title.charAt(0)} size={40} />} label={title} description={<span className={styles.oneLine}>{description}</span>} />
 }
 ```
 
@@ -2612,6 +2601,12 @@ export function supertrend(candles: Candle[], period = 10, multiplier = 3) {
 .footer {
   width: 100%;
 }
+
+/* Designer's call (One Canvas, 2026-10-23): the row inside each rule card has no padding of its own (the card's 12
+   inset is the only space). The attributes make it beat L3's .cell[data-variant][data-size] row padding. */
+.cell.cell[data-variant][data-size] {
+  padding: 0;
+}
 ```
 
 ### `src/flows/dash/screens/ActiveRules.tsx`
@@ -2694,8 +2689,9 @@ function RuleItem({ rule, onDelete }: { rule: SavedRule; onDelete: () => void })
         </Stack>
       }
     >
-      <Inset paddingInline="12">
+      <Inset style={{ height: 'fit-content' }} paddingInline="12">
         <ListCell
+          className={styles.cell}
           iconLeft={<Avatar initials={rule.title.charAt(0)} size={40} />}
           label={rule.title}
           multiline
@@ -3135,6 +3131,8 @@ export function Landing({ onBack, onRules, onStrategy, onIndicator, onMenu }: La
   display: grid;
   grid-template-rows: 1fr;
   animation: dash-pin var(--app-dash-pin-duration) var(--l3-motion-easing-decelerate) both;
+  padding-top: var(--l3-spacing-12);
+  padding-bottom: var(--l3-spacing-12);
 }
 
 .pinInner {
@@ -3559,18 +3557,16 @@ export function RuleCreatedSheet({ rule, onCancel, onViewRules }: { rule: DraftR
         </ButtonGroup>
       }
     >
-      <div>
-        <Stack gap="24" align="stretch" className={styles.content}>
-          <Stack gap="16" align="center" className={styles.centre}>
-            <SuccessBurst leaving={leaving} />
-            <Stack gap="08" align="center">
-              <h2 id={id} className={styles.title}>{t('created.title')}</h2>
-              <p className={styles.description}>{t('created.description')}</p>
-            </Stack>
+      <Stack gap="24" align="stretch" className={styles.content}>
+        <Stack gap="16" align="center" className={styles.centre}>
+          <SuccessBurst leaving={leaving} />
+          <Stack gap="08" align="center">
+            <h2 id={id} className={styles.title}>{t('created.title')}</h2>
+            <p className={styles.description}>{t('created.description')}</p>
           </Stack>
-          <RuleSummary title={rule.title} description={rule.description} />
         </Stack>
-      </div>
+        <RuleSummary title={rule.title} description={rule.description} />
+      </Stack>
     </Sheet>
   )
 }
