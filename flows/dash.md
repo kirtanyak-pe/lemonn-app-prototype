@@ -191,6 +191,8 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-23 — Landing option cards: no drop shadow (only the 1px DASH green edge).
+
 - 2026-10-23 — Suggestion chips: L3's 14 line height (20) instead of 100% so wrapped text breathes (one line stays 40 tall, text centred); lines balance, and a wrapped chip hugs its longest line (no empty space on its right).
 
 - 2026-10-23 — Landing: Create Custom Indicator moved to the top (indicator · rules · strategy).
@@ -1763,10 +1765,12 @@ LD�"o"�F� h �#�6�5��L�&$�EIJ��uq;?�ѽ%:J��
 ### `src/flows/dash/components/BuildOption.module.css`
 
 ```css
-/* An L3 clickable Card (12 padding) as Figma's "Option card": radius 16, a 1px DASH green edge. */
+/* An L3 clickable Card (12 padding) as Figma's "Option card": radius 16, a 1px DASH green edge, no drop shadow
+   (designer's call, 2026-10-23 — the green edge is enough on the DASH background). */
 .option.option {
   --card-border: inset 0 0 0 1px var(--app-dash-green); /* 1px: Figma stroke */
   border-radius: var(--l3-radius-16);
+  box-shadow: var(--card-border);
 }
 
 /* Icon tile: 56, radius 8, a light DASH green (Figma rgba(104, 218, 111, 0.15)), the glyph 32 in success green. */
