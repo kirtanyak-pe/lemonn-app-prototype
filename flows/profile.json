@@ -53,6 +53,28 @@
         "profile-01"
       ],
       "figmaUrl": ""
+    },
+    {
+      "id": "profile-05",
+      "name": "Settings B · Appearance row",
+      "figma": "",
+      "note": "A/B version B (Zomato-style): Appearance shows the current theme; tapping it opens the Appearance sheet.",
+      "goesTo": [
+        "profile-06",
+        "profile-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "profile-06",
+      "name": "Settings B · Appearance sheet",
+      "figma": "",
+      "note": "Light theme / Dark theme / Use device theme as radio rows; Save preference applies it.",
+      "goesTo": [
+        "profile-05",
+        "profile-01"
+      ],
+      "figmaUrl": ""
     }
   ],
   "files": [
@@ -66,7 +88,8 @@
     "src/flows/profile/index.tsx",
     "src/flows/profile/screens/Profile.module.css",
     "src/flows/profile/screens/Profile.tsx",
-    "src/flows/profile/screens/Settings.tsx"
+    "src/flows/profile/screens/Settings.tsx",
+    "src/flows/profile/sheets/AppearanceSheet.tsx"
   ],
   "shared": [
     "src/shared/copy.ts",

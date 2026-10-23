@@ -14,6 +14,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/profile · mach
 | `profile-02` | Settings | — | `profile-01` | Three setting cards: Biometric, Theme (Light / Dark / Auto, live), Accessibility (off). |
 | `profile-03` | Settings · accessibility on | — | `profile-01` | Accessibility on: darker colours (♿ Accessible theme) and a bigger font together; the illustration shows it. |
 | `profile-04` | Settings · couldn’t save | — | `profile-01` | A change didn’t save: error toast with Retry at the bottom; the controls show what’s stored. |
+| `profile-05` | Settings B · Appearance row | — | `profile-06`, `profile-01` | A/B version B (Zomato-style): Appearance shows the current theme; tapping it opens the Appearance sheet. |
+| `profile-06` | Settings B · Appearance sheet | — | `profile-05`, `profile-01` | Light theme / Dark theme / Use device theme as radio rows; Save preference applies it. |
 
 ## Spec (README.md)
 
@@ -35,6 +37,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/profile · mach
 | `profile-01` | Profile | The live page 1:1. Grey header (back, name, View Details ›, avatar) that stays put; the list scrolls under its rounded top: **Account Information** (Bank Details · Verified, Balance, Get ₹149 instant balance, Tax and P&L Reports) · **App Settings** (Settings, Kill Switch, Auto TP/SL) · **How can we help?** (Help & Support, Follow us on X, Subscribe on YouTube, Follow us on Instagram, Rate Us, About 7.2.38 (3)) · Logout · the broker's line with Read More |
 | `profile-02` | Settings | Three matching setting cards: **Biometric** (switch) · **Theme** (small icon toggle on the right: Light / Dark / Auto) · **Accessibility** (switch, off) |
 | `profile-03` | Settings · accessibility on | Accessibility on: darker colours and bigger text together (the screen shows the darker colours) |
+| `profile-05` | Settings B · Appearance row | A/B version B (Zomato-style): the Theme card becomes "Appearance" with the current theme (Light / Dark / Automatic) + chevron |
+| `profile-06` | Settings B · Appearance sheet | Sheet: Light theme / Dark theme / Use device theme (radio rows) + Save preference; nothing changes until Save |
 | `profile-04` | Settings · couldn't save | A change didn't save: error toast "Couldn't save your settings" + Retry |
 
 ### Navigation
@@ -133,6 +137,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - 2026-10-22 — Accessibility illustration removed (user's call).
 - 2026-10-22 — Accessibility on makes every text style 2px bigger across the whole app.
 - 2026-10-23 — Theme: a small icon-only Light / Dark / Auto toggle on the right of its card, like the other cards' switches.
+- 2026-10-23 — A/B: version B of the theme control — an Appearance card that opens a sheet (radio rows + Save preference).
 
 
 ## Source — this flow
@@ -235,6 +240,8 @@ type Props = {
    *  small segmented toggle (`controlType="choice"` — the header stays a plain row). */
   control?: ReactNode
   controlType?: 'switch' | 'choice'
+  /** The whole card opens something (a sheet): a clickable L3 Card; `control` then shows the current value + chevron. */
+  onClick?: () => void
   /** What the setting opens up underneath (theme choices, accessibility options), 12 below the header. */
   children?: ReactNode
 }
@@ -244,10 +251,10 @@ type Props = {
  * with a header row — icon · label (Label/16) + description (Description/12) · control (switch or small toggle) —
  * and optional content below
  */
-export function SettingCard({ icon, label, description, control, controlType = 'switch', children }: Props) {
-  const Head = control && controlType === 'switch' ? 'label' : 'div'
+export function SettingCard({ icon, label, description, control, controlType = 'switch', onClick, children }: Props) {
+  const Head = control && controlType === 'switch' && !onClick ? 'label' : 'div'
   return (
-    <Card>
+    <Card onClick={onClick}>
       <Stack>
         <Head className={styles.head}>
           <Icon size={20} icon={icon} />
@@ -319,7 +326,15 @@ export function SettingCard({ icon, label, description, control, controlType = '
   "settings.themeLabel": "Theme",
   "settings.theme.light": "Light",
   "settings.theme.dark": "Dark",
-  "settings.theme.auto": "Auto · follows your phone"
+  "settings.theme.auto": "Auto · follows your phone",
+  "appearance.title": "Appearance",
+  "appearance.light": "Light theme",
+  "appearance.dark": "Dark theme",
+  "appearance.auto": "Use device theme",
+  "appearance.save": "Save preference",
+  "appearance.value.light": "Light",
+  "appearance.value.dark": "Dark",
+  "appearance.value.auto": "Automatic"
 }
 ```
 
@@ -379,6 +394,7 @@ export const profile: Flow = {
   sections: [
     { id: 'profile', title: 'Profile' },
     { id: 'settings', title: 'Settings' },
+    { id: 'settings-b', title: 'Settings · version B (A/B test)' },
   ],
   screens: [
     {
@@ -400,6 +416,16 @@ export const profile: Flow = {
       id: 'profile-04', section: 'settings', name: 'Settings · couldn’t save', figma: '',
       note: 'A change didn’t save: error toast with Retry at the bottom; the controls show what’s stored.',
       render: (go) => <Settings saveFailed onBack={() => go('profile-01')} />,
+    },
+    {
+      id: 'profile-05', section: 'settings-b', name: 'Settings B · Appearance row', figma: '',
+      note: 'A/B version B (Zomato-style): Appearance shows the current theme; tapping it opens the Appearance sheet.',
+      render: (go) => <Settings themeUI="sheet" onAppearance={() => go('profile-06')} onBack={() => go('profile-01')} />,
+    },
+    {
+      id: 'profile-06', section: 'settings-b', name: 'Settings B · Appearance sheet', figma: '',
+      note: 'Light theme / Dark theme / Use device theme as radio rows; Save preference applies it.',
+      render: (go) => <Settings themeUI="sheet" appearanceOpen onAppearanceClose={() => go('profile-05')} onBack={() => go('profile-01')} />,
     },
   ],
 }
@@ -497,6 +523,16 @@ export const profile: Flow = {
 :global(::view-transition-new(root)) {
   animation-duration: var(--l3-motion-duration-medium);
   animation-timing-function: var(--l3-motion-easing-standard);
+}
+
+/* Settings B: the Appearance card's current value + chevron, where the other cards have their switch. */
+.value {
+  display: inline-flex;
+  flex: none;
+  gap: var(--l3-spacing-04);
+  align-items: center;
+  font: var(--l3-text-description-14);
+  color: var(--l3-content-secondary);
 }
 ```
 
@@ -633,12 +669,13 @@ import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
 import { Switch } from '@l3/components/Switch'
 import { Tabs } from '@l3/components/Tabs'
-import { msAccessibilityNew, msBrightnessAuto, msDarkMode, msError, msFingerprint, msLightMode, msPalette } from '@l3/icons/material'
+import { msAccessibilityNew, msBrightnessAuto, msChevronRight, msDarkMode, msError, msFingerprint, msLightMode, msPalette } from '@l3/icons/material'
 import { useTheme } from '@l3/theme'
 import { usePreview } from '../../../shared/prototype'
 import { largeText } from '../../../shared/textSize'
 import { Screen } from '../../../shared/ui/Screen'
 import { SettingCard } from '../components/SettingCard'
+import { AppearanceSheet } from '../sheets/AppearanceSheet'
 import { t } from '../copy'
 import { type ThemeChoice } from '../data'
 import styles from './Profile.module.css'
@@ -648,6 +685,15 @@ type Props = {
   lowVision?: boolean
   /** A save that just failed: the error toast with Retry. */
   saveFailed?: boolean
+  /**
+   * A/B test of the theme control. 'toggle' (A): a small Light / Dark / Auto icon toggle on the card. 'sheet' (B,
+   * Zomato-style): an Appearance card showing the current theme; tapping it opens the Appearance sheet.
+   */
+  themeUI?: 'toggle' | 'sheet'
+  /** B: the Appearance sheet is open. */
+  appearanceOpen?: boolean
+  onAppearance?: () => void
+  onAppearanceClose?: () => void
   onBack?: () => void
 }
 
@@ -671,14 +717,15 @@ const themeChoices: { value: ThemeChoice; label: string; icon: typeof msLightMod
 /**
  * profile-02 … 04 · Settings — three setting cards built the same way (icon · label + description · control):
  *  - Biometric: a switch.
- *  - Theme: Light / Dark / Auto as a small icon-only toggle on the right (where the other cards have their switch);
- *    the description names the current choice (Auto follows the phone).
+ *  - Theme, A/B (`themeUI`): A = a small icon-only Light / Dark / Auto toggle on the right (the description names
+ *    the choice); B = an Appearance card with the current theme + chevron that opens the Appearance sheet (radio
+ *    rows + Save preference, Zomato-style).
  *  - Accessibility: one switch that turns on darker colours (L3's ♿ Accessible theme) and a bigger font (every text
  *    style 2px bigger, app-wide) together.
  * Everything applies at once. Prototype: Theme and darker colours set the app's real theme (L3 ThemeProvider); the
  * screen also carries the contrast it shows; the bigger text applies to the whole prototype (src/shared/textSize).
  */
-export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
+export function Settings({ lowVision, saveFailed = false, themeUI = 'toggle', appearanceOpen = false, onAppearance, onAppearanceClose, onBack }: Props) {
   const theme = useTheme()
   const { interactive } = usePreview()
   const [biometric, setBiometric] = useState(true)
@@ -704,6 +751,15 @@ export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
     <div className={styles.scope} data-product={theme.product} data-mode={theme.mode} data-contrast={on ? 'accessible' : undefined}>
       <Screen
         top={<Actionbar title={t('settings.title')} onBack={onBack} />}
+        sheet={
+          themeUI === 'sheet' && appearanceOpen && (
+            <AppearanceSheet
+              current={themeChoice}
+              onClose={onAppearanceClose}
+              onSave={(c) => { if (theme.availableModes.length > 1) withTransition(() => theme.setModePreference(c === 'auto' ? 'system' : c)); onAppearanceClose?.() }}
+            />
+          )
+        }
         toast={
           failed && (
             <Aerobar
@@ -728,24 +784,38 @@ export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
                 control={<Switch checked={biometric} onChange={(e) => setBiometric(e.target.checked)} />}
               />
 
-              <SettingCard
-                icon={msPalette}
-                label={t('settings.theme')}
-                description={t(`settings.theme.${themeChoice}`)}
-                controlType="choice"
-                control={
-                  <Tabs
-                    appearance="pill-group"
-                    behavior="toggle"
-                    size="sm"
-                    aria-label={t('settings.themeLabel')}
-                    items={themeChoices.map((c) => ({ value: c.value, label: c.label, hideLabel: true, iconLeft: <Icon icon={c.icon} size={16} /> }))}
-                    value={themeChoice}
-                    className={styles.themeTabs}
-                    onChange={(v) => theme.availableModes.length > 1 && withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))}
-                  />
-                }
-              />
+              {themeUI === 'sheet' ? (
+                <SettingCard
+                  icon={msPalette}
+                  label={t('appearance.title')}
+                  onClick={onAppearance}
+                  control={
+                    <span className={styles.value}>
+                      {t(`appearance.value.${themeChoice}`)}
+                      <Icon icon={msChevronRight} size={20} />
+                    </span>
+                  }
+                />
+              ) : (
+                <SettingCard
+                  icon={msPalette}
+                  label={t('settings.theme')}
+                  description={t(`settings.theme.${themeChoice}`)}
+                  controlType="choice"
+                  control={
+                    <Tabs
+                      appearance="pill-group"
+                      behavior="toggle"
+                      size="sm"
+                      aria-label={t('settings.themeLabel')}
+                      items={themeChoices.map((c) => ({ value: c.value, label: c.label, hideLabel: true, iconLeft: <Icon icon={c.icon} size={16} /> }))}
+                      value={themeChoice}
+                      className={styles.themeTabs}
+                      onChange={(v) => theme.availableModes.length > 1 && withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))}
+                    />
+                  }
+                />
+              )}
 
               <SettingCard
                 icon={msAccessibilityNew}
@@ -758,6 +828,54 @@ export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
         </div>
       </Screen>
     </div>
+  )
+}
+```
+
+### `src/flows/profile/sheets/AppearanceSheet.tsx`
+
+```tsx
+import { useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Radio } from '@l3/components/Checkbox'
+import { ListCell } from '@l3/components/ListCell'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { t } from '../copy'
+import type { ThemeChoice } from '../data'
+
+const choices: ThemeChoice[] = ['light', 'dark', 'auto']
+
+/**
+ * profile-06 · Appearance (version B, Zomato-style): a sheet with the three themes as radio rows — Light theme, Dark
+ * theme, Use device theme — and Save preference. Nothing changes until Save; a backdrop tap or drag down cancels.
+ */
+export function AppearanceSheet({ current, onSave, onClose }: { current: ThemeChoice; onSave?: (choice: ThemeChoice) => void; onClose?: () => void }) {
+  const id = useId()
+  const [picked, setPicked] = useState<ThemeChoice>(current)
+  return (
+    <Sheet
+      labelledBy={id}
+      onClose={onClose}
+      header={<BottomSheetHeader headingId={id} heading={t('appearance.title')} />}
+      footer={
+        <ButtonGroup aria-label={t('appearance.title')}>
+          <Button fullWidth onClick={() => onSave?.(picked)}>{t('appearance.save')}</Button>
+        </ButtonGroup>
+      }
+    >
+      <div role="radiogroup" aria-labelledby={id}>
+        {choices.map((c) => (
+          <ListCell
+            key={c}
+            as="label"
+            label={t(`appearance.${c}`)}
+            trailing={<Radio name={`${id}-theme`} checked={picked === c} onChange={() => setPicked(c)} />}
+          />
+        ))}
+      </div>
+    </Sheet>
   )
 }
 ```
