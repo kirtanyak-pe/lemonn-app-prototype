@@ -138,6 +138,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - 2026-10-22 — Accessibility on makes every text style 2px bigger across the whole app.
 - 2026-10-23 — Theme: a small icon-only Light / Dark / Auto toggle on the right of its card, like the other cards' switches.
 - 2026-10-23 — A/B: version B of the theme control — an Appearance card that opens a sheet (radio rows + Save preference).
+- 2026-10-23 — the Theme card is called Appearance (both A/B versions).
 
 
 ## Source — this flow
@@ -315,7 +316,7 @@ export function SettingCard({ icon, label, description, control, controlType = '
   "settings.title": "Settings",
   "settings.biometric": "Biometric",
   "settings.biometricHint": "Login with your fingerprint",
-  "settings.theme": "Theme",
+  "settings.theme": "Appearance",
   "settings.themeLight": "Light",
   "settings.themeDark": "Dark",
   "settings.themeAuto": "Auto",
@@ -323,7 +324,7 @@ export function SettingCard({ icon, label, description, control, controlType = '
   "settings.accessibilityHint": "Darker colours and bigger text",
   "settings.saveFailed": "Couldn’t save your settings",
   "settings.retry": "Retry",
-  "settings.themeLabel": "Theme",
+  "settings.themeLabel": "Appearance",
   "settings.theme.light": "Light",
   "settings.theme.dark": "Dark",
   "settings.theme.auto": "Auto · follows your phone",
