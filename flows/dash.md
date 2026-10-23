@@ -2278,19 +2278,22 @@ export function SuggestionList({ items, onPick }: { items: string[]; onPick?: (p
 function hugWrappedChips(list: HTMLElement) {
   const chips = [...list.querySelectorAll<HTMLElement>('button')]
   chips.forEach((chip) => (chip.style.width = ''))
-  // Balanced lines re-break at the new width, so hug again until nothing narrows (two or three passes).
-  for (let pass = 0; pass < 4; pass++) {
-    const widths = chips.map(longestLineWidth)
-    let narrowed = false
-    chips.forEach((chip, i) => {
-      const w = widths[i]
-      if (w !== null && w < chip.offsetWidth) {
-        chip.style.width = `${w}px`
-        narrowed = true
-      }
-    })
-    if (!narrowed) return
-  }
+  // One pass only: measured at the full width, then hugged. Measuring again would let balanced lines re-break
+  // narrower each time and squeeze the chip into a thin column. If hugging ever adds a line, it's undone.
+  const measured = chips.map((chip) => ({ width: longestLineWidth(chip), lines: lineCount(chip) }))
+  chips.forEach((chip, i) => {
+    const { width, lines } = measured[i]
+    if (width === null || width >= chip.offsetWidth) return
+    chip.style.width = `${width}px`
+    if (lineCount(chip) > lines) chip.style.width = ''
+  })
+}
+
+/** How many lines a chip's text runs to. */
+function lineCount(chip: HTMLElement): number {
+  const range = document.createRange()
+  range.selectNodeContents(chip.firstElementChild ?? chip)
+  return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size
 }
 
 /** A wrapped chip's width hugging its longest line (+ padding and edge); null for a chip on one line. */
