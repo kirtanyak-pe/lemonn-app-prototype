@@ -139,6 +139,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - 2026-10-23 — Theme: a small icon-only Light / Dark / Auto toggle on the right of its card, like the other cards' switches.
 - 2026-10-23 — A/B: version B of the theme control — an Appearance card that opens a sheet (radio rows + Save preference).
 - 2026-10-23 — the Theme card is called Appearance (both A/B versions).
+- 2026-10-23 — version A: tapping anywhere on the Appearance card moves the toggle to the next option (Light → Dark → Auto).
 
 
 ## Source — this flow
@@ -198,7 +199,8 @@ export function CardRow({ icon, leading, label, description, trailing, toggle = 
   cursor: default;
 }
 
-label.head {
+label.head,
+.head[data-cycle] {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -241,6 +243,8 @@ type Props = {
    *  small segmented toggle (`controlType="choice"` — the header stays a plain row). */
   control?: ReactNode
   controlType?: 'switch' | 'choice'
+  /** `choice` cards: a tap anywhere on the card (outside the toggle) moves the toggle to its next option. */
+  onCycle?: () => void
   /** The whole card opens something (a sheet): a clickable L3 Card; `control` then shows the current value + chevron. */
   onClick?: () => void
   /** What the setting opens up underneath (theme choices, accessibility options), 12 below the header. */
@@ -252,18 +256,18 @@ type Props = {
  * with a header row — icon · label (Label/16) + description (Description/12) · control (switch or small toggle) —
  * and optional content below
  */
-export function SettingCard({ icon, label, description, control, controlType = 'switch', onClick, children }: Props) {
+export function SettingCard({ icon, label, description, control, controlType = 'switch', onClick, onCycle, children }: Props) {
   const Head = control && controlType === 'switch' && !onClick ? 'label' : 'div'
   return (
     <Card onClick={onClick}>
       <Stack>
-        <Head className={styles.head}>
+        <Head className={styles.head} data-cycle={onCycle ? '' : undefined} onClick={onCycle}>
           <Icon size={20} icon={icon} />
           <Stack gap="04" className={styles.text}>
             <span className={styles.label}>{label}</span>
             {description && <span className={styles.description}>{description}</span>}
           </Stack>
-          {control}
+          {onCycle ? <span onClick={(e) => e.stopPropagation()}>{control}</span> : control}
         </Head>
         {children && <div className={styles.more}>{children}</div>}
       </Stack>
@@ -735,6 +739,10 @@ export function Settings({ lowVision, saveFailed = false, themeUI = 'toggle', ap
   const [failed, setFailed] = useState(saveFailed)
   const themeChoice: ThemeChoice = theme.modePreference === 'system' ? 'auto' : theme.modePreference
 
+  const pickTheme = (v: ThemeChoice) => {
+    if (theme.availableModes.length > 1) withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))
+  }
+
   const toggle = (next: boolean) => {
     const apply = () => {
       setOn(next)
@@ -803,6 +811,8 @@ export function Settings({ lowVision, saveFailed = false, themeUI = 'toggle', ap
                   label={t('settings.theme')}
                   description={t(`settings.theme.${themeChoice}`)}
                   controlType="choice"
+                  // A tap on the card (outside the toggle) moves to the next option: Light → Dark → Auto → Light.
+                  onCycle={() => pickTheme(themeChoices[(themeChoices.findIndex((c) => c.value === themeChoice) + 1) % themeChoices.length].value)}
                   control={
                     <Tabs
                       appearance="pill-group"
@@ -812,7 +822,7 @@ export function Settings({ lowVision, saveFailed = false, themeUI = 'toggle', ap
                       items={themeChoices.map((c) => ({ value: c.value, label: c.label, hideLabel: true, iconLeft: <Icon icon={c.icon} size={16} /> }))}
                       value={themeChoice}
                       className={styles.themeTabs}
-                      onChange={(v) => theme.availableModes.length > 1 && withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))}
+                      onChange={pickTheme}
                     />
                   }
                 />
