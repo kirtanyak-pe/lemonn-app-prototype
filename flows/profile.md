@@ -33,7 +33,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/profile · mach
 | Id | Screen | What it shows / when |
 |---|---|---|
 | `profile-01` | Profile | The live page 1:1. Grey header (back, name, View Details ›, avatar) that stays put; the list scrolls under its rounded top: **Account Information** (Bank Details · Verified, Balance, Get ₹149 instant balance, Tax and P&L Reports) · **App Settings** (Settings, Kill Switch, Auto TP/SL) · **How can we help?** (Help & Support, Follow us on X, Subscribe on YouTube, Follow us on Instagram, Rate Us, About 7.2.38 (3)) · Logout · the broker's line with Read More |
-| `profile-02` | Settings | Three matching setting cards: **Biometric** (switch) · **Theme** (Light / Dark / Auto pill toggle) · **Accessibility** (switch, off) |
+| `profile-02` | Settings | Three matching setting cards: **Biometric** (switch) · **Theme** (small icon toggle on the right: Light / Dark / Auto) · **Accessibility** (switch, off) |
 | `profile-03` | Settings · accessibility on | Accessibility on: darker colours and bigger text together (the screen shows the darker colours) |
 | `profile-04` | Settings · couldn't save | A change didn't save: error toast "Couldn't save your settings" + Retry |
 
@@ -77,7 +77,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 | Logout | Button | `variant="tertiary"`, `lg`, full width |
 | Disclosure | text + Button | Description/12 tertiary, 5 lines; `ghost` `sm` Read More / Read less |
 | Setting cards | Card (static) — `components/SettingCard` | header: icon 24 · Label/16 (+ Description/12, not on Theme) · Switch (the header is a label: tap anywhere toggles); cards 12 apart |
-| Theme | Tabs | `appearance="pill-group"`, `behavior="toggle"`, `width="fill"`, icons light_mode / dark_mode / brightness_auto |
+| Theme | Tabs (the card's control, on the right) | `appearance="pill-group"`, `behavior="toggle"`, `size="sm"`, icon-only (`hideLabel`): light_mode / dark_mode / brightness_auto; the description names the choice |
 | Failed save | Aerobar (toast) | `floating`, `type="danger"`, `emphasis="primary"`, icon error, `action` Retry |
 
 ### Rules & behaviour
@@ -132,6 +132,7 @@ platform's string table (Flutter ARB, iOS Localizable.strings).
 - 2026-10-22 — Accessibility: one switch for darker colours + bigger text (checkboxes removed).
 - 2026-10-22 — Accessibility illustration removed (user's call).
 - 2026-10-22 — Accessibility on makes every text style 2px bigger across the whole app.
+- 2026-10-23 — Theme: a small icon-only Light / Dark / Auto toggle on the right of its card, like the other cards' switches.
 
 
 ## Source — this flow
@@ -230,18 +231,21 @@ type Props = {
   icon: IconSource
   label: string
   description?: string
-  /** A Switch on the right. The header is then a <label>: tapping anywhere on it toggles the switch. */
+  /** The control on the right: a Switch (default — the header is then a <label>, a tap anywhere toggles it) or a
+   *  small segmented toggle (`controlType="choice"` — the header stays a plain row). */
   control?: ReactNode
+  controlType?: 'switch' | 'choice'
   /** What the setting opens up underneath (theme choices, accessibility options), 12 below the header. */
   children?: ReactNode
 }
 
 /**
  * One setting on the Settings page, all built the same so the page reads as one set: a static L3 Card (12 padding)
- * with a header row — icon · label (Label/16) + description (Description/12) · switch — and optional content below
+ * with a header row — icon · label (Label/16) + description (Description/12) · control (switch or small toggle) —
+ * and optional content below
  */
-export function SettingCard({ icon, label, description, control, children }: Props) {
-  const Head = control ? 'label' : 'div'
+export function SettingCard({ icon, label, description, control, controlType = 'switch', children }: Props) {
+  const Head = control && controlType === 'switch' ? 'label' : 'div'
   return (
     <Card>
       <Stack>
@@ -312,7 +316,10 @@ export function SettingCard({ icon, label, description, control, children }: Pro
   "settings.accessibilityHint": "Darker colours and bigger text",
   "settings.saveFailed": "Couldn’t save your settings",
   "settings.retry": "Retry",
-  "settings.themeLabel": "Theme"
+  "settings.themeLabel": "Theme",
+  "settings.theme.light": "Light",
+  "settings.theme.dark": "Dark",
+  "settings.theme.auto": "Auto · follows your phone"
 }
 ```
 
@@ -664,7 +671,8 @@ const themeChoices: { value: ThemeChoice; label: string; icon: typeof msLightMod
 /**
  * profile-02 … 04 · Settings — three setting cards built the same way (icon · label + description · control):
  *  - Biometric: a switch.
- *  - Theme: Light / Dark / Auto as a pill-group toggle under the header (Auto follows the phone).
+ *  - Theme: Light / Dark / Auto as a small icon-only toggle on the right (where the other cards have their switch);
+ *    the description names the current choice (Auto follows the phone).
  *  - Accessibility: one switch that turns on darker colours (L3's ♿ Accessible theme) and a bigger font (every text
  *    style 2px bigger, app-wide) together.
  * Everything applies at once. Prototype: Theme and darker colours set the app's real theme (L3 ThemeProvider); the
@@ -720,18 +728,24 @@ export function Settings({ lowVision, saveFailed = false, onBack }: Props) {
                 control={<Switch checked={biometric} onChange={(e) => setBiometric(e.target.checked)} />}
               />
 
-              <SettingCard icon={msPalette} label={t('settings.theme')}>
-                <Tabs
-                  appearance="pill-group"
-                  behavior="toggle"
-                  width="fill"
-                  aria-label={t('settings.themeLabel')}
-                  items={themeChoices.map((c) => ({ value: c.value, label: c.label, iconLeft: <Icon icon={c.icon} size={16} /> }))}
-                  value={themeChoice}
-                  className={styles.themeTabs}
-                  onChange={(v) => theme.availableModes.length > 1 && withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))}
-                />
-              </SettingCard>
+              <SettingCard
+                icon={msPalette}
+                label={t('settings.theme')}
+                description={t(`settings.theme.${themeChoice}`)}
+                controlType="choice"
+                control={
+                  <Tabs
+                    appearance="pill-group"
+                    behavior="toggle"
+                    size="sm"
+                    aria-label={t('settings.themeLabel')}
+                    items={themeChoices.map((c) => ({ value: c.value, label: c.label, hideLabel: true, iconLeft: <Icon icon={c.icon} size={16} /> }))}
+                    value={themeChoice}
+                    className={styles.themeTabs}
+                    onChange={(v) => theme.availableModes.length > 1 && withTransition(() => theme.setModePreference(v === 'auto' ? 'system' : v))}
+                  />
+                }
+              />
 
               <SettingCard
                 icon={msAccessibilityNew}

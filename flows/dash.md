@@ -4403,7 +4403,7 @@ import type { RuleQuestion } from './data'
 
 /** Example prompts on the empty indicator chat (simple, plain words — no formulas). */
 export const indicatorPrompts: string[][] = [
-  ['Supertrend with buy / sell labels and a 20 EMA', 'Show the trend with a 50-day average'],
+  ['Supertrend with a 20 EMA', 'Show the trend with a 50-day average'],
   ['Mark the 15-minute opening range', 'Highlight candles with 2× average volume'],
 ]
 
