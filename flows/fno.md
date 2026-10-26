@@ -59,6 +59,9 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
 - Sheets use shared Sheet hosting and L3 focus management, Escape and backdrop dismissal.
 - Scalper has linked NIFTY 50 spot and call-option charts, a strategy toolbar, active toggle, market / limit order type,
   quantity stepper and market buy / sell order dock. Its values and candles are illustrative; no order is submitted.
+- The upper-right add-control on the spot chart opens an L3 bottom sheet. It starts on **Indicators**, with the
+  supplied indicator list and selectable Range, Zing, Drawings, Templates and Settings rail items. Selecting an
+  indicator closes the sheet and shows its name below the spot quote.
 
 ### L3 components
 
@@ -73,6 +76,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 - 2026-10-26 — Added Equity home and board positions, connected the F&O tab and existing flows, added local selectors, filters, watchlist creation and details sheets.
 - 2026-10-26 — Reused the Stocks home header on F&O, including its scrolled surface and all four actions.
 - 2026-10-26 — Added Scalper: a dark L3 workspace from the ScalpPro shortcut, with two intraday charts and order controls.
+- 2026-10-26 — Added the Scalper chart-tools bottom sheet and Indicators list from the supplied reference.
 
 
 ## Source — this flow
@@ -852,35 +856,48 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
 .orderType { align-self: center; }
 .orderSide { flex: 1; min-width: 0; text-align: center; color: var(--l3-content-secondary); font: var(--l3-text-label-10); }
 .stepper { flex: none; }
+.selectedIndicator { overflow: hidden; color: var(--l3-content-accent-discover-default); font: var(--l3-text-label-10); text-overflow: ellipsis; white-space: nowrap; }
+.indicatorPanel { height: min(100%, calc(var(--l3-size-80) * 7)); }
+.sheetGrid { display: grid; grid-template-columns: minmax(var(--l3-size-80), 1fr) 3fr; min-height: calc(var(--l3-size-80) * 5); }
+.sheetRail { display: flex; flex-direction: column; gap: var(--l3-spacing-08); padding-inline-end: var(--l3-spacing-12); border-inline-end: 1px solid var(--l3-border-light); }
+.sheetContent { display: flex; min-width: 0; flex-direction: column; gap: var(--l3-spacing-16); padding-inline-start: var(--l3-spacing-16); }
+.sheetContent h2 { margin: 0; color: var(--l3-content-primary); font: var(--l3-text-heading-20); }
+.comingSoon { margin: 0; color: var(--l3-content-secondary); font: var(--l3-text-description-14); }
 ```
 
 ### `src/flows/fno/screens/Scalper.tsx`
 
 ```tsx
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { BottomSheet } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { Chart } from '@l3/components/Chart'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
+import { ListCell } from '@l3/components/ListCell'
 import { PriceChange } from '@l3/components/PriceChange'
 import { Stack } from '@l3/components/Stack'
 import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
-import { msAdd, msArrowBack, msCandlestickChart, msKeyboardArrowDown, msLink, msListAlt, msShowChart, msTune } from '@l3/icons/material'
+import { msAdd, msAddChart, msArrowBack, msBookmark, msCandlestickChart, msDraw, msKeyboardArrowDown, msLink, msListAlt, msPlaylistAdd, msSearch, msSettings, msShowChart, msStar } from '@l3/icons/material'
 import { scalperOptionCandles, scalperSpotCandles } from '../data'
 import styles from './Scalper.module.css'
 
 type Props = { onBack: () => void }
 
 const timeLabels = ['12:15', '13:05', '13:55', '14:45', '15:25']
+const indicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA']
 
 /** Full-screen trading workspace for the ScalpPro shortcut. Values are illustrative prototype data. */
 export function Scalper({ onBack }: Props) {
   const [quantity, setQuantity] = useState(65)
   const [orderType, setOrderType] = useState('market')
   const [active, setActive] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [indicator, setIndicator] = useState<string | null>(null)
+  const screen = useRef<HTMLDivElement>(null)
   return <div className={styles.theme} data-product="lm" data-mode="dark">
-    <div className={styles.screen}>
+    <div className={styles.screen} ref={screen}>
       <header className={styles.header}>
         <Button variant="ghost" size="sm" aria-label="Back to F&O" iconLeft={<Icon icon={msArrowBack} />} onClick={onBack} />
         <Tabs aria-label="Scalper strategy" appearance="pill" size="sm" value="all" onChange={() => {}} items={[{ value: 'all', label: 'All' }]} className={styles.strategyTab} />
@@ -895,7 +912,7 @@ export function Scalper({ onBack }: Props) {
       </nav>
 
       <main className={styles.content}>
-        <ScalperChart title="NIFTY 50" subtitle="Spot" price={22753.2} change={153.2} percent={0.68} high="22,753.20" low="22,541.55" data={scalperSpotCandles} />
+        <ScalperChart title="NIFTY 50" subtitle="Spot" price={22753.2} change={153.2} percent={0.68} high="22,753.20" low="22,541.55" data={scalperSpotCandles} indicator={indicator} onOpenIndicators={() => setSheetOpen(true)} />
         <ScalperChart title="NIFTY 27OCT 22750 Call" price={108.2} change={41.75} percent={62.83} high="123.25" low="52.35" data={scalperOptionCandles} />
       </main>
 
@@ -911,20 +928,41 @@ export function Scalper({ onBack }: Props) {
           </Stack>
         </Inset>
       </footer>
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} container={screen.current} aria-label="Chart tools" className={styles.indicatorPanel}>
+        <IndicatorSheet onPick={(name) => { setIndicator(name); setSheetOpen(false) }} />
+      </BottomSheet>
     </div>
   </div>
 }
 
-function ScalperChart({ title, subtitle, price, change, percent, high, low, data }: { title: string; subtitle?: string; price: number; change: number; percent: number; high: string; low: string; data: typeof scalperSpotCandles }) {
+function ScalperChart({ title, subtitle, price, change, percent, high, low, data, indicator, onOpenIndicators }: { title: string; subtitle?: string; price: number; change: number; percent: number; high: string; low: string; data: typeof scalperSpotCandles; indicator?: string | null; onOpenIndicators?: () => void }) {
   return <section className={styles.chartSection} aria-label={`${title} intraday chart`}>
     <Stack direction="horizontal" align="start" justify="between" gap="12">
-      <Stack gap="04"><Stack direction="horizontal" align="center" gap="04"><h2>{title}</h2>{subtitle && <><span className={styles.subTitle}>{subtitle}</span><Icon icon={msLink} size={20} /></>}</Stack><Stack direction="horizontal" align="center" gap="08"><strong>{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong><PriceChange value={change} unit="currency" size="sm" /><span className={styles.percent}>({percent.toFixed(2)}%)</span></Stack></Stack>
-      <Stack direction="horizontal" gap="08"><Button variant="secondary" size="sm" aria-label={`Set ${title} as chart leader`} iconLeft={<Icon icon={msShowChart} />} /><Button variant="secondary" size="sm" aria-label={`Add ${title} to order`} iconLeft={<Icon icon={msTune} />} /></Stack>
+      <Stack gap="04"><Stack direction="horizontal" align="center" gap="04"><h2>{title}</h2>{subtitle && <><span className={styles.subTitle}>{subtitle}</span><Icon icon={msLink} size={20} /></>}</Stack><Stack direction="horizontal" align="center" gap="08"><strong>{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong><PriceChange value={change} unit="currency" size="sm" /><span className={styles.percent}>({percent.toFixed(2)}%)</span></Stack>{indicator && <span className={styles.selectedIndicator}>{indicator}</span>}</Stack>
+      <Stack direction="horizontal" gap="08"><Button variant="secondary" size="sm" aria-label={`Set ${title} as chart leader`} iconLeft={<Icon icon={msShowChart} />} />{onOpenIndicators && <Button variant="secondary" size="sm" aria-label="Add chart indicator" iconLeft={<Icon icon={msPlaylistAdd} />} onClick={onOpenIndicators} />}</Stack>
     </Stack>
     <div className={styles.chartWrap}><Chart data={data} type="candle" timeLabels={timeLabels} showVolume={false} showGrid={false} showLastPrice label={`${title}, intraday`} className={styles.chart} /><span className={styles.high}>{high}</span><span className={styles.low}>{low}</span></div>
     <Stack direction="horizontal" justify="end"><Button variant="ghost" size="sm" iconRight={<Icon icon={msKeyboardArrowDown} />}>5m</Button></Stack>
   </section>
 }
+
+function IndicatorSheet({ onPick }: { onPick: (name: string) => void }) {
+  const [section, setSection] = useState('indicators')
+  const items = [
+    { id: 'range', label: 'Range', icon: msShowChart }, { id: 'zing', label: 'Zing', icon: msCandlestickChart },
+    { id: 'indicators', label: 'Indicators', icon: msAddChart }, { id: 'drawings', label: 'Drawings', icon: msDraw },
+    { id: 'templates', label: 'Templates', icon: msBookmark }, { id: 'settings', label: 'Settings', icon: msSettings },
+  ]
+  return <div className={styles.sheetGrid}>
+    <nav className={styles.sheetRail} aria-label="Chart tool categories">{items.map((item) => <Button key={item.id} variant={section === item.id ? 'secondary' : 'tertiary'} size="sm" fullWidth iconLeft={<Icon icon={item.icon} />} onClick={() => setSection(item.id)}>{item.label}</Button>)}</nav>
+    <section className={styles.sheetContent} aria-label={section === 'indicators' ? 'Indicators' : itemTitle(section)}>
+      <Stack direction="horizontal" align="center" justify="between"><h2>{section === 'indicators' ? 'Indicators' : itemTitle(section)}</h2><Button variant="ghost" size="sm" aria-label="Search indicators" iconLeft={<Icon icon={msSearch} />} /></Stack>
+      {section === 'indicators' ? <Stack gap="08">{indicators.map((name) => <ListCell key={name} variant="card" label={name} iconLeft={<Icon icon={msStar} />} onClick={() => onPick(name)} />)}</Stack> : <p className={styles.comingSoon}>Choose Indicators to add one to this chart.</p>}
+    </section>
+  </div>
+}
+
+const itemTitle = (section: string) => section.charAt(0).toUpperCase() + section.slice(1)
 ```
 
 ### `src/flows/fno/sheets/HomeSheets.tsx`
