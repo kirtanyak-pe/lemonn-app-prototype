@@ -43,6 +43,16 @@
       "note": "",
       "goesTo": [],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100"
+    },
+    {
+      "id": "fno-05",
+      "name": "Scalper",
+      "figma": "",
+      "note": "From ScalpPro on F&O home or the Scalper bottom-nav tab. Dark trading workspace with linked spot and option charts, active strategy controls, quantity, and market order dock. Values are illustrative.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": ""
     }
   ],
   "files": [
@@ -72,6 +82,8 @@
     "src/flows/fno/data.ts",
     "src/flows/fno/index.tsx",
     "src/flows/fno/screens/Home.tsx",
+    "src/flows/fno/screens/Scalper.module.css",
+    "src/flows/fno/screens/Scalper.tsx",
     "src/flows/fno/sheets/HomeSheets.tsx"
   ],
   "shared": [

@@ -14,6 +14,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-02` | Home · watchlists & Smart Options | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — | The same long screen, scrolled to watchlists. |
 | `fno-03` | Home · Futures Heatmap | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
 | `fno-04` | Home · Smart Futures | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
+| `fno-05` | Scalper | — | `fno-01` | From ScalpPro on F&O home or the Scalper bottom-nav tab. Dark trading workspace with linked spot and option charts, active strategy controls, quantity, and market order dock. Values are illustrative. |
 
 ## Spec (README.md)
 
@@ -32,6 +33,7 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-02 | The same page, at Watchlists / Smart Options | 11569:41100 |
 | fno-03 | The same page, at Futures Heatmap | 11569:41100 |
 | fno-04 | The same page, at Smart Futures | 11569:41100 |
+| fno-05 | Scalper | Screenshot supplied 2026-10-26 |
 
 ### Structure
 
@@ -44,7 +46,7 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 
 ### Navigation and behaviour
 
-Main F&O → fno-01. Home → stocks-01. Search → search-25 (F&O selected, Back → fno-01).
+Main F&O → fno-01. Home → stocks-01. Search → search-25 (F&O selected, Back → fno-01). ScalpPro and the Scalper tab → fno-05; Back → fno-01.
 Profile → profile-01; Wallet → deposit-01; DASH → dash-02. These shared flows retain their existing return behaviour.
 The other F&O navbar items and Commodities / Strategies open a sheet explaining that those destinations are outside this prototype; they do not switch the selected Equity tab.
 
@@ -55,6 +57,8 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
 - View all on Smart Options / Smart Futures opens the existing combined signals list (index / stock scope respectively); these are shared prototype lists, rather than newly designed destinations.
 - Heatmap filters show subsets of the example snapshot. Stock / Index changes labels. Tiles open details.
 - Sheets use shared Sheet hosting and L3 focus management, Escape and backdrop dismissal.
+- Scalper has linked NIFTY 50 spot and call-option charts, a strategy toolbar, active toggle, market / limit order type,
+  quantity stepper and market buy / sell order dock. Its values and candles are illustrative; no order is submitted.
 
 ### L3 components
 
@@ -68,6 +72,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 - 2026-10-26 — Added Equity home and board positions, connected the F&O tab and existing flows, added local selectors, filters, watchlist creation and details sheets.
 - 2026-10-26 — Reused the Stocks home header on F&O, including its scrolled surface and all four actions.
+- 2026-10-26 — Added Scalper: a dark L3 workspace from the ScalpPro shortcut, with two intraday charts and order controls.
 
 
 ## Source — this flow
@@ -376,14 +381,14 @@ import { BottomNavbar } from '@l3/components/BottomNavbar'
 import { NavIcon } from '@l3/components/BottomNavbar/NavIcon'
 import { t } from '../copy'
 
-export function FnoNav({ onHome, onDestination }: { onHome: () => void; onDestination: (label: string) => void }) {
+export function FnoNav({ onHome, onDestination, onScalper }: { onHome: () => void; onDestination: (label: string) => void; onScalper: () => void }) {
   const items = [
     { value: 'fno', label: t('title'), name: 'fno' },
     { value: 'chain', label: t('nav.chain'), name: 'fnoOptionChain' },
     { value: 'positions', label: t('nav.positions'), name: 'fnoPositions' },
     { value: 'scalper', label: t('nav.scalper'), name: 'fnoScalper' },
   ] as const
-  return <BottomNavbar aria-label="F&O" home={{ label: t('nav.home'), onClick: onHome }} value="fno" onChange={(v) => { const item = items.find((i) => i.value === v); if (item && v !== 'fno') onDestination(item.label) }} items={items.map(({ value, label, name }) => ({ value, label, icon: <NavIcon name={name} />, selectedIcon: <NavIcon name={name} selected /> }))} />
+  return <BottomNavbar aria-label="F&O" home={{ label: t('nav.home'), onClick: onHome }} value="fno" onChange={(v) => { const item = items.find((i) => i.value === v); if (v === 'scalper') onScalper(); else if (item && v !== 'fno') onDestination(item.label) }} items={items.map(({ value, label, name }) => ({ value, label, icon: <NavIcon name={name} />, selectedIcon: <NavIcon name={name} selected /> }))} />
 }
 ```
 
@@ -567,7 +572,7 @@ import scalper from '../assets/scalppro.svg'
 import downtrend from '../assets/downtrend.svg'
 import styles from './HomeParts.module.css'
 
-export function TradingChart({ onChoose, onDestination }: { onChoose: (title: string, values: string[], value: string, onPick: (v: string) => void) => void; onDestination: (name: string) => void }) {
+export function TradingChart({ onChoose, onDestination, onScalper }: { onChoose: (title: string, values: string[], value: string, onPick: (v: string) => void) => void; onDestination: (name: string) => void; onScalper: () => void }) {
   const [index, setIndex] = useState('NIFTY 50')
   const [metric, setMetric] = useState('price')
   const items = (['price', 'oi', 'change', 'pcr', 'advance'] as const).map((value) => ({ value, label: t(`chart.${value}`) }))
@@ -578,7 +583,7 @@ export function TradingChart({ onChoose, onDestination }: { onChoose: (title: st
     </Stack>
     <Tabs aria-label="Chart metric" appearance="pill" size="sm" items={items} value={metric} onChange={setMetric} />
     <Chart data={chartSeries(metric, index)} label={t('chart.label', { index, metric: items.find((i) => i.value === metric)!.label })} type={metric === 'price' ? 'candle' : 'line'} showLastPrice={false} showVolume={metric === 'price'} className={styles.chart} />
-    <Stack direction="horizontal" gap="12"><Button variant="secondary" size="md" fullWidth iconLeft={<span className={styles.actionIcon}><img className={styles.asset} src={chain} alt="" /></span>} onClick={() => onDestination(t('nav.chain'))}>{t('chart.chain')}</Button><Button variant="primary" size="md" fullWidth iconLeft={<span className={styles.actionIcon}><MaskIcon src={scalper} /></span>} onClick={() => onDestination(t('nav.scalper'))}>{t('chart.scalper')}</Button></Stack>
+    <Stack direction="horizontal" gap="12"><Button variant="secondary" size="md" fullWidth iconLeft={<span className={styles.actionIcon}><img className={styles.asset} src={chain} alt="" /></span>} onClick={() => onDestination(t('nav.chain'))}>{t('chart.chain')}</Button><Button variant="primary" size="md" fullWidth iconLeft={<span className={styles.actionIcon}><MaskIcon src={scalper} /></span>} onClick={onScalper}>{t('chart.scalper')}</Button></Stack>
   </section>
 }
 ```
@@ -710,6 +715,18 @@ export function chartSeries(metric: string, index: string): ChartCandle[] {
     return { open: base - delta, close: base, high: base + Math.abs(delta) + (metric === 'price' ? 10 : base * 0.01), low: base - Math.abs(delta) - (metric === 'price' ? 10 : base * 0.01), volume: c.volume }
   })
 }
+
+/** Intraday samples used by the Scalper prototype. They illustrate the two linked instruments, not live data. */
+const scalperCloses = [22552,22544,22567,22581,22576,22592,22614,22603,22586,22570,22582,22595,22609,22626,22648,22661,22647,22670,22659,22675,22655,22672,22664,22678,22710,22685,22672,22666,22683,22692,22704,22718,22706,22690,22712,22716,22728,22725,22753]
+const optionCloses = [56,62,68,65,61,58,63,70,76,69,62,58,55,61,66,73,81,90,86,79,83,75,118,106,96,92,99,104,101,108,111,106,89,97,102,105,107,105,108]
+const makeScalperCandles = (closes: number[]): ChartCandle[] => closes.map((close, i) => {
+  const open = i ? closes[i - 1] : close - 4
+  const range = Math.max(3, Math.round(close * 0.003))
+  return { open, close, high: Math.max(open, close) + range, low: Math.min(open, close) - range, volume: 36 + (i * 19) % 90 }
+})
+
+export const scalperSpotCandles = makeScalperCandles(scalperCloses)
+export const scalperOptionCandles = makeScalperCandles(optionCloses)
 ```
 
 ### `src/flows/fno/index.tsx`
@@ -717,8 +734,9 @@ export function chartSeries(metric: string, index: string): ChartCandle[] {
 ```tsx
 import type { Flow, Go } from '../types'
 import { Home, type HomePart } from './screens/Home'
+import { Scalper } from './screens/Scalper'
 
-const home = (go: Go, scrollTo?: HomePart) => <Home scrollTo={scrollTo} onHome={() => go('stocks-01')} onSearch={() => go('search-25')} onProfile={() => go('profile-01')} onWallet={() => go('deposit-01')} onDash={() => go('dash-02')} onOptions={() => go('search-26')} onFutures={() => go('search-27')} />
+const home = (go: Go, scrollTo?: HomePart) => <Home scrollTo={scrollTo} onHome={() => go('stocks-01')} onSearch={() => go('search-25')} onProfile={() => go('profile-01')} onWallet={() => go('deposit-01')} onDash={() => go('dash-02')} onOptions={() => go('search-26')} onFutures={() => go('search-27')} onScalper={() => go('fno-05')} />
 
 export const fno: Flow = {
   id: 'fno', title: 'F&O',
@@ -729,6 +747,7 @@ export const fno: Flow = {
     { id: 'fno-02', name: 'Home · watchlists & Smart Options', figma: '11569:41100', tab: true, note: 'The same long screen, scrolled to watchlists.', render: (go) => home(go, 'watchlists') },
     { id: 'fno-03', name: 'Home · Futures Heatmap', figma: '11569:41100', tab: true, render: (go) => home(go, 'heatmap') },
     { id: 'fno-04', name: 'Home · Smart Futures', figma: '11569:41100', tab: true, render: (go) => home(go, 'futures') },
+    { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. Dark trading workspace with linked spot and option charts, active strategy controls, quantity, and market order dock. Values are illustrative.', render: (go) => <Scalper onBack={() => go('fno-01')} /> },
   ],
 }
 ```
@@ -759,11 +778,11 @@ import strategies from '../assets/strategies.svg'
 import styles from '../components/HomeParts.module.css'
 
 export type HomePart = 'top' | 'watchlists' | 'options' | 'heatmap' | 'futures'
-type Props = { scrollTo?: HomePart; onHome: () => void; onSearch: () => void; onProfile: () => void; onWallet: () => void; onDash: () => void; onOptions: () => void; onFutures: () => void }
+type Props = { scrollTo?: HomePart; onHome: () => void; onSearch: () => void; onProfile: () => void; onWallet: () => void; onDash: () => void; onOptions: () => void; onFutures: () => void; onScalper: () => void }
 type Modal = { kind: 'detail'; title: string; contract?: Contract } | { kind: 'create' } | { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void }
 
 /** fno-01 … 04 · one scrollable Equity home, with board frames for the lower sections. */
-export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, onDash, onOptions, onFutures }: Props) {
+export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, onDash, onOptions, onFutures, onScalper }: Props) {
   const root = useRef<HTMLDivElement>(null)
   const [modal, setModal] = useState<Modal | null>(null)
   const [lists, setLists] = useState(watchlists)
@@ -791,13 +810,13 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
     if (body && target && scrollTo !== 'top') body.scrollTop += target.getBoundingClientRect().top - body.getBoundingClientRect().top
   }, [scrollTo])
   const sheet = modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : modal?.kind === 'create' ? <CreateWatchlistSheet onClose={close} onCreate={(name) => { setLists((ls) => [...ls, { id: `custom-${ls.length}`, name, count: 0 }]); close(); setCreated(true) }} /> : undefined
-  return <Screen top={<Header scrolled={scrolled} initials={user.name.split(' ').map((name) => name[0]).join('')} onSearch={onSearch} onProfile={onProfile} onWallet={onWallet} onDash={onDash} />} bottom={<FnoNav onHome={onHome} onDestination={open} />} sheet={sheet} toast={created ? <Aerobar floating type="success" heading={t('watchlists.created')} onDismiss={() => setCreated(false)} /> : undefined}>
+  return <Screen top={<Header scrolled={scrolled} initials={user.name.split(' ').map((name) => name[0]).join('')} onSearch={onSearch} onProfile={onProfile} onWallet={onWallet} onDash={onDash} />} bottom={<FnoNav onHome={onHome} onDestination={open} onScalper={onScalper} />} sheet={sheet} toast={created ? <Aerobar floating type="success" heading={t('watchlists.created')} onDismiss={() => setCreated(false)} /> : undefined}>
     <Stack ref={root}>
       <div data-fno="top"><Overview onDestination={open} /></div>
       <Tabs aria-label="F&O products" appearance="ribbon" size="md" value="equity" onChange={(v) => open(t(v))} items={[{ value: 'equity', label: t('equity'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={equity} /></span> }, { value: 'commodities', label: t('commodities'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={commodities} /></span> }, { value: 'strategies', label: t('strategies'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={strategies} /></span> }]} />
       <Stack gap="32" className={styles.feed}>
         <Shortcuts onWatchlist={() => scroll('watchlists')} onDestination={open} />
-        <TradingChart onChoose={choose} onDestination={open} />
+        <TradingChart onChoose={choose} onDestination={open} onScalper={onScalper} />
         <div className={styles.divider} />
         <div data-fno="watchlists"><Watchlists lists={lists} onAdd={() => setModal({ kind: 'create' })} onOpen={open} /></div>
         <div data-fno="options"><ContractSection kind="options" onChoose={choose} onContract={(contract) => setModal({ kind: 'detail', title: contract.name, contract })} onViewAll={onOptions} /></div>
@@ -806,6 +825,105 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
       </Stack>
     </Stack>
   </Screen>
+}
+```
+
+### `src/flows/fno/screens/Scalper.module.css`
+
+```css
+.theme { height: 100%; background: var(--l3-surface-primary); color: var(--l3-content-primary); }
+.screen { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 100%; overflow: hidden; background: var(--l3-surface-primary); }
+.header, .tools { display: flex; align-items: center; gap: var(--l3-spacing-08); padding-inline: var(--l3-spacing-16); border-bottom: 1px solid var(--l3-border-light); }
+.header { min-height: var(--l3-size-64); }
+.tools { min-height: var(--l3-size-48); overflow-x: auto; }
+.tools > * { flex: none; }
+.strategyTab { flex: none; }
+.content { min-height: 0; overflow: auto; }
+.chartSection { display: flex; flex-direction: column; gap: var(--l3-spacing-08); padding: var(--l3-spacing-16); border-bottom: 1px solid var(--l3-border-light); }
+.chartSection h2, .chartSection strong { margin: 0; font: var(--l3-text-heading-18); color: var(--l3-content-primary); }
+.subTitle { font: var(--l3-text-label-16); color: var(--l3-content-secondary); }
+.percent { color: var(--l3-content-accent-indicator-up-default); font: var(--l3-text-label-14); }
+.chartWrap { position: relative; }
+.chart { min-height: var(--l3-size-200); }
+.high, .low { position: absolute; left: var(--l3-spacing-12); padding-inline: var(--l3-spacing-04); background: var(--l3-surface-primary); color: var(--l3-content-primary); font: var(--l3-text-label-12); }
+.high { top: var(--l3-spacing-12); }
+.low { bottom: var(--l3-spacing-24); }
+.orderDock { border-top: 1px solid var(--l3-border-light); background: var(--l3-surface-primary); }
+.orderType { align-self: center; }
+.orderSide { flex: 1; min-width: 0; text-align: center; color: var(--l3-content-secondary); font: var(--l3-text-label-10); }
+.stepper { flex: none; }
+```
+
+### `src/flows/fno/screens/Scalper.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { Chart } from '@l3/components/Chart'
+import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { PriceChange } from '@l3/components/PriceChange'
+import { Stack } from '@l3/components/Stack'
+import { Stepper } from '@l3/components/Stepper'
+import { Tabs } from '@l3/components/Tabs'
+import { msAdd, msArrowBack, msCandlestickChart, msKeyboardArrowDown, msLink, msListAlt, msShowChart, msTune } from '@l3/icons/material'
+import { scalperOptionCandles, scalperSpotCandles } from '../data'
+import styles from './Scalper.module.css'
+
+type Props = { onBack: () => void }
+
+const timeLabels = ['12:15', '13:05', '13:55', '14:45', '15:25']
+
+/** Full-screen trading workspace for the ScalpPro shortcut. Values are illustrative prototype data. */
+export function Scalper({ onBack }: Props) {
+  const [quantity, setQuantity] = useState(65)
+  const [orderType, setOrderType] = useState('market')
+  const [active, setActive] = useState(false)
+  return <div className={styles.theme} data-product="lm" data-mode="dark">
+    <div className={styles.screen}>
+      <header className={styles.header}>
+        <Button variant="ghost" size="sm" aria-label="Back to F&O" iconLeft={<Icon icon={msArrowBack} />} onClick={onBack} />
+        <Tabs aria-label="Scalper strategy" appearance="pill" size="sm" value="all" onChange={() => {}} items={[{ value: 'all', label: 'All' }]} className={styles.strategyTab} />
+        <Button variant="tertiary" size="sm" iconRight={<Icon icon={msAdd} />} onClick={() => {}}>Add strategies</Button>
+      </header>
+
+      <nav className={styles.tools} aria-label="Scalper tools">
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msShowChart} />}>Positions</Button>
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msListAlt} />}>Orders</Button>
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msLink} />}>Option chain</Button>
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msCandlestickChart} />} onClick={() => setActive((v) => !v)}>{active ? 'Active' : 'Inactive'}</Button>
+      </nav>
+
+      <main className={styles.content}>
+        <ScalperChart title="NIFTY 50" subtitle="Spot" price={22753.2} change={153.2} percent={0.68} high="22,753.20" low="22,541.55" data={scalperSpotCandles} />
+        <ScalperChart title="NIFTY 27OCT 22750 Call" price={108.2} change={41.75} percent={62.83} high="123.25" low="52.35" data={scalperOptionCandles} />
+      </main>
+
+      <footer className={styles.orderDock}>
+        <Inset paddingInline="16" paddingBlock="12">
+          <Stack gap="12">
+            <Tabs aria-label="Order type" appearance="pill" size="sm" value={orderType} onChange={setOrderType} items={[{ value: 'market', label: 'Market' }, { value: 'limit', label: 'Limit/Trigger' }]} className={styles.orderType} />
+            <Stack direction="horizontal" align="center" gap="12">
+              <Stack gap="04" className={styles.orderSide}><Button variant="buy" size="lg" fullWidth>Buy at Mkt</Button><span>Req: ₹7,059.75</span></Stack>
+              <Stepper label="Order quantity" value={quantity} onChange={setQuantity} min={1} step={1} size="lg" sublabel="1 lot" className={styles.stepper} />
+              <Stack gap="04" className={styles.orderSide}><Button variant="sell" size="lg" fullWidth>Sell at Mkt</Button><span>Req: ₹1,57,436.49</span></Stack>
+            </Stack>
+          </Stack>
+        </Inset>
+      </footer>
+    </div>
+  </div>
+}
+
+function ScalperChart({ title, subtitle, price, change, percent, high, low, data }: { title: string; subtitle?: string; price: number; change: number; percent: number; high: string; low: string; data: typeof scalperSpotCandles }) {
+  return <section className={styles.chartSection} aria-label={`${title} intraday chart`}>
+    <Stack direction="horizontal" align="start" justify="between" gap="12">
+      <Stack gap="04"><Stack direction="horizontal" align="center" gap="04"><h2>{title}</h2>{subtitle && <><span className={styles.subTitle}>{subtitle}</span><Icon icon={msLink} size={20} /></>}</Stack><Stack direction="horizontal" align="center" gap="08"><strong>{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong><PriceChange value={change} unit="currency" size="sm" /><span className={styles.percent}>({percent.toFixed(2)}%)</span></Stack></Stack>
+      <Stack direction="horizontal" gap="08"><Button variant="secondary" size="sm" aria-label={`Set ${title} as chart leader`} iconLeft={<Icon icon={msShowChart} />} /><Button variant="secondary" size="sm" aria-label={`Add ${title} to order`} iconLeft={<Icon icon={msTune} />} /></Stack>
+    </Stack>
+    <div className={styles.chartWrap}><Chart data={data} type="candle" timeLabels={timeLabels} showVolume={false} showGrid={false} showLastPrice label={`${title}, intraday`} className={styles.chart} /><span className={styles.high}>{high}</span><span className={styles.low}>{low}</span></div>
+    <Stack direction="horizontal" justify="end"><Button variant="ghost" size="sm" iconRight={<Icon icon={msKeyboardArrowDown} />}>5m</Button></Stack>
+  </section>
 }
 ```
 

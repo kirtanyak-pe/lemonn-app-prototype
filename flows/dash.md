@@ -32,7 +32,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | …and the timeframe. |
 | `dash-23` | Indicator · building | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
 | `dash-24` | Indicator · ready | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification. |
-| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02` | The preview card is removed. DASH confirms the indicator is saved and offers View indicator; Scalper is a future destination. |
+| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02`, `fno-05` | The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper. |
 
 ## Spec (README.md)
 
@@ -88,7 +88,7 @@ dash-14 Delete ─▶ dash-15 ─Yes─▶ dash-16 ─Okay─▶ dash-17 · No �
 dash-02 ☰ and the history action on every chat page ─▶ dash-14
 dash-02 Create Custom Indicator ─▶ dash-20 ─prompt─▶ dash-21 ─chart─▶ dash-22 ─timeframe─▶ dash-23 ─built─▶ dash-24
 dash-24 Modify ─▶ DASH asks for a manual change ─send─▶ same preview + Modify / Save indicator · Save indicator ─▶ dash-25
-dash-25 View indicator ─▶ Scalper (future flow)
+dash-25 View indicator ─▶ fno-05 Scalper
 ```
 
 ### Data
@@ -132,8 +132,8 @@ dash-25 View indicator ─▶ Scalper (future flow)
 - Create Custom Strategy (landing) is another DASH flow — not designed yet.
 - The custom-indicator preview has a secondary **Modify** button with an edit icon and a primary **Save indicator** button.
   Modify opens a manual text prompt in the chat. Its submitted reply keeps the illustrative preview and returns to the
-  same actions. Saving removes the preview card and adds DASH's saved confirmation with **View indicator**. Scalper is
-  intentionally left as the next, unbuilt destination.
+  same actions. Saving removes the preview card and adds DASH's saved confirmation with **View indicator**, which opens
+  Scalper.
 
 ### Differences from Figma
 
@@ -4400,7 +4400,7 @@ export const dash: Flow = {
     { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
     { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
     { id: 'dash-24', group: 'dash', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'The preview card is removed. DASH confirms the indicator is saved and offers View indicator; Scalper is a future destination.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="saved" onBack={() => go('dash-02')} /> },
+    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-05')} /> },
   ],
 }
 ```
