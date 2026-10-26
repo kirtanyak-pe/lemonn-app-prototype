@@ -298,11 +298,11 @@
       "id": "dash-25",
       "name": "Indicator · saved",
       "figma": "",
-      "note": "The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper.",
+      "note": "The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.",
       "goesTo": [
         "dash-14",
         "dash-02",
-        "fno-05"
+        "fno-06"
       ],
       "figmaUrl": ""
     }

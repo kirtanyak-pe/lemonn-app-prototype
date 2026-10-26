@@ -32,7 +32,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | …and the timeframe. |
 | `dash-23` | Indicator · building | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
 | `dash-24` | Indicator · ready | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification. |
-| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02`, `fno-05` | The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper. |
+| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02`, `fno-06` | The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators. |
 
 ## Spec (README.md)
 
@@ -4400,7 +4400,7 @@ export const dash: Flow = {
     { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
     { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
     { id: 'dash-24', group: 'dash', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-05')} /> },
+    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} /> },
   ],
 }
 ```

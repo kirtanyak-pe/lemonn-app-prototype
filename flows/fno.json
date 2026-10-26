@@ -48,9 +48,21 @@
       "id": "fno-05",
       "name": "Scalper",
       "figma": "",
-      "note": "From ScalpPro on F&O home or the Scalper bottom-nav tab. Dark trading workspace with linked spot and option charts, active strategy controls, quantity, and market order dock. Values are illustrative.",
+      "note": "From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.",
       "goesTo": [
-        "fno-01"
+        "fno-01",
+        "dash-20"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "fno-06",
+      "name": "Scalper · DASH indicator",
+      "figma": "",
+      "note": "From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators.",
+      "goesTo": [
+        "dash-25",
+        "dash-20"
       ],
       "figmaUrl": ""
     }

@@ -14,7 +14,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-02` | Home · watchlists & Smart Options | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — | The same long screen, scrolled to watchlists. |
 | `fno-03` | Home · Futures Heatmap | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
 | `fno-04` | Home · Smart Futures | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
-| `fno-05` | Scalper | — | `fno-01` | From ScalpPro on F&O home or the Scalper bottom-nav tab. Dark trading workspace with linked spot and option charts, active strategy controls, quantity, and market order dock. Values are illustrative. |
+| `fno-05` | Scalper | — | `fno-01`, `dash-20` | From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators. |
+| `fno-06` | Scalper · DASH indicator | — | `dash-25`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators. |
 
 ## Spec (README.md)
 
@@ -751,7 +752,8 @@ export const fno: Flow = {
     { id: 'fno-02', name: 'Home · watchlists & Smart Options', figma: '11569:41100', tab: true, note: 'The same long screen, scrolled to watchlists.', render: (go) => home(go, 'watchlists') },
     { id: 'fno-03', name: 'Home · Futures Heatmap', figma: '11569:41100', tab: true, render: (go) => home(go, 'heatmap') },
     { id: 'fno-04', name: 'Home · Smart Futures', figma: '11569:41100', tab: true, render: (go) => home(go, 'futures') },
-    { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. Dark trading workspace with linked spot and option charts, active strategy controls, quantity, and market order dock. Values are illustrative.', render: (go) => <Scalper onBack={() => go('fno-01')} /> },
+    { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} /> },
+    { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators.', render: (go) => <Scalper onBack={() => go('dash-25')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
   ],
 }
 ```
@@ -862,6 +864,10 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
 .sheetRail { display: flex; flex-direction: column; gap: var(--l3-spacing-08); padding-inline-end: var(--l3-spacing-12); border-inline-end: 1px solid var(--l3-border-light); }
 .sheetContent { display: flex; min-width: 0; flex-direction: column; gap: var(--l3-spacing-16); padding-inline-start: var(--l3-spacing-16); }
 .sheetContent h2 { margin: 0; color: var(--l3-content-primary); font: var(--l3-text-heading-20); }
+.indicatorSectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--l3-spacing-08); margin-block-end: var(--l3-spacing-12); }
+.indicatorSectionHeader h3, .indicatorSectionTitle { margin: 0; color: var(--l3-content-primary); font: var(--l3-text-heading-14); }
+.indicatorSectionTitle { margin-block-end: var(--l3-spacing-12); }
+.emptyIndicators { margin: 0; color: var(--l3-content-secondary); font: var(--l3-text-description-14); }
 .comingSoon { margin: 0; color: var(--l3-content-secondary); font: var(--l3-text-description-14); }
 ```
 
@@ -879,21 +885,26 @@ import { PriceChange } from '@l3/components/PriceChange'
 import { Stack } from '@l3/components/Stack'
 import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
-import { msAdd, msAddChart, msArrowBack, msBookmark, msCandlestickChart, msDraw, msKeyboardArrowDown, msLink, msListAlt, msPlaylistAdd, msSearch, msSettings, msShowChart, msStar } from '@l3/icons/material'
+import { msAdd, msAddChart, msArrowBack, msBookmark, msCandlestickChart, msChevronRight, msDraw, msKeyboardArrowDown, msLink, msListAlt, msPlaylistAdd, msSearch, msSettings, msShowChart, msStar } from '@l3/icons/material'
 import { scalperOptionCandles, scalperSpotCandles } from '../data'
 import styles from './Scalper.module.css'
 
-type Props = { onBack: () => void }
+type Props = {
+  onBack: () => void
+  /** A DASH-created indicator opens the workspace with this sheet already visible. */
+  createdIndicator?: string
+  onCreateIndicator?: () => void
+}
 
 const timeLabels = ['12:15', '13:05', '13:55', '14:45', '15:25']
 const indicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA']
 
 /** Full-screen trading workspace for the ScalpPro shortcut. Values are illustrative prototype data. */
-export function Scalper({ onBack }: Props) {
+export function Scalper({ onBack, createdIndicator, onCreateIndicator }: Props) {
   const [quantity, setQuantity] = useState(65)
   const [orderType, setOrderType] = useState('market')
   const [active, setActive] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(Boolean(createdIndicator))
   const [indicator, setIndicator] = useState<string | null>(null)
   const screen = useRef<HTMLDivElement>(null)
   return <div className={styles.theme}>
@@ -929,7 +940,11 @@ export function Scalper({ onBack }: Props) {
         </Inset>
       </footer>
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} container={screen.current} aria-label="Chart tools" className={styles.indicatorPanel}>
-        <IndicatorSheet onPick={(name) => { setIndicator(name); setSheetOpen(false) }} />
+        <IndicatorSheet
+          yourIndicators={createdIndicator ? [createdIndicator] : []}
+          onCreateIndicator={onCreateIndicator}
+          onPick={(name) => { setIndicator(name); setSheetOpen(false) }}
+        />
       </BottomSheet>
     </div>
   </div>
@@ -946,7 +961,7 @@ function ScalperChart({ title, subtitle, price, change, percent, high, low, data
   </section>
 }
 
-function IndicatorSheet({ onPick }: { onPick: (name: string) => void }) {
+function IndicatorSheet({ yourIndicators, onCreateIndicator, onPick }: { yourIndicators: string[]; onCreateIndicator?: () => void; onPick: (name: string) => void }) {
   const [section, setSection] = useState('indicators')
   const items = [
     { id: 'range', label: 'Range', icon: msShowChart }, { id: 'zing', label: 'Zing', icon: msCandlestickChart },
@@ -957,7 +972,23 @@ function IndicatorSheet({ onPick }: { onPick: (name: string) => void }) {
     <nav className={styles.sheetRail} aria-label="Chart tool categories">{items.map((item) => <Button key={item.id} variant={section === item.id ? 'secondary' : 'tertiary'} size="sm" fullWidth iconLeft={<Icon icon={item.icon} />} onClick={() => setSection(item.id)}>{item.label}</Button>)}</nav>
     <section className={styles.sheetContent} aria-label={section === 'indicators' ? 'Indicators' : itemTitle(section)}>
       <Stack direction="horizontal" align="center" justify="between"><h2>{section === 'indicators' ? 'Indicators' : itemTitle(section)}</h2><Button variant="ghost" size="sm" aria-label="Search indicators" iconLeft={<Icon icon={msSearch} />} /></Stack>
-      {section === 'indicators' ? <Stack gap="08">{indicators.map((name) => <ListCell key={name} variant="card" label={name} iconLeft={<Icon icon={msStar} />} onClick={() => onPick(name)} />)}</Stack> : <p className={styles.comingSoon}>Choose Indicators to add one to this chart.</p>}
+      {section === 'indicators' ? (
+        <Stack gap="24">
+          <section aria-labelledby="your-indicators-heading">
+            <div className={styles.indicatorSectionHeader}>
+              <h3 id="your-indicators-heading">Your indicators</h3>
+              <Button variant="ghost" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreateIndicator}>Create indicator</Button>
+            </div>
+            {yourIndicators.length ? (
+              <Stack gap="08">{yourIndicators.map((name) => <ListCell key={name} variant="card" label={name} description="Created with DASH AI" iconLeft={<Icon icon={msStar} />} iconRight={<Icon icon={msChevronRight} />} onClick={() => onPick(name)} />)}</Stack>
+            ) : <p className={styles.emptyIndicators}>No indicators created yet.</p>}
+          </section>
+          <section aria-labelledby="lemon-indicators-heading">
+            <h3 id="lemon-indicators-heading" className={styles.indicatorSectionTitle}>Lemon indicators</h3>
+            <Stack gap="08">{indicators.map((name) => <ListCell key={name} variant="card" label={name} iconLeft={<Icon icon={msStar} />} iconRight={<Icon icon={msChevronRight} />} onClick={() => onPick(name)} />)}</Stack>
+          </section>
+        </Stack>
+      ) : <p className={styles.comingSoon}>Choose Indicators to add one to this chart.</p>}
     </section>
   </div>
 }
