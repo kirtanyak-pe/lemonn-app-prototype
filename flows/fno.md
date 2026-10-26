@@ -75,7 +75,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 - 2026-10-26 — Added Equity home and board positions, connected the F&O tab and existing flows, added local selectors, filters, watchlist creation and details sheets.
 - 2026-10-26 — Reused the Stocks home header on F&O, including its scrolled surface and all four actions.
-- 2026-10-26 — Added Scalper: a dark L3 workspace from the ScalpPro shortcut, with two intraday charts and order controls.
+- 2026-10-26 — Added Scalper: an L3 workspace from the ScalpPro shortcut, with two intraday charts and order controls.
 - 2026-10-26 — Added the Scalper chart-tools bottom sheet and Indicators list from the supplied reference.
 
 
@@ -896,7 +896,7 @@ export function Scalper({ onBack }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [indicator, setIndicator] = useState<string | null>(null)
   const screen = useRef<HTMLDivElement>(null)
-  return <div className={styles.theme} data-product="lm" data-mode="dark">
+  return <div className={styles.theme}>
     <div className={styles.screen} ref={screen}>
       <header className={styles.header}>
         <Button variant="ghost" size="sm" aria-label="Back to F&O" iconLeft={<Icon icon={msArrowBack} />} onClick={onBack} />
