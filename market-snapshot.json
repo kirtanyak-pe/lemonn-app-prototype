@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-10-26T10:21:39.463Z",
+ "fetchedAt": "2026-10-26T10:32:20.076Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -3005,8 +3005,8 @@
      "close": 1917.5
     }
    ],
-   "sector": null,
-   "industry": null
+   "sector": "Communication Services",
+   "industry": "Telecom Services"
   },
   "COALINDIA": {
    "price": 405,
