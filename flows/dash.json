@@ -282,7 +282,7 @@
       "id": "dash-24",
       "name": "Indicator · ready",
       "figma": "",
-      "note": "BUY / SELL labels on the preview, notes from testing (fold open), Add to chart (loader → On chart). Ask for changes in plain words: the preview redraws (SELL labels turn orange).",
+      "note": "Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.",
       "goesTo": [
         "dash-14",
         "dash-02",
@@ -296,17 +296,12 @@
     },
     {
       "id": "dash-25",
-      "name": "Indicator · on chart",
+      "name": "Indicator · saved",
       "figma": "",
-      "note": "Added: the tag and the button read On chart.",
+      "note": "The preview card is removed. DASH confirms the indicator is saved and offers View indicator; Scalper is a future destination.",
       "goesTo": [
         "dash-14",
-        "dash-02",
-        "dash-21",
-        "dash-22",
-        "dash-23",
-        "dash-24",
-        "dash-25"
+        "dash-02"
       ],
       "figmaUrl": ""
     }

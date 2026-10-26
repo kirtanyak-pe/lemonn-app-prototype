@@ -77,6 +77,37 @@
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13703"
     },
     {
+      "id": "search-25",
+      "name": "F&O · search from home",
+      "figma": "4912:13728",
+      "note": "From F&O home; Back returns there.",
+      "goesTo": [
+        "fno-01",
+        "search-26"
+      ],
+      "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728"
+    },
+    {
+      "id": "search-26",
+      "name": "F&O home · all Smart Options",
+      "figma": "4912:13925",
+      "note": "",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13925"
+    },
+    {
+      "id": "search-27",
+      "name": "F&O home · all Smart Futures",
+      "figma": "4912:14019",
+      "note": "Uses the existing combined Smart Options & Futures stock list.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-14019"
+    },
+    {
       "id": "search-06",
       "name": "F&O · before typing",
       "figma": "4912:13728",

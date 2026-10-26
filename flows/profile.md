@@ -320,7 +320,7 @@ export function SettingCard({ icon, label, description, control, controlType = '
   "settings.title": "Settings",
   "settings.biometric": "Biometric",
   "settings.biometricHint": "Login with your fingerprint",
-  "settings.theme": "Appearance",
+  "settings.theme": "Theme",
   "settings.themeLight": "Light",
   "settings.themeDark": "Dark",
   "settings.themeAuto": "Auto",

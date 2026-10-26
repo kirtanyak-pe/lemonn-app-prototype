@@ -1449,7 +1449,7 @@ export function MainNav({ value, onChange }: { value: Section; onChange?: (value
 }
 
 /** The first screen of each tab that's built so far (prototype navigation). Tabs not built yet stay where they are. */
-const tabScreens: Partial<Record<Section, string>> = { stocks: 'stocks-01', market: 'market-01' }
+const tabScreens: Partial<Record<Section, string>> = { stocks: 'stocks-01', market: 'market-01', fno: 'fno-01' }
 
 /** The navbar's onChange in a flow: `onTab={(t) => goToTab(go, t)}`. */
 export const goToTab = (go: (id: string) => void, section: Section) => {

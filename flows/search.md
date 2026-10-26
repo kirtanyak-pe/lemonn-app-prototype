@@ -16,6 +16,9 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/search · machi
 | `search-03` | Stocks · only a watchlist matches | [4912:13671](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13671) | `stocks-01` | "Penny": the watchlist, and "Stocks (0)" with nothing under it. |
 | `search-04` | Stocks · no matching watchlist | [4912:13587](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13587) | `stocks-01`, `search-18` | Same results without the watchlist group. |
 | `search-05` | Stocks · nothing found | [4912:13703](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13703) | `stocks-01` | L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field. |
+| `search-25` | F&O · search from home | [4912:13728](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728) | `fno-01`, `search-26` | From F&O home; Back returns there. |
+| `search-26` | F&O home · all Smart Options | [4912:13925](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13925) | `fno-01` |  |
+| `search-27` | F&O home · all Smart Futures | [4912:14019](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-14019) | `fno-01` | Uses the existing combined Smart Options & Futures stock list. |
 | `search-06` | F&O · before typing | [4912:13728](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728) | `stocks-01`, `search-09` | Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows). |
 | `search-07` | F&O · results | [4912:14199](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-14199) | `stocks-01` | "Bank": watchlists (no count on this tab), then the contracts. |
 | `search-08` | F&O · nothing found | [4912:13902](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13902) | `stocks-01` |  |
@@ -37,6 +40,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/search · machi
 
 ## Spec (README.md)
 
+
+F&O home entry points (2026-10-26): `search-25` opens F&O search, `search-26` opens the existing combined Smart Options & Futures index list, and `search-27` opens its stock list. Back returns to `fno-01` for these entry points.
 
 > The spec for this flow. A developer should be able to build it on any platform (Flutter, iOS, web) from this file,
 > the Figma links and the screens in this folder — without reading the rest of the repo.
@@ -960,6 +965,9 @@ export const search: Flow = {
     { id: 'search-04', section: 'stocks', name: 'Stocks · no matching watchlist', figma: '4912:13587', note: 'Same results without the watchlist group.', render: (go) => <Search results={bankNoWatchlist} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
     { id: 'search-05', section: 'stocks', name: 'Stocks · nothing found', figma: '4912:13703', note: 'L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field.', render: (go) => <Search results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },
     // ---- F&O
+    { id: 'search-25', section: 'fno', name: 'F&O · search from home', figma: '4912:13728', note: 'From F&O home; Back returns there.', render: (go) => <Search tab="fno" onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
+    { id: 'search-26', section: 'fno', name: 'F&O home · all Smart Options', figma: '4912:13925', render: (go) => <Signals scope="indices" onBack={() => go('fno-01')} /> },
+    { id: 'search-27', section: 'fno', name: 'F&O home · all Smart Futures', figma: '4912:14019', note: 'Uses the existing combined Smart Options & Futures stock list.', render: (go) => <Signals scope="stocks" onBack={() => go('fno-01')} /> },
     { id: 'search-06', section: 'fno', name: 'F&O · before typing', figma: '4912:13728', note: 'Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows).', render: (go) => <Search tab="fno" onBack={() => go('stocks-01')} onSignals={() => go('search-09')} /> },
     { id: 'search-07', section: 'fno', name: 'F&O · results', figma: '4912:14199', note: '"Bank": watchlists (no count on this tab), then the contracts.', render: (go) => <Search tab="fno" results={bank} onBack={() => go('stocks-01')} /> },
     { id: 'search-08', section: 'fno', name: 'F&O · nothing found', figma: '4912:13902', render: (go) => <Search tab="fno" results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },

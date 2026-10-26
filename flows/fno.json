@@ -1,0 +1,98 @@
+{
+  "id": "fno",
+  "title": "F&O",
+  "description": "Equity F&O home: P&L, indices, chart metrics, watchlists, Smart Options, Futures Heatmap and Smart Futures.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "4d1c31d",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno",
+    "screen": "https://kirtanyak-pe.github.io/lemonn-app-prototype/#/<screen-id>"
+  },
+  "screens": [
+    {
+      "id": "fno-01",
+      "name": "Equity home",
+      "figma": "11569:41100",
+      "note": "From the main F&O tab. Home returns to Stocks; DASH, Search, Profile and Wallet open their existing flows. Selectors, chart metrics, filters, sorting and watchlist creation work locally. Destinations outside this frame open an explanatory sheet.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100"
+    },
+    {
+      "id": "fno-02",
+      "name": "Home · watchlists & Smart Options",
+      "figma": "11569:41100",
+      "note": "The same long screen, scrolled to watchlists.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100"
+    },
+    {
+      "id": "fno-03",
+      "name": "Home · Futures Heatmap",
+      "figma": "11569:41100",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100"
+    },
+    {
+      "id": "fno-04",
+      "name": "Home · Smart Futures",
+      "figma": "11569:41100",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100"
+    }
+  ],
+  "files": [
+    "src/flows/fno/README.md",
+    "src/flows/fno/assets/commodities.svg",
+    "src/flows/fno/assets/downtrend.svg",
+    "src/flows/fno/assets/equity.svg",
+    "src/flows/fno/assets/option-chain.svg",
+    "src/flows/fno/assets/referral.svg",
+    "src/flows/fno/assets/scalppro.svg",
+    "src/flows/fno/assets/smart-invest.svg",
+    "src/flows/fno/assets/strategies.svg",
+    "src/flows/fno/assets/trade-calls.svg",
+    "src/flows/fno/assets/watchlist.svg",
+    "src/flows/fno/assets/zing.svg",
+    "src/flows/fno/components/ContractSection.tsx",
+    "src/flows/fno/components/Discovery.tsx",
+    "src/flows/fno/components/FnoNav.tsx",
+    "src/flows/fno/components/Header.module.css",
+    "src/flows/fno/components/Header.tsx",
+    "src/flows/fno/components/Heatmap.tsx",
+    "src/flows/fno/components/HomeParts.module.css",
+    "src/flows/fno/components/Overview.tsx",
+    "src/flows/fno/components/TradingChart.tsx",
+    "src/flows/fno/copy.json",
+    "src/flows/fno/copy.ts",
+    "src/flows/fno/data.ts",
+    "src/flows/fno/index.tsx",
+    "src/flows/fno/screens/Home.tsx",
+    "src/flows/fno/sheets/HomeSheets.tsx"
+  ],
+  "shared": [
+    "src/shared/copy.ts",
+    "src/shared/data/format.ts",
+    "src/shared/data/user.ts",
+    "src/shared/prototype.ts",
+    "src/shared/ui/Rail.module.css",
+    "src/shared/ui/Rail.tsx",
+    "src/shared/ui/Raised.module.css",
+    "src/shared/ui/Screen.module.css",
+    "src/shared/ui/Screen.tsx",
+    "src/shared/ui/Sheet.module.css",
+    "src/shared/ui/Sheet.tsx",
+    "src/shared/ui/dash/DashEntry.module.css",
+    "src/shared/ui/dash/DashEntry.tsx",
+    "src/shared/ui/dash/DashOrb.module.css",
+    "src/shared/ui/dash/DashOrb.tsx",
+    "src/shared/ui/dash/assets/leaf-back.svg",
+    "src/shared/ui/dash/assets/leaf-front.svg",
+    "src/shared/ui/dash/assets/orb-fill.svg",
+    "src/shared/ui/dash/assets/orb-ring.svg"
+  ]
+}
