@@ -88,7 +88,7 @@ dash-14 Delete ─▶ dash-15 ─Yes─▶ dash-16 ─Okay─▶ dash-17 · No �
 dash-02 ☰ and the history action on every chat page ─▶ dash-14
 dash-02 Create Custom Indicator ─▶ dash-20 ─prompt─▶ dash-21 ─chart─▶ dash-22 ─timeframe─▶ dash-23 ─built─▶ dash-24
 dash-24 Modify ─▶ DASH asks for a manual change ─send─▶ same preview + Modify / Save indicator · Save indicator ─▶ dash-25
-dash-25 View indicator ─▶ fno-05 Scalper
+dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH indicator in Your indicators)
 ```
 
 ### Data

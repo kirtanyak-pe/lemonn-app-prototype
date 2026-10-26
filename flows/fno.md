@@ -15,7 +15,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-03` | Home · Futures Heatmap | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
 | `fno-04` | Home · Smart Futures | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
 | `fno-05` | Scalper | — | `fno-01`, `dash-20` | From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators. |
-| `fno-06` | Scalper · DASH indicator | — | `dash-25`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators. |
+| `fno-06` | Scalper · DASH indicator | — | `dash-25`, `dash-20`, `fno-07` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators. |
+| `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | After choosing the saved DASH AI indicator. The sheet closes and a compact EMA 9 / EMA 21 treatment is overlaid on the NIFTY 50 candle pane. |
 
 ## Spec (README.md)
 
@@ -35,6 +36,8 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-03 | The same page, at Futures Heatmap | 11569:41100 |
 | fno-04 | The same page, at Smart Futures | 11569:41100 |
 | fno-05 | Scalper | Screenshot supplied 2026-10-26 |
+| fno-06 | Scalper, with DASH indicator sheet open | — |
+| fno-07 | Scalper, with the saved indicator applied | — |
 
 ### Structure
 
@@ -60,9 +63,13 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
 - Sheets use shared Sheet hosting and L3 focus management, Escape and backdrop dismissal.
 - Scalper has linked NIFTY 50 spot and call-option charts, a strategy toolbar, active toggle, market / limit order type,
   quantity stepper and market buy / sell order dock. Its values and candles are illustrative; no order is submitted.
-- The upper-right add-control on the spot chart opens an L3 bottom sheet. It starts on **Indicators**, with the
-  supplied indicator list and selectable Range, Zing, Drawings, Templates and Settings rail items. Selecting an
-  indicator closes the sheet and shows its name below the spot quote.
+- The upper-right add-control on the spot chart opens an L3 bottom sheet. **Indicators** has **Your indicators**
+  (a DASH AI-created list, Create indicator action and empty state) and **Lemon indicators**. DASH's View indicator
+  opens this sheet directly with its saved indicator visible. Selecting an indicator closes the sheet and shows its
+  name below the spot quote.
+- When an indicator is applied, the price pane renders a pair of illustrative 9/21 EMA overlay lines and a small
+  legend over the candles. The lines are calculated from prototype candle data; this is visual behaviour only, not
+  execution or indicator-rule evaluation.
 
 ### L3 components
 
@@ -78,6 +85,8 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 - 2026-10-26 — Reused the Stocks home header on F&O, including its scrolled surface and all four actions.
 - 2026-10-26 — Added Scalper: an L3 workspace from the ScalpPro shortcut, with two intraday charts and order controls.
 - 2026-10-26 — Added the Scalper chart-tools bottom sheet and Indicators list from the supplied reference.
+- 2026-10-26 — Grouped the chart-tools list into Your indicators and Lemon indicators; linked DASH AI's View indicator
+  action to the saved custom indicator in the open sheet.
 
 
 ## Source — this flow
@@ -753,7 +762,8 @@ export const fno: Flow = {
     { id: 'fno-03', name: 'Home · Futures Heatmap', figma: '11569:41100', tab: true, render: (go) => home(go, 'heatmap') },
     { id: 'fno-04', name: 'Home · Smart Futures', figma: '11569:41100', tab: true, render: (go) => home(go, 'futures') },
     { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} /> },
-    { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators.', render: (go) => <Scalper onBack={() => go('dash-25')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
+    { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators.', render: (go) => <Scalper onBack={() => go('dash-25')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} onApplyIndicator={() => go('fno-07')} /> },
+    { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'After choosing the saved DASH AI indicator. The sheet closes and a compact EMA 9 / EMA 21 treatment is overlaid on the NIFTY 50 candle pane.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
   ],
 }
 ```
@@ -837,26 +847,42 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
 ### `src/flows/fno/screens/Scalper.module.css`
 
 ```css
-.theme { height: 100%; background: var(--l3-surface-primary); color: var(--l3-content-primary); }
-.screen { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 100%; overflow: hidden; background: var(--l3-surface-primary); }
-.header, .tools { display: flex; align-items: center; gap: var(--l3-spacing-08); padding-inline: var(--l3-spacing-16); border-bottom: 1px solid var(--l3-border-light); }
-.header { min-height: var(--l3-size-64); }
-.tools { min-height: var(--l3-size-48); overflow-x: auto; }
+.theme { height: 100%; background: var(--l3-surface-default); color: var(--l3-content-primary); }
+.screen { display: grid; grid-template-rows: var(--l3-size-56) var(--l3-size-48) minmax(0, 1fr) auto; height: 100%; overflow: hidden; background: var(--l3-surface-default); }
+.header, .tools { display: flex; align-items: center; border-bottom: 1px solid var(--l3-border-light); }
+.header { gap: var(--l3-spacing-04); min-height: var(--l3-size-56); padding-inline: var(--l3-spacing-08); background: var(--l3-surface-default); }
+.tools { gap: var(--l3-spacing-04); min-height: var(--l3-size-48); overflow-x: auto; padding-inline: var(--l3-spacing-08); background: var(--l3-surface-primary); }
 .tools > * { flex: none; }
-.strategyTab { flex: none; }
-.content { min-height: 0; overflow: auto; }
-.chartSection { display: flex; flex-direction: column; gap: var(--l3-spacing-08); padding: var(--l3-spacing-16); border-bottom: 1px solid var(--l3-border-light); }
+.tools > * + * { border-inline-start: 1px solid var(--l3-border-light); border-radius: var(--l3-radius-00); }
+.activeTool { border: 1px solid var(--l3-border-accent-zing-default); border-radius: var(--l3-radius-12) !important; background: var(--l3-surface-accent-zing-light) !important; color: var(--l3-content-accent-zing-default) !important; }
+.strategyTab { flex: none; align-self: stretch; }
+.content { min-height: 0; overflow: hidden; background: var(--l3-surface-primary); }
+.chartSection { box-sizing: border-box; display: flex; height: calc(var(--l3-size-128) * 2 + var(--l3-spacing-48)); flex-direction: column; padding-block-start: var(--l3-spacing-12); border-bottom: 1px solid var(--l3-border-light); background: var(--l3-surface-primary); }
+.chartHeader { flex: none; min-height: var(--l3-size-48); padding-inline: var(--l3-spacing-16); }
 .chartSection h2, .chartSection strong { margin: 0; font: var(--l3-text-heading-18); color: var(--l3-content-primary); }
 .subTitle { font: var(--l3-text-label-16); color: var(--l3-content-secondary); }
 .percent { color: var(--l3-content-accent-indicator-up-default); font: var(--l3-text-label-14); }
-.chartWrap { position: relative; }
-.chart { min-height: var(--l3-size-200); }
-.high, .low { position: absolute; left: var(--l3-spacing-12); padding-inline: var(--l3-spacing-04); background: var(--l3-surface-primary); color: var(--l3-content-primary); font: var(--l3-text-label-12); }
-.high { top: var(--l3-spacing-12); }
-.low { bottom: var(--l3-spacing-24); }
-.orderDock { border-top: 1px solid var(--l3-border-light); background: var(--l3-surface-primary); }
+.chartWrap { position: relative; flex: 1; min-height: 0; }
+.chart { position: absolute; inset: 0; width: 100%; height: 100%; }
+.overlayChart { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.overlayFastLine, .overlaySlowLine { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.overlayFastLine { stroke: var(--l3-content-accent-discover-default); }
+.overlaySlowLine { stroke: var(--l3-content-accent-warning-default); }
+.overlayLegend { position: absolute; z-index: 1; top: var(--l3-spacing-04); left: var(--l3-spacing-04); display: flex; gap: var(--l3-spacing-08); color: var(--l3-content-primary); font: var(--l3-text-label-10); pointer-events: none; }
+.overlayFast, .overlaySlow { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); }
+.overlayFast::before, .overlaySlow::before { width: var(--l3-spacing-12); height: 1px; background: currentColor; content: ''; }
+.overlayFast { color: var(--l3-content-accent-discover-default); }
+.overlaySlow { color: var(--l3-content-accent-warning-default); }
+.high, .low { position: absolute; left: var(--l3-spacing-16); padding-inline: var(--l3-spacing-04); background: var(--l3-surface-primary); color: var(--l3-content-primary); font: var(--l3-text-label-12); }
+.high { top: var(--l3-spacing-16); }
+.low { bottom: var(--l3-spacing-32); }
+.zoomControls { position: absolute; z-index: 2; top: var(--l3-spacing-12); right: var(--l3-size-48); display: flex; height: calc(100% - var(--l3-spacing-48)); flex-direction: column; justify-content: space-between; color: var(--l3-content-secondary); }
+.timeframe { position: absolute; z-index: 2; right: var(--l3-spacing-04); bottom: var(--l3-spacing-00); }
+.orderDock { position: relative; z-index: 3; flex: none; border-top: 1px solid var(--l3-border-light); background: var(--l3-surface-default); box-shadow: var(--l3-shadow-elevation-medium); }
 .orderType { align-self: center; }
+.orderActions { display: grid !important; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); width: 100%; }
 .orderSide { flex: 1; min-width: 0; text-align: center; color: var(--l3-content-secondary); font: var(--l3-text-label-10); }
+.sellButton { border: 1px solid var(--l3-border-dark) !important; background: var(--l3-surface-default) !important; color: var(--l3-content-primary) !important; }
 .stepper { flex: none; }
 .selectedIndicator { overflow: hidden; color: var(--l3-content-accent-discover-default); font: var(--l3-text-label-10); text-overflow: ellipsis; white-space: nowrap; }
 .indicatorPanel { height: min(100%, calc(var(--l3-size-80) * 7)); }
@@ -877,7 +903,7 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
 import { useRef, useState } from 'react'
 import { BottomSheet } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
-import { Chart } from '@l3/components/Chart'
+import { Chart, type ChartCandle } from '@l3/components/Chart'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
 import { ListCell } from '@l3/components/ListCell'
@@ -885,7 +911,7 @@ import { PriceChange } from '@l3/components/PriceChange'
 import { Stack } from '@l3/components/Stack'
 import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
-import { msAdd, msAddChart, msArrowBack, msBookmark, msCandlestickChart, msChevronRight, msDraw, msKeyboardArrowDown, msLink, msListAlt, msPlaylistAdd, msSearch, msSettings, msShowChart, msStar } from '@l3/icons/material'
+import { msAdd, msAddChart, msArrowBack, msBookmark, msCandlestickChart, msChevronRight, msDraw, msKeyboardArrowDown, msLink, msListAlt, msPlaylistAdd, msSearch, msSettings, msShowChart, msStar, msZoomIn, msZoomOut } from '@l3/icons/material'
 import { scalperOptionCandles, scalperSpotCandles } from '../data'
 import styles from './Scalper.module.css'
 
@@ -893,33 +919,36 @@ type Props = {
   onBack: () => void
   /** A DASH-created indicator opens the workspace with this sheet already visible. */
   createdIndicator?: string
+  openIndicators?: boolean
+  initialIndicator?: string
   onCreateIndicator?: () => void
+  onApplyIndicator?: (name: string) => void
 }
 
 const timeLabels = ['12:15', '13:05', '13:55', '14:45', '15:25']
 const indicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA']
 
 /** Full-screen trading workspace for the ScalpPro shortcut. Values are illustrative prototype data. */
-export function Scalper({ onBack, createdIndicator, onCreateIndicator }: Props) {
+export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator }: Props) {
   const [quantity, setQuantity] = useState(65)
   const [orderType, setOrderType] = useState('market')
-  const [active, setActive] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(Boolean(createdIndicator))
-  const [indicator, setIndicator] = useState<string | null>(null)
+  const [active, setActive] = useState(true)
+  const [sheetOpen, setSheetOpen] = useState(openIndicators ?? Boolean(createdIndicator))
+  const [indicator, setIndicator] = useState<string | null>(initialIndicator ?? null)
   const screen = useRef<HTMLDivElement>(null)
   return <div className={styles.theme}>
     <div className={styles.screen} ref={screen}>
       <header className={styles.header}>
         <Button variant="ghost" size="sm" aria-label="Back to F&O" iconLeft={<Icon icon={msArrowBack} />} onClick={onBack} />
-        <Tabs aria-label="Scalper strategy" appearance="pill" size="sm" value="all" onChange={() => {}} items={[{ value: 'all', label: 'All' }]} className={styles.strategyTab} />
-        <Button variant="tertiary" size="sm" iconRight={<Icon icon={msAdd} />} onClick={() => {}}>Add strategies</Button>
+        <Tabs aria-label="Scalper strategy" appearance="ribbon" size="md" value="all" onChange={() => {}} items={[{ value: 'all', label: 'All' }]} className={styles.strategyTab} />
+        <Button variant="ghost" size="md" iconRight={<Icon icon={msAdd} />} onClick={() => {}}>Add more strategies</Button>
       </header>
 
       <nav className={styles.tools} aria-label="Scalper tools">
-        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msShowChart} />}>Positions</Button>
-        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msListAlt} />}>Orders</Button>
-        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msLink} />}>Option chain</Button>
-        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msCandlestickChart} />} onClick={() => setActive((v) => !v)}>{active ? 'Active' : 'Inactive'}</Button>
+        <Button variant="ghost" size="md" iconLeft={<Icon icon={msShowChart} />}>Positions</Button>
+        <Button variant="ghost" size="md" iconLeft={<Icon icon={msListAlt} />}>Orders</Button>
+        <Button variant="ghost" size="md" iconLeft={<Icon icon={msLink} />}>Option chain</Button>
+        <Button variant={active ? 'tertiary' : 'ghost'} size="md" className={active ? styles.activeTool : undefined} iconLeft={<Icon icon={msCandlestickChart} />} onClick={() => setActive((v) => !v)}>{active ? 'Active' : 'Inactive'}</Button>
       </nav>
 
       <main className={styles.content}>
@@ -931,10 +960,10 @@ export function Scalper({ onBack, createdIndicator, onCreateIndicator }: Props) 
         <Inset paddingInline="16" paddingBlock="12">
           <Stack gap="12">
             <Tabs aria-label="Order type" appearance="pill" size="sm" value={orderType} onChange={setOrderType} items={[{ value: 'market', label: 'Market' }, { value: 'limit', label: 'Limit/Trigger' }]} className={styles.orderType} />
-            <Stack direction="horizontal" align="center" gap="12">
+            <Stack direction="horizontal" align="center" gap="08" className={styles.orderActions}>
               <Stack gap="04" className={styles.orderSide}><Button variant="buy" size="lg" fullWidth>Buy at Mkt</Button><span>Req: ₹7,059.75</span></Stack>
               <Stepper label="Order quantity" value={quantity} onChange={setQuantity} min={1} step={1} size="lg" sublabel="1 lot" className={styles.stepper} />
-              <Stack gap="04" className={styles.orderSide}><Button variant="sell" size="lg" fullWidth>Sell at Mkt</Button><span>Req: ₹1,57,436.49</span></Stack>
+              <Stack gap="04" className={styles.orderSide}><Button variant="sell" size="lg" fullWidth className={styles.sellButton}>Sell at Mkt</Button><span>Req: ₹1,57,436.49</span></Stack>
             </Stack>
           </Stack>
         </Inset>
@@ -943,7 +972,7 @@ export function Scalper({ onBack, createdIndicator, onCreateIndicator }: Props) 
         <IndicatorSheet
           yourIndicators={createdIndicator ? [createdIndicator] : []}
           onCreateIndicator={onCreateIndicator}
-          onPick={(name) => { setIndicator(name); setSheetOpen(false) }}
+          onPick={(name) => { setIndicator(name); setSheetOpen(false); onApplyIndicator?.(name) }}
         />
       </BottomSheet>
     </div>
@@ -952,13 +981,45 @@ export function Scalper({ onBack, createdIndicator, onCreateIndicator }: Props) 
 
 function ScalperChart({ title, subtitle, price, change, percent, high, low, data, indicator, onOpenIndicators }: { title: string; subtitle?: string; price: number; change: number; percent: number; high: string; low: string; data: typeof scalperSpotCandles; indicator?: string | null; onOpenIndicators?: () => void }) {
   return <section className={styles.chartSection} aria-label={`${title} intraday chart`}>
-    <Stack direction="horizontal" align="start" justify="between" gap="12">
+    <Stack direction="horizontal" align="start" justify="between" gap="12" className={styles.chartHeader}>
       <Stack gap="04"><Stack direction="horizontal" align="center" gap="04"><h2>{title}</h2>{subtitle && <><span className={styles.subTitle}>{subtitle}</span><Icon icon={msLink} size={20} /></>}</Stack><Stack direction="horizontal" align="center" gap="08"><strong>{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong><PriceChange value={change} unit="currency" size="sm" /><span className={styles.percent}>({percent.toFixed(2)}%)</span></Stack>{indicator && <span className={styles.selectedIndicator}>{indicator}</span>}</Stack>
       <Stack direction="horizontal" gap="08"><Button variant="secondary" size="sm" aria-label={`Set ${title} as chart leader`} iconLeft={<Icon icon={msShowChart} />} />{onOpenIndicators && <Button variant="secondary" size="sm" aria-label="Add chart indicator" iconLeft={<Icon icon={msPlaylistAdd} />} onClick={onOpenIndicators} />}</Stack>
     </Stack>
-    <div className={styles.chartWrap}><Chart data={data} type="candle" timeLabels={timeLabels} showVolume={false} showGrid={false} showLastPrice label={`${title}, intraday`} className={styles.chart} /><span className={styles.high}>{high}</span><span className={styles.low}>{low}</span></div>
-    <Stack direction="horizontal" justify="end"><Button variant="ghost" size="sm" iconRight={<Icon icon={msKeyboardArrowDown} />}>5m</Button></Stack>
+    <div className={styles.chartWrap}>
+      <Chart data={data} type="candle" timeLabels={timeLabels} showVolume={false} showGrid={false} showLastPrice label={`${title}, intraday`} className={styles.chart} />
+      {indicator && <ChartOverlay data={data} name={indicator} />}
+      <div className={styles.zoomControls} aria-label={`${title} zoom controls`}><Button variant="ghost" size="sm" aria-label={`Zoom in on ${title}`} iconLeft={<Icon icon={msZoomIn} />} /><Button variant="ghost" size="sm" aria-label={`Zoom out on ${title}`} iconLeft={<Icon icon={msZoomOut} />} /></div>
+      <span className={styles.high}>{high}</span><span className={styles.low}>{low}</span>
+      <Button variant="ghost" size="sm" className={styles.timeframe} iconRight={<Icon icon={msKeyboardArrowDown} />}>5m</Button>
+    </div>
   </section>
+}
+
+/**
+ * Prototype treatment for a price-pane indicator. The two plotted lines are short and long EMAs calculated from
+ * the same illustrative candles; they provide a recognisable overlay without pretending to run the saved DASH rule.
+ */
+function ChartOverlay({ data, name }: { data: ChartCandle[]; name: string }) {
+  const lines = [ema(data, 9), ema(data, 21)]
+  const high = Math.max(...data.map((c) => c.high))
+  const low = Math.min(...data.map((c) => c.low))
+  const x = (index: number) => (index * 304) / data.length + 304 / data.length / 2
+  const y = (value: number) => 12 + ((high - value) / (high - low || 1)) * (164 - 12)
+  const path = (values: number[]) => values.map((value, index) => `${index ? 'L' : 'M'}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(' ')
+  return <>
+    <div className={styles.overlayLegend} aria-label={`${name} applied: two illustrative moving-average overlays`}>
+      <span className={styles.overlayFast}>EMA 9</span><span className={styles.overlaySlow}>EMA 21</span>
+    </div>
+    <svg className={styles.overlayChart} viewBox="0 0 360 200" aria-hidden="true">
+      <path className={styles.overlayFastLine} d={path(lines[0])} />
+      <path className={styles.overlaySlowLine} d={path(lines[1])} />
+    </svg>
+  </>
+}
+
+function ema(data: ChartCandle[], period: number) {
+  const factor = 2 / (period + 1)
+  return data.reduce<number[]>((values, candle, index) => [...values, index ? candle.close * factor + values[index - 1] * (1 - factor) : candle.close], [])
 }
 
 function IndicatorSheet({ yourIndicators, onCreateIndicator, onPick }: { yourIndicators: string[]; onCreateIndicator?: () => void; onPick: (name: string) => void }) {
