@@ -2159,18 +2159,9 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   box-shadow: var(--l3-shadow-sm);
 }
 
-/* Suggestions: a faint gradient edge in the DASH colours (lime → green), softened toward the plain hairline. */
+/* Suggestions (a ready indicator's changes): the same DASH green edge as the empty chat's suggestions. */
 .reply[data-glow] {
-  border-color: transparent;
-  background:
-    linear-gradient(var(--l3-surface-default), var(--l3-surface-default)) padding-box,
-    linear-gradient(
-        120deg,
-        color-mix(in srgb, var(--app-dash-glow-2) 55%, var(--l3-border-light)),
-        color-mix(in srgb, var(--app-dash-glow-1) 70%, var(--l3-border-light)) 50%,
-        var(--l3-border-light)
-      )
-      border-box;
+  border-color: var(--app-dash-green);
 }
 
 .reply:active {
@@ -2403,7 +2394,7 @@ export function Thinking({ children }: { children: ReactNode }) {
 export type ReplyOption = { label: string; onClick?: () => void; suggested?: boolean }
 
 /** Quick replies under DASH's question: pill chips; the one DASH suggests has the green edge. */
-export function ReplyChips({ options, asButtons = false, glow = false }: { options: ReplyOption[]; /** Version 2: real L3 buttons — the suggested reply primary with ›, the others tertiary — so they read as actions. */ asButtons?: boolean; /** Suggestions (a ready indicator's changes): a faint DASH-gradient edge, so they stand out a little. */ glow?: boolean }) {
+export function ReplyChips({ options, asButtons = false, glow = false }: { options: ReplyOption[]; /** Version 2: real L3 buttons — the suggested reply primary with ›, the others tertiary — so they read as actions. */ asButtons?: boolean; /** Suggestions (a ready indicator's changes): the DASH green edge, like the empty chat's suggestions. */ glow?: boolean }) {
   if (asButtons) {
     return (
       <Stack direction="horizontal" gap="08" wrap role="group" aria-label={t('replies.label')}>
@@ -2765,8 +2756,8 @@ export function DashBar(props: ActionbarProps) {
   padding-block: var(--l3-spacing-04);
 }
 
-/* Expanded: the chart has lifted out into the sheet (it flies back on close). */
-.chart[data-lifted] {
+/* Expanded: the card has grown into the floating card (it shrinks back here on close). */
+.card[data-lifted] {
   visibility: hidden;
 }
 
@@ -3027,7 +3018,6 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
   const [notesOpen, setNotesOpen] = useState(false)
   const [fullView, setFullView] = useState(false)
   const card = useRef<HTMLElement>(null)
-  const chartBox = useRef<HTMLDivElement>(null)
   // The full view covers the DASH screen the card is on.
   const container = fullView ? card.current?.closest<HTMLElement>('[data-dash]') : null
   // Prototype setting "Indicator tags": the part tags under the chart, shown or hidden.
@@ -3071,6 +3061,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
     <article
       ref={card}
       className={styles.card}
+      data-lifted={fullView || undefined}
       data-state={state.kind}
       data-compact={mini || undefined}
       data-superseded={superseded || undefined}
@@ -3109,7 +3100,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
         <div className={styles.fold} inert={mini || undefined}>
           <div className={styles.foldBody}>
             <Stack gap="12" className={styles.foldContent}>
-              <div className={styles.chart} ref={chartBox} data-lifted={fullView || undefined}>
+              <div className={styles.chart}>
                 <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} />
               </div>
 
@@ -3139,13 +3130,13 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           </div>
         </div>
       </div>
-      {fullView && container && chartBox.current && (
+      {fullView && container && card.current && (
         <IndicatorFullView
           draft={draft}
           settings={settings}
           sellTone={sellTone}
           container={container}
-          cardChart={chartBox.current}
+          cardEl={card.current}
           tag={state.kind === 'saved' ? <Tag color="success" size="sm">{t('indicator.savedTag')}</Tag> : undefined}
           parts={parts}
           notes={notes}
@@ -3164,8 +3155,9 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
 
 ```css
 /*
- * The expanded indicator card: a tall sheet over the DASH screen (≈ 88 % of it), top corners 24, the card's padding
- * (16 here), the scrim behind. The slide and the chart's flight are Web Animations (IndicatorFullView.tsx).
+ * The expanded indicator card: a big floating card in the middle of the DASH screen (16 from the sides, ≈ 80 % of
+ * the height), styled like the card (radius 16, the DASH green edge, 12 inside), over the scrim. Growing out of the
+ * card and back is a Web Animation of its box (IndicatorFullView.tsx).
  */
 .layer {
   position: absolute;
@@ -3177,38 +3169,40 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
   position: absolute;
   inset: 0;
   background: var(--l3-surface-overlay);
-  animation: full-view-scrim var(--app-dash-scene) var(--app-dash-scene-easing) both;
+  animation: full-view-scrim var(--l3-motion-duration-medium) var(--app-dash-scene-easing) both;
 }
 
 .layer[data-closing] .scrim {
-  animation: full-view-scrim var(--app-dash-scene) var(--app-dash-scene-easing) reverse both;
+  animation: full-view-scrim var(--l3-motion-duration-medium) var(--app-dash-scene-easing) reverse both;
 }
 
 @keyframes full-view-scrim {
   from { opacity: 0; }
 }
 
-.sheet {
+.panel {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  top: calc((100% - var(--app-dash-full-view-height)) / 2);
+  left: var(--l3-spacing-16);
   display: flex;
   flex-direction: column;
   gap: var(--l3-spacing-12);
   box-sizing: border-box;
+  width: calc(100% - 2 * var(--l3-spacing-16));
   height: var(--app-dash-full-view-height);
-  padding: var(--l3-spacing-16) var(--l3-spacing-16) calc(var(--os-inset-bottom, 0px) + var(--l3-spacing-16));
+  padding: var(--l3-spacing-12);
   overflow: hidden;
-  border-radius: var(--l3-radius-24) var(--l3-radius-24) 0 0;
+  border: 1px solid color-mix(in srgb, var(--app-dash-green) 60%, transparent);
+  border-radius: var(--l3-radius-16);
   background: var(--l3-surface-default);
+  box-shadow: var(--l3-shadow-elevation-high);
 }
 
-/* The chart takes all the room left; drags belong to it (nothing else scrolls here). */
+/* The chart takes all the room left, to the card's left edge; drags belong to it (nothing else scrolls here). */
 .chart {
   flex: 1;
   min-height: 0;
-  margin-left: calc(-1 * var(--l3-spacing-16)); /* the chart runs to the screen's left edge */
+  margin-left: calc(-1 * var(--l3-spacing-12));
   overflow: hidden;
   touch-action: none;
   cursor: grab;
@@ -3216,26 +3210,13 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
   -webkit-user-select: none;
 }
 
+.chart:active {
+  cursor: grabbing;
+}
+
 .fit {
   width: 100%;
   height: 100%;
-}
-
-/* While the chart is flying in (or out), its place in the sheet stays empty. */
-.chart[data-waiting] {
-  visibility: hidden;
-}
-
-/* The chart in flight: above the sheet, its box animated from the card's chart to the sheet's (IndicatorFullView). */
-.flyer {
-  position: absolute;
-  z-index: 1;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.chart:active {
-  cursor: grabbing;
 }
 ```
 
@@ -3254,8 +3235,8 @@ import { MiniChart } from './MiniChart'
 import card from './IndicatorCard.module.css'
 import styles from './IndicatorFullView.module.css'
 
-/** The expand / collapse (≈ motion duration long): the sheet slides, the chart flies and grows with it. */
-const MOVE_MS = 380
+/** The expand / collapse (= motion duration medium, designer: quick): the card grows into the floating card and back. */
+const MOVE_MS = 250
 const EASE_OPEN = 'cubic-bezier(0.2, 0, 0, 1)'
 const EASE_CLOSE = 'cubic-bezier(0.3, 0, 0.8, 0.15)'
 
@@ -3267,8 +3248,8 @@ type IndicatorFullViewProps = {
   sellTone?: 'sell' | 'orange'
   /** Where the sheet opens: the DASH screen the card is on. */
   container: HTMLElement
-  /** The card's chart: it lifts out of the card and grows into the sheet (and goes back into it on close). */
-  cardChart: HTMLElement
+  /** The card itself: the floating card grows out of it and shrinks back into it. */
+  cardEl: HTMLElement
   /** The card's own pieces, the same here: a Saved tag, the part tags and DASH's notes. */
   tag?: ReactNode
   parts?: ReactNode
@@ -3280,19 +3261,16 @@ type IndicatorFullViewProps = {
 }
 
 /**
- * The indicator card, expanded: a tall sheet (≈ 88 % of the screen) with the card's layout kept as it is — the name
- * and where it goes (collapse at the top right, where expand was), the chart (filling the room, moving / zooming like
- * Scalper's — no hint: people know these gestures), the part tags, DASH's notes, and Modify / Save indicator.
- * Motion: the sheet slides up while the card's own chart lifts out of the card and grows into its place in the sheet
- * — redrawn at every size, so it never stretches — and the reverse on close. Collapse, a tap above the sheet or Esc
- * closes it; Modify and Save close it and carry on.
+ * The indicator card, expanded: the card itself grows from where it sits into a big floating card in the middle of
+ * the screen (16 from the sides, ≈ 80 % of the height), over a scrim — and shrinks back into its place on close. It
+ * keeps the card's layout as it is: the name and where it goes (collapse at the top right, where expand was), the chart
+ * (filling the room, moving / zooming like Scalper's — no hint: people know these gestures), the part tags, DASH's
+ * notes, and Modify / Save indicator. The box's size is what animates (not a stretch), so the chart redraws as it
+ * grows. Collapse, a tap outside or Esc closes it; Modify and Save close it and carry on.
  */
-export function IndicatorFullView({ draft, settings, sellTone, container, cardChart, tag, parts, notes, onClose, onModify, onSave }: IndicatorFullViewProps) {
-  const sheet = useRef<HTMLDivElement>(null)
-  const slot = useRef<HTMLDivElement>(null)
-  const flyer = useRef<HTMLDivElement>(null)
-  /** Where the flying chart is between the card and the sheet (null: it's landed, the sheet's own chart shows). */
-  const [flight, setFlight] = useState<'open' | 'close' | null>('open')
+export function IndicatorFullView({ draft, settings, sellTone, container, cardEl, tag, parts, notes, onClose, onModify, onSave }: IndicatorFullViewProps) {
+  const panel = useRef<HTMLDivElement>(null)
+  const [closing, setClosing] = useState(false)
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches
 
   /** An element's box in the container's own px (the phone mockup may be scaled on screen). */
@@ -3304,37 +3282,26 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardCh
   }
   const frame = (b: Box) => ({ left: `${b.left}px`, top: `${b.top}px`, width: `${b.width}px`, height: `${b.height}px` })
 
-  // Open: measure where the chart lands (the sheet at rest), then slide the sheet up and fly the chart there.
+  // Open: from the card's box to the floating card's (its place at rest, set by CSS).
   useLayoutEffect(() => {
-    const s = sheet.current
-    const f = flyer.current
-    if (!s || !f || !slot.current) return
-    s.getAnimations().forEach((a) => a.cancel()) // dev mode runs this twice
-    f.getAnimations().forEach((a) => a.cancel())
-    const to = boxOf(slot.current)
-    const from = boxOf(cardChart)
-    if (reduced()) return setFlight(null)
-    s.animate([{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: MOVE_MS, easing: EASE_OPEN })
-    const fly = f.animate([frame(from), frame(to)], { duration: MOVE_MS, easing: EASE_OPEN, fill: 'forwards' })
-    fly.onfinish = () => setFlight(null)
+    const p = panel.current
+    if (!p || reduced()) return
+    p.getAnimations().forEach((a) => a.cancel()) // dev mode runs this twice
+    p.animate([frame(boxOf(cardEl)), frame(boxOf(p))], { duration: MOVE_MS, easing: EASE_OPEN })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  /** Close: the sheet slides down while its chart flies back into the card; then close (`then`: Modify / Save go on). */
+  /** Close: shrink back into the card, then close (`then`: Modify / Save carry on after). */
   const close = (then?: () => void) => {
-    if (flight === 'close') return
+    if (closing) return
     const done = () => {
       onClose()
       then?.()
     }
-    const s = sheet.current
-    const f = flyer.current
-    if (!s || !f || !slot.current || reduced()) return done()
-    const from = boxOf(slot.current)
-    const to = boxOf(cardChart)
-    setFlight('close')
-    s.animate([{ transform: 'none' }, { transform: 'translateY(100%)' }], { duration: MOVE_MS, easing: EASE_CLOSE, fill: 'forwards' })
-    f.animate([frame(from), frame(to)], { duration: MOVE_MS, easing: EASE_CLOSE, fill: 'forwards' })
+    const p = panel.current
+    if (!p || reduced()) return done()
+    setClosing(true)
+    p.animate([frame(boxOf(p)), frame(boxOf(cardEl))], { duration: MOVE_MS, easing: EASE_CLOSE, fill: 'forwards' })
     window.setTimeout(done, MOVE_MS) // on time even where animations don't run (a hidden tab)
   }
 
@@ -3345,9 +3312,9 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardCh
   })
 
   return createPortal(
-    <div className={styles.layer} data-closing={flight === 'close' || undefined}>
+    <div className={styles.layer} data-closing={closing || undefined}>
       <div className={styles.scrim} onClick={() => close()} aria-hidden="true" />
-      <div className={styles.sheet} ref={sheet} role="dialog" aria-modal="true" aria-label={draft.name}>
+      <div className={styles.panel} ref={panel} role="dialog" aria-modal="true" aria-label={draft.name}>
         {/* The card's header, as on the card: name, where it goes, collapse in the expand button's place. */}
         <Stack direction="horizontal" align="start" justify="between" gap="12">
           <Stack gap="04" className={card.heading}>
@@ -3359,8 +3326,7 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardCh
             <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msCloseFullscreen} />} aria-label={t('indicator.collapse')} onClick={() => close()} />
           </Stack>
         </Stack>
-        {/* The chart's place: the flying chart lands here, then this one (the same chart, movable) takes over. */}
-        <div className={styles.chart} ref={slot} data-waiting={flight !== null || undefined}>
+        <div className={styles.chart}>
           <FitChart sellTone={sellTone} settings={settings} interactive />
         </div>
         <Stack gap="12">
@@ -3373,10 +3339,6 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardCh
             </Stack>
           )}
         </Stack>
-      </div>
-      {/* The chart in flight, above the sheet: from the card to its place in the sheet (or back). */}
-      <div className={styles.flyer} ref={flyer} hidden={flight === null} aria-hidden="true">
-        <FitChart sellTone={sellTone} settings={settings} />
       </div>
     </div>,
     container,
@@ -3411,6 +3373,10 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
  * The indicator preview. SVG geometry is artwork (viewBox units); colours are L3 tokens. Motion: candles fade up one
  * after another, then each line draws itself left to right (stroke-dashoffset 1 → 0), then the labels pop in.
  */
+.chart[data-interactive] {
+  touch-action: none; /* the full view's drags and pinches are the chart's, not the page's */
+}
+
 .chart {
   display: block;
   user-select: none; /* the chart's labels never get selected (dragging it in the full view) */
@@ -3484,7 +3450,7 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
 }
 
 /* Axes (like Scalper's chart): hairlines, price and time labels in secondary text, the last price tagged green.
-   Font sizes are viewBox units — the chart scales to ≈ 1.1 × on a 328 card. */
+   Labels are 10 px on screen: --mini-label is that size in the chart's viewBox units (MiniChart.tsx). */
 .axisLine {
   stroke: var(--l3-border-light);
   stroke-width: 0.8;
@@ -3494,7 +3460,7 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
 .timeframe,
 .lastText {
   font: var(--l3-text-label-12);
-  font-size: 7px;
+  font-size: var(--mini-label, 8px);
 }
 
 .tick {
@@ -3504,7 +3470,7 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
 .timeframe {
   fill: var(--l3-content-primary);
   font: var(--l3-text-heading-12);
-  font-size: 7px;
+  font-size: var(--mini-label, 8px);
 }
 
 .lastLine {
@@ -3590,7 +3556,7 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
 ### `src/flows/dash/components/MiniChart.tsx`
 
 ```tsx
-import { useId, useMemo, useRef, useState, type CSSProperties, type Dispatch, type MouseEvent, type PointerEvent, type SetStateAction, type WheelEvent } from 'react'
+import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type MouseEvent, type PointerEvent, type SetStateAction, type WheelEvent } from 'react'
 import { defaultSettings, ema, sampleCandles, supertrend, timeframeShort, type IndicatorSettings } from '../indicatorData'
 import styles from './MiniChart.module.css'
 
@@ -3604,8 +3570,7 @@ export type MiniChartStage = 'sketch' | 'candles' | 'ready'
 const W = 300 // viewBox units — the SVG scales to its box's width
 const CARD_H = 150 // the card's chart; the full view passes its own height (`height`)
 const PAD = 8
-const AXIS = 36 // the price axis on the right, past its line (like Scalper's chart)
-const TIME = 16 // the time axis under the plot
+const LABEL_PX = 10 // the axis labels (prices, times, the last price, the timeframe): 10 screen px at any chart size
 const TIME_EVERY = 12 // a time label every 12 candles
 const SESSION_START = 9 * 60 + 15 // 09:15
 const SESSION = 375 // 09:15 → 15:30, in minutes
@@ -3655,6 +3620,22 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
   const clipId = useId()
   const [view, setView] = useState<View>(fitted)
   const { end, count, yScale, yShift } = view
+  // The chart scales with its width, so the labels are sized from it: LABEL_PX on screen, whatever the chart's size.
+  // The price axis and the time axis make room for them.
+  const svg = useRef<SVGSVGElement>(null)
+  const [shownWidth, setShownWidth] = useState(336)
+  useLayoutEffect(() => {
+    const el = svg.current
+    if (!el) return
+    const measure = () => el.clientWidth > 0 && setShownWidth(el.clientWidth)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const font = (LABEL_PX * W) / shownWidth // the labels' size in viewBox units
+  const AXIS = Math.round(font * 4.4) // the price axis on the right, past its line (fits "22672.7")
+  const TIME = Math.round(font * 1.8) // the time axis under the plot
   const series = useMemo(() => {
     const candles = sampleCandles(HISTORY, 22650, timeframe)
     return { candles, avg: ema(candles, emaPeriod), trend: supertrend(candles, stPeriod, stMultiplier) }
@@ -3690,18 +3671,18 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
       }
     }
     const last = candles[count - 1].close
-    const ticks = niceTicks(min, max, Math.max(4, Math.round(plotH / 35))).filter((v) => y(v) > PAD && y(v) < plotH - PAD && Math.abs(y(v) - y(last)) > 9)
+    const ticks = niceTicks(min, max, Math.max(3, Math.round(plotH / (font * 4)))).filter((v) => y(v) > PAD && y(v) < plotH - PAD && Math.abs(y(v) - y(last)) > font * 1.3)
     // About five time labels, staying with their candles as the chart moves (every Nth candle of the whole history).
-    const every = Math.max(6, Math.round(count / 5 / 6) * 6)
+    const every = Math.max(6, Math.round(count / 4 / 6) * 6) // about four (a 10 px time label is wide)
     const times = candles.map((_, i) => i).filter((i) => (first + i) % every === every / 2)
     const signals = trend.signals.filter((s) => s.index > first && s.index < end).map((s) => ({ ...s, index: s.index - first }))
     return { first, candles, x, y, step, plotW, plotH, min, max, last, ticks, times, ema: path(ema), runs, signals }
-  }, [series, end, count, yScale, yShift, axes, H, interactive])
+  }, [series, end, count, yScale, yShift, axes, H, interactive, AXIS, TIME, font])
 
   const gestures = useChartGestures(interactive, view, setView, data)
 
   return (
-    <svg viewBox={`0 0 ${W} ${axes ? H : H - TIME}`} className={styles.chart} data-stage={stage} data-redraw={redraw || undefined} data-interactive={interactive || undefined} aria-hidden="true" {...gestures}>
+    <svg ref={svg} viewBox={`0 0 ${W} ${axes ? H : H - TIME}`} style={{ '--mini-label': `${font}px` } as CSSProperties} className={styles.chart} data-stage={stage} data-redraw={redraw || undefined} data-interactive={interactive || undefined} aria-hidden="true" {...gestures}>
       {stage === 'sketch' ? (
         <path className={styles.sketch} d={`M${PAD},${H / 2} C 60,${H / 2 - 30} 100,${H / 2 + 30} 150,${H / 2} S 240,${H / 2 - 30} ${W - PAD},${H / 2}`} pathLength={1} />
       ) : (
@@ -3716,13 +3697,13 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
               {data.times.map((i) => (
                 <g key={i}>
                   <line className={styles.axisLine} x1={data.x(i)} x2={data.x(i)} y1={data.plotH} y2={data.plotH + 3} />
-                  <text className={styles.tick} x={data.x(i)} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeAt(data.first + i, timeframe, data.times[data.times.indexOf(i) - 1] === undefined ? undefined : data.first + data.times[data.times.indexOf(i) - 1])}</text>
+                  <text className={styles.tick} x={data.x(i)} y={data.plotH + TIME / 2 + 1} textAnchor="middle" dominantBaseline="central">{timeAt(data.first + i, timeframe, data.times[data.times.indexOf(i) - 1] === undefined ? undefined : data.first + data.times[data.times.indexOf(i) - 1])}</text>
                 </g>
               ))}
-              <text className={styles.timeframe} x={data.plotW + AXIS / 2} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeframeShort(timeframe)}</text>
+              <text className={styles.timeframe} x={data.plotW + AXIS / 2} y={data.plotH + TIME / 2 + 1} textAnchor="middle" dominantBaseline="central">{timeframeShort(timeframe)}</text>
               {/* last price: a dashed line to the axis, then the tag */}
               <line className={styles.lastLine} x1={data.x(data.candles.length - 1)} y1={data.y(data.last)} x2={data.plotW} y2={data.y(data.last)} />
-              <rect className={styles.lastTag} x={data.plotW + 1} y={data.y(data.last) - 6} width={AXIS - 1} height={12} rx={2} />
+              <rect className={styles.lastTag} x={data.plotW + 1} y={data.y(data.last) - font * 0.75} width={AXIS - 1} height={font * 1.5} rx={2} />
               <text className={styles.lastText} x={data.plotW + 3} y={data.y(data.last)} dominantBaseline="central">{data.last.toFixed(1)}</text>
             </g>
           )}
@@ -3890,7 +3871,6 @@ function useChartGestures(
       if (zone(e.currentTarget, e.clientX, e.clientY).zone === 'price') setView((v) => ({ ...v, yScale: 1, yShift: 0 }))
       else setView(fitted)
     },
-    style: { touchAction: 'none' as const },
   }
 }
 ```
