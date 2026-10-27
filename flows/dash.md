@@ -2105,6 +2105,18 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 }
 
 /* An earlier message scrolled up under the pinned rule card (Figma: faded). */
+/* Message style "Bubbles": DASH's reply in a bubble on the left — the user's bubble's shape (radius 24, 12 / 16
+   inside), on the plain surface with a hairline so it reads on DASH's background. */
+.assistant[data-bubble] {
+  box-sizing: border-box;
+  width: fit-content; /* hugs its text, like the user's bubble */
+  max-width: 85%;
+  padding: var(--l3-spacing-12) var(--l3-spacing-16);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-24);
+  background: var(--l3-surface-default);
+}
+
 .assistant[data-faded] {
   opacity: var(--l3-opacity-40);
 }
@@ -2178,7 +2190,7 @@ import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { msArrowUpward, msChevronRight } from '@l3/icons/material'
 import sparkle from '../assets/sparkle.svg'
-import { useSystemKeyboard } from '../../../shared/prototype'
+import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
 import styles from './Chat.module.css'
 
@@ -2367,10 +2379,14 @@ export function UserMessage({ children }: { children: ReactNode }) {
   )
 }
 
-/** DASH's reply: a bold first line (Heading/14) and the text under it (Description/14), no bubble. */
+/**
+ * DASH's reply: a bold first line (Heading/14) and the text under it (Description/14). Prototype setting "Message
+ * style" (A/B): Plain = no bubble (default); Bubbles = in a bubble on the left, like the user's on the right.
+ */
 export function AssistantMessage({ title, children, faded }: { title?: ReactNode; children?: ReactNode; faded?: boolean }) {
+  const bubble = useFlowOption('dash', 'messageStyle', 'plain') === 'bubbles'
   return (
-    <Stack gap="08" className={styles.assistant} data-faded={faded || undefined}>
+    <Stack gap="08" className={styles.assistant} data-faded={faded || undefined} data-bubble={bubble || undefined}>
       {title && <p className={styles.assistantTitle}>{title}</p>}
       {children && <p className={styles.assistantText}>{children}</p>}
     </Stack>
@@ -3083,15 +3099,27 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
             <h2 key={named ? 'named' : 'unnamed'} className={styles.title}>{named ? draft.name : t('indicator.yourIndicator')}</h2>
             {!building && <span className={styles.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>}
           </Stack>
-          {/* Top right: the expand button (the full view) where a Ready tag used to be; Saved still shows its tag. A
-              mini card is itself the button that opens it, and an earlier version is tagged so. */}
+          {/* Top right: the expand button (the full view) where a Ready tag used to be — on the mini card too; Saved still
+              shows its tag. An earlier version is tagged so. */}
           {!building && (
             superseded ? (
               <Tag color="neutral" size="sm" className={styles.tag}>{t('indicator.earlierTag')}</Tag>
             ) : (
               <Stack direction="horizontal" align="center" gap="08" className={styles.tag}>
                 {state.kind === 'saved' && <Tag color="success" size="sm">{t('indicator.savedTag')}</Tag>}
-                {!mini && <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msOpenInFull} />} aria-label={t('indicator.expand')} onClick={() => setFullView(true)} />}
+                {/* On the mini card too (it folds while the chat scrolls): straight to the full view — the tap stays here,
+                    it doesn't also unfold the card. */}
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  iconLeft={<Icon icon={msOpenInFull} />}
+                  aria-label={t('indicator.expand')}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setFullView(true)
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
               </Stack>
             )
           )}
@@ -5284,6 +5312,8 @@ export const dash: Flow = {
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     { id: 'cardVersion', label: 'Card version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
+    { id: 'messageStyle', label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'plain' },
     // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
     { id: 'indicatorTags', label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     { id: 'cardIcons', label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
