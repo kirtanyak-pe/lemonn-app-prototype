@@ -4277,6 +4277,78 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
 }
 ```
 
+### `src/flows/dash/components/stickToBottom.ts`
+
+```ts
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
+
+/** How close to the bottom (px) still counts as "at the newest message". */
+const NEAR_BOTTOM = 64
+
+/**
+ * Chat-app scrolling: the newest message stays in view.
+ * - Each new turn (`turn` changes) glides to the bottom; so does starting to type (the keyboard comes up).
+ * - While the reader is at the bottom, anything that grows the chat — a card building itself, a turn fading in, the
+ *   phone's keyboard shrinking the screen — keeps it pinned there.
+ * - Scrolling up by hand (wheel, swipe) lets go, so older messages can be read; coming back down to the bottom pins
+ *   it again. The chat moving itself never lets go.
+ */
+export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: readonly unknown[]) {
+  const pinned = useRef(true)
+
+  useEffect(() => {
+    const el = scroller.current
+    if (!el) return
+    const distance = () => el.scrollHeight - el.clientHeight - el.scrollTop
+    // Instant, so it keeps up with the keyboard sliding in (a glide would trail behind it).
+    const follow = () => {
+      if (pinned.current) el.scrollTop = el.scrollHeight
+    }
+    const onScroll = () => {
+      if (distance() < NEAR_BOTTOM) pinned.current = true
+    }
+    // Only the reader's own scrolling lets go (checked a frame later, once the scroll has moved).
+    const onUserScroll = () => requestAnimationFrame(() => {
+      if (distance() >= NEAR_BOTTOM) pinned.current = false
+    })
+    el.addEventListener('scroll', onScroll, { passive: true })
+    el.addEventListener('wheel', onUserScroll, { passive: true })
+    el.addEventListener('touchmove', onUserScroll, { passive: true })
+    // The scroller itself (keyboard, rotation) and each of its children (the conversation growing).
+    const resize = new ResizeObserver(follow)
+    const watch = () => {
+      resize.disconnect()
+      resize.observe(el)
+      for (const child of el.children) resize.observe(child)
+    }
+    watch()
+    const changes = new MutationObserver(() => {
+      watch()
+      follow()
+    })
+    changes.observe(el, { childList: true, subtree: true })
+    // The phone's keyboard opening or closing (the screen above it shrinks / grows).
+    const view = window.visualViewport
+    view?.addEventListener('resize', follow)
+    return () => {
+      view?.removeEventListener('resize', follow)
+      el.removeEventListener('scroll', onScroll)
+      el.removeEventListener('wheel', onUserScroll)
+      el.removeEventListener('touchmove', onUserScroll)
+      resize.disconnect()
+      changes.disconnect()
+    }
+  }, [scroller])
+
+  // A new turn: back to the newest message, gliding.
+  useLayoutEffect(() => {
+    pinned.current = true
+    scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, turn)
+}
+```
+
 ### `src/flows/dash/copy.json`
 
 ```json
@@ -4339,18 +4411,18 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "deleted.description": "DASH has stopped tracking this rule.",
   "deleted.okay": "Okay",
   "landing.indicatorTitle": "Create Custom Indicator",
-  "landing.indicatorDescription": "Describe what your chart should show — DASH draws it.",
+  "landing.indicatorDescription": "Describe what your chart should show and DASH draws it.",
   "indicator.title": "Custom indicator",
   "indicator.history": "Your indicators",
   "indicator.emptyTitle": "What should your chart show?",
   "indicator.emptyDescription": "Describe it in plain words. DASH builds the indicator and draws it on your chart.",
   "indicator.gotIt": "Got it!",
   "indicator.fewQuestions": "Two quick questions before I build it.",
-  "indicator.buildingNow": "Building it for {chart} on {timeframe} candles — watch it take shape above.",
+  "indicator.buildingNow": "Building it for {chart} on {timeframe} candles. Watch it take shape above.",
   "indicator.readyTitle": "Your indicator is ready",
   "indicator.readyText": "Review it, modify it, or save it when you’re ready.",
   "indicator.revisionPrompt": "Describe the changes you want to make.",
-  "indicator.changed": "Done — here’s the updated preview.",
+  "indicator.changed": "Done! Here’s the updated preview.",
   "indicator.savedTitle": "Your indicator has been saved",
   "indicator.savedText": "You can view it in Scalper whenever you’re ready.",
   "indicator.view": "View indicator",
@@ -4365,13 +4437,13 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "rulesHome.topSuggestions": "Top {count} suggestions",
   "indicator.savedTag": "Saved",
   "indicator.oneQuestion": "One quick question before I build it.",
-  "indicator.noQuestions": "Your message has everything I need — building it now.",
-  "indicator.buildingBelow": "Building it for {chart} on {timeframe} candles — watch it take shape.",
+  "indicator.noQuestions": "Your message has everything I need, so I’m building it now.",
+  "indicator.buildingBelow": "Building it for {chart} on {timeframe} candles. Watch it take shape.",
   "indicator.earlierTag": "Earlier version",
   "indicator.updatedTitle": "Updated",
-  "indicator.updatedText": "Here’s the new version with your change — the earlier one is folded above.",
+  "indicator.updatedText": "Here’s the new version with your change. The earlier one is folded above.",
   "indicatorSaved.title": "Your indicator is ready to use",
-  "indicatorSaved.description": "It’s saved to Your indicators — add it to any chart from Scalper.",
+  "indicatorSaved.description": "It’s saved to Your indicators. Add it to any chart from Scalper.",
   "indicatorSaved.summary": "{place} · tested on {count} candles",
   "indicatorSaved.done": "Done",
   "indicatorSaved.view": "View indicator",
@@ -4387,7 +4459,7 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "creations.onChart": "{name} on the chart",
   "creations.deleteIndicator": "Are you sure you want to delete this indicator?",
   "creations.emptyAll": "Nothing created yet",
-  "creations.emptyAllText": "Ask DASH for a trading rule, an indicator or a strategy — it builds it for you.",
+  "creations.emptyAllText": "Ask DASH for a trading rule, an indicator or a strategy and it builds it for you.",
   "creations.emptyRules": "No AI rules yet",
   "creations.emptyRulesText": "Describe a trading habit and DASH turns it into a rule that steps in for you.",
   "creations.emptyIndicators": "No AI indicators yet",
@@ -4407,7 +4479,7 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "cards.paused": "Paused",
   "cards.onChart": "On chart",
   "cards.smartInfo": "What's a Smart Rule?",
-  "cards.smartTip": "A built-in safety rule — on by default to protect you from big losses.",
+  "cards.smartTip": "A built-in safety rule, on by default to protect you from big losses.",
   "cards.rulePaused": "Rule paused",
   "cards.ruleOn": "Rule turned on",
   "cards.indicatorOn": "Indicator added to the chart",
@@ -4692,7 +4764,7 @@ export const supertrendEma: IndicatorDraft = {
   placement: 'On the price chart',
   testedOn: 500,
   notes: [
-    'It gave 14 buy and 13 sell signals on the last 500 candles — about one a day on 15 min.',
+    'It gave 14 buy and 13 sell signals on the last 500 candles, about one a day on 15 min.',
     'In sideways markets the trend flips often; the 20 EMA helps you spot those stretches.',
   ],
 }
@@ -5467,6 +5539,7 @@ import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorC
 import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
+import { useStickToBottom } from '../components/stickToBottom'
 import { t } from '../copy'
 import { chartQuestion, indicatorPrompts, indicatorPromptsV2, supertrendEma, timeframeQuestion, type IndicatorPrompt } from '../indicatorData'
 import type { DashVersion } from './RuleChat'
@@ -5627,9 +5700,8 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     else if (!down && el.scrollTop <= 0) setCompactWanted(false)
   }
 
-  useLayoutEffect(() => {
-    scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' })
-  }, [step, pending, changes.length, changing, revisionRequested])
+  // Chat-app scrolling: the newest message stays in view (a new turn glides there; growth keeps it pinned).
+  useStickToBottom(scroller, [step, pending, changes.length, changing, revisionRequested, typingNow])
   // The keyboard takes the bottom of the screen (300 ms): once it's up, bring the newest message back into view.
   useEffect(() => {
     if (!keyboardUp) return
@@ -6102,6 +6174,7 @@ import { QuestionCard } from '../components/QuestionCard'
 import { RuleCard } from '../components/RuleCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
+import { useStickToBottom } from '../components/stickToBottom'
 import { t } from '../copy'
 import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions } from '../data'
 import styles from './RuleChat.module.css'
@@ -6171,6 +6244,8 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   const scene = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
   useEdgeFade(scroller)
+  // Chat-app scrolling: the newest message stays in view (a new turn glides there; growth keeps it pinned).
+  useStickToBottom(scroller, [step, pending, typing])
   const keyboard = useRef<HTMLDivElement>(null)
 
   const send = (text: string, from: HTMLElement) => {
@@ -6214,10 +6289,6 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
     if (screen && keyboard.current) screen.style.setProperty('--dash-kb', `${(keyboard.current.firstElementChild as HTMLElement | null)?.offsetHeight ?? 0}px`) // the keyboard itself (its wrapper is still folded)
   }, [typing])
 
-  // Keep the newest message in view as the conversation grows.
-  useLayoutEffect(() => {
-    scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' })
-  }, [step, pending])
 
   const thinkThen = (next?: () => void) => () => next && setPending(() => next)
 

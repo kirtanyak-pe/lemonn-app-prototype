@@ -1831,11 +1831,11 @@ function ema(candles: ChartCandle[], period: number) {
   color: var(--l3-content-tertiary);
 }
 
-/* Indicator rows: 32 tall — L3 card cell (Small) with the padding taken in, radius 16 (designer's call, 2026-10-27). */
+/* Indicator rows: 32 tall — L3 card cell (Small) with the padding taken in, radius 8 (designer's call, 2026-10-27). */
 .row.row.row {
   min-height: var(--l3-size-32);
   padding-block: var(--l3-spacing-06);
-  border-radius: var(--l3-radius-16);
+  border-radius: var(--l3-radius-08);
 }
 
 /* Flat rows: the light edge only, no drop shadow (designer's call, 2026-10-27; L3's clickable cell has elevation/low). */
