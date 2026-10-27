@@ -23,10 +23,10 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-11` | Read more · cost | [5612:41268](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41268) | `dash-08` | Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both. |
 | `dash-12` | Read more · no data | [5612:41402](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41402) | `dash-09` |  |
 | `dash-13` | Rule created | [5612:41875](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875) | `dash-07`, `dash-14` | Over the ready screen it was saved from (Figma shows an older card behind it). |
-| `dash-14` | Active rules | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07` | Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule. |
+| `dash-14` | Active rules | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24` | Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule. |
 | `dash-15` | Delete rule? | [5612:42250](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250) | `dash-02`, `dash-14`, `dash-16` | Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it). |
 | `dash-16` | Rule deleted | [5612:42455](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455) | `dash-02`, `dash-17` | The list behind already has 3 rules. |
-| `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07` | Not a Figma frame: the list once the sheet closes (3 rules). |
+| `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24` | Not a Figma frame: the list once the sheet closes (3 rules). |
 | `dash-20` | Indicator · what to show | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
 | `dash-21` | Indicator · which chart | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds) |
 | `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | …and the timeframe. (only for “…on Nifty 50”.) |
@@ -2638,6 +2638,7 @@ export function DashBar(props: ActionbarProps) {
 ```css
 /* Indicator card — border-light, radius 16 (designer's call, 2026-10-27), 12 inside, with the mini chart. */
 .card {
+  position: relative;
   overflow: clip;
   border: 1px solid var(--l3-border-light);
   border-radius: var(--l3-radius-16);
@@ -2760,7 +2761,67 @@ export function DashBar(props: ActionbarProps) {
 }
 
 .chart {
+  position: relative;
   padding-block: var(--l3-spacing-04);
+}
+
+/* Expand (top left of the chart, clear of the price axis): opens the full view. */
+.expand.expand {
+  position: absolute;
+  top: var(--l3-spacing-04);
+  left: 0;
+  z-index: 1;
+}
+
+.fullChart {
+  padding-block: var(--l3-spacing-08);
+}
+
+/* A change was made: a soft band of DASH light sweeps across the card once (left to right, 1.2 s). */
+.shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in srgb, var(--app-dash-glow-1) 35%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: card-shimmer var(--app-dash-shimmer) var(--l3-motion-easing-standard) var(--l3-motion-duration-short) both;
+}
+
+@keyframes card-shimmer {
+  to { transform: translateX(100%); }
+}
+
+/* "Indicator updated", above the card for a moment: it opens and fades in, stays, then fades and closes (2.8 s). */
+.updatedNote {
+  display: grid;
+  overflow: hidden;
+  color: var(--app-dash-green);
+  font: var(--l3-text-label-12);
+  animation: updated-note var(--app-dash-updated-note) var(--l3-motion-easing-standard) both;
+}
+
+.updatedNote > p {
+  min-height: 0;
+  margin: 0;
+}
+
+@keyframes updated-note {
+  0% { grid-template-rows: 0fr; opacity: 0; }
+  12% { grid-template-rows: 1fr; opacity: 1; padding-bottom: var(--l3-spacing-08); }
+  80% { grid-template-rows: 1fr; opacity: 1; padding-bottom: var(--l3-spacing-08); }
+  100% { grid-template-rows: 0fr; opacity: 0; padding-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    display: none;
+  }
 }
 
 /* Parts: small pills tinted by what they are (wireframe: lime lines, blue labels). */
@@ -2920,15 +2981,17 @@ export function DashBar(props: ActionbarProps) {
 ### `src/flows/dash/components/IndicatorCard.tsx`
 
 ```tsx
-import { useState, type KeyboardEvent } from 'react'
+import { useId, useState, type KeyboardEvent } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
-import { msCheck, msEdit, msError, msKeyboardArrowDown } from '@l3/icons/material'
+import { msCheck, msEdit, msError, msKeyboardArrowDown, msOpenInFull } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
+import { Sheet } from '../../../shared/ui/Sheet'
 import { t } from '../copy'
-import { buildSteps, type IndicatorDraft, type IndicatorSettings } from '../indicatorData'
+import { buildSteps, timeframeLabel, type IndicatorDraft, type IndicatorSettings } from '../indicatorData'
 import { MiniChart } from './MiniChart'
 import styles from './IndicatorCard.module.css'
 
@@ -2954,6 +3017,9 @@ type IndicatorCardProps = {
   settings?: IndicatorSettings
   /** A changed version: the chart plays its build again (and again on each new change), so it reads as recreated. */
   redrawn?: boolean
+  /** Counts the changes made so far: each new one shows "Indicator updated" above the card for a moment and runs a
+   *  shimmer across it. 0 / unset: nothing. */
+  updated?: number
 }
 
 /**
@@ -2965,8 +3031,10 @@ type IndicatorCardProps = {
  * - mini (compact): while the user scrolls the chat, the chart, chips, notes and button fold away
  *   and a small preview slides in beside the name (300 ms, ease in and out) — the chat gets the room. Tap to open.
  */
-export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false }: IndicatorCardProps) {
+export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false, updated = 0 }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
+  const [fullView, setFullView] = useState(false)
+  const fullViewId = useId()
   // Prototype setting "Indicator tags": the part tags under the chart, shown or hidden.
   const showTags = useFlowOption('dash', 'indicatorTags', 'show') === 'show'
   const building = state.kind === 'building'
@@ -2974,6 +3042,12 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
   const mini = (compact || superseded) && !building
 
   return (
+    <>
+    {updated > 0 && (
+      <div key={`note-${updated}`} className={styles.updatedNote} role="status">
+        <p>{t('indicator.updatedNote')}</p>
+      </div>
+    )}
     <article
       className={styles.card}
       data-state={state.kind}
@@ -2982,6 +3056,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
       aria-label={named ? draft.name : t('indicator.yourIndicator')}
       {...(mini && onExpand && { role: 'button', tabIndex: 0, 'aria-expanded': false, onClick: onExpand, onKeyDown: (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && onExpand?.() })}
     >
+      {updated > 0 && <span key={`shimmer-${updated}`} className={styles.shimmer} aria-hidden="true" />}
       <div className={styles.body}>
         <Stack direction="horizontal" align={mini ? 'center' : 'start'} justify="between" gap="12">
           {!building && (
@@ -3009,6 +3084,9 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           <div className={styles.foldBody}>
             <Stack gap="12" className={styles.foldContent}>
               <div className={styles.chart}>
+                {!building && (
+                  <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msOpenInFull} />} aria-label={t('indicator.expand')} onClick={() => setFullView(true)} className={styles.expand} />
+                )}
                 <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} />
               </div>
 
@@ -3057,7 +3135,16 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           </div>
         </div>
       </div>
+      {fullView && (
+        // The full view: the same chart, taller, in a sheet (tap outside or drag down to close).
+        <Sheet labelledBy={fullViewId} onClose={() => setFullView(false)} header={<BottomSheetHeader headingId={fullViewId} heading={draft.name} description={t('indicator.fullViewDescription', { place: draft.placement, timeframe: timeframeLabel(settings?.timeframe ?? 15) })} />}>
+          <div className={styles.fullChart}>
+            <MiniChart stage="ready" sellTone={sellTone} settings={settings} tall />
+          </div>
+        </Sheet>
+      )}
     </article>
+    </>
   )
 }
 ```
@@ -3258,7 +3345,8 @@ import styles from './MiniChart.module.css'
 export type MiniChartStage = 'sketch' | 'candles' | 'ready'
 
 const W = 300 // viewBox units — the SVG scales to the card's width
-const H = 150
+const CARD_H = 150 // the card's chart; the full view draws taller (`tall`)
+const H_TALL = 260
 const PAD = 8
 const AXIS = 36 // the price axis on the right, past its line (like Scalper's chart)
 const TIME = 16 // the time axis under the plot
@@ -3272,8 +3360,9 @@ const SESSION = 375 // 09:15 → 15:30, in minutes
  * a time axis under it and the timeframe in the corner, like Scalper's chart. Drawn from `settings`, so a change to
  * the timeframe, the EMA or the Supertrend redraws it. `axes={false}`: the bare chart (the mini card's thumbnail).
  */
-export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false }: { stage: MiniChartStage; sellTone?: 'sell' | 'orange'; settings?: IndicatorSettings; axes?: boolean; /** A changed indicator: the ready chart plays its build again (candles up, lines drawing in, then the labels). */ redraw?: boolean }) {
+export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false, tall = false }: { stage: MiniChartStage; sellTone?: 'sell' | 'orange'; settings?: IndicatorSettings; axes?: boolean; /** A changed indicator: the ready chart plays its build again (candles up, lines drawing in, then the labels). */ redraw?: boolean; /** The full view (expanded): a taller chart, same width. */ tall?: boolean }) {
   const { timeframe, emaPeriod, stPeriod, stMultiplier } = settings
+  const H = tall ? H_TALL : CARD_H
   const data = useMemo(() => {
     const candles = sampleCandles(60, 22650, timeframe)
     const avg = ema(candles, emaPeriod)
@@ -3301,7 +3390,7 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
     const ticks = niceTicks(min, max).filter((v) => y(v) > PAD && y(v) < plotH - PAD && Math.abs(y(v) - y(last)) > 9)
     const times = candles.map((_, i) => i).filter((i) => i % TIME_EVERY === TIME_EVERY / 2)
     return { candles, x, y, step, plotW, plotH, last, ticks, times, ema: path(avg, 5), runs, signals: trend.signals.filter((s) => s.index > from) }
-  }, [timeframe, emaPeriod, stPeriod, stMultiplier, axes])
+  }, [timeframe, emaPeriod, stPeriod, stMultiplier, axes, H])
 
   return (
     <svg viewBox={`0 0 ${W} ${axes ? H : H - TIME}`} className={styles.chart} data-stage={stage} data-redraw={redraw || undefined} aria-hidden="true">
@@ -4628,11 +4717,15 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "indicator.changeEma": "The EMA now averages the last {value} candles.",
   "indicator.changeSupertrend": "Supertrend is now ({period}, {multiplier}).",
   "indicator.earlierFolded": "The earlier one is folded above.",
-  "indicator.noChange": "I couldn’t find a change to make there. Try “make the timeframe 20 minutes”, “EMA 50” or “supertrend 7, 2”.",
   "indicator.suggestLabel": "Want to change something? Tap one or type your own.",
   "indicator.suggestTimeframe": "Change the timeframe to {value}",
   "indicator.suggestEma": "Use a {value} EMA",
-  "indicator.suggestSupertrend": "Make the Supertrend {period}, {multiplier}"
+  "indicator.suggestSupertrend": "Make the Supertrend {period}, {multiplier}",
+  "details.edit": "Edit",
+  "indicator.changeOther": "Done. I’ve made that change to your indicator.",
+  "indicator.updatedNote": "Indicator updated",
+  "indicator.expand": "View the full chart",
+  "indicator.fullViewDescription": "{place} · {timeframe} candles"
 }
 ```
 
@@ -4825,10 +4918,10 @@ export const dash: Flow = {
     { id: 'dash-12', group: 'dash', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <DashAI scene="rules" step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
     { id: 'dash-13', group: 'dash', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <DashAI scene="rules" step="saved" sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-07')} onViewRules={() => go('dash-14')} />} /> },
     // ---- Your rules
-    { id: 'dash-14', enter: 'fade', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-14', enter: 'fade', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
-    { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
     // ---- Custom indicator (wireframe "AI Indicator") — ONE chat screen in different states (group 'indicator')
     { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
     { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
@@ -4952,8 +5045,11 @@ export function draftFor(settings: IndicatorSettings): IndicatorDraft {
   }
 }
 
-/** What a typed change touched (empty: DASH didn't find a change it can make). */
-export type IndicatorChange = { settings: IndicatorSettings; changed: ('timeframe' | 'ema' | 'supertrend')[] }
+/**
+ * What a typed change touched. 'other': a change the prototype can't read — it's accepted anyway (there's no real
+ * DASH behind it), the chart redrawn as it was.
+ */
+export type IndicatorChange = { settings: IndicatorSettings; changed: ('timeframe' | 'ema' | 'supertrend' | 'other')[] }
 
 /**
  * Reads a plain-words change — "make the time period 20 minutes", "EMA 50", "50-day average", "supertrend 7, 2",
@@ -4986,7 +5082,8 @@ export function applyChange(settings: IndicatorSettings, text: string): Indicato
     changed.push('timeframe')
   }
   const valid = next.timeframe > 0 && next.emaPeriod > 1 && next.stPeriod > 0 && next.stMultiplier > 0
-  return valid ? { settings: next, changed } : { settings, changed: [] }
+  // Prototype: every change is accepted. One it can't read keeps the settings and is shown as made ('other').
+  return valid && changed.length ? { settings: next, changed } : { settings, changed: ['other'] }
 }
 
 /** The steps DASH shows while it builds. */
@@ -5158,6 +5255,7 @@ type ActiveRulesProps = {
   onCreateIndicator?: () => void
   /** Version 2 · card style New: the details' Edit with DASH / Add to chart. */
   onAddToChart?: () => void
+  onEditIndicator?: () => void
   onBack?: () => void
   onDelete?: (rule: SavedRule) => void
   onCreate?: () => void
@@ -5168,12 +5266,12 @@ type ActiveRulesProps = {
  * Trading rules — the user's saved rules (Figma "Active rules" 5612:42076): one L3 card per rule — its initial, name,
  * what it does and an on / off switch; the footer says what the rule did lately, with Delete. Create New in the dock.
  */
-export function ActiveRules({ rules, onBack, onDelete, onCreate, onCreateIndicator, onAddToChart, sheet }: ActiveRulesProps) {
+export function ActiveRules({ rules, onBack, onDelete, onCreate, onCreateIndicator, onAddToChart, onEditIndicator, sheet }: ActiveRulesProps) {
   // History version (its own setting, apart from the chat's): 2 = everything made with DASH, tabbed, on a plain screen
   // (Creations); 1 = this rules list.
   const history = useFlowOption('dash', 'history', '2')
   if (history === '2') {
-    return <Creations rules={dashRules} indicators={savedIndicators} strategies={savedStrategies} onBack={onBack} onDeleteRule={onDelete} onCreateRule={onCreate} onCreateIndicator={onCreateIndicator} onAddToChart={onAddToChart} sheet={sheet} />
+    return <Creations rules={dashRules} indicators={savedIndicators} strategies={savedStrategies} onBack={onBack} onDeleteRule={onDelete} onCreateRule={onCreate} onCreateIndicator={onCreateIndicator} onAddToChart={onAddToChart} onEditIndicator={onEditIndicator} sheet={sheet} />
   }
   return (
     <DashScreen
@@ -5495,6 +5593,8 @@ type CreationsProps = {
   onCreateIndicator?: () => void
   /** Card style "New" · details: Edit with DASH (a rule / an indicator) and Add to chart (an indicator). */
   onAddToChart?: () => void
+  /** An indicator's Edit (details sheet): opens it in the DASH chat, ready to change. */
+  onEditIndicator?: () => void
   /** Version 1's sheets over this screen (unused here: Version 2 opens its own details / delete sheets). */
   sheet?: ReactNode
 }
@@ -5506,7 +5606,7 @@ type CreationsProps = {
  * create one. Rules and indicators are the same card — the name's initial in an L3 Avatar, a switch (on / on the chart), footer: activity + Delete.
  * Create New in the dock makes the kind of the tab (All → a rule).
  */
-export function Creations({ rules, indicators, strategies, onBack, onDeleteRule, onCreateRule, onCreateIndicator, onAddToChart, sheet }: CreationsProps) {
+export function Creations({ rules, indicators, strategies, onBack, onDeleteRule, onCreateRule, onCreateIndicator, onAddToChart, onEditIndicator, sheet }: CreationsProps) {
   const [tab, setTab] = useState<Tab>('all')
   const [ruleList, setRuleList] = useState(rules)
   const [list, setList] = useState(indicators)
@@ -5611,7 +5711,7 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
             kind={open.of === 'rules' ? 'rule' : 'indicator'}
             on={onMap[open.item.id] ?? open.item.on}
             onClose={() => setOpen(null)}
-            onPrimary={onAddToChart}
+            onEdit={onEditIndicator}
             onDelete={() => setOpen({ kind: 'delete', item: open.item, of: open.of })}
           />
         ) : open?.kind === 'details' ? (
@@ -5975,7 +6075,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   }
   // A typed change is read into new settings (timeframe, EMA, Supertrend): after DASH thinks, the chart is redrawn
   // with them. Version 2: every change shares a new card under DASH's reply, the ones before it fold to "Earlier
-  // version"; Version 1: the pinned card redraws. A message with no change DASH can make gets a hint instead.
+  // version"; Version 1: the pinned card redraws. (Prototype: any message is taken as a change.)
   const base: IndicatorSettings = { ...defaultSettings, timeframe: minutesOf(timeframe) }
   const results = changes.reduce<IndicatorChange[]>((acc, c) => [...acc, applyChange(acc.at(-1)?.settings ?? base, c)], [])
   const answered = changing ? results.slice(0, -1) : results
@@ -5992,10 +6092,6 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     turns.push({ key: `change-${i}`, node: <UserMessage>{c}</UserMessage> })
     const result = answered[i]
     if (!result) return // DASH is still working on it
-    if (result.changed.length === 0) {
-      turns.push({ key: `changed-${i}`, node: <AssistantMessage>{t('indicator.noChange')}</AssistantMessage> })
-      return
-    }
     const summary = describeChange(result)
     if (!v2) {
       turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.changed')}>{summary}</AssistantMessage> })
@@ -6005,7 +6101,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     turns.push({
       key: `card-${i}`,
       node: i === lastCard
-        ? <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} redrawn state={step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} />
+        ? <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} redrawn updated={i + 1} state={step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} />
         : <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} state={{ kind: 'ready' }} superseded />,
     })
   })
@@ -6036,7 +6132,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         <div className={styles.pin}>
           <div className={styles.pinInner}>
             <Inset paddingInline="16" paddingBlock="08">
-              <IndicatorCard draft={draftFor(latest)} settings={latest} redrawn={versions > 0} state={cardState} onModify={modify} onSave={save} compact={compact || folding} onExpand={() => { setCompactWanted(false); onTyping?.(false) }} />
+              <IndicatorCard draft={draftFor(latest)} settings={latest} redrawn={versions > 0} updated={versions} state={cardState} onModify={modify} onSave={save} compact={compact || folding} onExpand={() => { setCompactWanted(false); onTyping?.(false) }} />
             </Inset>
           </div>
         </div>
@@ -6130,7 +6226,9 @@ function describeChange({ settings, changed }: IndicatorChange) {
         ? t('indicator.changeTimeframe', { value: timeframeLabel(settings.timeframe) })
         : part === 'ema'
           ? t('indicator.changeEma', { value: settings.emaPeriod })
-          : t('indicator.changeSupertrend', { period: settings.stPeriod, multiplier: settings.stMultiplier }),
+          : part === 'supertrend'
+            ? t('indicator.changeSupertrend', { period: settings.stPeriod, multiplier: settings.stMultiplier })
+            : t('indicator.changeOther'),
     )
     .join(' ')
 }
@@ -6919,7 +7017,7 @@ import { Icon } from '@l3/components/Icon'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
-import { msAddChart, msDelete } from '@l3/icons/material'
+import { msAddChart, msDelete, msEdit } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { BacktestStrip } from '../components/RuleCard'
@@ -7110,30 +7208,37 @@ export function RuleDeletedSheet({ onOkay }: { onOkay?: () => void }) {
  * - a short list of the other actions — Edit with DASH › (indicators), Delete (red, last, apart from the main action);
  * - the dock: Add to chart (an indicator) or Edit with DASH (a rule). Close: tap outside or drag down.
  */
-export function CreationDetailsSheet({ item, kind, on, onClose, onPrimary, onDelete }: {
+export function CreationDetailsSheet({ item, kind, on, onClose, onEdit, onDelete }: {
   item: { title: string; summary: string; smart?: boolean; activity: { text: string; strong?: string; after?: string } }
   kind: 'rule' | 'indicator'
   /** As it is now (the card's switch). */
   on: boolean
   onClose?: () => void
-  /** Indicators: Add to chart (the dock's main button). A rule has only Delete; closing is a tap outside. */
-  onPrimary?: () => void
+  /** Indicators: Edit with DASH (opens it in the chat, ready to change). Rules can't be edited once made. */
+  onEdit?: () => void
   onDelete?: () => void
 }) {
   const id = useId()
   const { text, strong, after } = item.activity
   const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
-  // A rule or an indicator can't be edited once it's made: the dock is Add to chart (indicators), Delete (asks first) under it.
+  // The dock: an indicator has Edit (primary) with Delete (secondary) under it; a rule has Delete only. (Adding to a
+  // chart is the card's own switch.)
   return (
     <Sheet
       labelledBy={id}
       onClose={onClose}
       header={<BottomSheetHeader size="lg" headingId={id} heading={item.title} description={item.summary} icon={<DashOrb size="md" />} />}
       footer={
-        <ButtonGroup aria-label={item.title} direction="vertical">
-          {kind === 'indicator' && <Button iconLeft={<Icon icon={msAddChart} />} onClick={onPrimary}>{t('cards.addToChart')}</Button>}
-          <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
-        </ButtonGroup>
+        kind === 'indicator' ? (
+          <ButtonGroup aria-label={item.title} direction="vertical">
+            <Button iconLeft={<Icon icon={msEdit} />} onClick={onEdit}>{t('details.edit')}</Button>
+            <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
+          </ButtonGroup>
+        ) : (
+          <ButtonGroup aria-label={item.title}>
+            <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
+          </ButtonGroup>
+        )
       }
     >
       <Stack gap="16">
