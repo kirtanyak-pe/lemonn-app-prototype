@@ -1785,8 +1785,12 @@ function ema(candles: ChartCandle[], period: number) {
   height: 100vh;
 }
 
+/* NEW on the Zing yellow: content/inverted (white in light, black in dark). Beats L3's [data-flag-tone='zing']. */
+.nav.nav[data-flag-tone] {
+  --side-nav-flag-content: var(--l3-content-inverted);
+}
+
 .nav {
-  --side-nav-flag-content: var(--l3-content-inverted); /* NEW on the Zing yellow: inverted (white in light) */
   padding: var(--l3-spacing-16) var(--l3-spacing-08);
   overflow-y: auto;
   box-shadow: inset -1px 0 0 var(--l3-border-light); /* 1px: Figma stroke weight has no variable */

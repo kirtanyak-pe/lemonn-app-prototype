@@ -205,6 +205,8 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-27 — The card setting is now **Card version: Version 1 / Version 2** (was Card style: Current / New), default Version 2 for everyone. Preview: Shift+D flips light / dark.
+- 2026-10-27 — Card style New · details sheet: one primary in the dock (Add to chart for an indicator, Edit with DASH for a rule); large header with a smaller DASH mark, the name and what it does; facts (Status, Activity); a Smart Rule's meaning; the other actions as a quiet list — Edit with DASH › (indicators), Delete in red, last. Off indicator cards say “Not on a chart”.
 - 2026-10-27 — Created with DASH · prototype setting **Card style: Current / New** (default New). New adds, without rewording anything: an icon for what each rule does (push notification / warning / in-app alert; indicator = chart) instead of the initial; off cards dim with a Paused tag; every toggle toasts (Rule paused / turned on, Indicator added / removed) with Undo; titles wrap to two lines; Smart Rule's ⓘ is its own button with a tooltip (a built-in safety rule, on by default); “On chart” under an indicator's switch; active first, “3 active · 5 paused” under each section title; details sheet: Add to chart (indicators), Edit with DASH, Delete.
 - 2026-10-27 — Created with DASH cards: two tap areas — the body (12 inside) is the switch's label, so tapping anywhere turns it on / off; the footer is one button across the grey strip (activity · Details ›) that opens the details sheet (Okay, Delete rule / Delete indicator, which still asks to confirm).
 - 2026-10-27 — Created with DASH (Version 2): the user's 8 rules from the live app (titles, wording, on / off, dates; “Smart Rule ⓘ” tag on the 3 smart ones); a › on every card opens its details sheet (DASH mark, name, full text, Okay); Delete (rules and indicators) asks in a sheet with the large header — the delete icon in a red circle — and Yes, Delete above No. Prototype setting “Card icons” (Show / Hide), also Shift+P on that screen.
@@ -4354,7 +4356,12 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "cards.rulesStatus": "{on} active · {off} paused",
   "cards.indicatorsStatus": "{on} on chart · {off} off",
   "cards.editWithDash": "Edit with DASH",
-  "cards.addToChart": "Add to chart"
+  "cards.addToChart": "Add to chart",
+  "details.on": "On",
+  "details.notOnChart": "Not on a chart",
+  "details.facts": "About it",
+  "details.status": "Status",
+  "details.activity": "Activity"
 }
 ```
 
@@ -4514,8 +4521,8 @@ export const dash: Flow = {
   options: [
     { id: 'version', label: 'DASH version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
-    // Version 2 · Created with DASH: the card — Current, or New (paused state, undo toast, kind icons, details actions).
-    { id: 'cardStyle', label: 'Card style', values: [{ value: 'current', label: 'Current' }, { value: 'new', label: 'New' }], default: 'new' },
+    // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
+    { id: 'cardVersion', label: 'Card version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
     { id: 'cardIcons', label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
   ],
   sections: [
@@ -5055,7 +5062,7 @@ export function CreationCard({ item, kind, on, onToggle, onOpen }: CreationCardP
             {(item.smart || !on) && (
               <Stack direction="horizontal" align="center" gap="04" wrap>
                 {item.smart && <Tag color="success" variant="secondary" size="sm">{t('rules.smart')}</Tag>}
-                {!on && <Tag color="neutral" variant="secondary" size="sm">{t('cards.paused')}</Tag>}
+                {!on && <Tag color="neutral" variant="secondary" size="sm">{kind === 'indicator' ? t('details.notOnChart') : t('cards.paused')}</Tag>}
               </Stack>
             )}
             <span className={styles.title}>{item.title}</span>
@@ -5112,7 +5119,7 @@ import { setFlowOption, useFlowOption } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
 import { t } from '../copy'
 import type { SavedRule } from '../data'
-import { DeleteRuleSheet, RuleDetailsSheet } from '../sheets/RuleSheets'
+import { CreationDetailsSheet, DeleteRuleSheet, RuleDetailsSheet } from '../sheets/RuleSheets'
 import { RuleItem } from './ActiveRules'
 import { CreationCard } from './CreationCard'
 import styles from './Creations.module.css'
@@ -5152,8 +5159,8 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
   const [open, setOpen] = useState<{ kind: 'details' | 'delete'; item: SavedRule; of: 'rules' | 'indicators' } | null>(null)
   // Prototype setting "Card icons" (or Shift+P): the initial avatar on the Current card (the New card has none).
   const showIcons = useFlowOption('dash', 'cardIcons', 'show') === 'show'
-  // Prototype setting "Card style": Current (as it was) or New (paused state, undo toast, kind icons, details actions).
-  const modern = useFlowOption('dash', 'cardStyle', 'new') === 'new'
+  // Prototype setting "Card version": 1 (as it was) or 2 (default: paused state, undo toast, details sheet).
+  const modern = useFlowOption('dash', 'cardVersion', '2') === '2'
   // On / off per item (New): kept here so the toast can undo a toggle.
   const [onMap, setOnMap] = useState<Record<string, boolean>>(() => Object.fromEntries([...rules, ...indicators].map((r) => [r.id, r.on])))
   const [toast, setToast] = useState<{ key: number; heading: string; undo: () => void } | null>(null)
@@ -5243,13 +5250,20 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
         )
       }
       sheet={
-        open?.kind === 'details' ? (
+        open?.kind === 'details' && modern ? (
+          <CreationDetailsSheet
+            item={open.item}
+            kind={open.of === 'rules' ? 'rule' : 'indicator'}
+            on={onMap[open.item.id] ?? open.item.on}
+            onClose={() => setOpen(null)}
+            onPrimary={open.of === 'rules' ? onEditRule : onAddToChart}
+            onEdit={onEditIndicator}
+            onDelete={() => setOpen({ kind: 'delete', item: open.item, of: open.of })}
+          />
+        ) : open?.kind === 'details' ? (
           <RuleDetailsSheet
             rule={open.item}
             onClose={() => setOpen(null)}
-            modern={modern}
-            onEdit={open.of === 'rules' ? onEditRule : onEditIndicator}
-            onAddToChart={open.of === 'indicators' ? onAddToChart : undefined}
             deleteLabel={open.of === 'rules' ? t('creations.deleteRuleButton') : t('creations.deleteIndicatorButton')}
             onDelete={() => setOpen({ kind: 'delete', item: open.item, of: open.of })}
           />
@@ -6385,6 +6399,42 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
   font: var(--l3-text-description-12);
   text-align: center;
 }
+
+/* Card style New · details */
+.activityValue {
+  font: var(--l3-text-label-12);
+  color: var(--l3-content-secondary);
+  text-align: end;
+}
+
+.activityValue strong {
+  font: var(--l3-text-heading-12);
+  color: var(--l3-content-primary);
+}
+
+.smartInline {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--l3-spacing-08);
+  margin: 0;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+}
+
+.smartInline > :first-child {
+  flex: none;
+}
+
+/* The other actions: plain rows, a hairline between; Delete last, in the error colour. */
+.actions {
+  margin-inline: calc(-1 * var(--l3-spacing-16));
+  border-top: 1px solid var(--l3-border-light);
+}
+
+.danger.danger,
+.danger.danger :is(span, svg) {
+  color: var(--l3-content-accent-error-default);
+}
 ```
 
 ### `src/flows/dash/sheets/RuleSheets.tsx`
@@ -6395,9 +6445,11 @@ import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Icon } from '@l3/components/Icon'
+import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { ListCell } from '@l3/components/ListCell'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
-import { msAddChart, msDelete, msEdit } from '@l3/icons/material'
+import { msAddChart, msChevronRight, msDelete, msEdit } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { BacktestStrip } from '../components/RuleCard'
@@ -6581,6 +6633,73 @@ export function RuleDeletedSheet({ onOkay }: { onOkay?: () => void }) {
       <Stack gap="08" align="center" className={[styles.content, styles.centre, styles.roomy].join(' ')}>
         <h2 id={id} className={styles.title}>{t('deleted.title')}</h2>
         <p className={styles.description}>{t('deleted.description')}</p>
+      </Stack>
+    </Sheet>
+  )
+}
+
+
+/**
+ * Card style New · a creation's details: one clear next step in the dock, everything else quiet.
+ * - header (L3 large): DASH's mark, the name, what it does;
+ * - facts: its status (On / Paused · On chart / Not on a chart) and the activity line the card shows;
+ * - a Smart Rule says what that means;
+ * - a short list of the other actions — Edit with DASH › (indicators), Delete (red, last, apart from the main action);
+ * - the dock: Add to chart (an indicator) or Edit with DASH (a rule). Close: tap outside or drag down.
+ */
+export function CreationDetailsSheet({ item, kind, on, onClose, onPrimary, onEdit, onDelete }: {
+  item: { title: string; summary: string; smart?: boolean; activity: { text: string; strong?: string; after?: string } }
+  kind: 'rule' | 'indicator'
+  /** As it is now (the card's switch). */
+  on: boolean
+  onClose?: () => void
+  /** The dock: Add to chart (an indicator) / Edit with DASH (a rule). */
+  onPrimary?: () => void
+  /** Indicators: Edit with DASH (in the list). */
+  onEdit?: () => void
+  onDelete?: () => void
+}) {
+  const id = useId()
+  const { text, strong, after } = item.activity
+  const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
+  return (
+    <Sheet
+      labelledBy={id}
+      onClose={onClose}
+      header={<BottomSheetHeader size="lg" headingId={id} heading={item.title} description={item.summary} icon={<DashOrb size="md" />} />}
+      footer={
+        <ButtonGroup aria-label={item.title}>
+          {kind === 'indicator' ? (
+            <Button iconLeft={<Icon icon={msAddChart} />} onClick={onPrimary}>{t('cards.addToChart')}</Button>
+          ) : (
+            <Button iconLeft={<Icon icon={msEdit} />} onClick={onPrimary}>{t('cards.editWithDash')}</Button>
+          )}
+        </ButtonGroup>
+      }
+    >
+      <Stack gap="16">
+        <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
+          <KeyValueRow label={t('details.status')} value={<Tag color={on ? 'success' : 'neutral'} variant="secondary" size="sm">{status}</Tag>} />
+          <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
+        </KeyValueList>
+        {item.smart && (
+          <p className={styles.smartInline}>
+            <Tag color="success" variant="secondary" size="sm">{t('rules.smart')}</Tag>
+            <span>{t('cards.smartTip')}</span>
+          </p>
+        )}
+        <div className={styles.actions}>
+          {kind === 'indicator' && (
+            <ListCell as="button" iconLeft={<Icon icon={msEdit} />} label={t('cards.editWithDash')} iconRight={<Icon icon={msChevronRight} />} onClick={onEdit} />
+          )}
+          <ListCell
+            as="button"
+            className={styles.danger}
+            iconLeft={<Icon icon={msDelete} />}
+            label={kind === 'rule' ? t('creations.deleteRuleButton') : t('creations.deleteIndicatorButton')}
+            onClick={onDelete}
+          />
+        </div>
       </Stack>
     </Sheet>
   )
