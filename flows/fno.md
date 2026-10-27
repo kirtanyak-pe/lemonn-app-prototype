@@ -1025,7 +1025,7 @@ function clock(start: string, add: number) {
   "tools.new": "NEW",
   "tools.search": "Search {section}",
   "tools.yours": "Your indicators",
-  "tools.create": "Create indicator",
+  "tools.create": "Create",
   "tools.none": "No indicators created yet.",
   "tools.byDash": "Made with DASH AI",
   "tools.lemonn": "Lemonn indicators",
@@ -1042,7 +1042,8 @@ function clock(start: string, add: number) {
   "tools.closeSearch": "Close search",
   "tools.noResults": "No indicators match “{query}”.",
   "scalper.indicatorCount": "{count} indicators on the chart",
-  "scalper.refresh": "Reset the chart"
+  "scalper.refresh": "Reset the chart",
+  "tools.createLabel": "Create an indicator with DASH"
 }
 ```
 
@@ -1814,17 +1815,28 @@ function ema(candles: ChartCandle[], period: number) {
   color: var(--l3-content-primary);
 }
 
+.subDescription {
+  margin: 0;
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
+
 .empty {
   margin: 0;
   font: var(--l3-text-description-14);
   color: var(--l3-content-tertiary);
 }
 
-/* Indicator rows: the live app's 33-tall pills — L3 card cell (Small) with the padding taken in and full rounding. */
+/* Indicator rows: 32 tall — L3 card cell (Small) with the padding taken in, radius 16 (designer's call, 2026-10-27). */
 .row.row.row {
   min-height: var(--l3-size-32);
   padding-block: var(--l3-spacing-06);
-  border-radius: var(--l3-radius-full);
+  border-radius: var(--l3-radius-16);
+}
+
+/* Flat rows: the light edge only, no drop shadow (designer's call, 2026-10-27; L3's clickable cell has elevation/low). */
+.panel .row.row.row {
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
 .star {
@@ -1832,13 +1844,13 @@ function ema(candles: ChartCandle[], period: number) {
 }
 
 /* On the chart (live app): the row turns blue — discover tint, edge and text, ✕ to take it off. */
-.row.row.row[data-selected] {
+.panel .row.row.row[data-selected] {
   background: var(--l3-surface-accent-discover-light);
   box-shadow: inset 0 0 0 1px var(--l3-border-accent-discover-default); /* 1px: Figma stroke weight has no variable */
   color: var(--l3-content-accent-discover-default);
 }
 
-.row.row.row[data-selected] :is(span, p, svg) {
+.panel .row.row.row[data-selected] :is(span, p, svg) {
   color: var(--l3-content-accent-discover-default);
 }
 
@@ -1945,7 +1957,8 @@ type ChartToolsSheetProps = {
  * - some on the chart: "Indicators (2)" · bin (take all off) · fx with the count · search; each one on the chart is a
  *   blue row with ✕ — tapping a row adds or removes it, several at once;
  * - search: a search field takes the title's place, the list filters as you type, the sheet opens to full height.
- * Your indicators (made with DASH AI, or "No indicators created yet." and Create indicator) sit above Lemonn indicators.
+ * Your indicators ("Made with DASH AI" under the heading; or "No indicators created yet.") and Create indicator sit above
+ * Lemonn indicators.
  */
 export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll, onCreateIndicator, guide = false }: ChartToolsSheetProps) {
   const [section, setSection] = useState<Section>('indicators')
@@ -1987,11 +2000,11 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
     <div className={styles.body} data-search={searching || undefined}>
       {guiding && <div className={styles.dim} aria-hidden="true" />}
       <SideNav<Section>
+        selectedTone="discover"
         aria-label={t('scalper.chartTools')}
         aria-controls="chart-tools-panel"
         value={section}
         onChange={setSection}
-        selectedTone="discover"
         flagTone="zing"
         className={styles.nav}
         items={[
@@ -2042,10 +2055,13 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
               <Tooltip open={guiding} content={t('tools.guideTip')} placement="top" onClose={() => setGuiding(false)}>
                 <Stack as="section" gap="12" aria-label={t('tools.yours')}>
                   <Stack direction="horizontal" align="center" justify="between">
-                    <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
-                    <Button variant="ghost" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreateIndicator}>{t('tools.create')}</Button>
+                    <Stack gap="00">
+                      <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
+                      <p className={styles.subDescription}>{t('tools.byDash')}</p>
+                    </Stack>
+                    <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msAdd} />} aria-label={t('tools.createLabel')} onClick={onCreateIndicator}>{t('tools.create')}</Button>
                   </Stack>
-                  {yourIndicators.length ? <Stack gap="12">{yourIndicators.map((name) => row(name, t('tools.byDash')))}</Stack> : <p className={styles.empty}>{t('tools.none')}</p>}
+                  {yourIndicators.length ? <Stack gap="12">{yourIndicators.map((name) => row(name))}</Stack> : <p className={styles.empty}>{t('tools.none')}</p>}
                 </Stack>
               </Tooltip>
             </div>
