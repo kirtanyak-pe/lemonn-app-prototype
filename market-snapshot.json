@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-10-27T15:29:22.925Z",
+ "fetchedAt": "2026-10-27T15:43:03.284Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -7401,8 +7401,8 @@
      "close": 1163
     }
    ],
-   "sector": "Technology",
-   "industry": "Information Technology Services"
+   "sector": null,
+   "industry": null
   },
   "IOC": {
    "price": 131.75,
