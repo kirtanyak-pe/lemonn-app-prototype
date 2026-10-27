@@ -1536,7 +1536,6 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
 
 ```tsx
 import { useMemo, useState } from 'react'
-import { BottomSheet } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import type { ChartCandle } from '@l3/components/Chart'
 import { Icon } from '@l3/components/Icon'
@@ -1545,6 +1544,7 @@ import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
 import { msAdd, msArrowBack, msArrowDropUp, msJoin, msLink, msMonitoring, msPlaylistAdd, msReceiptLong, msShowChart, msSwapHoriz, msUnfoldMore } from '@l3/icons/material'
 import { Screen } from '../../../shared/ui/Screen'
+import { Sheet } from '../../../shared/ui/Sheet'
 import { TradingPane, type PaneLine } from '../components/TradingPane'
 import { t } from '../copy'
 import { scalperOption, scalperSpot, type ScalperInstrument } from '../data'
@@ -1637,17 +1637,19 @@ export function Scalper({ onBack, createdIndicator, openIndicators, initialIndic
         </div>
       }
       sheet={
-        <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} aria-label={t('scalper.chartTools')} className={styles.sheet}>
-          <ChartToolsSheet
-            yourIndicators={createdIndicator ? [createdIndicator] : []}
-            onCreateIndicator={onCreateIndicator}
-            onPick={(name) => {
-              setIndicator(name)
-              setSheetOpen(false)
-              onApplyIndicator?.(name)
-            }}
-          />
-        </BottomSheet>
+        sheetOpen && (
+          <Sheet label={t('scalper.chartTools')} onClose={() => setSheetOpen(false)} className={styles.sheet}>
+            <ChartToolsSheet
+              yourIndicators={createdIndicator ? [createdIndicator] : []}
+              onCreateIndicator={onCreateIndicator}
+              onPick={(name) => {
+                setIndicator(name)
+                setSheetOpen(false)
+                onApplyIndicator?.(name)
+              }}
+            />
+          </Sheet>
+        )
       }
     >
       <ChartPanel instrument={scalperSpot} lines={overlay} indicator={indicator} chartType onTools={() => setSheetOpen(true)} />
@@ -2321,6 +2323,8 @@ type SheetProps = {
   label?: string
   /** Prototype: where a backdrop tap, drag down or Esc goes. Leave out for sheets that can't be dismissed (loaders). */
   onClose?: () => void
+  /** A screen's own styling hook on the sheet surface (e.g. a sheet that brings its own layout and no padding). */
+  className?: string
 }
 
 type Publish = (id: string, sheet: SheetProps | null) => void
@@ -2344,12 +2348,12 @@ export function Sheet(props: SheetProps) {
   useLayoutEffect(() => (hosted ? () => publish(id, null) : undefined), [hosted, publish, id])
 
   if (hosted) return null
-  const { header, children, footer, labelledBy, label } = props
+  const { header, children, footer, labelledBy, label, className } = props
   return (
     <>
       <Overlay open className={styles.scrim} />
       <div className={styles.dock} role="dialog" aria-labelledby={labelledBy} aria-label={label}>
-        <BottomSheetSurface header={header} footer={footer}>{children}</BottomSheetSurface>
+        <BottomSheetSurface header={header} footer={footer} className={className}>{children}</BottomSheetSurface>
       </div>
     </>
   )
@@ -2384,6 +2388,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
           footer={shown.sheet.footer}
           aria-labelledby={shown.sheet.labelledBy}
           aria-label={shown.sheet.label}
+          className={shown.sheet.className}
         >
           {shown.sheet.children}
         </BottomSheet>

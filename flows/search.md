@@ -1701,6 +1701,8 @@ type SheetProps = {
   label?: string
   /** Prototype: where a backdrop tap, drag down or Esc goes. Leave out for sheets that can't be dismissed (loaders). */
   onClose?: () => void
+  /** A screen's own styling hook on the sheet surface (e.g. a sheet that brings its own layout and no padding). */
+  className?: string
 }
 
 type Publish = (id: string, sheet: SheetProps | null) => void
@@ -1724,12 +1726,12 @@ export function Sheet(props: SheetProps) {
   useLayoutEffect(() => (hosted ? () => publish(id, null) : undefined), [hosted, publish, id])
 
   if (hosted) return null
-  const { header, children, footer, labelledBy, label } = props
+  const { header, children, footer, labelledBy, label, className } = props
   return (
     <>
       <Overlay open className={styles.scrim} />
       <div className={styles.dock} role="dialog" aria-labelledby={labelledBy} aria-label={label}>
-        <BottomSheetSurface header={header} footer={footer}>{children}</BottomSheetSurface>
+        <BottomSheetSurface header={header} footer={footer} className={className}>{children}</BottomSheetSurface>
       </div>
     </>
   )
@@ -1764,6 +1766,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
           footer={shown.sheet.footer}
           aria-labelledby={shown.sheet.labelledBy}
           aria-label={shown.sheet.label}
+          className={shown.sheet.className}
         >
           {shown.sheet.children}
         </BottomSheet>
