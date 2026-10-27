@@ -205,6 +205,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-27 — Indicator chart: price and time axes, last price, timeframe; typed changes (timeframe, EMA, Supertrend) redraw it after DASH thinks, with the build playing again; change suggestions (faint gradient edge) under a ready indicator; the card folds while typing. The chat always uses the drawn keyboard (a phone's own stays closed). Prototype setting **Indicator tags** (Show / Hide).
 - 2026-10-27 — Settings split: **Chat version** (was “DASH version”) for the chats, **History version** for the history page (1 = Trading rules list, 2 = Created with DASH), each set on its own. Version 1 chats now get the same end-to-end steps as Version 2: Save indicator opens the saved sheet, after Modify the pinned card shows the updated version, and the indicator examples work as in Version 2 (builds straight away / asks the chart / asks the timeframe). Nothing made with DASH can be edited: the details sheet's dock is Add to chart on top, Delete under it (a rule: Delete only).
 - 2026-10-27 — The card setting is now **Card version: Version 1 / Version 2** (was Card style: Current / New), default Version 2 for everyone. Preview: Shift+D flips light / dark.
 - 2026-10-27 — Card style New · details sheet: one primary in the dock (Add to chart for an indicator, Edit with DASH for a rule); large header with a smaller DASH mark, the name and what it does; facts (Status, Activity); a Smart Rule's meaning; the other actions as a quiet list — Edit with DASH › (indicators), Delete in red, last. Off indicator cards say “Not on a chart”.
@@ -2158,6 +2159,20 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   box-shadow: var(--l3-shadow-sm);
 }
 
+/* Suggestions: a faint gradient edge in the DASH colours (lime → green), softened toward the plain hairline. */
+.reply[data-glow] {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--l3-surface-default), var(--l3-surface-default)) padding-box,
+    linear-gradient(
+        120deg,
+        color-mix(in srgb, var(--app-dash-glow-2) 55%, var(--l3-border-light)),
+        color-mix(in srgb, var(--app-dash-glow-1) 70%, var(--l3-border-light)) 50%,
+        var(--l3-border-light)
+      )
+      border-box;
+}
+
 .reply:active {
   transform: scale(var(--l3-motion-scale-press-default));
 }
@@ -2172,6 +2187,7 @@ import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { msArrowUpward, msChevronRight } from '@l3/icons/material'
 import sparkle from '../assets/sparkle.svg'
+import { useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
 import styles from './Chat.module.css'
 
@@ -2207,6 +2223,9 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
   const setValue = (v: string) => (onChange ? onChange(v) : setOwn(v))
   const ownField = useRef<HTMLInputElement>(null)
   const field = inputRef ?? ownField
+  // A phone (touch) types on the prototype's drawn keyboard: its own keyboard stays closed (inputMode none). A laptop
+  // types on its keyboard too.
+  const touch = useSystemKeyboard()
   const send = () => {
     const text = value.trim()
     if (!text || !field.current) return
@@ -2232,6 +2251,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
         placeholder={t('input.placeholder')}
         aria-label={t('input.label')}
         enterKeyHint="send"
+        inputMode={touch ? 'none' : undefined}
       />
       <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || !value.trim()} className={styles.send} />
     </form>
@@ -2383,7 +2403,7 @@ export function Thinking({ children }: { children: ReactNode }) {
 export type ReplyOption = { label: string; onClick?: () => void; suggested?: boolean }
 
 /** Quick replies under DASH's question: pill chips; the one DASH suggests has the green edge. */
-export function ReplyChips({ options, asButtons = false }: { options: ReplyOption[]; /** Version 2: real L3 buttons — the suggested reply primary with ›, the others tertiary — so they read as actions. */ asButtons?: boolean }) {
+export function ReplyChips({ options, asButtons = false, glow = false }: { options: ReplyOption[]; /** Version 2: real L3 buttons — the suggested reply primary with ›, the others tertiary — so they read as actions. */ asButtons?: boolean; /** Suggestions (a ready indicator's changes): a faint DASH-gradient edge, so they stand out a little. */ glow?: boolean }) {
   if (asButtons) {
     return (
       <Stack direction="horizontal" gap="08" wrap role="group" aria-label={t('replies.label')}>
@@ -2398,7 +2418,7 @@ export function ReplyChips({ options, asButtons = false }: { options: ReplyOptio
   return (
     <Stack direction="horizontal" gap="08" wrap role="group" aria-label={t('replies.label')}>
       {options.map((o) => (
-        <button key={o.label} type="button" className={styles.reply} data-suggested={o.suggested || undefined} onClick={o.onClick}>
+        <button key={o.label} type="button" className={styles.reply} data-suggested={o.suggested || undefined} data-glow={glow || undefined} onClick={o.onClick}>
           {o.label}
         </button>
       ))}
@@ -2906,8 +2926,9 @@ import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msCheck, msEdit, msError, msKeyboardArrowDown } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
 import { t } from '../copy'
-import { buildSteps, type IndicatorDraft } from '../indicatorData'
+import { buildSteps, type IndicatorDraft, type IndicatorSettings } from '../indicatorData'
 import { MiniChart } from './MiniChart'
 import styles from './IndicatorCard.module.css'
 
@@ -2929,6 +2950,10 @@ type IndicatorCardProps = {
   onExpand?: () => void
   /** Version 2: a newer version was shared below — this one folds to its mini form, dimmed, tagged "Earlier version". */
   superseded?: boolean
+  /** What the chart is drawn with (timeframe, EMA, Supertrend) — a change in the chat redraws it. */
+  settings?: IndicatorSettings
+  /** A changed version: the chart plays its build again (and again on each new change), so it reads as recreated. */
+  redrawn?: boolean
 }
 
 /**
@@ -2940,8 +2965,10 @@ type IndicatorCardProps = {
  * - mini (compact): while the user scrolls the chat, the chart, chips, notes and button fold away
  *   and a small preview slides in beside the name (300 ms, ease in and out) — the chat gets the room. Tap to open.
  */
-export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false }: IndicatorCardProps) {
+export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
+  // Prototype setting "Indicator tags": the part tags under the chart, shown or hidden.
+  const showTags = useFlowOption('dash', 'indicatorTags', 'show') === 'show'
   const building = state.kind === 'building'
   const stage = building ? (state.step === 0 ? 'sketch' : 'candles') : 'ready'
   const mini = (compact || superseded) && !building
@@ -2960,7 +2987,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           {!building && (
             <div className={styles.thumb} aria-hidden="true">
               <div className={styles.thumbChart}>
-                <MiniChart stage="ready" sellTone={sellTone} />
+                <MiniChart stage="ready" sellTone={sellTone} settings={settings} axes={false} />
               </div>
             </div>
           )}
@@ -2982,10 +3009,10 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           <div className={styles.foldBody}>
             <Stack gap="12" className={styles.foldContent}>
               <div className={styles.chart}>
-                <MiniChart stage={stage} sellTone={sellTone} />
+                <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} />
               </div>
 
-              {(named || !building) && (
+              {showTags && (named || !building) && (
                 <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
                   {draft.parts.map((p, i) => (
                     <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
@@ -3112,19 +3139,62 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
   stroke: var(--l3-content-accent-indicator-up-default);
 }
 
+/* Axes (like Scalper's chart): hairlines, price and time labels in secondary text, the last price tagged green.
+   Font sizes are viewBox units — the chart scales to ≈ 1.1 × on a 328 card. */
+.axisLine {
+  stroke: var(--l3-border-light);
+  stroke-width: 0.8;
+}
+
+.tick,
+.timeframe,
+.lastText {
+  font: var(--l3-text-label-12);
+  font-size: 7px;
+}
+
+.tick {
+  fill: var(--l3-content-secondary);
+}
+
+.timeframe {
+  fill: var(--l3-content-primary);
+  font: var(--l3-text-heading-12);
+  font-size: 7px;
+}
+
+.lastLine {
+  stroke: var(--l3-content-accent-indicator-up-default);
+  stroke-width: 0.8;
+  stroke-dasharray: 3 2;
+}
+
+.lastTag {
+  fill: var(--l3-surface-accent-indicator-up-default);
+}
+
+.lastText {
+  fill: var(--l3-static-white);
+}
+
 @keyframes mini-draw {
   to { stroke-dashoffset: 0; }
 }
 
 /* ready: lines already drawn (no replay), labels pop in */
-.chart[data-stage='ready'] .ema,
-.chart[data-stage='ready'] .trend {
+.chart[data-stage='ready']:not([data-redraw]) .ema,
+.chart[data-stage='ready']:not([data-redraw]) .trend {
   animation: none;
   stroke-dashoffset: 0;
 }
 
-.chart[data-stage='ready'] .candles g {
+.chart[data-stage='ready']:not([data-redraw]) .candles g {
   animation: none;
+}
+
+/* redraw (a change was made): the whole build plays again — candles, lines, then the labels once the lines are in. */
+.chart[data-redraw] .signal {
+  animation-delay: calc(var(--app-dash-redraw-labels) + var(--signal-delay, 0ms));
 }
 
 .signal {
@@ -3176,8 +3246,8 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
 ### `src/flows/dash/components/MiniChart.tsx`
 
 ```tsx
-import { useMemo } from 'react'
-import { ema, sampleCandles, supertrend } from '../indicatorData'
+import { useMemo, type CSSProperties } from 'react'
+import { defaultSettings, ema, sampleCandles, supertrend, timeframeShort, type IndicatorSettings } from '../indicatorData'
 import styles from './MiniChart.module.css'
 
 /**
@@ -3188,43 +3258,77 @@ import styles from './MiniChart.module.css'
 export type MiniChartStage = 'sketch' | 'candles' | 'ready'
 
 const W = 300 // viewBox units — the SVG scales to the card's width
-const H = 128
+const H = 150
 const PAD = 8
+const AXIS = 36 // the price axis on the right, past its line (like Scalper's chart)
+const TIME = 16 // the time axis under the plot
+const TIME_EVERY = 12 // a time label every 12 candles
+const SESSION_START = 9 * 60 + 15 // 09:15
+const SESSION = 375 // 09:15 → 15:30, in minutes
 
 /**
  * The live preview on the indicator card: sample candles with the indicator drawn on them — Supertrend (green while
- * up, red while down), EMA 20 (blue) and BUY / SELL labels. Decoration for the preview: the card's text says what it is.
+ * up, red while down), the EMA (blue) and BUY / SELL labels — with a price axis on the right (the last price tagged),
+ * a time axis under it and the timeframe in the corner, like Scalper's chart. Drawn from `settings`, so a change to
+ * the timeframe, the EMA or the Supertrend redraws it. `axes={false}`: the bare chart (the mini card's thumbnail).
  */
-export function MiniChart({ stage, sellTone = 'sell' }: { stage: MiniChartStage; sellTone?: 'sell' | 'orange' }) {
+export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false }: { stage: MiniChartStage; sellTone?: 'sell' | 'orange'; settings?: IndicatorSettings; axes?: boolean; /** A changed indicator: the ready chart plays its build again (candles up, lines drawing in, then the labels). */ redraw?: boolean }) {
+  const { timeframe, emaPeriod, stPeriod, stMultiplier } = settings
   const data = useMemo(() => {
-    const candles = sampleCandles()
-    const avg = ema(candles, 20)
-    const trend = supertrend(candles, 10, 3)
-    const values = candles.flatMap((c) => [c.high, c.low]).concat(trend.line.slice(10))
+    const candles = sampleCandles(60, 22650, timeframe)
+    const avg = ema(candles, emaPeriod)
+    const trend = supertrend(candles, stPeriod, stMultiplier)
+    const from = Math.min(stPeriod, 20)
+    const values = candles.flatMap((c) => [c.high, c.low]).concat(trend.line.slice(from), avg.slice(5))
     const min = Math.min(...values)
     const max = Math.max(...values)
-    const step = (W - PAD * 2) / candles.length
+    const plotW = axes ? W - AXIS : W
+    const plotH = axes ? H - TIME : H
+    const step = (plotW - PAD * 2) / candles.length
     const x = (i: number) => PAD + step * (i + 0.5)
-    const y = (v: number) => PAD + (1 - (v - min) / (max - min)) * (H - PAD * 2)
-    const path = (vs: number[], from = 0) => vs.slice(from).map((v, i) => `${i ? 'L' : 'M'}${x(i + from).toFixed(1)},${y(v).toFixed(1)}`).join('')
+    const y = (v: number) => PAD + (1 - (v - min) / (max - min)) * (plotH - PAD * 2)
+    const path = (vs: number[], start = 0) => vs.slice(start).map((v, i) => `${i ? 'L' : 'M'}${x(i + start).toFixed(1)},${y(v).toFixed(1)}`).join('')
     // Supertrend as runs of one direction, so each run takes its colour.
     const runs: { up: boolean; d: string }[] = []
-    let start = 10
-    for (let i = 11; i <= candles.length; i++) {
+    let start = from
+    for (let i = from + 1; i <= candles.length; i++) {
       if (i === candles.length || trend.up[i] !== trend.up[start]) {
         runs.push({ up: trend.up[start], d: path(trend.line.slice(0, i), start) })
         start = i
       }
     }
-    return { candles, x, y, step, ema: path(avg, 5), runs, signals: trend.signals.filter((s) => s.index > 10) }
-  }, [])
+    const last = candles[candles.length - 1].close
+    const ticks = niceTicks(min, max).filter((v) => y(v) > PAD && y(v) < plotH - PAD && Math.abs(y(v) - y(last)) > 9)
+    const times = candles.map((_, i) => i).filter((i) => i % TIME_EVERY === TIME_EVERY / 2)
+    return { candles, x, y, step, plotW, plotH, last, ticks, times, ema: path(avg, 5), runs, signals: trend.signals.filter((s) => s.index > from) }
+  }, [timeframe, emaPeriod, stPeriod, stMultiplier, axes])
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className={styles.chart} data-stage={stage} aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${axes ? H : H - TIME}`} className={styles.chart} data-stage={stage} data-redraw={redraw || undefined} aria-hidden="true">
       {stage === 'sketch' ? (
         <path className={styles.sketch} d={`M${PAD},${H / 2} C 60,${H / 2 - 30} 100,${H / 2 + 30} 150,${H / 2} S 240,${H / 2 - 30} ${W - PAD},${H / 2}`} pathLength={1} />
       ) : (
         <>
+          {axes && (
+            <g className={styles.axes}>
+              <line className={styles.axisLine} x1={data.plotW + 0.5} y1={0} x2={data.plotW + 0.5} y2={data.plotH} />
+              <line className={styles.axisLine} x1={0} y1={data.plotH + 0.5} x2={W} y2={data.plotH + 0.5} />
+              {data.ticks.map((v) => (
+                <text key={v} className={styles.tick} x={data.plotW + 4} y={data.y(v)} dominantBaseline="central">{Math.round(v)}</text>
+              ))}
+              {data.times.map((i) => (
+                <g key={i}>
+                  <line className={styles.axisLine} x1={data.x(i)} x2={data.x(i)} y1={data.plotH} y2={data.plotH + 3} />
+                  <text className={styles.tick} x={data.x(i)} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeAt(i, timeframe, data.times[data.times.indexOf(i) - 1])}</text>
+                </g>
+              ))}
+              <text className={styles.timeframe} x={data.plotW + AXIS / 2} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeframeShort(timeframe)}</text>
+              {/* last price: a dashed line to the axis, then the tag */}
+              <line className={styles.lastLine} x1={data.x(data.candles.length - 1)} y1={data.y(data.last)} x2={data.plotW} y2={data.y(data.last)} />
+              <rect className={styles.lastTag} x={data.plotW + 1} y={data.y(data.last) - 6} width={AXIS - 1} height={12} rx={2} />
+              <text className={styles.lastText} x={data.plotW + 3} y={data.y(data.last)} dominantBaseline="central">{data.last.toFixed(1)}</text>
+            </g>
+          )}
           <g className={styles.candles}>
             {data.candles.map((c, i) => {
               const up = c.close >= c.open
@@ -3249,7 +3353,7 @@ export function MiniChart({ stage, sellTone = 'sell' }: { stage: MiniChartStage;
               const cx = data.x(s.index)
               const cy = buy ? data.y(c.low) + 12 : data.y(c.high) - 12
               return (
-                <g key={i} className={styles.signal} data-side={buy ? 'buy' : sellTone} style={{ animationDelay: `${i * 70}ms`, transformOrigin: `${cx}px ${cy}px` }}>
+                <g key={i} className={styles.signal} data-side={buy ? 'buy' : sellTone} style={{ animationDelay: `${i * 70}ms`, '--signal-delay': `${i * 70}ms`, transformOrigin: `${cx}px ${cy}px` } as CSSProperties}>
                   <rect x={cx - 13} y={cy - 6} width={26} height={12} rx={3} />
                   <text x={cx} y={cy + 3}>{buy ? 'BUY' : 'SELL'}</text>
                 </g>
@@ -3259,6 +3363,32 @@ export function MiniChart({ stage, sellTone = 'sell' }: { stage: MiniChartStage;
       )}
     </svg>
   )
+}
+
+/** Round price steps (1, 2, 5 × 10ⁿ) for about four labels. */
+function niceTicks(lo: number, hi: number) {
+  const raw = (hi - lo) / 4
+  const pow = 10 ** Math.floor(Math.log10(raw))
+  const step = [1, 2, 5, 10].map((m) => m * pow).find((s) => s >= raw) ?? raw
+  const first = Math.ceil(lo / step) * step
+  return Array.from({ length: Math.floor((hi - first) / step) + 1 }, (_, k) => first + k * step)
+}
+
+/**
+ * The label under candle `i`: market hours only (09:15–15:30), so longer candles run back over earlier days. A label
+ * on a new day shows that day's date instead of a time (like trading charts); daily candles always show the date.
+ * The last candle opened at 14:15 today (27 Oct).
+ */
+function timeAt(i: number, timeframe: number, previous?: number) {
+  const date = (daysBack: number) => new Date(2026, 9, 27 - daysBack).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+  const back = 59 - i // candles before the last one
+  if (timeframe >= 1440) return date(Math.round((back * timeframe) / 1440))
+  const at = (candlesBack: number) => 14 * 60 + 15 - SESSION_START - candlesBack * timeframe // minutes into today's session (may be < 0)
+  const dayOf = (k: number) => Math.floor(at(59 - k) / SESSION)
+  const day = dayOf(i)
+  if (previous !== undefined && dayOf(previous) !== day) return date(-day)
+  const t = SESSION_START + (((at(back) % SESSION) + SESSION) % SESSION)
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`
 }
 ```
 
@@ -4493,7 +4623,16 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "details.notOnChart": "Not on a chart",
   "details.facts": "About it",
   "details.status": "Status",
-  "details.activity": "Activity"
+  "details.activity": "Activity",
+  "indicator.changeTimeframe": "The timeframe is now {value}.",
+  "indicator.changeEma": "The EMA now averages the last {value} candles.",
+  "indicator.changeSupertrend": "Supertrend is now ({period}, {multiplier}).",
+  "indicator.earlierFolded": "The earlier one is folded above.",
+  "indicator.noChange": "I couldn’t find a change to make there. Try “make the timeframe 20 minutes”, “EMA 50” or “supertrend 7, 2”.",
+  "indicator.suggestLabel": "Want to change something? Tap one or type your own.",
+  "indicator.suggestTimeframe": "Change the timeframe to {value}",
+  "indicator.suggestEma": "Use a {value} EMA",
+  "indicator.suggestSupertrend": "Make the Supertrend {period}, {multiplier}"
 }
 ```
 
@@ -4657,6 +4796,8 @@ export const dash: Flow = {
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     { id: 'cardVersion', label: 'Card version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
+    { id: 'indicatorTags', label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     { id: 'cardIcons', label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
   ],
   sections: [
@@ -4769,6 +4910,85 @@ export const supertrendEma: IndicatorDraft = {
   ],
 }
 
+/**
+ * What the preview chart is drawn with — the parts a plain-words change can tune: the candle timeframe (minutes), the
+ * EMA's length and the Supertrend's ATR period and multiplier.
+ */
+export type IndicatorSettings = { timeframe: number; emaPeriod: number; stPeriod: number; stMultiplier: number }
+export const defaultSettings: IndicatorSettings = { timeframe: 15, emaPeriod: 20, stPeriod: 10, stMultiplier: 3 }
+
+/** "15 min" / "1 hour" / "1 day" (the timeframe question's answers) → minutes. Unknown → 15. */
+export function minutesOf(label: string): number {
+  const m = label.toLowerCase().match(/(\d+)\s*(min|hour|day)/)
+  if (!m) return 15
+  return Number(m[1]) * (m[2] === 'hour' ? 60 : m[2] === 'day' ? 1440 : 1)
+}
+
+/** Minutes → how people say it: "20 min", "1 hour", "2 hours", "1 day". */
+export function timeframeLabel(minutes: number): string {
+  if (minutes % 1440 === 0) return minutes === 1440 ? '1 day' : `${minutes / 1440} days`
+  if (minutes % 60 === 0) return minutes === 60 ? '1 hour' : `${minutes / 60} hours`
+  return `${minutes} min`
+}
+
+/** Minutes → the chart corner's short form: "20m", "1h", "1D". */
+export function timeframeShort(minutes: number): string {
+  if (minutes % 1440 === 0) return `${minutes / 1440}D`
+  if (minutes % 60 === 0) return `${minutes / 60}h`
+  return `${minutes}m`
+}
+
+/** The indicator as the card shows it, for these settings (name, the EMA chip, the notes' timeframe). */
+export function draftFor(settings: IndicatorSettings): IndicatorDraft {
+  const { emaPeriod, stPeriod, stMultiplier, timeframe } = settings
+  return {
+    ...supertrendEma,
+    name: `Supertrend (${stPeriod}, ${stMultiplier}) with EMA ${emaPeriod}`,
+    parts: supertrendEma.parts.map((p) => (p.tone === 'average' ? { ...p, label: `EMA ${emaPeriod}` } : p)),
+    notes: [
+      `It gave 14 buy and 13 sell signals on the last 500 candles, about one a day on ${timeframeLabel(timeframe)}.`,
+      `In sideways markets the trend flips often; the ${emaPeriod} EMA helps you spot those stretches.`,
+    ],
+  }
+}
+
+/** What a typed change touched (empty: DASH didn't find a change it can make). */
+export type IndicatorChange = { settings: IndicatorSettings; changed: ('timeframe' | 'ema' | 'supertrend')[] }
+
+/**
+ * Reads a plain-words change — "make the time period 20 minutes", "EMA 50", "50-day average", "supertrend 7, 2",
+ * "multiplier 2" — into new settings. The prototype's stand-in for DASH understanding the request.
+ */
+export function applyChange(settings: IndicatorSettings, text: string): IndicatorChange {
+  let rest = ` ${text.toLowerCase()} `
+  const next = { ...settings }
+  const changed: IndicatorChange['changed'] = []
+  // The EMA first ("50-day average" is the EMA, not a 50-day timeframe); its number is then taken out of the text.
+  const ema = rest.match(/(?:ema|average)\D{0,12}?(\d+)/) ?? rest.match(/(\d+)\s*-?\s*(?:(?:day|period|candle)s?\s*)?(?:ema|average)/)
+  if (ema) {
+    next.emaPeriod = Number(ema[1])
+    changed.push('ema')
+    rest = rest.replace(ema[0], ' ')
+  }
+  const st = rest.match(/supertrend\D{0,12}?(\d+)(?:\s*[,x×/ ]\s*(\d+(?:\.\d+)?))?/)
+  const mult = rest.match(/multiplier\D{0,8}?(\d+(?:\.\d+)?)/)
+  if (st || mult) {
+    if (st) next.stPeriod = Number(st[1])
+    if (st?.[2]) next.stMultiplier = Number(st[2])
+    if (mult) next.stMultiplier = Number(mult[1])
+    changed.push('supertrend')
+    rest = rest.replace(st?.[0] ?? '', ' ').replace(mult?.[0] ?? '', ' ')
+  }
+  const tf = rest.match(/(\d+)\s*-?\s*(minutes?|mins?|m|hours?|hrs?|h|days?|d)\b/)
+  if (tf) {
+    const unit = tf[2][0]
+    next.timeframe = Number(tf[1]) * (unit === 'h' ? 60 : unit === 'd' ? 1440 : 1)
+    changed.push('timeframe')
+  }
+  const valid = next.timeframe > 0 && next.emaPeriod > 1 && next.stPeriod > 0 && next.stMultiplier > 0
+  return valid ? { settings: next, changed } : { settings, changed: [] }
+}
+
 /** The steps DASH shows while it builds. */
 export const buildSteps = ['Reading your request', 'Writing the logic', 'Testing it on 500 candles'] as const
 
@@ -4777,18 +4997,22 @@ export const buildSteps = ['Reading your request', 'Writing the logic', 'Testing
 
 export type Candle = { open: number; high: number; low: number; close: number }
 
-/** 60 sample 15-min candles around Nifty's level — a deterministic random walk (same every time). */
-export function sampleCandles(count = 60, start = 22650): Candle[] {
-  let seed = 7
+/**
+ * 60 sample candles around Nifty's level — a deterministic random walk (the same every time for one timeframe; another
+ * timeframe gets its own walk, and longer candles move more).
+ */
+export function sampleCandles(count = 60, start = 22650, timeframe = 15): Candle[] {
+  let seed = 7 + (timeframe === 15 ? 0 : timeframe * 31)
+  const scale = Math.sqrt(timeframe / 15)
   const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
   const candles: Candle[] = []
   let close = start
   for (let i = 0; i < count; i++) {
-    const drift = Math.sin(i / 5) * 9 // gentle swings, so the trend flips a few times
+    const drift = Math.sin(i / 5) * 9 * scale // gentle swings, so the trend flips a few times
     const open = close
-    close = open + drift + (rand() - 0.5) * 28
-    const high = Math.max(open, close) + rand() * 12
-    const low = Math.min(open, close) - rand() * 12
+    close = open + drift + (rand() - 0.5) * 28 * scale
+    const high = Math.max(open, close) + rand() * 12 * scale
+    const low = Math.min(open, close) - rand() * 12 * scale
     candles.push({ open, high, low, close })
   }
   return candles
@@ -5444,10 +5668,10 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
 ### `src/flows/dash/screens/DashAI.tsx`
 
 ```tsx
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { ActionbarAction } from '@l3/components/Actionbar'
 import { msHistory } from '@l3/icons/material'
-import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
+import { useFlowOption } from '../../../shared/prototype'
 import { DashBar, DashScreen } from '../components/DashScreen'
 import { SceneSwap, type SceneMove } from '../components/SceneSwap'
 import { t } from '../copy'
@@ -5496,10 +5720,22 @@ export function DashAI(props: DashAIProps) {
     setTyping(false)
   }
 
+  // Escape (laptop) puts the drawn keyboard away, like tapping the chat.
+  useEffect(() => {
+    if (!typing) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setTyping(false)
+      ;(document.activeElement as HTMLElement | null)?.blur()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [typing])
+
   const tone = props.scene === 'rules' && props.step === 'cost' ? 'loss' : 'brand'
   // The background ends above the drawn keyboard (laptop). Scenes turn typing on only where the keyboard comes up
   // (the empty chat's input, Modify) and off again when it goes.
-  const keyboardUp = typing && props.scene !== 'landing' && !useSystemKeyboard()
+  const keyboardUp = typing && props.scene !== 'landing' // the drawn keyboard, on a phone too
 
   let body: ReactNode
   if (props.scene === 'landing') body = <LandingScene onRules={props.onRules} onIndicator={props.onIndicator} onStrategy={props.onStrategy} />
@@ -5531,9 +5767,9 @@ import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { msChevronRight } from '@l3/icons/material'
 import { Stack } from '@l3/components/Stack'
-import { usePreview, useSystemKeyboard } from '../../../shared/prototype'
+import { usePreview } from '../../../shared/prototype'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
-import { AssistantMessage, ChatInput, Thinking, UserMessage } from '../components/Chat'
+import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
 import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
 import { QuestionCard } from '../components/QuestionCard'
@@ -5541,7 +5777,7 @@ import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
 import { useStickToBottom } from '../components/stickToBottom'
 import { t } from '../copy'
-import { chartQuestion, indicatorPrompts, indicatorPromptsV2, supertrendEma, timeframeQuestion, type IndicatorPrompt } from '../indicatorData'
+import { applyChange, chartQuestion, defaultSettings, draftFor, indicatorPrompts, indicatorPromptsV2, minutesOf, timeframeLabel, timeframeQuestion, type IndicatorChange, type IndicatorPrompt, type IndicatorSettings } from '../indicatorData'
 import type { DashVersion } from './RuleChat'
 // The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
 import styles from './RuleChat.module.css'
@@ -5615,7 +5851,6 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   useEdgeFade(scroller)
   const keyboard = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLInputElement>(null)
-  const systemKeyboard = useSystemKeyboard()
   const [draft, setDraft] = useState('')
   // The mini card: scrolling the chat down folds the pinned card; scrolling back to the top (or a tap) opens it.
   // Driven by the user's own wheel / swipe — never by the chat moving itself to its newest message.
@@ -5676,8 +5911,12 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     setChanges((c) => [...c, text])
     setRevisionRequested(false)
     onTyping?.(false)
+    input.current?.blur() // the keyboard goes; tapping the field again brings it back
     setChanging(true)
-    window.setTimeout(() => setChanging(false), THINKING_MS)
+    window.setTimeout(() => {
+      setChanging(false)
+      setCompactWanted(false) // the changed card opens in full (Version 1's pinned card too, even if it was scrolled mini)
+    }, THINKING_MS)
   }
 
   // The empty state shows before sending; while DASH reads the prompt it's already the chat.
@@ -5690,8 +5929,14 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     step === 'building' ? { kind: 'building', step: buildStep } : step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }
   const asking = !pending && (step === 'chart' || step === 'timeframe')
   // Typing: the empty chat's input, or a change after Modify. The drawn keyboard only on a laptop; a phone has its own.
-  const typingNow = typing && (empty || revisionRequested)
-  const keyboardUp = typingNow && !systemKeyboard
+  // Typing: the empty chat, or a change once the indicator is ready (with or without Modify). The drawn keyboard, on a
+  // phone too.
+  const canChange = step === 'ready' && !changing
+  const typingNow = typing && (empty || revisionRequested || canChange)
+  const keyboardUp = typingNow
+  // Typing a change: the newest card folds to its mini form, so the chat and the keyboard get the room. Sending puts
+  // the keyboard away; after DASH thinks, the changed card comes back full size and draws itself again.
+  const folding = step === 'ready' && (typingNow || changing)
   const compact = !v2 && compactWanted && step === 'ready'
   const userScroll = (down: boolean) => {
     const el = scroller.current
@@ -5728,31 +5973,59 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     turns.push({ key: 'q-timeframe', node: <AssistantMessage>{timeframeQuestion.question}</AssistantMessage> })
     turns.push({ key: 'a-timeframe', node: <UserMessage>{timeframe}</UserMessage> })
   }
-  // Version 2: every change shares a new card under DASH's reply; the ones before it fold to "Earlier version".
-  // (Prototype: an updated version shows its SELL labels orange — the sample change.)
-  const versions = changing ? changes.length - 1 : changes.length
+  // A typed change is read into new settings (timeframe, EMA, Supertrend): after DASH thinks, the chart is redrawn
+  // with them. Version 2: every change shares a new card under DASH's reply, the ones before it fold to "Earlier
+  // version"; Version 1: the pinned card redraws. A message with no change DASH can make gets a hint instead.
+  const base: IndicatorSettings = { ...defaultSettings, timeframe: minutesOf(timeframe) }
+  const results = changes.reduce<IndicatorChange[]>((acc, c) => [...acc, applyChange(acc.at(-1)?.settings ?? base, c)], [])
+  const answered = changing ? results.slice(0, -1) : results
+  const lastCard = answered.map((r) => r.changed.length > 0).lastIndexOf(true)
+  const latest = answered.at(-1)?.settings ?? base
+  const versions = lastCard + 1
   if (v2 && built) {
     turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingBelow', { chart, timeframe })}</AssistantMessage> })
-    turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={supertrendEma} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={supertrendEma} state={cardState} onModify={modify} onSave={save} /> })
+    turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={draftFor(base)} settings={base} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={draftFor(base)} settings={base} state={cardState} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} /> })
   } else if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
   if (step === 'ready' || step === 'saved') turns.push({ key: 'ready', node: <AssistantMessage title={t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
   if (revisionRequested) turns.push({ key: 'revision-prompt', node: <AssistantMessage>{t('indicator.revisionPrompt')}</AssistantMessage> })
   changes.forEach((c, i) => {
     turns.push({ key: `change-${i}`, node: <UserMessage>{c}</UserMessage> })
-    if (changing && i === changes.length - 1) return
-    if (!v2) {
-      turns.push({ key: `changed-${i}`, node: <AssistantMessage>{t('indicator.changed')}</AssistantMessage> })
+    const result = answered[i]
+    if (!result) return // DASH is still working on it
+    if (result.changed.length === 0) {
+      turns.push({ key: `changed-${i}`, node: <AssistantMessage>{t('indicator.noChange')}</AssistantMessage> })
       return
     }
-    const latest = i === versions - 1
-    turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{t('indicator.updatedText')}</AssistantMessage> })
+    const summary = describeChange(result)
+    if (!v2) {
+      turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.changed')}>{summary}</AssistantMessage> })
+      return
+    }
+    turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{`${summary} ${t('indicator.earlierFolded')}`}</AssistantMessage> })
     turns.push({
       key: `card-${i}`,
-      node: latest
-        ? <IndicatorCard draft={supertrendEma} state={step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }} sellTone="orange" onModify={modify} onSave={save} />
-        : <IndicatorCard draft={supertrendEma} state={{ kind: 'ready' }} sellTone="orange" superseded />,
+      node: i === lastCard
+        ? <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} redrawn state={step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} />
+        : <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} state={{ kind: 'ready' }} superseded />,
     })
   })
+  // Ready: a few changes to try, as chips — a tap asks for it (like typing it). They suggest values not in use yet.
+  if (step === 'ready' && !changing && !pending && !revisionRequested) {
+    const options = [
+      t('indicator.suggestTimeframe', { value: timeframeLabel(latest.timeframe === 20 ? 5 : 20) }),
+      t('indicator.suggestEma', { value: latest.emaPeriod === 50 ? 20 : 50 }),
+      latest.stPeriod === 7 ? t('indicator.suggestSupertrend', { period: 10, multiplier: 3 }) : t('indicator.suggestSupertrend', { period: 7, multiplier: 2 }),
+    ]
+    turns.push({
+      key: `suggest-${changes.length}`,
+      node: (
+        <Stack gap="08" align="start">
+          <p className={styles.suggestLabel}>{t('indicator.suggestLabel')}</p>
+          <ReplyChips glow options={options.map((label) => ({ label, onClick: () => askChange(label) }))} />
+        </Stack>
+      ),
+    })
+  }
   if (step === 'saved') turns.push({ key: 'saved', node: <Stack gap="12" align="start"><AssistantMessage title={t('indicator.savedTitle')}>{t('indicator.savedText')}</AssistantMessage><Button variant="secondary" size="md" iconRight={<Icon icon={msChevronRight} />} onClick={onViewIndicator}>{t('indicator.view')}</Button></Stack> })
 
   const question = step === 'chart' ? chartQuestion : timeframeQuestion
@@ -5763,7 +6036,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         <div className={styles.pin}>
           <div className={styles.pinInner}>
             <Inset paddingInline="16" paddingBlock="08">
-              <IndicatorCard draft={supertrendEma} state={cardState} sellTone={versions > 0 ? 'orange' : undefined} onModify={modify} onSave={save} compact={compact} onExpand={() => setCompactWanted(false)} />
+              <IndicatorCard draft={draftFor(latest)} settings={latest} redrawn={versions > 0} state={cardState} onModify={modify} onSave={save} compact={compact || folding} onExpand={() => { setCompactWanted(false); onTyping?.(false) }} />
             </Inset>
           </div>
         </div>
@@ -5834,8 +6107,8 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
             inputRef={input}
             typing={typingNow}
             autoFocus={typingNow}
-            onFocus={empty || revisionRequested ? () => onTyping?.(true) : undefined}
-            onSend={empty ? send : step === 'ready' && revisionRequested ? askChange : undefined}
+            onFocus={empty || canChange ? () => onTyping?.(true) : undefined}
+            onSend={empty ? send : canChange ? askChange : undefined}
           />
         </Inset>
       </div>
@@ -5847,6 +6120,19 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
       </div>
     </div>
   )
+}
+
+/** DASH's one-line summary of a change: "The timeframe is now 20 min." (one sentence per part changed). */
+function describeChange({ settings, changed }: IndicatorChange) {
+  return changed
+    .map((part) =>
+      part === 'timeframe'
+        ? t('indicator.changeTimeframe', { value: timeframeLabel(settings.timeframe) })
+        : part === 'ema'
+          ? t('indicator.changeEma', { value: settings.emaPeriod })
+          : t('indicator.changeSupertrend', { period: settings.stPeriod, multiplier: settings.stMultiplier }),
+    )
+    .join(' ')
 }
 ```
 
@@ -6158,6 +6444,12 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 .turns.turns {
   gap: var(--l3-spacing-20);
 }
+
+/* The line above the change suggestions on a ready indicator. */
+.suggestLabel {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+}
 ```
 
 ### `src/flows/dash/screens/RuleChat.tsx`
@@ -6166,7 +6458,7 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
-import { usePreview, useSystemKeyboard } from '../../../shared/prototype'
+import { usePreview } from '../../../shared/prototype'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
@@ -6302,7 +6594,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   const asking = step === 'question' && !pending
   // Typing in the empty chat; the drawn keyboard only on a laptop (a phone opens its own).
   const typingNow = empty && typing
-  const keyboardUp = typingNow && !useSystemKeyboard()
+  const keyboardUp = typingNow // the drawn keyboard, on a phone too
 
   return (
     <div className={styles.scene} ref={scene}>
