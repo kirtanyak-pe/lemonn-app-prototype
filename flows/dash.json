@@ -179,8 +179,6 @@
         "dash-15",
         "dash-03",
         "dash-20",
-        "dash-06",
-        "dash-24",
         "fno-07"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
@@ -191,6 +189,7 @@
       "figma": "5612:42250",
       "note": "Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).",
       "goesTo": [
+        "dash-02",
         "dash-14",
         "dash-16"
       ],
@@ -202,6 +201,7 @@
       "figma": "5612:42455",
       "note": "The list behind already has 3 rules.",
       "goesTo": [
+        "dash-02",
         "dash-17"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455"
@@ -216,8 +216,6 @@
         "dash-15",
         "dash-03",
         "dash-20",
-        "dash-06",
-        "dash-24",
         "fno-07"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
@@ -243,7 +241,7 @@
       "id": "dash-21",
       "name": "Indicator · which chart",
       "figma": "",
-      "note": "DASH asks only what the prompt didn’t say: the chart… (Version 2: only for “…on 15-min candles”; then it builds)",
+      "note": "DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)",
       "goesTo": [
         "dash-14",
         "dash-02",
@@ -260,7 +258,7 @@
       "id": "dash-22",
       "name": "Indicator · which timeframe",
       "figma": "",
-      "note": "…and the timeframe. (Version 2: only for “…on Nifty 50”.)",
+      "note": "…and the timeframe. (only for “…on Nifty 50”.)",
       "goesTo": [
         "dash-14",
         "dash-02",
@@ -323,7 +321,7 @@
       "id": "dash-27",
       "name": "Indicator · saved sheet",
       "figma": "",
-      "note": "Version 2: Save indicator opens this over the chat — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.",
+      "note": "Save indicator opens this over the chat (both versions) — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.",
       "goesTo": [
         "dash-14",
         "dash-02",
