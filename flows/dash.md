@@ -2481,14 +2481,37 @@ export function ReplyChips({ options, asButtons = false }: { options: ReplyOptio
   transform: translateX(-50%);
   transition:
     top var(--app-dash-scene) var(--app-dash-scene-easing),
-    bottom var(--app-dash-scene) var(--app-dash-scene-easing);
+    bottom var(--app-dash-scene) var(--app-dash-scene-easing),
+    opacity var(--app-dash-scene) var(--app-dash-scene-easing);
 }
 
-/* Chatting (Version 2): the disc reaches higher, so the conversation sits on the calm middle, and ends higher above the
-   bottom, so the glow comes back around the input. */
+/* Chatting (Version 2): the round disc gives way to a straight white veil (crossfade, 300 ms), so the glow at the bottom
+   is a level band rising from the input's bottom edge — not the disc's curve. The conversation sits on the calm
+   middle and fades into the band as it scrolls under the input. */
 .frame[data-chatting] .overlay {
-  top: 3cqh;
-  bottom: 14cqh;
+  opacity: 0;
+}
+
+/* The veil: white across the box, fading out linearly at the top (the glow behind the top bar) and towards the bottom:
+   clear from the input's bottom edge (the dock's 16 + the OS bar), white again a band higher. */
+.veil {
+  --dash-veil-clear: calc(var(--os-inset-bottom, 0px) + var(--l3-spacing-16));
+  position: absolute;
+  inset: 0;
+  /* Drawn as the gradient itself (not a mask) so every browser shows it the same. */
+  background: linear-gradient(
+    to top,
+    transparent var(--dash-veil-clear),
+    var(--l3-surface-default) calc(var(--dash-veil-clear) + var(--app-dash-veil-band)),
+    var(--l3-surface-default) 86%,
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+.frame[data-chatting] .veil {
+  opacity: 1;
 }
 
 /* "grids": fine lines across the top, 360 × 116.8 on the 360 frame. */
@@ -2526,7 +2549,8 @@ export function ReplyChips({ options, asButtons = false }: { options: ReplyOptio
   }
 
   .background,
-  .overlay {
+  .overlay,
+  .veil {
     transition: none;
   }
 }
@@ -2571,6 +2595,7 @@ export function DashScreen({ tone = 'brand', keyboard = false, chatting = false,
           <img src={gradient} alt="" className={styles.gradient} />
         </div>
         <span className={styles.overlay} />
+        <span className={styles.veil} />
         <img src={grids} alt="" className={styles.grids} />
       </div>
       <Screen {...screen} className={[styles.screen, className].filter(Boolean).join(' ')} />
@@ -4114,6 +4139,40 @@ export function SuccessBurst({ leaving = false }: { leaving?: boolean }) {
 }
 ```
 
+### `src/flows/dash/components/edgeFade.ts`
+
+```ts
+import { useEffect, type RefObject } from 'react'
+
+/**
+ * Soft edges on a scrolling chat: marks the scroller `data-fade-top` while there's content above (scrolled down) and
+ * `data-fade-bottom` while there's content below — the CSS fades that edge out, so messages slide in and out of view
+ * (behind the input) instead of being cut. At rest at either end that edge stays sharp. Re-checked on scroll, resize
+ * and whenever the conversation changes. Written straight onto the element (no re-render per scroll).
+ */
+export function useEdgeFade(scroller: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = scroller.current
+    if (!el) return
+    const check = () => {
+      el.toggleAttribute('data-fade-top', el.scrollTop > 1)
+      el.toggleAttribute('data-fade-bottom', el.scrollHeight - el.clientHeight - el.scrollTop > 1)
+    }
+    check()
+    el.addEventListener('scroll', check, { passive: true })
+    const resize = new ResizeObserver(check)
+    resize.observe(el)
+    const changes = new MutationObserver(check)
+    changes.observe(el, { childList: true, subtree: true })
+    return () => {
+      el.removeEventListener('scroll', check)
+      resize.disconnect()
+      changes.disconnect()
+    }
+  }, [scroller])
+}
+```
+
 ### `src/flows/dash/components/flyMessage.ts`
 
 ```ts
@@ -5316,7 +5375,7 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
 ```tsx
 import { useState, type ReactNode } from 'react'
 import { ActionbarAction } from '@l3/components/Actionbar'
-import { msFactCheck } from '@l3/icons/material'
+import { msHistory } from '@l3/icons/material'
 import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { DashBar, DashScreen } from '../components/DashScreen'
 import { SceneSwap, type SceneMove } from '../components/SceneSwap'
@@ -5381,7 +5440,7 @@ export function DashAI(props: DashAIProps) {
       tone={tone}
       keyboard={keyboardUp}
       chatting={version === '2' && props.scene !== 'landing' && props.step !== 'empty'}
-      top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msFactCheck} label={t('landing.menu')} onClick={() => onYourRules?.()} />} />}
+      top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msHistory} label={t('landing.menu')} onClick={() => onYourRules?.()} />} />}
       sheet={sheet}
     >
       <SceneSwap sceneKey={scene} move={move}>
@@ -5408,6 +5467,7 @@ import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMess
 import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
 import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
+import { useEdgeFade } from '../components/edgeFade'
 import { t } from '../copy'
 import { chartQuestion, indicatorPrompts, indicatorPromptsV2, supertrendEma, timeframeQuestion, type IndicatorPrompt } from '../indicatorData'
 import type { DashVersion } from './RuleChat'
@@ -5479,6 +5539,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   const [introLeaving, setIntroLeaving] = useState(false)
   const stage = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
+  useEdgeFade(scroller)
   const keyboard = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLInputElement>(null)
   const systemKeyboard = useSystemKeyboard()
@@ -5824,12 +5885,56 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 }
 
 .scroll {
+  --dash-fade-top: 0px;
+  --dash-fade-bottom: 0px;
   position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
   overflow-y: auto;
+  /* Soft edges (components/edgeFade): with more to scroll that way, the top edge fades over 24 and the bottom one over
+     48, ending where the input starts — so messages fade in and out from behind it instead of being cut. */
+  -webkit-mask-image: var(--dash-fade-mask);
+  mask-image: var(--dash-fade-mask);
+  --dash-fade-mask: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--dash-fade-top),
+    black calc(100% - var(--app-dash-under-dock) - var(--dash-fade-bottom)),
+    transparent calc(100% - var(--app-dash-under-dock) + var(--l3-spacing-16))
+  );
+  transition:
+    --dash-fade-top var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    --dash-fade-bottom var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* The chat runs on under the input dock (the dock overlaps it), so the last message can scroll up from behind it. */
+.scroll::after {
+  flex: none;
+  height: var(--app-dash-under-dock);
+  content: '';
+}
+
+.scroll[data-fade-top] {
+  --dash-fade-top: var(--l3-spacing-24);
+}
+
+.scroll[data-fade-bottom] {
+  --dash-fade-bottom: var(--l3-spacing-48);
+}
+
+/* Registered so the fades ease in and out instead of snapping. */
+@property --dash-fade-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --dash-fade-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
 
 /* The empty state: 16 below the top bar (Figma space block), centred in the space above the input. */
@@ -5865,9 +5970,13 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
   background: none;
 }
 
-/* The input dock: no surface of its own (the background shows), 16 around. */
+/* The input dock: no surface of its own (the background shows), 16 around. It sits over the chat's last 40 (the dock's
+   16 above the input + 24), so the conversation slides under it. */
 .dock {
+  position: relative;
+  z-index: 1;
   flex: none;
+  margin-top: calc(-1 * var(--app-dash-under-dock));
 }
 
 /* The phone's keyboard: rises with the typing state (its height opens, 300 ms), so everything above moves with it. */
@@ -5995,6 +6104,7 @@ import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMess
 import { QuestionCard } from '../components/QuestionCard'
 import { RuleCard } from '../components/RuleCard'
 import { RulesIntro } from '../components/RulesIntro'
+import { useEdgeFade } from '../components/edgeFade'
 import { t } from '../copy'
 import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions } from '../data'
 import styles from './RuleChat.module.css'
@@ -6063,6 +6173,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   const [introLeaving, setIntroLeaving] = useState(false)
   const scene = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
+  useEdgeFade(scroller)
   const keyboard = useRef<HTMLDivElement>(null)
 
   const send = (text: string, from: HTMLElement) => {

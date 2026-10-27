@@ -360,6 +360,7 @@
     "src/flows/dash/components/SceneSwap.tsx",
     "src/flows/dash/components/SuccessBurst.module.css",
     "src/flows/dash/components/SuccessBurst.tsx",
+    "src/flows/dash/components/edgeFade.ts",
     "src/flows/dash/components/flyMessage.ts",
     "src/flows/dash/copy.json",
     "src/flows/dash/copy.ts",
