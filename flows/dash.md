@@ -2778,6 +2778,10 @@ export function DashBar(props: ActionbarProps) {
   padding-block: var(--l3-spacing-04);
 }
 
+.chart[data-openable] {
+  cursor: zoom-in;
+}
+
 /* Expanded: the card has grown into the floating card (it shrinks back here on close). */
 .card[data-lifted] {
   visibility: hidden;
@@ -3134,7 +3138,8 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
         <div className={styles.fold} inert={mini || undefined}>
           <div className={styles.foldBody}>
             <Stack gap="12" className={styles.foldContent}>
-              <div className={styles.chart}>
+              {/* A tap anywhere on the chart opens the full view too (the expand button is its accessible way). */}
+              <div className={styles.chart} data-openable={!building || undefined} onClick={building ? undefined : () => setFullView(true)}>
                 <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} />
               </div>
 
@@ -3300,7 +3305,8 @@ type IndicatorFullViewProps = {
  * keeps the card's layout as it is: the name and where it goes (collapse at the top right, where expand was), the chart
  * (filling the room, moving / zooming like Scalper's — no hint: people know these gestures), the part tags, DASH's
  * notes, and Modify / Save indicator. The box's size is what animates (not a stretch), so the chart redraws as it
- * grows. Collapse, a tap outside or Esc closes it; Modify and Save close it and carry on.
+ * grows. Only collapse (or Esc on a laptop) closes it — taps on the chart or outside don't; Modify and Save close it
+ * and carry on.
  */
 export function IndicatorFullView({ draft, settings, sellTone, container, cardEl, tag, parts, notes, onClose, onModify, onSave }: IndicatorFullViewProps) {
   const panel = useRef<HTMLDivElement>(null)
@@ -3347,7 +3353,8 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardEl
 
   return createPortal(
     <div className={styles.layer} data-closing={closing || undefined}>
-      <div className={styles.scrim} onClick={() => close()} aria-hidden="true" />
+      {/* A tap outside doesn't close it: only the collapse button (or Esc on a laptop) does. */}
+      <div className={styles.scrim} aria-hidden="true" />
       <div className={styles.panel} ref={panel} role="dialog" aria-modal="true" aria-label={draft.name}>
         {/* The card's header, as on the card: name, where it goes, collapse in the expand button's place. */}
         <Stack direction="horizontal" align="start" justify="between" gap="12">
