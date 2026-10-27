@@ -1798,18 +1798,40 @@ function ema(candles: ChartCandle[], period: number) {
 
 .panel {
   min-height: 0;
+  overflow-x: clip; /* scrolls up and down only (the lit guide box reaches 8 past the rows) */
   overflow-y: auto;
-  padding: var(--l3-spacing-12) var(--l3-spacing-12) var(--l3-spacing-24);
+  padding: 0 var(--l3-spacing-16) var(--l3-spacing-24);
+}
+
+/* The panel's header (title + actions, or the search field) stays put while the lists scroll under it: the panel's
+   full width, a 1px border-light line under it, the content 16 below. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin: 0 calc(-1 * var(--l3-spacing-16)) var(--l3-spacing-16);
+  padding: var(--l3-spacing-12) var(--l3-spacing-16);
+  background: var(--l3-surface-default);
+  box-shadow: inset 0 -1px 0 var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
 .titleRow {
   min-height: var(--l3-size-40);
-  margin-bottom: var(--l3-spacing-16);
+}
+
+/* Your indicators' heading row: as tall as its Create button (40), centred with it. */
+.sectionHead {
+  min-height: var(--l3-size-40);
+}
+
+/* Header icons (search, clear all): 20 — 4 up from the Small button's 16 (designer's call). */
+.headerIcon.headerIcon {
+  --btn-icon-size: var(--l3-icon-size-20);
 }
 
 .title {
   margin: 0;
-  font: var(--l3-text-label-16);
+  font: var(--l3-text-heading-16); /* the sheet's heading: Heading/16 (was Label/16) */
   color: var(--l3-content-primary);
 }
 
@@ -1831,9 +1853,10 @@ function ema(candles: ChartCandle[], period: number) {
   color: var(--l3-content-tertiary);
 }
 
-/* Indicator rows: 32 tall — L3 card cell (Small) with the padding taken in, radius 8 (designer's call, 2026-10-27). */
+/* Indicator rows: 48 tall — L3 card cell (Small), radius 8 (designer's call, 2026-10-27). */
 .row.row.row {
-  min-height: var(--l3-size-32);
+  --cell-icon: var(--l3-icon-size-20); /* the star (and the applied ✕): 20, up from the Small cell's 16 */
+  min-height: var(--l3-size-48);
   padding-block: var(--l3-spacing-06);
   border-radius: var(--l3-radius-08);
 }
@@ -1865,9 +1888,6 @@ function ema(candles: ChartCandle[], period: number) {
   --btn-surface: var(--l3-surface-accent-discover-light);
 }
 
-.search {
-  margin-bottom: var(--l3-spacing-16);
-}
 
 /* The coach mark's anchor hugs its content (inline): here it takes the panel's width, like Lemonn indicators below. */
 .yours > * {
@@ -2021,6 +2041,7 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
         ]}
       />
       <section id="chart-tools-panel" className={styles.panel} role="tabpanel" aria-label={title}>
+        <div className={styles.header}>
         {section === 'indicators' && searching ? (
           <TextField
             autoFocus
@@ -2038,16 +2059,17 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
             <Stack direction="horizontal" align="center" gap="16">
               {section === 'indicators' && count > 0 && (
                 <>
-                  <Button variant="ghost" size="sm" iconLeft={<Icon icon={msDelete} />} aria-label={t('tools.clearAll')} onClick={onClearAll} />
+                  <Button variant="ghost" size="sm" iconLeft={<Icon icon={msDelete} />} aria-label={t('tools.clearAll')} onClick={onClearAll} className={styles.headerIcon} />
                   <Badge count={count} color="discover" label={t('tools.onChart')}>
                     <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msFunction} />} aria-label={t('tools.onChartList', { count })} className={styles.fx} />
                   </Badge>
                 </>
               )}
-              <Button variant="ghost" size="sm" iconLeft={<Icon icon={msSearch} />} aria-label={t('tools.search', { section: title })} onClick={() => section === 'indicators' && setSearching(true)} />
+              <Button variant="ghost" size="sm" iconLeft={<Icon icon={msSearch} />} aria-label={t('tools.search', { section: title })} onClick={() => section === 'indicators' && setSearching(true)} className={styles.headerIcon} />
             </Stack>
           </Stack>
         )}
+        </div>
 
         {section !== 'indicators' ? (
           <p className={styles.empty}>{t('tools.soon')}</p>
@@ -2058,7 +2080,7 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
             <div className={styles.yours} data-lit={guiding || undefined}>
               <Tooltip open={guiding} content={t('tools.guideTip')} placement="top" onClose={() => setGuiding(false)}>
                 <Stack as="section" gap="12" aria-label={t('tools.yours')}>
-                  <Stack direction="horizontal" align="center" justify="between">
+                  <Stack direction="horizontal" align="center" justify="between" className={styles.sectionHead}>
                     <Stack gap="00">
                       <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
                       <p className={styles.subDescription}>{t('tools.byDash')}</p>

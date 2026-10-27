@@ -2117,6 +2117,12 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   background: var(--l3-surface-default);
 }
 
+/* Back-to-back replies sit a little closer: 12 apart instead of the chat's 20. Each turn is its own wrapper in the
+   chat's list, so the pairs are found through them. (Corners stay as they are: designer's call.) */
+:global(div):has(> .assistant[data-bubble]) + :global(div) > .assistant[data-bubble] {
+  margin-top: calc(var(--l3-spacing-12) - var(--l3-spacing-20));
+}
+
 .assistant[data-faded] {
   opacity: var(--l3-opacity-40);
 }
@@ -5382,9 +5388,9 @@ export type IndicatorAsk = 'chart' | 'timeframe'
  */
 export type IndicatorPrompt = { text: string; asks: IndicatorAsk[]; chart: string; timeframe: string }
 export const indicatorPromptsV2: IndicatorPrompt[] = [
-  { text: 'Supertrend with a 20 EMA on any 15-min chart', asks: [], chart: 'any chart', timeframe: '15 min' },
   { text: 'Supertrend with a 20 EMA on Nifty 50', asks: ['timeframe'], chart: 'Nifty 50', timeframe: '15 min' },
   { text: 'Supertrend with a 20 EMA on 15-min candles', asks: ['chart'], chart: 'Nifty 50', timeframe: '15 min' },
+  { text: 'Supertrend with a 20 EMA on any 15-min chart', asks: [], chart: 'any chart', timeframe: '15 min' },
 ]
 
 /** What DASH asks before building (only what the prompt didn't say). */
@@ -6358,7 +6364,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   // Save opens the saved sheet (both versions; onSaved is the fallback where a screen has no sheet).
   const save = onSaveSheet ?? onSaved
   // The request decides what DASH asks (both versions). Opened straight on a step, it's the example that leads there.
-  const [prompt, setPrompt] = useState<IndicatorPrompt>(() => indicatorPromptsV2[step === 'chart' ? 2 : step === 'timeframe' ? 1 : 0])
+  const [prompt, setPrompt] = useState<IndicatorPrompt>(() => indicatorPromptsV2.find((p) => (step === 'chart' || step === 'timeframe' ? p.asks[0] === step : p.asks.length === 0)) ?? indicatorPromptsV2[0])
   const asks = prompt.asks
   const [request, setRequest] = useState(initialRequest ?? prompt.text)
   const [chart, setChart] = useState(prompt.chart)
