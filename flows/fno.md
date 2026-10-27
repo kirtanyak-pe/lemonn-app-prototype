@@ -61,26 +61,52 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
 - View all on Smart Options / Smart Futures opens the existing combined signals list (index / stock scope respectively); these are shared prototype lists, rather than newly designed destinations.
 - Heatmap filters show subsets of the example snapshot. Stock / Index changes labels. Tiles open details.
 - Sheets use shared Sheet hosting and L3 focus management, Escape and backdrop dismissal.
-- Scalper has linked NIFTY 50 spot and call-option charts, a strategy toolbar, active toggle, market / limit order type,
-  quantity stepper and market buy / sell order dock. Its values and candles are illustrative; no order is submitted.
-- The upper-right add-control on the spot chart opens an L3 bottom sheet. **Indicators** has **Your indicators**
-  (a DASH AI-created list, Create indicator action and empty state) and **Lemon indicators**. DASH's View indicator
-  opens this sheet directly with its saved indicator visible. Selecting an indicator closes the sheet and shows its
-  name below the spot quote.
-- When an indicator is applied, the price pane renders a pair of illustrative 9/21 EMA overlay lines and a small
-  legend over the candles. The lines are calculated from prototype candle data; this is visual behaviour only, not
-  execution or indicator-rule evaluation.
+- **Scalper (fno-05)** is rebuilt from the live app's screenshot (2026-10-26, dark), measured to it at 392 wide:
+  - top: back · strategy tabs (L3 ribbon "All", recoloured with the Tabs' own variables so it runs into the tool row)
+    · Add more strategies (Zing-edged ring); the tool row (36, surface/primary, dashed line under it): Positions ·
+    Orders · Option chain, then the Active chip (Zing tint, count 14 on its icon) running off the right edge — the row
+    scrolls sideways;
+  - two chart panels on surface/primary, a 16 band with a drag handle between them: instrument (name ⇅ underlined,
+    Spot ⇅, link-charts), price · change · ▲ (percent) in the up colour; the spot panel's buttons are chart type
+    (US-stock blue tint) and chart tools, the option panel has chart tools only;
+  - each chart (`components/TradingPane`): candles, a 50-wide price axis with round steps and the last price tagged in
+    the up colour (dashed line to it), the session high / low marked with value · dot · line, zoom in / out against the
+    axis, a time axis every 50 minutes (12:15 … 15:25 / 12:25 … 15:35) and "5m ▾" in the corner;
+  - order dock: Market / Limit-Trigger (L3 pill group, outlined), Buy at Mkt (brand) · quantity in lots (L3 Stepper
+    Large, steps of one lot = 65) · Sell at Mkt (secondary), the margin each needs and the funds under the stepper.
+  Values and candles are illustrative (`data.ts`, traced from the screenshot, high / low pinned to its markers); no
+  order is submitted.
+- **Chart tools sheet** (`sheets/ChartToolsSheet`, from either panel's tools button; fno-06 opens with it up): a 96
+  **Side nav** column (Range · Zing NEW · Indicators · Drawings · Templates · Settings; `components/SideNav`) and the
+  chosen group beside it. Indicators: **Your indicators** (made with DASH AI, Create indicator, or "No indicators
+  created yet.") and **Lemonn indicators**, each a starred 32-tall row. DASH's View indicator opens it with the saved
+  indicator listed. Picking one closes the sheet and applies it (fno-07): its name under the spot quote and two
+  illustrative moving-average lines (EMA 9 / 21 of the sample candles) on the spot chart.
 
 ### L3 components
+
+Scalper: Screen, Button (ghost, tertiary, brand, secondary), Tabs (ribbon, pill group), Stepper, BottomSheet,
+ListCell (card, Small), Icon, Stack. New here, from L3 tokens only:
+- **Side nav** (`components/SideNav`) — vertical icon-over-label tiles that switch the panel beside them. L3 gap:
+  candidate for the design system.
+- **Trading pane** (`components/TradingPane`) — L3 gap: L3 Chart is a fixed 360 × 200 picture without high / low
+  markers, zoom, a timeframe control or a real-size price axis.
 
 Screen and Rail are shared app composition helpers. The F&O header matches Stocks home in its profile, search, DASH and wallet controls; other controls use BottomNavbar / NavIcon, Button, Card, Tabs (including the explicitly requested Ribbon), Select, Chart, PriceChange, Tag, SectionHeader, BottomSheetHeader, Radio, TextField, EmptyState and Aerobar. Layout uses Stack and Inset. CSS uses semantic L3 tokens, including profit/loss heatmap surfaces.
 
 ### Differences and prototype limits
 
+Scalper vs the live screenshot: L3 sizes win where they differ — the order buttons are L3 Medium (40, the live app's
+are 35) with radius 16; the sheet's top corners are L3's 24; type is Manrope (L3), a little wider than the live app's,
+so the tool row reaches the Active chip slightly later. The Zing glyph on Active and the Zing tile is Material
+swap_horiz (L3 has no Zing mark icon). Colours map to the nearest L3 tokens (panels surface/primary #161616 vs the
+live #1d1d1d).
+
 The source uses old D2 controls alongside L3; their code equivalents are L3 components rather than hand-built lookalikes, including L3 shortcut buttons. The header matches Stocks home, including its search pill, DASH entry and wallet. The profile uses the app's fictional Rohan Mehta instead of AG. The misspelled watchlist name “Specail 25” is corrected to “Special 25”. Chart candles are representative data rendered by L3 Chart; chart metrics and data are illustrative, with no market/API or order execution integration. Repeated Figma quotes, historical expiry text and the red/green JSWSTEEL pattern are preserved, including the source's inconsistent negative percentages in green cells. The source ribbon's custom green edge is replaced by the existing L3 Ribbon styling.
 
 ### Changelog
 
+- 2026-10-27 — Scalper rebuilt from the live app's screenshot: measured layout, trading chart panes (price axis, last-price tag, high / low markers, zoom, time axis, timeframe), the tool row with the Active chip, the order dock, and the chart-tools sheet with a new Side nav.
 - 2026-10-26 — Added Equity home and board positions, connected the F&O tab and existing flows, added local selectors, filters, watchlist creation and details sheets.
 - 2026-10-26 — Reused the Stocks home header on F&O, including its scrolled surface and all four actions.
 - 2026-10-26 — Added Scalper: an L3 workspace from the ScalpPro shortcut, with two intraday charts and order controls.
@@ -569,6 +595,162 @@ export function Overview({ onDestination }: { onDestination: (name: string) => v
 }
 ```
 
+### `src/flows/fno/components/SideNav.module.css`
+
+```css
+/*
+ * Side nav (candidate L3 component). Tiles are square and fill the column's width; 10 between them (live app:
+ * 78 × 78 tiles in a 96 column, radius 12).
+ */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-10);
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--l3-spacing-08);
+  width: 100%;
+  aspect-ratio: 1;
+  padding: var(--l3-spacing-08) var(--l3-spacing-04);
+  border: 0;
+  border-radius: var(--l3-radius-12);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
+  color: var(--l3-content-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* Selected: the accent tint fills the tile, no outline, primary text. */
+.tile[aria-selected='true'] {
+  background: var(--l3-surface-accent-us-stock-light);
+  box-shadow: none;
+  color: var(--l3-content-primary);
+}
+
+@media (hover: hover) {
+  .tile[aria-selected='false']:hover {
+    background-image: linear-gradient(var(--l3-state-layer-dark-hover), var(--l3-state-layer-dark-hover));
+  }
+}
+
+.tile:active {
+  transform: scale(var(--l3-motion-scale-press-default));
+}
+
+.tile:focus-visible {
+  outline: var(--l3-spacing-02) solid var(--l3-border-dark);
+  outline-offset: var(--l3-spacing-02);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  color: var(--l3-content-secondary);
+}
+
+.tile[aria-selected='true'] .icon {
+  color: var(--l3-content-primary);
+}
+
+.label {
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--l3-text-label-14);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Corner flag ("NEW"): the Zing yellow, tucked into the tile's top-right corner. */
+.flag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: var(--l3-spacing-02) var(--l3-spacing-06);
+  border-radius: 0 var(--l3-radius-12) 0 var(--l3-radius-08);
+  background: var(--l3-surface-accent-zing-default);
+  color: var(--l3-static-black);
+  font: var(--l3-text-heading-10);
+  letter-spacing: var(--l3-letter-spacing-00);
+}
+```
+
+### `src/flows/fno/components/SideNav.tsx`
+
+```tsx
+import type { ReactNode } from 'react'
+import styles from './SideNav.module.css'
+
+export type SideNavItem<V extends string> = {
+  value: V
+  label: string
+  icon: ReactNode
+  /** A small corner flag, e.g. "NEW". */
+  flag?: string
+}
+
+type SideNavProps<V extends string> = {
+  items: SideNavItem<V>[]
+  value: V
+  onChange: (value: V) => void
+  'aria-label': string
+  className?: string
+}
+
+/**
+ * Side nav — a vertical column of square tiles (icon over label) that switches the panel beside it, as in the live
+ * app's chart-tools sheet (Range · Zing · Indicators · Drawings · Templates · Settings). Unselected tiles are outlined
+ * (border/light); the selected one fills with the accent tint. A tile can carry a corner flag ("NEW").
+ * Not in L3 yet: built here from L3 tokens only, product-neutral, ready to move into the design system as "Side nav".
+ * Keyboard: a vertical tab list — ↑ / ↓ move between tiles, Home / End jump to the ends.
+ */
+export function SideNav<V extends string>({ items, value, onChange, className, ...aria }: SideNavProps<V>) {
+  const move = (from: number, by: number) => {
+    const next = items[(from + by + items.length) % items.length]
+    onChange(next.value)
+    document.getElementById(tileId(next.value))?.focus()
+  }
+  return (
+    <div role="tablist" aria-orientation="vertical" aria-label={aria['aria-label']} className={[styles.nav, className].filter(Boolean).join(' ')}>
+      {items.map((item, i) => {
+        const selected = item.value === value
+        return (
+          <button
+            key={item.value}
+            id={tileId(item.value)}
+            type="button"
+            role="tab"
+            aria-selected={selected}
+            tabIndex={selected ? 0 : -1}
+            className={styles.tile}
+            onClick={() => onChange(item.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown') { e.preventDefault(); move(i, 1) }
+              if (e.key === 'ArrowUp') { e.preventDefault(); move(i, -1) }
+              if (e.key === 'Home') { e.preventDefault(); move(0, 0) }
+              if (e.key === 'End') { e.preventDefault(); move(items.length - 1, 0) }
+            }}
+          >
+            {item.flag && <span className={styles.flag}>{item.flag}</span>}
+            <span className={styles.icon} aria-hidden="true">{item.icon}</span>
+            <span className={styles.label}>{item.label}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+const tileId = (value: string) => `side-nav-${value}`
+```
+
 ### `src/flows/fno/components/TradingChart.tsx`
 
 ```tsx
@@ -599,6 +781,287 @@ export function TradingChart({ onChoose, onDestination, onScalper }: { onChoose:
     <Chart data={chartSeries(metric, index)} label={t('chart.label', { index, metric: items.find((i) => i.value === metric)!.label })} type={metric === 'price' ? 'candle' : 'line'} showLastPrice={false} showVolume={metric === 'price'} className={styles.chart} />
     <Stack direction="horizontal" gap="12"><Button variant="secondary" size="md" fullWidth iconLeft={<span className={styles.actionIcon}><img className={styles.asset} src={chain} alt="" /></span>} onClick={() => onDestination(t('nav.chain'))}>{t('chart.chain')}</Button><Button variant="primary" size="md" fullWidth iconLeft={<span className={styles.actionIcon}><MaskIcon src={scalper} /></span>} onClick={onScalper}>{t('chart.scalper')}</Button></Stack>
   </section>
+}
+```
+
+### `src/flows/fno/components/TradingPane.module.css`
+
+```css
+/* Trading chart pane (Scalper). SVG geometry is in CSS px (TradingPane.tsx); colours and type are L3 tokens. */
+.pane {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.axisLine {
+  stroke: var(--l3-border-intense);
+  stroke-width: 1;
+}
+
+.tick,
+.time {
+  fill: var(--l3-content-secondary);
+  font: var(--l3-text-label-12);
+}
+
+/* Candles: up green, down red (L3 indicator colours); 1px wicks. */
+.up {
+  fill: var(--l3-content-accent-indicator-up-default);
+  stroke: var(--l3-content-accent-indicator-up-default);
+}
+
+.down {
+  fill: var(--l3-content-accent-indicator-down-default);
+  stroke: var(--l3-content-accent-indicator-down-default);
+}
+
+.up line,
+.down line {
+  stroke-width: 1;
+}
+
+.up rect,
+.down rect {
+  stroke: none;
+}
+
+/* Last price: a dashed line in the up colour to the axis, and the green tag with white text. */
+.lastLine {
+  stroke: var(--l3-content-accent-indicator-up-default);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.lastTag {
+  fill: var(--l3-surface-accent-indicator-up-default);
+}
+
+.lastText {
+  fill: var(--l3-static-white);
+  font: var(--l3-text-label-12);
+}
+
+/* Session high / low: the value in primary text, a dot and a line in secondary. */
+.marker line {
+  stroke: var(--l3-content-secondary);
+  stroke-width: 1;
+}
+
+.marker circle {
+  fill: var(--l3-content-secondary);
+}
+
+.marker text {
+  fill: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+}
+
+/* An applied indicator's two lines. */
+.fast,
+.slow {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.fast {
+  stroke: var(--l3-content-accent-us-stock-default);
+}
+
+.slow {
+  stroke: var(--l3-content-accent-zing-default);
+}
+
+/* Zoom in at the top of the plot, zoom out at the bottom, against the price axis. */
+.zoom {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-block: var(--l3-spacing-04) var(--l3-spacing-08);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.zoomButton.zoomButton {
+  --btn-content: var(--l3-content-secondary);
+  pointer-events: auto;
+}
+
+/* "5m ▾" in the corner under the price axis. */
+.timeframe.timeframe {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  font: var(--l3-text-label-14);
+}
+```
+
+### `src/flows/fno/components/TradingPane.tsx`
+
+```tsx
+import { useLayoutEffect, useRef, useState } from 'react'
+import { Button } from '@l3/components/Button'
+import type { ChartCandle } from '@l3/components/Chart'
+import { Icon } from '@l3/components/Icon'
+import { msArrowDropDown, msZoomIn, msZoomOut } from '@l3/icons/material'
+import { t } from '../copy'
+import styles from './TradingPane.module.css'
+
+/** A line drawn over the candles (an applied indicator), one value per candle. */
+export type PaneLine = { values: number[]; tone: 'fast' | 'slow' }
+
+type TradingPaneProps = {
+  candles: ChartCandle[]
+  /** The first candle's time ("11:30") and the candle length in minutes: the time axis is worked out from them. */
+  start: string
+  minutes: number
+  /** Accessible name, e.g. "NIFTY 50, today, 5-minute candles". */
+  label: string
+  lines?: PaneLine[]
+}
+
+// Geometry in CSS px, measured on the live app's screenshot (392 wide).
+const AXIS = 50 // the price axis on the right, past its separator line
+const TIME = 30 // the time axis under the plot
+const PAD_TOP = 26 // the session high sits this far under the top
+const PAD_BOTTOM = 34 // …and the low this far above the time axis
+const EMPTY_SLOTS = 3 // room after the last candle
+const TIME_EVERY = 10 // a time label every 10 candles (50 minutes)
+const MARKER = 18 // the high / low marker's line length
+
+/**
+ * A trading chart pane (Scalper): candles, a price axis on the right with the last price tagged, the session's high
+ * and low marked with their values, zoom in / out, a time axis under it and the candle length (5m) in the corner.
+ * Drawn at the pane's real size (it fills its parent), so the text never stretches. Colours are L3 tokens.
+ * L3's Chart is a fixed 360 × 200 picture without high / low markers, zoom or a timeframe — listed as an L3 gap.
+ */
+export function TradingPane({ candles, start, minutes, label, lines = [] }: TradingPaneProps) {
+  const box = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState({ w: 0, h: 0 })
+  useLayoutEffect(() => {
+    const el = box.current
+    if (!el) return
+    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const plotW = Math.max(0, size.w - AXIS)
+  const plotH = Math.max(0, size.h - TIME)
+  const highs = candles.map((c) => c.high)
+  const lows = candles.map((c) => c.low)
+  const hi = Math.max(...highs)
+  const lo = Math.min(...lows)
+  const slot = plotW / (candles.length + EMPTY_SLOTS)
+  const x = (i: number) => slot * (i + 0.5)
+  const y = (v: number) => PAD_TOP + ((hi - v) / (hi - lo || 1)) * (plotH - PAD_TOP - PAD_BOTTOM)
+  const last = candles[candles.length - 1]
+  const ticks = niceTicks(lo, hi).filter((v) => y(v) > 8 && y(v) < plotH - 8 && Math.abs(y(v) - y(last.close)) > 14)
+  const hiIndex = highs.indexOf(hi)
+  const loIndex = lows.indexOf(lo)
+  const fmt = (v: number) => v.toFixed(2)
+  const times = candles.map((_, i) => i).filter((i) => (i + 1) % TIME_EVERY === 0 || i === candles.length - 1)
+
+  return (
+    <div className={styles.pane} ref={box}>
+      {size.w > 0 && (
+        <svg className={styles.svg} width={size.w} height={size.h} role="img" aria-label={label}>
+          {/* separators: the price axis and the time axis */}
+          <line className={styles.axisLine} x1={plotW + 0.5} y1={0} x2={plotW + 0.5} y2={plotH} />
+          <line className={styles.axisLine} x1={0} y1={plotH + 0.5} x2={size.w} y2={plotH + 0.5} />
+
+          {ticks.map((v) => (
+            <text key={v} className={styles.tick} x={plotW + 4} y={y(v)} dominantBaseline="central">{Math.round(v * 100) / 100}</text>
+          ))}
+
+          {candles.map((c, i) => {
+            const up = c.close >= c.open
+            const top = y(Math.max(c.open, c.close))
+            const body = Math.max(1, y(Math.min(c.open, c.close)) - top)
+            return (
+              <g key={i} className={up ? styles.up : styles.down}>
+                <line x1={x(i)} x2={x(i)} y1={y(c.high)} y2={y(c.low)} />
+                <rect x={x(i) - slot * 0.32} y={top} width={slot * 0.64} height={body} />
+              </g>
+            )
+          })}
+
+          {lines.map((l) => (
+            <path key={l.tone} className={styles[l.tone]} d={l.values.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')} />
+          ))}
+
+          {/* last price: a dashed line to the axis, then the tag */}
+          <line className={styles.lastLine} x1={x(candles.length - 1) + slot * 0.5} y1={y(last.close)} x2={plotW} y2={y(last.close)} />
+          <rect className={styles.lastTag} x={plotW + 1} y={y(last.close) - 8} width={AXIS} height={16} rx={2} />
+          <text className={styles.lastText} x={plotW + 3} y={y(last.close)} dominantBaseline="central">{fmt(last.close)}</text>
+
+          <Marker x={x(hiIndex)} y={y(hi)} value={fmt(hi)} towardRight={hiIndex < candles.length / 2} />
+          <Marker x={x(loIndex)} y={y(lo)} value={fmt(lo)} towardRight={loIndex < candles.length / 2} />
+
+          {times.map((i) => (
+            <g key={i}>
+              <line className={styles.axisLine} x1={x(i)} x2={x(i)} y1={plotH} y2={plotH + 5} />
+              <text className={styles.time} x={x(i)} y={plotH + 18} textAnchor="middle" dominantBaseline="central">{clock(start, minutes * i)}</text>
+            </g>
+          ))}
+        </svg>
+      )}
+      <div className={styles.zoom} style={{ right: AXIS + 2, height: plotH }}>
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msZoomIn} />} aria-label={t('scalper.zoomIn')} className={styles.zoomButton} />
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msZoomOut} />} aria-label={t('scalper.zoomOut')} className={styles.zoomButton} />
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        iconRight={<Icon icon={msArrowDropDown} />}
+        aria-label={t('scalper.timeframeLabel')}
+        className={styles.timeframe}
+        style={{ width: AXIS, height: TIME }}
+      >
+        {t('scalper.timeframe')}
+      </Button>
+    </div>
+  )
+}
+
+/** The session's high / low: its value, a dot and a short line to the candle (to the right when the candle is on the left). */
+function Marker({ x, y, value, towardRight }: { x: number; y: number; value: string; towardRight: boolean }) {
+  const end = towardRight ? x + MARKER : x - MARKER
+  return (
+    <g className={styles.marker}>
+      <line x1={x} y1={y} x2={end} y2={y} />
+      <circle cx={end} cy={y} r={1.5} />
+      <text x={towardRight ? end + 5 : end - 5} y={y} textAnchor={towardRight ? 'start' : 'end'} dominantBaseline="central">{value}</text>
+    </g>
+  )
+}
+
+/** Round price-axis steps (1, 2, 5 × 10ⁿ) for about six labels. */
+function niceTicks(lo: number, hi: number) {
+  const raw = (hi - lo) / 6
+  const pow = 10 ** Math.floor(Math.log10(raw))
+  const step = [1, 2, 4, 5, 10].map((m) => m * pow).find((s) => s >= raw) ?? raw
+  const first = Math.ceil(lo / step) * step
+  return Array.from({ length: Math.floor((hi - first) / step) + 1 }, (_, k) => first + k * step)
+}
+
+/** "11:30" + 45 minutes → "12:15". */
+function clock(start: string, add: number) {
+  const [h, m] = start.split(':').map(Number)
+  const total = h * 60 + m + add
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 ```
 
@@ -677,7 +1140,52 @@ export function TradingChart({ onChoose, onDestination, onScalper }: { onChoose:
   "contract.volume": "Volume",
   "contract.change": "Change",
   "empty": "No contracts match",
-  "empty.description": "Choose another filter to see contracts."
+  "empty.description": "Choose another filter to see contracts.",
+  "scalper.back": "Back to F&O",
+  "scalper.strategies": "Strategies",
+  "scalper.all": "All",
+  "scalper.addStrategies": "Add more strategies",
+  "scalper.tools": "Scalper tools",
+  "scalper.positions": "Positions",
+  "scalper.orders": "Orders",
+  "scalper.chain": "Option chain",
+  "scalper.active": "Active",
+  "scalper.activeCount": "{count} active",
+  "scalper.pickInstrument": "Change instrument",
+  "scalper.pickSegment": "Change segment",
+  "scalper.link": "Link both charts",
+  "scalper.chartType": "Chart type",
+  "scalper.chartTools": "Chart tools",
+  "scalper.zoomIn": "Zoom in",
+  "scalper.zoomOut": "Zoom out",
+  "scalper.timeframe": "5m",
+  "scalper.timeframeLabel": "Candle length",
+  "scalper.chartLabel": "{name}, today, 5-minute candles",
+  "scalper.resize": "Resize the charts",
+  "scalper.orderType": "Order type",
+  "scalper.market": "Market",
+  "scalper.limit": "Limit/Trigger",
+  "scalper.buy": "Buy at Mkt",
+  "scalper.sell": "Sell at Mkt",
+  "scalper.quantity": "Quantity",
+  "scalper.lots": "{count} lot",
+  "scalper.required": "Req: {amount}",
+  "scalper.funds": "Funds: {amount}",
+  "tools.range": "Range",
+  "tools.zing": "Zing",
+  "tools.indicators": "Indicators",
+  "tools.drawings": "Drawings",
+  "tools.templates": "Templates",
+  "tools.settings": "Settings",
+  "tools.new": "NEW",
+  "tools.search": "Search {section}",
+  "tools.yours": "Your indicators",
+  "tools.create": "Create indicator",
+  "tools.none": "No indicators created yet.",
+  "tools.byDash": "Made with DASH AI",
+  "tools.lemonn": "Lemonn indicators",
+  "tools.favourite": "Add {name} to favourites",
+  "tools.soon": "Pick Indicators to add one to the chart."
 }
 ```
 
@@ -730,17 +1238,59 @@ export function chartSeries(metric: string, index: string): ChartCandle[] {
   })
 }
 
-/** Intraday samples used by the Scalper prototype. They illustrate the two linked instruments, not live data. */
-const scalperCloses = [22552,22544,22567,22581,22576,22592,22614,22603,22586,22570,22582,22595,22609,22626,22648,22661,22647,22670,22659,22675,22655,22672,22664,22678,22710,22685,22672,22666,22683,22692,22704,22718,22706,22690,22712,22716,22728,22725,22753]
-const optionCloses = [56,62,68,65,61,58,63,70,76,69,62,58,55,61,66,73,81,90,86,79,83,75,118,106,96,92,99,104,101,108,111,106,89,97,102,105,107,105,108]
-const makeScalperCandles = (closes: number[]): ChartCandle[] => closes.map((close, i) => {
-  const open = i ? closes[i - 1] : close - 4
-  const range = Math.max(3, Math.round(close * 0.003))
-  return { open, close, high: Math.max(open, close) + range, low: Math.min(open, close) - range, volume: 36 + (i * 19) % 90 }
-})
+/**
+ * Scalper: two linked intraday panes (5-minute candles, 11:30 → 15:25) traced from the live app's screenshot —
+ * NIFTY 50 spot and the NIFTY 27 OCT 22750 call. Illustrative prototype data, not live quotes. Each candle opens at
+ * the previous close; the wick sizes vary a little so the panes read like a real session. The session's high and low
+ * are pinned to the screenshot's markers (22,753.20 / 22,541.55 and 123.25 / 52.35).
+ */
+export type ScalperInstrument = {
+  /** The contract's name, e.g. "NIFTY 50". */
+  name: string
+  /** What the first pane shows (Spot / Futures); the option pane has none. */
+  segment?: string
+  /** Call / Put, for an option. */
+  side?: string
+  price: number
+  change: number
+  percent: number
+  candles: ChartCandle[]
+  /** The first candle's time and the candle length, for the time axis. */
+  start: string
+  minutes: number
+}
 
-export const scalperSpotCandles = makeScalperCandles(scalperCloses)
-export const scalperOptionCandles = makeScalperCandles(optionCloses)
+const spotCloses = [22556, 22545, 22562, 22584, 22596, 22606, 22598, 22589, 22576, 22593, 22608, 22622, 22634, 22617, 22598, 22582, 22574, 22590, 22606, 22620, 22652, 22641, 22655, 22646, 22662, 22653, 22646, 22658, 22650, 22704, 22690, 22673, 22668, 22684, 22679, 22694, 22706, 22712, 22691, 22708, 22714, 22719, 22716, 22723, 22725, 22721, 22728, 22753.2]
+const optionCloses = [56, 61, 59, 66, 64, 58, 61, 66, 59, 67, 73, 69, 62, 58, 55, 59, 63, 68, 74, 70, 79, 83, 78, 86, 82, 90, 84, 79, 121, 111, 96, 91, 95, 92, 102, 99, 104, 96, 88, 100, 103, 101, 104, 106, 104, 107, 106, 108.2]
+
+function sessionCandles(closes: number[], wick: number, pins: { high: [number, number]; low: [number, number] }): ChartCandle[] {
+  return closes.map((close, i) => {
+    const open = i ? closes[i - 1] : close + wick
+    const reach = wick * (1 + ((i * 7) % 5) / 4)
+    const last = i === closes.length - 1
+    let high = last ? Math.max(open, close) : Math.max(open, close) + reach
+    let low = Math.min(open, close) - reach
+    // The session's high and low are the screenshot's: no other wick goes past them.
+    high = i === pins.high[0] ? pins.high[1] : Math.min(high, pins.high[1] - wick / 2)
+    low = i === pins.low[0] ? pins.low[1] : Math.max(low, pins.low[1] + wick / 2)
+    return { open, close, high, low }
+  })
+}
+
+export const scalperSpot: ScalperInstrument = {
+  name: 'NIFTY 50', segment: 'Spot', price: 22753.2, change: 153.2, percent: 0.68,
+  candles: sessionCandles(spotCloses, 6, { high: [47, 22753.2], low: [1, 22541.55] }),
+  start: '11:30', minutes: 5,
+}
+
+export const scalperOption: ScalperInstrument = {
+  name: 'NIFTY 27OCT 22750', side: 'Call', price: 108.2, change: 41.75, percent: 62.83,
+  candles: sessionCandles(optionCloses, 2, { high: [28, 123.25], low: [14, 52.35] }),
+  start: '11:40', minutes: 5,
+}
+
+/** The Lemonn indicators in the chart-tools sheet (the live app's list, alphabetical). */
+export const lemonnIndicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA', 'EMA', 'Ichimoku Cloud', 'MACD', 'RSI', 'Supertrend', 'VWAP']
 ```
 
 ### `src/flows/fno/index.tsx`
@@ -847,214 +1397,619 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
 ### `src/flows/fno/screens/Scalper.module.css`
 
 ```css
-.theme { height: 100%; background: var(--l3-surface-default); color: var(--l3-content-primary); }
-.screen { display: grid; grid-template-rows: var(--l3-size-56) var(--l3-size-48) minmax(0, 1fr) auto; height: 100%; overflow: hidden; background: var(--l3-surface-default); }
-.header, .tools { display: flex; align-items: center; border-bottom: 1px solid var(--l3-border-light); }
-.header { gap: var(--l3-spacing-04); min-height: var(--l3-size-56); padding-inline: var(--l3-spacing-08); background: var(--l3-surface-default); }
-.tools { gap: var(--l3-spacing-04); min-height: var(--l3-size-48); overflow-x: auto; padding-inline: var(--l3-spacing-08); background: var(--l3-surface-primary); }
-.tools > * { flex: none; }
-.tools > * + * { border-inline-start: 1px solid var(--l3-border-light); border-radius: var(--l3-radius-00); }
-.activeTool { border: 1px solid var(--l3-border-accent-zing-default); border-radius: var(--l3-radius-12) !important; background: var(--l3-surface-accent-zing-light) !important; color: var(--l3-content-accent-zing-default) !important; }
-.strategyTab { flex: none; align-self: stretch; }
-.content { min-height: 0; overflow: hidden; background: var(--l3-surface-primary); }
-.chartSection { box-sizing: border-box; display: flex; height: calc(var(--l3-size-128) * 2 + var(--l3-spacing-48)); flex-direction: column; padding-block-start: var(--l3-spacing-12); border-bottom: 1px solid var(--l3-border-light); background: var(--l3-surface-primary); }
-.chartHeader { flex: none; min-height: var(--l3-size-48); padding-inline: var(--l3-spacing-16); }
-.chartSection h2, .chartSection strong { margin: 0; font: var(--l3-text-heading-18); color: var(--l3-content-primary); }
-.subTitle { font: var(--l3-text-label-16); color: var(--l3-content-secondary); }
-.percent { color: var(--l3-content-accent-indicator-up-default); font: var(--l3-text-label-14); }
-.chartWrap { position: relative; flex: 1; min-height: 0; }
-.chart { position: absolute; inset: 0; width: 100%; height: 100%; }
-.overlayChart { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.overlayFastLine, .overlaySlowLine { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; vector-effect: non-scaling-stroke; }
-.overlayFastLine { stroke: var(--l3-content-accent-discover-default); }
-.overlaySlowLine { stroke: var(--l3-content-accent-warning-default); }
-.overlayLegend { position: absolute; z-index: 1; top: var(--l3-spacing-04); left: var(--l3-spacing-04); display: flex; gap: var(--l3-spacing-08); color: var(--l3-content-primary); font: var(--l3-text-label-10); pointer-events: none; }
-.overlayFast, .overlaySlow { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); }
-.overlayFast::before, .overlaySlow::before { width: var(--l3-spacing-12); height: 1px; background: currentColor; content: ''; }
-.overlayFast { color: var(--l3-content-accent-discover-default); }
-.overlaySlow { color: var(--l3-content-accent-warning-default); }
-.high, .low { position: absolute; left: var(--l3-spacing-16); padding-inline: var(--l3-spacing-04); background: var(--l3-surface-primary); color: var(--l3-content-primary); font: var(--l3-text-label-12); }
-.high { top: var(--l3-spacing-16); }
-.low { bottom: var(--l3-spacing-32); }
-.zoomControls { position: absolute; z-index: 2; top: var(--l3-spacing-12); right: var(--l3-size-48); display: flex; height: calc(100% - var(--l3-spacing-48)); flex-direction: column; justify-content: space-between; color: var(--l3-content-secondary); }
-.timeframe { position: absolute; z-index: 2; right: var(--l3-spacing-04); bottom: var(--l3-spacing-00); }
-.orderDock { position: relative; z-index: 3; flex: none; border-top: 1px solid var(--l3-border-light); background: var(--l3-surface-default); box-shadow: var(--l3-shadow-elevation-medium); }
-.orderType { align-self: center; }
-.orderActions { display: grid !important; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); width: 100%; }
-.orderSide { flex: 1; min-width: 0; text-align: center; color: var(--l3-content-secondary); font: var(--l3-text-label-10); }
-.sellButton { border: 1px solid var(--l3-border-dark) !important; background: var(--l3-surface-default) !important; color: var(--l3-content-primary) !important; }
-.stepper { flex: none; }
-.selectedIndicator { overflow: hidden; color: var(--l3-content-accent-discover-default); font: var(--l3-text-label-10); text-overflow: ellipsis; white-space: nowrap; }
-.indicatorPanel { height: min(100%, calc(var(--l3-size-80) * 7)); }
-.sheetGrid { display: grid; grid-template-columns: minmax(var(--l3-size-80), 1fr) 3fr; min-height: calc(var(--l3-size-80) * 5); }
-.sheetRail { display: flex; flex-direction: column; gap: var(--l3-spacing-08); padding-inline-end: var(--l3-spacing-12); border-inline-end: 1px solid var(--l3-border-light); }
-.sheetContent { display: flex; min-width: 0; flex-direction: column; gap: var(--l3-spacing-16); padding-inline-start: var(--l3-spacing-16); }
-.sheetContent h2 { margin: 0; color: var(--l3-content-primary); font: var(--l3-text-heading-20); }
-.indicatorSectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--l3-spacing-08); margin-block-end: var(--l3-spacing-12); }
-.indicatorSectionHeader h3, .indicatorSectionTitle { margin: 0; color: var(--l3-content-primary); font: var(--l3-text-heading-14); }
-.indicatorSectionTitle { margin-block-end: var(--l3-spacing-12); }
-.emptyIndicators { margin: 0; color: var(--l3-content-secondary); font: var(--l3-text-description-14); }
-.comingSoon { margin: 0; color: var(--l3-content-secondary); font: var(--l3-text-description-14); }
+/*
+ * Scalper — measured on the live app's screenshot (392 wide, dark). Every colour is an L3 token: the page is
+ * surface/default, the panels surface/primary; Active and its count use the Zing accent, the chart-type button the
+ * US-stock blue (the live app's blue tint), Buy the brand lime.
+ */
+
+/* ---- Top: header (back · strategy tabs · add) and the tool row ---- */
+.top {
+  flex: none;
+  background: var(--l3-surface-default);
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  height: var(--l3-size-48);
+  padding-left: var(--l3-spacing-06);
+}
+
+.back.back {
+  align-self: center;
+  margin-top: var(--l3-spacing-08);
+}
+
+/* L3 ribbon tabs: the selected tab takes the tool row's surface and a light edge, so it runs into the row below. */
+.strategies.strategies {
+  flex: none;
+  padding-inline: var(--l3-spacing-16) var(--l3-spacing-20);
+  background: transparent;
+  box-shadow: none;
+}
+
+.strategies [aria-selected='true'] {
+  --tab-surface: var(--l3-surface-primary);
+  --tab-border: var(--l3-border-light);
+}
+
+.addStrategies {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  align-self: center;
+  margin-top: var(--l3-spacing-08);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-14);
+  cursor: pointer;
+}
+
+.addRing {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-24);
+  height: var(--l3-size-24);
+  border-radius: var(--l3-radius-full);
+  box-shadow: inset 0 0 0 1px var(--l3-border-accent-zing-light); /* 1px: Figma stroke weight has no variable */
+  color: var(--l3-content-primary);
+}
+
+/* Tool row: 36 tall on surface/primary, a dashed line under it; scrolls sideways (Active runs off the edge). */
+.tools {
+  display: flex;
+  align-items: center;
+  height: var(--l3-spacing-36);
+  padding-left: var(--l3-spacing-12);
+  overflow-x: auto;
+  background: var(--l3-surface-primary);
+  border-bottom: 1px dashed var(--l3-border-intense);
+}
+
+.tool.tool {
+  flex: none;
+  --btn-content: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
+
+.divider {
+  flex: none;
+  width: 1px;
+  height: var(--l3-size-20);
+  margin-inline: var(--l3-spacing-12);
+  background: var(--l3-border-light);
+}
+
+/* Active strategies: Zing tint, rounded on the left, running off the right edge; the count sits on the icon. */
+.active {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  height: var(--l3-size-32);
+  margin-left: var(--l3-spacing-12);
+  padding: 0 var(--l3-spacing-24) 0 var(--l3-spacing-12);
+  border: 1px solid var(--l3-border-accent-zing-light);
+  border-right: 0;
+  border-radius: var(--l3-radius-08) 0 0 var(--l3-radius-08);
+  background: var(--l3-surface-accent-zing-light);
+  color: var(--l3-content-accent-zing-default);
+  font: var(--l3-text-label-14);
+  cursor: pointer;
+}
+
+.activeIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.count {
+  position: absolute;
+  top: calc(-1 * var(--l3-spacing-08));
+  right: calc(-1 * var(--l3-spacing-08));
+  display: grid;
+  place-items: center;
+  min-width: var(--l3-size-16);
+  height: var(--l3-size-16);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-zing-default);
+  color: var(--l3-static-black);
+  font: var(--l3-text-heading-10);
+}
+
+/* ---- Chart panels ---- */
+.panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--l3-surface-primary);
+}
+
+.panelHead {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--l3-spacing-12);
+  padding: var(--l3-spacing-12) var(--l3-spacing-16) var(--l3-spacing-04);
+}
+
+.instrument {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nameRow,
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-06);
+  height: var(--l3-size-20);
+}
+
+.picker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-02);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-secondary);
+  cursor: pointer;
+}
+
+.name {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-14);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--l3-spacing-04);
+}
+
+.segment {
+  margin-left: var(--l3-spacing-04);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
+
+.link.link {
+  --btn-content: var(--l3-content-primary);
+  margin-left: var(--l3-spacing-04);
+}
+
+.price {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
+
+.up {
+  display: inline-flex;
+  align-items: center;
+  color: var(--l3-content-accent-indicator-up-default);
+  font: var(--l3-text-label-14);
+}
+
+.applied {
+  margin-top: var(--l3-spacing-04);
+  color: var(--l3-content-accent-us-stock-default);
+  font: var(--l3-text-label-12);
+}
+
+/* The panes' square buttons: 32 (L3 Small). Chart type in the US-stock blue tint, tools on surface/secondary. */
+.chartType.chartType {
+  --btn-surface: var(--l3-surface-accent-us-stock-light);
+  --btn-content: var(--l3-content-accent-us-stock-default);
+  --btn-border: var(--l3-border-accent-us-stock-light);
+  margin-top: var(--l3-spacing-04);
+}
+
+.paneButton.paneButton {
+  --btn-surface: var(--l3-surface-secondary);
+  --btn-content: var(--l3-content-primary);
+  --btn-border: var(--l3-border-intense);
+  margin-top: var(--l3-spacing-04);
+}
+
+/* Between the panes: a 16 band on the page colour with a drag handle. */
+.split {
+  display: grid;
+  flex: none;
+  place-items: center;
+  height: var(--l3-size-16);
+  background: var(--l3-surface-default);
+}
+
+.handle {
+  width: var(--l3-size-40);
+  height: var(--l3-size-04);
+  padding: 0;
+  border: 0;
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-content-secondary);
+  cursor: row-resize;
+}
+
+/* ---- Order dock ---- */
+.dock {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-12) var(--l3-spacing-04) var(--l3-spacing-08);
+  background: var(--l3-surface-default);
+}
+
+.orderType.orderType {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--l3-border-intense); /* 1px: Figma stroke weight has no variable */
+}
+
+.order {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--l3-spacing-08);
+  width: 100%;
+}
+
+.side,
+.qty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+}
+
+.buy.buy,
+.sell.sell {
+  --btn-radius: var(--l3-radius-16);
+}
+
+.req {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-12);
+}
+
+.funds {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-10);
+}
+
+/* The chart-tools sheet brings its own layout: no content padding. */
+.sheet [data-sheet-content] {
+  padding: 0;
+}
 ```
 
 ### `src/flows/fno/screens/Scalper.tsx`
 
 ```tsx
-import { useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { BottomSheet } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
-import { Chart, type ChartCandle } from '@l3/components/Chart'
+import type { ChartCandle } from '@l3/components/Chart'
 import { Icon } from '@l3/components/Icon'
-import { Inset } from '@l3/components/Inset'
-import { ListCell } from '@l3/components/ListCell'
-import { PriceChange } from '@l3/components/PriceChange'
 import { Stack } from '@l3/components/Stack'
 import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
-import { msAdd, msAddChart, msArrowBack, msBookmark, msCandlestickChart, msChevronRight, msDraw, msKeyboardArrowDown, msLink, msListAlt, msPlaylistAdd, msSearch, msSettings, msShowChart, msStar, msZoomIn, msZoomOut } from '@l3/icons/material'
-import { scalperOptionCandles, scalperSpotCandles } from '../data'
+import { msAdd, msArrowBack, msArrowDropUp, msJoin, msLink, msMonitoring, msPlaylistAdd, msReceiptLong, msShowChart, msSwapHoriz, msUnfoldMore } from '@l3/icons/material'
+import { Screen } from '../../../shared/ui/Screen'
+import { TradingPane, type PaneLine } from '../components/TradingPane'
+import { t } from '../copy'
+import { scalperOption, scalperSpot, type ScalperInstrument } from '../data'
+import { ChartToolsSheet } from '../sheets/ChartToolsSheet'
 import styles from './Scalper.module.css'
 
-type Props = {
+type ScalperProps = {
   onBack: () => void
-  /** A DASH-created indicator opens the workspace with this sheet already visible. */
+  /** An indicator made with DASH AI: listed under Your indicators. */
   createdIndicator?: string
+  /** Open with the chart-tools sheet up on Indicators. Default: open when a DASH indicator is passed (View indicator). */
   openIndicators?: boolean
+  /** An indicator already applied to the NIFTY 50 pane. */
   initialIndicator?: string
   onCreateIndicator?: () => void
   onApplyIndicator?: (name: string) => void
 }
 
-const timeLabels = ['12:15', '13:05', '13:55', '14:45', '15:25']
-const indicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA']
+const LOT = 65
 
-/** Full-screen trading workspace for the ScalpPro shortcut. Values are illustrative prototype data. */
-export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator }: Props) {
-  const [quantity, setQuantity] = useState(65)
-  const [orderType, setOrderType] = useState('market')
-  const [active, setActive] = useState(true)
+/**
+ * Scalper (ScalpPro on F&O home) — the live app's trading workspace, rebuilt in L3:
+ * - top: back · the strategy tabs (L3 ribbon: "All") · Add more strategies; under it the tool row (Positions · Orders ·
+ *   Option chain · the Active strategies chip with its count);
+ * - two linked chart panes: NIFTY 50 spot above, the option contract below, a handle between them;
+ * - the order dock: Market / Limit-Trigger, Buy at Mkt · quantity in lots · Sell at Mkt, the margin each needs.
+ * The spot pane's "add" button opens the chart-tools sheet (indicators). Prices are sample data.
+ */
+export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator }: ScalperProps) {
   const [sheetOpen, setSheetOpen] = useState(openIndicators ?? Boolean(createdIndicator))
   const [indicator, setIndicator] = useState<string | null>(initialIndicator ?? null)
-  const screen = useRef<HTMLDivElement>(null)
-  return <div className={styles.theme}>
-    <div className={styles.screen} ref={screen}>
-      <header className={styles.header}>
-        <Button variant="ghost" size="sm" aria-label="Back to F&O" iconLeft={<Icon icon={msArrowBack} />} onClick={onBack} />
-        <Tabs aria-label="Scalper strategy" appearance="ribbon" size="md" value="all" onChange={() => {}} items={[{ value: 'all', label: 'All' }]} className={styles.strategyTab} />
-        <Button variant="ghost" size="md" iconRight={<Icon icon={msAdd} />} onClick={() => {}}>Add more strategies</Button>
-      </header>
+  const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
+  const [quantity, setQuantity] = useState(LOT)
+  const overlay = useMemo<PaneLine[]>(() => (indicator ? [{ values: ema(scalperSpot.candles, 9), tone: 'fast' }, { values: ema(scalperSpot.candles, 21), tone: 'slow' }] : []), [indicator])
 
-      <nav className={styles.tools} aria-label="Scalper tools">
-        <Button variant="ghost" size="md" iconLeft={<Icon icon={msShowChart} />}>Positions</Button>
-        <Button variant="ghost" size="md" iconLeft={<Icon icon={msListAlt} />}>Orders</Button>
-        <Button variant="ghost" size="md" iconLeft={<Icon icon={msLink} />}>Option chain</Button>
-        <Button variant={active ? 'tertiary' : 'ghost'} size="md" className={active ? styles.activeTool : undefined} iconLeft={<Icon icon={msCandlestickChart} />} onClick={() => setActive((v) => !v)}>{active ? 'Active' : 'Inactive'}</Button>
-      </nav>
-
-      <main className={styles.content}>
-        <ScalperChart title="NIFTY 50" subtitle="Spot" price={22753.2} change={153.2} percent={0.68} high="22,753.20" low="22,541.55" data={scalperSpotCandles} indicator={indicator} onOpenIndicators={() => setSheetOpen(true)} />
-        <ScalperChart title="NIFTY 27OCT 22750 Call" price={108.2} change={41.75} percent={62.83} high="123.25" low="52.35" data={scalperOptionCandles} />
-      </main>
-
-      <footer className={styles.orderDock}>
-        <Inset paddingInline="16" paddingBlock="12">
-          <Stack gap="12">
-            <Tabs aria-label="Order type" appearance="pill" size="sm" value={orderType} onChange={setOrderType} items={[{ value: 'market', label: 'Market' }, { value: 'limit', label: 'Limit/Trigger' }]} className={styles.orderType} />
-            <Stack direction="horizontal" align="center" gap="08" className={styles.orderActions}>
-              <Stack gap="04" className={styles.orderSide}><Button variant="buy" size="lg" fullWidth>Buy at Mkt</Button><span>Req: ₹7,059.75</span></Stack>
-              <Stepper label="Order quantity" value={quantity} onChange={setQuantity} min={1} step={1} size="lg" sublabel="1 lot" className={styles.stepper} />
-              <Stack gap="04" className={styles.orderSide}><Button variant="sell" size="lg" fullWidth className={styles.sellButton}>Sell at Mkt</Button><span>Req: ₹1,57,436.49</span></Stack>
-            </Stack>
-          </Stack>
-        </Inset>
-      </footer>
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} container={screen.current} aria-label="Chart tools" className={styles.indicatorPanel}>
-        <IndicatorSheet
-          yourIndicators={createdIndicator ? [createdIndicator] : []}
-          onCreateIndicator={onCreateIndicator}
-          onPick={(name) => { setIndicator(name); setSheetOpen(false); onApplyIndicator?.(name) }}
-        />
-      </BottomSheet>
-    </div>
-  </div>
+  return (
+    <Screen
+      className={styles.screen}
+      top={
+        <div className={styles.top}>
+          <div className={styles.header}>
+            <Button variant="ghost" size="sm" iconLeft={<Icon icon={msArrowBack} />} aria-label={t('scalper.back')} onClick={onBack} className={styles.back} />
+            <Tabs aria-label={t('scalper.strategies')} appearance="ribbon" size="md" value="all" onChange={() => {}} items={[{ value: 'all', label: t('scalper.all') }]} className={styles.strategies} />
+            <button type="button" className={styles.addStrategies}>
+              {t('scalper.addStrategies')}
+              <span className={styles.addRing} aria-hidden="true"><Icon icon={msAdd} size={16} /></span>
+            </button>
+          </div>
+          <nav className={styles.tools} aria-label={t('scalper.tools')}>
+            <Button variant="ghost" size="sm" iconLeft={<Icon icon={msMonitoring} />} className={styles.tool}>{t('scalper.positions')}</Button>
+            <span className={styles.divider} aria-hidden="true" />
+            <Button variant="ghost" size="sm" iconLeft={<Icon icon={msReceiptLong} />} className={styles.tool}>{t('scalper.orders')}</Button>
+            <span className={styles.divider} aria-hidden="true" />
+            <Button variant="ghost" size="sm" iconLeft={<Icon icon={msLink} />} className={styles.tool}>{t('scalper.chain')}</Button>
+            <button type="button" className={styles.active} aria-label={t('scalper.activeCount', { count: 14 })}>
+              <span className={styles.activeIcon} aria-hidden="true">
+                <Icon icon={msSwapHoriz} />
+                <span className={styles.count}>14</span>
+              </span>
+              {t('scalper.active')}
+            </button>
+          </nav>
+        </div>
+      }
+      bottom={
+        <div className={styles.dock} data-surface="default">
+          <Tabs
+            aria-label={t('scalper.orderType')}
+            appearance="pill-group"
+            size="sm"
+            value={orderType}
+            onChange={setOrderType}
+            items={[{ value: 'market', label: t('scalper.market') }, { value: 'limit', label: t('scalper.limit') }]}
+            className={styles.orderType}
+          />
+          <div className={styles.order}>
+            <div className={styles.side}>
+              <Button variant="brand" size="md" fullWidth className={styles.buy}>{t('scalper.buy')}</Button>
+              <span className={styles.req}>{t('scalper.required', { amount: '₹7,059.75' })}</span>
+            </div>
+            <div className={styles.qty}>
+              <Stepper label={t('scalper.quantity')} value={quantity} onChange={setQuantity} min={LOT} step={LOT} size="lg" sublabel={t('scalper.lots', { count: quantity / LOT })} />
+              <span className={styles.funds}>{t('scalper.funds', { amount: '₹-39.96' })}</span>
+            </div>
+            <div className={styles.side}>
+              <Button variant="secondary" size="md" fullWidth className={styles.sell}>{t('scalper.sell')}</Button>
+              <span className={styles.req}>{t('scalper.required', { amount: '₹1,57,436.49' })}</span>
+            </div>
+          </div>
+        </div>
+      }
+      sheet={
+        <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} aria-label={t('scalper.chartTools')} className={styles.sheet}>
+          <ChartToolsSheet
+            yourIndicators={createdIndicator ? [createdIndicator] : []}
+            onCreateIndicator={onCreateIndicator}
+            onPick={(name) => {
+              setIndicator(name)
+              setSheetOpen(false)
+              onApplyIndicator?.(name)
+            }}
+          />
+        </BottomSheet>
+      }
+    >
+      <ChartPanel instrument={scalperSpot} lines={overlay} indicator={indicator} chartType onTools={() => setSheetOpen(true)} />
+      <div className={styles.split}>
+        <button type="button" className={styles.handle} aria-label={t('scalper.resize')} />
+      </div>
+      <ChartPanel instrument={scalperOption} onTools={() => setSheetOpen(true)} />
+    </Screen>
+  )
 }
 
-function ScalperChart({ title, subtitle, price, change, percent, high, low, data, indicator, onOpenIndicators }: { title: string; subtitle?: string; price: number; change: number; percent: number; high: string; low: string; data: typeof scalperSpotCandles; indicator?: string | null; onOpenIndicators?: () => void }) {
-  return <section className={styles.chartSection} aria-label={`${title} intraday chart`}>
-    <Stack direction="horizontal" align="start" justify="between" gap="12" className={styles.chartHeader}>
-      <Stack gap="04"><Stack direction="horizontal" align="center" gap="04"><h2>{title}</h2>{subtitle && <><span className={styles.subTitle}>{subtitle}</span><Icon icon={msLink} size={20} /></>}</Stack><Stack direction="horizontal" align="center" gap="08"><strong>{price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong><PriceChange value={change} unit="currency" size="sm" /><span className={styles.percent}>({percent.toFixed(2)}%)</span></Stack>{indicator && <span className={styles.selectedIndicator}>{indicator}</span>}</Stack>
-      <Stack direction="horizontal" gap="08"><Button variant="secondary" size="sm" aria-label={`Set ${title} as chart leader`} iconLeft={<Icon icon={msShowChart} />} />{onOpenIndicators && <Button variant="secondary" size="sm" aria-label="Add chart indicator" iconLeft={<Icon icon={msPlaylistAdd} />} onClick={onOpenIndicators} />}</Stack>
-    </Stack>
-    <div className={styles.chartWrap}>
-      <Chart data={data} type="candle" timeLabels={timeLabels} showVolume={false} showGrid={false} showLastPrice label={`${title}, intraday`} className={styles.chart} />
-      {indicator && <ChartOverlay data={data} name={indicator} />}
-      <div className={styles.zoomControls} aria-label={`${title} zoom controls`}><Button variant="ghost" size="sm" aria-label={`Zoom in on ${title}`} iconLeft={<Icon icon={msZoomIn} />} /><Button variant="ghost" size="sm" aria-label={`Zoom out on ${title}`} iconLeft={<Icon icon={msZoomOut} />} /></div>
-      <span className={styles.high}>{high}</span><span className={styles.low}>{low}</span>
-      <Button variant="ghost" size="sm" className={styles.timeframe} iconRight={<Icon icon={msKeyboardArrowDown} />}>5m</Button>
-    </div>
-  </section>
+/** One chart pane: the instrument (name ⇅, segment ⇅, link), its price and change, the pane's buttons, the chart. */
+function ChartPanel({ instrument, lines, indicator, chartType, onTools }: { instrument: ScalperInstrument; lines?: PaneLine[]; indicator?: string | null; chartType?: boolean; onTools: () => void }) {
+  const { name, segment, side, price, change, percent } = instrument
+  return (
+    <section className={styles.panel} aria-label={name}>
+      <div className={styles.panelHead}>
+        <div className={styles.instrument}>
+          <div className={styles.nameRow}>
+            <button type="button" className={styles.picker} aria-label={t('scalper.pickInstrument')}>
+              <span className={styles.name}>{name}</span>
+              {side && <span className={styles.segment}>{side}</span>}
+              <Icon icon={msUnfoldMore} size={16} />
+            </button>
+            {segment && (
+              <button type="button" className={styles.picker} aria-label={t('scalper.pickSegment')}>
+                <span className={styles.segment}>{segment}</span>
+                <Icon icon={msUnfoldMore} size={16} />
+              </button>
+            )}
+            <Button variant="ghost" size="sm" iconLeft={<Icon icon={msJoin} />} aria-label={t('scalper.link')} className={styles.link} />
+          </div>
+          <div className={styles.priceRow}>
+            <span className={styles.price}>{inr(price)}</span>
+            <span className={styles.up}>{inr(change)}</span>
+            <span className={styles.up}>
+              <Icon icon={msArrowDropUp} size={16} />({percent.toFixed(2)}%)
+            </span>
+          </div>
+          {indicator && <span className={styles.applied}>{indicator}</span>}
+        </div>
+        <Stack direction="horizontal" gap="08">
+          {chartType && <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msShowChart} />} aria-label={t('scalper.chartType')} className={styles.chartType} />}
+          <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msPlaylistAdd} />} aria-label={t('scalper.chartTools')} onClick={onTools} className={styles.paneButton} />
+        </Stack>
+      </div>
+      <TradingPane candles={instrument.candles} start={instrument.start} minutes={instrument.minutes} lines={lines} label={t('scalper.chartLabel', { name })} />
+    </section>
+  )
+}
+
+const inr = (v: number) => v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+/** Exponential moving average of the closes — the applied indicator's illustrative lines. */
+function ema(candles: ChartCandle[], period: number) {
+  const k = 2 / (period + 1)
+  return candles.reduce<number[]>((out, c, i) => [...out, i ? c.close * k + out[i - 1] * (1 - k) : c.close], [])
+}
+```
+
+### `src/flows/fno/sheets/ChartToolsSheet.module.css`
+
+```css
+/*
+ * Chart tools sheet (live app): a 96 side-nav column with a hairline on its right, the panel beside it scrolls.
+ * About two thirds of the screen tall (live app: 571 of 872).
+ */
+.body {
+  display: grid;
+  grid-template-columns: var(--l3-size-96) minmax(0, 1fr);
+  height: calc(var(--l3-size-128) * 4.5); /* 576 — the live sheet's height; L3 has no size this large */
+  max-height: 100%;
+}
+
+.nav {
+  padding: var(--l3-spacing-16) var(--l3-spacing-08);
+  overflow-y: auto;
+  box-shadow: inset -1px 0 0 var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
+}
+
+.panel {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--l3-spacing-12) var(--l3-spacing-12) var(--l3-spacing-24);
+}
+
+.titleRow {
+  min-height: var(--l3-size-40);
+  margin-bottom: var(--l3-spacing-16);
+}
+
+.title {
+  margin: 0;
+  font: var(--l3-text-label-16);
+  color: var(--l3-content-primary);
+}
+
+.subTitle {
+  margin: 0;
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+}
+
+.empty {
+  margin: 0;
+  font: var(--l3-text-description-14);
+  color: var(--l3-content-tertiary);
+}
+
+/* Indicator rows: the live app's 33-tall pills — L3 card cell (Small) with the padding taken in and full rounding. */
+.row.row.row {
+  min-height: var(--l3-size-32);
+  padding-block: var(--l3-spacing-06);
+  border-radius: var(--l3-radius-full);
+}
+
+.star {
+  color: var(--l3-content-accent-us-stock-default);
+}
+```
+
+### `src/flows/fno/sheets/ChartToolsSheet.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { Stack } from '@l3/components/Stack'
+import { msAdd, msBookmarkFill, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msSwapHoriz } from '@l3/icons/material'
+import { SideNav } from '../components/SideNav'
+import { t } from '../copy'
+import { lemonnIndicators } from '../data'
+import styles from './ChartToolsSheet.module.css'
+
+type Section = 'range' | 'zing' | 'indicators' | 'drawings' | 'templates' | 'settings'
+
+type ChartToolsSheetProps = {
+  /** Indicators the user made with DASH AI (Your indicators). */
+  yourIndicators: string[]
+  onCreateIndicator?: () => void
+  onPick: (name: string) => void
 }
 
 /**
- * Prototype treatment for a price-pane indicator. The two plotted lines are short and long EMAs calculated from
- * the same illustrative candles; they provide a recognisable overlay without pretending to run the saved DASH rule.
+ * Chart tools (live app's sheet from the chart's "add" button): a side nav of tool groups on the left, the chosen group
+ * on the right. Only Indicators is built: Your indicators (made with DASH AI, or a line saying there are none, and
+ * Create indicator) above the Lemonn indicators, each a starred row. Picking one applies it to the chart.
  */
-function ChartOverlay({ data, name }: { data: ChartCandle[]; name: string }) {
-  const lines = [ema(data, 9), ema(data, 21)]
-  const high = Math.max(...data.map((c) => c.high))
-  const low = Math.min(...data.map((c) => c.low))
-  const x = (index: number) => (index * 304) / data.length + 304 / data.length / 2
-  const y = (value: number) => 12 + ((high - value) / (high - low || 1)) * (164 - 12)
-  const path = (values: number[]) => values.map((value, index) => `${index ? 'L' : 'M'}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(' ')
-  return <>
-    <div className={styles.overlayLegend} aria-label={`${name} applied: two illustrative moving-average overlays`}>
-      <span className={styles.overlayFast}>EMA 9</span><span className={styles.overlaySlow}>EMA 21</span>
-    </div>
-    <svg className={styles.overlayChart} viewBox="0 0 360 200" aria-hidden="true">
-      <path className={styles.overlayFastLine} d={path(lines[0])} />
-      <path className={styles.overlaySlowLine} d={path(lines[1])} />
-    </svg>
-  </>
-}
-
-function ema(data: ChartCandle[], period: number) {
-  const factor = 2 / (period + 1)
-  return data.reduce<number[]>((values, candle, index) => [...values, index ? candle.close * factor + values[index - 1] * (1 - factor) : candle.close], [])
-}
-
-function IndicatorSheet({ yourIndicators, onCreateIndicator, onPick }: { yourIndicators: string[]; onCreateIndicator?: () => void; onPick: (name: string) => void }) {
-  const [section, setSection] = useState('indicators')
-  const items = [
-    { id: 'range', label: 'Range', icon: msShowChart }, { id: 'zing', label: 'Zing', icon: msCandlestickChart },
-    { id: 'indicators', label: 'Indicators', icon: msAddChart }, { id: 'drawings', label: 'Drawings', icon: msDraw },
-    { id: 'templates', label: 'Templates', icon: msBookmark }, { id: 'settings', label: 'Settings', icon: msSettings },
-  ]
-  return <div className={styles.sheetGrid}>
-    <nav className={styles.sheetRail} aria-label="Chart tool categories">{items.map((item) => <Button key={item.id} variant={section === item.id ? 'secondary' : 'tertiary'} size="sm" fullWidth iconLeft={<Icon icon={item.icon} />} onClick={() => setSection(item.id)}>{item.label}</Button>)}</nav>
-    <section className={styles.sheetContent} aria-label={section === 'indicators' ? 'Indicators' : itemTitle(section)}>
-      <Stack direction="horizontal" align="center" justify="between"><h2>{section === 'indicators' ? 'Indicators' : itemTitle(section)}</h2><Button variant="ghost" size="sm" aria-label="Search indicators" iconLeft={<Icon icon={msSearch} />} /></Stack>
-      {section === 'indicators' ? (
-        <Stack gap="24">
-          <section aria-labelledby="your-indicators-heading">
-            <div className={styles.indicatorSectionHeader}>
-              <h3 id="your-indicators-heading">Your indicators</h3>
-              <Button variant="ghost" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreateIndicator}>Create indicator</Button>
-            </div>
-            {yourIndicators.length ? (
-              <Stack gap="08">{yourIndicators.map((name) => <ListCell key={name} variant="card" label={name} description="Created with DASH AI" iconLeft={<Icon icon={msStar} />} iconRight={<Icon icon={msChevronRight} />} onClick={() => onPick(name)} />)}</Stack>
-            ) : <p className={styles.emptyIndicators}>No indicators created yet.</p>}
-          </section>
-          <section aria-labelledby="lemon-indicators-heading">
-            <h3 id="lemon-indicators-heading" className={styles.indicatorSectionTitle}>Lemon indicators</h3>
-            <Stack gap="08">{indicators.map((name) => <ListCell key={name} variant="card" label={name} iconLeft={<Icon icon={msStar} />} iconRight={<Icon icon={msChevronRight} />} onClick={() => onPick(name)} />)}</Stack>
-          </section>
+export function ChartToolsSheet({ yourIndicators, onCreateIndicator, onPick }: ChartToolsSheetProps) {
+  const [section, setSection] = useState<Section>('indicators')
+  const title = t(`tools.${section}`)
+  return (
+    <div className={styles.body}>
+      <SideNav<Section>
+        aria-label={t('scalper.chartTools')}
+        value={section}
+        onChange={setSection}
+        className={styles.nav}
+        items={[
+          { value: 'range', label: t('tools.range'), icon: <Icon icon={msSpaceBar} /> },
+          { value: 'zing', label: t('tools.zing'), icon: <Icon icon={msSwapHoriz} />, flag: t('tools.new') },
+          { value: 'indicators', label: t('tools.indicators'), icon: <Icon icon={msFunction} /> },
+          { value: 'drawings', label: t('tools.drawings'), icon: <Icon icon={msDraw} /> },
+          { value: 'templates', label: t('tools.templates'), icon: <Icon icon={msBookmarkFill} /> },
+          { value: 'settings', label: t('tools.settings'), icon: <Icon icon={msSettings} /> },
+        ]}
+      />
+      <section className={styles.panel} role="tabpanel" aria-label={title}>
+        <Stack direction="horizontal" align="center" justify="between" className={styles.titleRow}>
+          <h2 className={styles.title}>{title}</h2>
+          <Button variant="ghost" size="sm" iconLeft={<Icon icon={msSearch} />} aria-label={t('tools.search', { section: title })} />
         </Stack>
-      ) : <p className={styles.comingSoon}>Choose Indicators to add one to this chart.</p>}
-    </section>
-  </div>
+        {section === 'indicators' ? (
+          <Stack gap="24">
+            <Stack as="section" gap="12" aria-label={t('tools.yours')}>
+              <Stack direction="horizontal" align="center" justify="between">
+                <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
+                <Button variant="ghost" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreateIndicator}>{t('tools.create')}</Button>
+              </Stack>
+              {yourIndicators.length ? (
+                <Stack gap="12">
+                  {yourIndicators.map((name) => (
+                    <ListCell key={name} variant="card" size="sm" label={name} description={t('tools.byDash')} iconLeft={<Icon icon={msStar} className={styles.star} />} onClick={() => onPick(name)} className={styles.row} />
+                  ))}
+                </Stack>
+              ) : (
+                <p className={styles.empty}>{t('tools.none')}</p>
+              )}
+            </Stack>
+            <Stack as="section" gap="12" aria-label={t('tools.lemonn')}>
+              <h3 className={styles.subTitle}>{t('tools.lemonn')}</h3>
+              <Stack gap="12">
+                {lemonnIndicators.map((name) => (
+                  <ListCell key={name} variant="card" size="sm" label={name} iconLeft={<Icon icon={msStar} className={styles.star} />} onClick={() => onPick(name)} className={styles.row} />
+                ))}
+              </Stack>
+            </Stack>
+          </Stack>
+        ) : (
+          <p className={styles.empty}>{t('tools.soon')}</p>
+        )}
+      </section>
+    </div>
+  )
 }
-
-const itemTitle = (section: string) => section.charAt(0).toUpperCase() + section.slice(1)
 ```
 
 ### `src/flows/fno/sheets/HomeSheets.tsx`

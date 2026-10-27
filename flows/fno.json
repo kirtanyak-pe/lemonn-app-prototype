@@ -100,7 +100,11 @@
     "src/flows/fno/components/Heatmap.tsx",
     "src/flows/fno/components/HomeParts.module.css",
     "src/flows/fno/components/Overview.tsx",
+    "src/flows/fno/components/SideNav.module.css",
+    "src/flows/fno/components/SideNav.tsx",
     "src/flows/fno/components/TradingChart.tsx",
+    "src/flows/fno/components/TradingPane.module.css",
+    "src/flows/fno/components/TradingPane.tsx",
     "src/flows/fno/copy.json",
     "src/flows/fno/copy.ts",
     "src/flows/fno/data.ts",
@@ -108,6 +112,8 @@
     "src/flows/fno/screens/Home.tsx",
     "src/flows/fno/screens/Scalper.module.css",
     "src/flows/fno/screens/Scalper.tsx",
+    "src/flows/fno/sheets/ChartToolsSheet.module.css",
+    "src/flows/fno/sheets/ChartToolsSheet.tsx",
     "src/flows/fno/sheets/HomeSheets.tsx"
   ],
   "shared": [
