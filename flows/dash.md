@@ -1920,6 +1920,56 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   transition: border-color var(--app-dash-scene) var(--app-dash-scene-easing);
 }
 
+/* With the attach button: it mirrors Send — a 40 round button 8 in from the edge, centred in the 56 field — and the
+   text starts 4 after it. */
+.input[data-attach] {
+  gap: var(--l3-spacing-04);
+  padding-left: var(--l3-spacing-08);
+}
+
+.attach.attach {
+  flex: none;
+  width: var(--l3-size-40);
+  height: var(--l3-size-40);
+  padding: 0;
+  border-radius: var(--l3-radius-full);
+  color: var(--l3-content-secondary);
+}
+
+/* The attachment chip sits 4 from the paperclip, the text 8 after the chip. */
+.attachment + .field {
+  margin-left: var(--l3-spacing-04);
+}
+
+/* A picked file, in the field before the text: a small grey pill — file icon, name, ✕. */
+.attachment {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  max-width: 50%;
+  padding: var(--l3-spacing-04) var(--l3-spacing-08);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-secondary);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+}
+
+.attachmentName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachmentRemove {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-secondary);
+  cursor: pointer;
+}
+
 .input[data-typing],
 .input:focus-within {
   border-color: var(--app-dash-green);
@@ -2066,6 +2116,13 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   height: var(--l3-size-16);
 }
 
+/* An action after the suggestions (Upload a Pine Script): a dashed edge and its icon before the label. */
+.promptChip[data-action] {
+  gap: var(--l3-spacing-08);
+  border-style: dashed;
+  color: var(--l3-content-primary);
+}
+
 .promptChip:active {
   transform: scale(var(--l3-motion-scale-press-default));
 }
@@ -2077,6 +2134,47 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 }
 
 /* ---- Messages */
+/* A sent file: the user's bubble, with a file tile (40, white) before its name and caption. */
+.userFile {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-12);
+  max-width: 80%;
+  padding: var(--l3-spacing-08) var(--l3-spacing-16) var(--l3-spacing-08) var(--l3-spacing-08);
+  border-radius: var(--l3-radius-24);
+  background: var(--l3-surface-secondary);
+}
+
+.userFileIcon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-40);
+  height: var(--l3-size-40);
+  border-radius: var(--l3-radius-16);
+  background: var(--l3-surface-default);
+  color: var(--app-dash-green);
+}
+
+.userFileText {
+  min-width: 0;
+}
+
+.userFileName {
+  margin: 0;
+  overflow: hidden;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userFileCaption {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+}
+
 .userMessage {
   display: flex;
   align-items: center;
@@ -2194,7 +2292,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } fro
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
-import { msArrowUpward, msChevronRight } from '@l3/icons/material'
+import { msArrowUpward, msAttachFile, msChevronRight, msClose, msDescription, msUploadFile } from '@l3/icons/material'
 import sparkle from '../assets/sparkle.svg'
 import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
@@ -2218,6 +2316,11 @@ type ChatInputProps = {
   autoFocus?: boolean
   /** The field itself — to focus it in a tap (on a phone, focusing inside the tap is what opens the keyboard). */
   inputRef?: RefObject<HTMLInputElement | null>
+  /** Attach (Pine Script): the paperclip at the start of the field; the screen opens its file picker. */
+  onAttach?: () => void
+  /** A picked file, shown as a chip in the field (sendable without text); ✕ takes it off. */
+  attachment?: { name: string } | null
+  onRemoveAttachment?: () => void
 }
 
 /**
@@ -2226,7 +2329,7 @@ type ChatInputProps = {
  * - Default: border-light edge, placeholder in content/tertiary, Send off (L3 disabled) until there's text.
  * - Typing: the DASH green edge, the text in content/primary, Send on (L3 primary, black).
  */
-export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef }: ChatInputProps) {
+export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment }: ChatInputProps) {
   const [own, setOwn] = useState('')
   const value = controlled ?? own
   const setValue = (v: string) => (onChange ? onChange(v) : setOwn(v))
@@ -2237,7 +2340,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
   const touch = useSystemKeyboard()
   const send = () => {
     const text = value.trim()
-    if (!text || !field.current) return
+    if ((!text && !attachment) || !field.current) return
     onSend?.(text, field.current)
     setValue('')
   }
@@ -2245,11 +2348,22 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
     <form
       className={styles.input}
       data-typing={typing || undefined}
+      data-attach={onAttach ? '' : undefined}
       onSubmit={(e) => {
         e.preventDefault()
         send()
       }}
     >
+      {onAttach && <Button type="button" variant="ghost" size="md" iconLeft={<Icon icon={msAttachFile} />} aria-label={t('input.attach')} onClick={onAttach} className={styles.attach} />}
+      {attachment && (
+        <span className={styles.attachment}>
+          <Icon icon={msDescription} size={16} />
+          <span className={styles.attachmentName}>{attachment.name}</span>
+          <button type="button" className={styles.attachmentRemove} aria-label={t('input.removeAttachment', { name: attachment.name })} onClick={onRemoveAttachment}>
+            <Icon icon={msClose} size={12} />
+          </button>
+        </span>
+      )}
       <input
         ref={field}
         className={styles.field}
@@ -2257,12 +2371,12 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
         onChange={(e) => setValue(e.target.value)}
         onFocus={onFocus}
         autoFocus={autoFocus}
-        placeholder={t('input.placeholder')}
+        placeholder={attachment ? t('input.attachmentPlaceholder') : t('input.placeholder')}
         aria-label={t('input.label')}
         enterKeyHint="send"
         inputMode={touch ? 'none' : undefined}
       />
-      <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || !value.trim()} className={styles.send} />
+      <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || (!value.trim() && !attachment)} className={styles.send} />
     </form>
   )
 }
@@ -2309,7 +2423,7 @@ export function PromptChips({ rows, onPick }: { rows: string[][]; onPick?: (prom
  * Top suggestions as a vertical list just above the input (primary layout of the empty chat): a green "Top N
  * suggestions ✦" label, then one DASH chip per line, left-aligned. A chip sends itself.
  */
-export function SuggestionList({ items, onPick }: { items: string[]; onPick?: (prompt: string, from: HTMLElement) => void }) {
+export function SuggestionList({ items, onPick, action }: { items: string[]; onPick?: (prompt: string, from: HTMLElement) => void; /** An extra action after the suggestions (Upload a Pine Script): a dashed chip with its icon; not counted in "Top N". */ action?: { label: string; onPick: () => void } }) {
   const list = useRef<HTMLElement>(null)
   useLayoutEffect(() => {
     const el = list.current
@@ -2332,6 +2446,12 @@ export function SuggestionList({ items, onPick }: { items: string[]; onPick?: (p
             <span>{prompt}</span>
           </button>
         ))}
+        {action && (
+          <button type="button" className={styles.promptChip} data-size="lg" data-action="" onClick={action.onPick}>
+            <Icon icon={msUploadFile} size={20} />
+            <span>{action.label}</span>
+          </button>
+        )}
       </Stack>
     </Stack>
   )
@@ -2381,6 +2501,21 @@ export function UserMessage({ children }: { children: ReactNode }) {
   return (
     <Stack direction="horizontal" justify="end">
       <p className={styles.userMessage}>{children}</p>
+    </Stack>
+  )
+}
+
+/** What the user sent as a file (Pine Script): a grey bubble on the right with a file icon, its name and a caption. */
+export function UserFile({ name, caption }: { name: string; caption?: string }) {
+  return (
+    <Stack direction="horizontal" justify="end">
+      <div className={styles.userFile}>
+        <span className={styles.userFileIcon} aria-hidden="true"><Icon icon={msDescription} size={20} /></span>
+        <Stack gap="00" className={styles.userFileText}>
+          <p className={styles.userFileName}>{name}</p>
+          {caption && <span className={styles.userFileCaption}>{caption}</span>}
+        </Stack>
+      </div>
     </Stack>
   )
 }
@@ -3024,6 +3159,8 @@ type IndicatorCardProps = {
   superseded?: boolean
   /** What the chart is drawn with (timeframe, EMA, Supertrend) — a change in the chat redraws it. */
   settings?: IndicatorSettings
+  /** The build's steps (default: from a request; a Pine Script has its own). */
+  steps?: readonly string[]
   /** A changed version: the chart plays its build again (and again on each new change), so it reads as recreated. */
   redrawn?: boolean
   /** Counts the changes made so far: each new one shows "Indicator updated" above the card for a moment and runs a
@@ -3040,7 +3177,7 @@ type IndicatorCardProps = {
  * - mini (compact): while the user scrolls the chat, the chart, chips, notes and button fold away
  *   and a small preview slides in beside the name (300 ms, ease in and out) — the chat gets the room. Tap to open.
  */
-export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false, updated = 0 }: IndicatorCardProps) {
+export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false, updated = 0, steps = buildSteps }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
   const [fullView, setFullView] = useState(false)
   const card = useRef<HTMLElement>(null)
@@ -3147,7 +3284,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
 
               {building ? (
                 <Stack as="ol" gap="08" className={styles.steps}>
-                  {buildSteps.map((label, i) => (
+                  {steps.map((label, i) => (
                     <li key={label} data-state={i < state.step ? 'done' : i === state.step ? 'now' : 'next'}>
                       <span className={styles.stepMark} aria-hidden="true">{i < state.step && <Icon icon={msCheck} size={12} />}</span>
                       {label}
@@ -4471,6 +4608,8 @@ type RulesIntroProps = {
   suggestions?: 'list' | 'rows'
   /** The list's suggestions (default: the first three examples). */
   top?: string[]
+  /** An action after the top suggestions (Upload a Pine Script). */
+  topAction?: { label: string; onPick: () => void }
 }
 
 /**
@@ -4479,7 +4618,7 @@ type RulesIntroProps = {
  * screen: a chip sends itself; tapping the input folds the heading and the examples away (300 ms) so the orb sits
  * alone above the keyboard.
  */
-export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstName }), description = t('rulesHome.description'), examples = examplePrompts, typing = false, suggestions = 'list', top = examples.flat().slice(0, 3) }: RulesIntroProps) {
+export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstName }), description = t('rulesHome.description'), examples = examplePrompts, typing = false, suggestions = 'list', top = examples.flat().slice(0, 3), topAction }: RulesIntroProps) {
   return (
     <Stack align="stretch" justify="center" className={styles.body}>
       <div className={styles.fold} data-part="heading" data-gone={typing || undefined}>
@@ -4499,7 +4638,7 @@ export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstN
         <div className={styles.foldInner}>
           {suggestions === 'list' ? (
             <Inset paddingInline="16">
-              <SuggestionList items={top} onPick={onPick} />
+              <SuggestionList items={top} onPick={onPick} action={topAction} />
             </Inset>
           ) : (
             <Stack as="section" gap="24">
@@ -5161,7 +5300,19 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "indicator.updatedNote": "Indicator updated",
   "indicator.expand": "View the full chart",
   "indicator.fullViewDescription": "{place} · {timeframe} candles",
-  "indicator.collapse": "Exit full view"
+  "indicator.collapse": "Exit full view",
+  "input.attach": "Attach a Pine Script",
+  "input.removeAttachment": "Remove {name}",
+  "input.attachmentPlaceholder": "Add a note, or just send",
+  "indicator.uploadPine": "Upload a Pine Script",
+  "indicator.pineCaption": "Pine Script",
+  "indicator.pastedPine": "Pasted Pine Script",
+  "indicator.readingPine": "Reading your Pine Script…",
+  "indicator.pineGotIt": "I’ve read your Pine Script",
+  "indicator.pineIntro": "It draws a Supertrend with a 20 EMA and marks the buy and sell flips. I’m rebuilding it for Lemonn charts now.",
+  "indicator.suggestRename": "Rename indicator",
+  "indicator.renamePrefix": "Change the indicator name to: ",
+  "indicator.changeName": "It’s now called “{name}”."
 }
 ```
 
@@ -5325,6 +5476,8 @@ export const dash: Flow = {
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     { id: 'cardVersion', label: 'Card version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
+    { id: 'pineScript', label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
     // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
     { id: 'messageStyle', label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'plain' },
     // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
@@ -5445,7 +5598,7 @@ export const supertrendEma: IndicatorDraft = {
  * What the preview chart is drawn with — the parts a plain-words change can tune: the candle timeframe (minutes), the
  * EMA's length and the Supertrend's ATR period and multiplier.
  */
-export type IndicatorSettings = { timeframe: number; emaPeriod: number; stPeriod: number; stMultiplier: number }
+export type IndicatorSettings = { timeframe: number; emaPeriod: number; stPeriod: number; stMultiplier: number; /** A name the user gave it (rename). */ name?: string }
 export const defaultSettings: IndicatorSettings = { timeframe: 15, emaPeriod: 20, stPeriod: 10, stMultiplier: 3 }
 
 /** "15 min" / "1 hour" / "1 day" (the timeframe question's answers) → minutes. Unknown → 15. */
@@ -5474,7 +5627,7 @@ export function draftFor(settings: IndicatorSettings): IndicatorDraft {
   const { emaPeriod, stPeriod, stMultiplier, timeframe } = settings
   return {
     ...supertrendEma,
-    name: `Supertrend (${stPeriod}, ${stMultiplier}) with EMA ${emaPeriod}`,
+    name: settings.name ?? `Supertrend (${stPeriod}, ${stMultiplier}) with EMA ${emaPeriod}`,
     parts: supertrendEma.parts.map((p) => (p.tone === 'average' ? { ...p, label: `EMA ${emaPeriod}` } : p)),
     notes: [
       `It gave 14 buy and 13 sell signals on the last 500 candles, about one a day on ${timeframeLabel(timeframe)}.`,
@@ -5487,13 +5640,16 @@ export function draftFor(settings: IndicatorSettings): IndicatorDraft {
  * What a typed change touched. 'other': a change the prototype can't read — it's accepted anyway (there's no real
  * DASH behind it), the chart redrawn as it was.
  */
-export type IndicatorChange = { settings: IndicatorSettings; changed: ('timeframe' | 'ema' | 'supertrend' | 'other')[] }
+export type IndicatorChange = { settings: IndicatorSettings; changed: ('timeframe' | 'ema' | 'supertrend' | 'name' | 'other')[] }
 
 /**
  * Reads a plain-words change — "make the time period 20 minutes", "EMA 50", "50-day average", "supertrend 7, 2",
  * "multiplier 2" — into new settings. The prototype's stand-in for DASH understanding the request.
  */
 export function applyChange(settings: IndicatorSettings, text: string): IndicatorChange {
+  // A rename ("Change the indicator name to: My trend") only renames.
+  const renamed = text.match(/name\s+(?:it\s+)?to\s*:?\s*(.+)$/i)?.[1]?.trim()
+  if (renamed) return { settings: { ...settings, name: renamed }, changed: ['name'] }
   let rest = ` ${text.toLowerCase()} `
   const next = { ...settings }
   const changed: IndicatorChange['changed'] = []
@@ -5526,6 +5682,13 @@ export function applyChange(settings: IndicatorSettings, text: string): Indicato
 
 /** The steps DASH shows while it builds. */
 export const buildSteps = ['Reading your request', 'Writing the logic', 'Testing it on 500 candles'] as const
+/** …and while it rebuilds a Pine Script for Lemonn charts. */
+export const pineBuildSteps = ['Reading your Pine Script', 'Matching its inputs and plots', 'Testing it on 500 candles'] as const
+
+/** Pasted text that reads like Pine Script (its version line, or an indicator / strategy / plot call). */
+export function looksLikePine(text: string) {
+  return /\/\/@version|\b(indicator|strategy|study)\s*\(|\bplot(shape)?\s*\(|\bta\.\w+\s*\(/.test(text)
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Sample candles + indicator maths
@@ -6305,9 +6468,9 @@ import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { msChevronRight } from '@l3/icons/material'
 import { Stack } from '@l3/components/Stack'
-import { usePreview } from '../../../shared/prototype'
+import { useFlowOption, usePreview } from '../../../shared/prototype'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
-import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserMessage } from '../components/Chat'
+import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserFile, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
 import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
 import { QuestionCard } from '../components/QuestionCard'
@@ -6315,7 +6478,7 @@ import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
 import { useStickToBottom } from '../components/stickToBottom'
 import { t } from '../copy'
-import { applyChange, chartQuestion, defaultSettings, draftFor, indicatorPrompts, indicatorPromptsV2, minutesOf, timeframeLabel, timeframeQuestion, type IndicatorChange, type IndicatorPrompt, type IndicatorSettings } from '../indicatorData'
+import { applyChange, chartQuestion, defaultSettings, draftFor, indicatorPrompts, indicatorPromptsV2, looksLikePine, minutesOf, pineBuildSteps, timeframeLabel, timeframeQuestion, type IndicatorChange, type IndicatorPrompt, type IndicatorSettings } from '../indicatorData'
 import type { DashVersion } from './RuleChat'
 // The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
 import styles from './RuleChat.module.css'
@@ -6348,6 +6511,8 @@ export type IndicatorChatProps = {
 }
 
 const THINKING_MS = 1200
+/** Reading a Pine Script takes DASH a little longer than a sentence. */
+const PINE_READ_MS = 2600
 const FLY_MS = 450
 const INTRO_OUT_MS = 300
 /** The drawn keyboard's rise (--app-dash-scene). */
@@ -6395,15 +6560,30 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   const [compactWanted, setCompactWanted] = useState(false)
   const touchY = useRef<number | null>(null)
 
-  const send = (text: string, from: HTMLElement) => {
-    setFlying(captureOrigin(from, text))
+  // Pine Script (prototype setting, on by default): a 4th suggestion and the paperclip pick a file — it never leaves the
+  // phone, only its name is used — or pasted Pine is spotted in the text. Either way DASH "reads" it a little longer,
+  // asks nothing, and builds the indicator (the usual card, suggestions after).
+  const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
+  const fileInput = useRef<HTMLInputElement>(null)
+  const [attachment, setAttachment] = useState<{ name: string } | null>(null)
+  const [pine, setPine] = useState<{ file?: string; pasted?: string } | null>(null)
+
+  const send = (typed: string, from: HTMLElement) => {
+    const pasted = pineOn && !attachment && looksLikePine(typed) ? typed : undefined
+    const fromPine = attachment ? { file: attachment.name } : pasted ? { pasted } : null
+    const text = attachment?.name ?? typed
+    setAttachment(null)
+    setPine(fromPine)
+    setFlying(captureOrigin(from, fromPine ? (fromPine.file ?? t('indicator.pastedPine')) : text))
     setRequest(text)
     setIntroLeaving(true)
     onTyping?.(false)
     window.setTimeout(() => setIntroLeaving(false), INTRO_OUT_MS)
     // Both versions: an example asks only what it doesn't say (nothing / the timeframe / the chart); a typed request
     // gets both questions.
-    const next = indicatorPromptsV2.find((p) => p.text === text) ?? { text, asks: ['chart', 'timeframe'], chart: chartQuestion.options[0], timeframe: timeframeQuestion.options[1] }
+    const next: IndicatorPrompt = fromPine
+      ? { text, asks: [], chart: 'any chart', timeframe: '15 min' } // the script says what it draws: no questions
+      : indicatorPromptsV2.find((p) => p.text === text) ?? { text, asks: ['chart', 'timeframe'], chart: chartQuestion.options[0], timeframe: timeframeQuestion.options[1] }
     setPrompt(next)
     setChart(next.chart)
     setTimeframe(next.timeframe)
@@ -6424,7 +6604,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     const timer = window.setTimeout(() => {
       setPending(null)
       pending()
-    }, THINKING_MS)
+    }, pine && step === 'empty' ? PINE_READ_MS : THINKING_MS)
     return () => window.clearTimeout(timer)
   }, [pending])
   useEffect(() => setPending(null), [step])
@@ -6443,6 +6623,16 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     input.current?.focus()
     setRevisionRequested(true)
     onTyping?.(true)
+  }
+
+  /** Rename: nothing changes yet — the field opens, typing, with "Change the indicator name to: " to finish. */
+  const rename = () => {
+    const prefix = t('indicator.renamePrefix')
+    setDraft(prefix)
+    onTyping?.(true)
+    const field = input.current
+    field?.focus()
+    requestAnimationFrame(() => field?.setSelectionRange(prefix.length, prefix.length))
   }
 
   const askChange = (text: string) => {
@@ -6499,9 +6689,14 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   }, [typing])
 
   const turns: { key: string; node: ReactNode }[] = []
-  if (chatStarted) turns.push({ key: 'request', node: <UserMessage>{request}</UserMessage> })
+  if (chatStarted) {
+    turns.push({
+      key: 'request',
+      node: pine?.file ? <UserFile name={pine.file} caption={t('indicator.pineCaption')} /> : pine?.pasted ? <UserFile name={t('indicator.pastedPine')} caption={pine.pasted.slice(0, 40)} /> : <UserMessage>{request}</UserMessage>,
+    })
+  }
   const intro = asks.length === 0 ? t('indicator.noQuestions') : asks.length === 1 ? t('indicator.oneQuestion') : t('indicator.fewQuestions')
-  if (step !== 'empty') turns.push({ key: 'got-it', node: <AssistantMessage title={t('indicator.gotIt')}>{intro}</AssistantMessage> })
+  if (step !== 'empty') turns.push({ key: 'got-it', node: pine ? <AssistantMessage title={t('indicator.pineGotIt')}>{t('indicator.pineIntro')}</AssistantMessage> : <AssistantMessage title={t('indicator.gotIt')}>{intro}</AssistantMessage> })
   const past = asks.includes('chart') && (['timeframe', 'building', 'ready', 'saved'].includes(step) || (step === 'chart' && pending))
   if (past) {
     turns.push({ key: 'q-chart', node: <AssistantMessage>{chartQuestion.question}</AssistantMessage> })
@@ -6522,7 +6717,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   const versions = lastCard + 1
   if (v2 && built) {
     turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingBelow', { chart, timeframe })}</AssistantMessage> })
-    turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={draftFor(base)} settings={base} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={draftFor(base)} settings={base} state={cardState} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} /> })
+    turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={draftFor(base)} settings={base} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={draftFor(base)} settings={base} steps={pine ? pineBuildSteps : undefined} state={cardState} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} /> })
   } else if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
   if (step === 'ready' || step === 'saved') turns.push({ key: 'ready', node: <AssistantMessage title={t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
   if (revisionRequested) turns.push({ key: 'revision-prompt', node: <AssistantMessage>{t('indicator.revisionPrompt')}</AssistantMessage> })
@@ -6555,7 +6750,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
       node: (
         <Stack gap="08" align="start">
           <p className={styles.suggestLabel}>{t('indicator.suggestLabel')}</p>
-          <ReplyChips glow options={options.map((label) => ({ label, onClick: () => askChange(label) }))} />
+          <ReplyChips glow options={[...options.map((label) => ({ label, onClick: () => askChange(label) })), { label: t('indicator.suggestRename'), onClick: rename }]} />
         </Stack>
       ),
     })
@@ -6570,7 +6765,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         <div className={styles.pin}>
           <div className={styles.pinInner}>
             <Inset paddingInline="16" paddingBlock="08">
-              <IndicatorCard draft={draftFor(latest)} settings={latest} redrawn={versions > 0} updated={versions} state={cardState} onModify={modify} onSave={save} compact={compact || folding} onExpand={() => { setCompactWanted(false); onTyping?.(false) }} />
+              <IndicatorCard draft={draftFor(latest)} settings={latest} steps={pine ? pineBuildSteps : undefined} redrawn={versions > 0} updated={versions} state={cardState} onModify={modify} onSave={save} compact={compact || folding} onExpand={() => { setCompactWanted(false); onTyping?.(false) }} />
             </Inset>
           </div>
         </div>
@@ -6592,7 +6787,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
       >
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} typing={typingNow} />
+            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} topAction={pineOn && empty ? { label: t('indicator.uploadPine'), onPick: () => fileInput.current?.click() } : undefined} typing={typingNow} />
           </div>
         )}
         {chatStarted && (
@@ -6623,7 +6818,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
                 )}
                 {(pending || changing) && (
                   <div className={step === 'empty' ? styles.appearAfterSend : styles.appear} key="thinking">
-                    <Thinking>{t('chat.thinking')}</Thinking>
+                    <Thinking>{pine && step === 'empty' ? t('indicator.readingPine') : t('chat.thinking')}</Thinking>
                   </div>
                 )}
               </Stack>
@@ -6643,6 +6838,20 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
             autoFocus={typingNow}
             onFocus={empty || canChange ? () => onTyping?.(true) : undefined}
             onSend={empty ? send : canChange ? askChange : undefined}
+            onAttach={pineOn && empty ? () => fileInput.current?.click() : undefined}
+            attachment={attachment}
+            onRemoveAttachment={() => setAttachment(null)}
+          />
+          {/* The Pine Script picker (prototype: any file is accepted) — it stays on the device, only its name is shown. */}
+          <input
+            ref={fileInput}
+            type="file"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) setAttachment({ name: file.name })
+              e.target.value = ''
+            }}
           />
         </Inset>
       </div>
@@ -6666,7 +6875,9 @@ function describeChange({ settings, changed }: IndicatorChange) {
           ? t('indicator.changeEma', { value: settings.emaPeriod })
           : part === 'supertrend'
             ? t('indicator.changeSupertrend', { period: settings.stPeriod, multiplier: settings.stMultiplier })
-            : t('indicator.changeOther'),
+            : part === 'name'
+              ? t('indicator.changeName', { name: settings.name ?? '' })
+              : t('indicator.changeOther'),
     )
     .join(' ')
 }
@@ -7659,7 +7870,7 @@ export function CreationDetailsSheet({ item, kind, on, onClose, onEdit, onDelete
   const id = useId()
   const { text, strong, after } = item.activity
   const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
-  // The dock: an indicator has Edit (primary) with Delete (secondary) under it; a rule has Delete only. (Adding to a
+  // The dock: an indicator has Edit (primary, left) and Delete (secondary, right) side by side; a rule has Delete only. (Adding to a
   // chart is the card's own switch.)
   return (
     <Sheet
@@ -7668,7 +7879,7 @@ export function CreationDetailsSheet({ item, kind, on, onClose, onEdit, onDelete
       header={<BottomSheetHeader size="lg" headingId={id} heading={item.title} description={item.summary} icon={<DashOrb size="md" />} />}
       footer={
         kind === 'indicator' ? (
-          <ButtonGroup aria-label={item.title} direction="vertical">
+          <ButtonGroup aria-label={item.title} direction="horizontal">
             <Button iconLeft={<Icon icon={msEdit} />} onClick={onEdit}>{t('details.edit')}</Button>
             <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
           </ButtonGroup>
