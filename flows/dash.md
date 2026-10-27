@@ -2765,16 +2765,9 @@ export function DashBar(props: ActionbarProps) {
   padding-block: var(--l3-spacing-04);
 }
 
-/* Expand (top left of the chart, clear of the price axis): opens the full view. */
-.expand.expand {
-  position: absolute;
-  top: var(--l3-spacing-04);
-  left: 0;
-  z-index: 1;
-}
-
-.fullChart {
-  padding-block: var(--l3-spacing-08);
+/* Expanded: the chart has lifted out into the sheet (it flies back on close). */
+.chart[data-lifted] {
+  visibility: hidden;
 }
 
 /* A change was made: a soft band of DASH light sweeps across the card once (left to right, 1.2 s). */
@@ -2981,17 +2974,16 @@ export function DashBar(props: ActionbarProps) {
 ### `src/flows/dash/components/IndicatorCard.tsx`
 
 ```tsx
-import { useId, useState, type KeyboardEvent } from 'react'
-import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { useRef, useState, type KeyboardEvent } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msCheck, msEdit, msError, msKeyboardArrowDown, msOpenInFull } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
-import { Sheet } from '../../../shared/ui/Sheet'
 import { t } from '../copy'
-import { buildSteps, timeframeLabel, type IndicatorDraft, type IndicatorSettings } from '../indicatorData'
+import { buildSteps, type IndicatorDraft, type IndicatorSettings } from '../indicatorData'
+import { IndicatorFullView } from './IndicatorFullView'
 import { MiniChart } from './MiniChart'
 import styles from './IndicatorCard.module.css'
 
@@ -3034,13 +3026,41 @@ type IndicatorCardProps = {
 export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false, updated = 0 }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
   const [fullView, setFullView] = useState(false)
-  const fullViewId = useId()
+  const card = useRef<HTMLElement>(null)
+  const chartBox = useRef<HTMLDivElement>(null)
+  // The full view covers the DASH screen the card is on.
+  const container = fullView ? card.current?.closest<HTMLElement>('[data-dash]') : null
   // Prototype setting "Indicator tags": the part tags under the chart, shown or hidden.
   const showTags = useFlowOption('dash', 'indicatorTags', 'show') === 'show'
   const building = state.kind === 'building'
   const stage = building ? (state.step === 0 ? 'sketch' : 'candles') : 'ready'
   const mini = (compact || superseded) && !building
 
+  // The part tags and DASH's notes: on the card and in its full view (the same pieces).
+  const parts = showTags && (named || !building) ? (
+    
+                <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
+                  {draft.parts.map((p, i) => (
+                    <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
+                      {p.kind === 'line' && building ? t('indicator.linePart', { name: p.label }) : p.label}
+                    </span>
+                  ))}
+                </Stack>
+  ) : null
+  const notes = (
+                  <div className={styles.notes}>
+                    <button type="button" className={styles.notesToggle} aria-expanded={notesOpen} onClick={() => setNotesOpen((o) => !o)}>
+                      <Icon icon={msError} size={16} />
+                      <span className={styles.notesText}>{t('indicator.notes', { count: draft.notes.length })}</span>
+                      <Icon icon={msKeyboardArrowDown} size={16} className={styles.chevron} />
+                    </button>
+                    {notesOpen && (
+                      <ul className={styles.noteList}>
+                        {draft.notes.map((n) => <li key={n}>{n}</li>)}
+                      </ul>
+                    )}
+                  </div>
+  )
   return (
     <>
     {updated > 0 && (
@@ -3049,6 +3069,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
       </div>
     )}
     <article
+      ref={card}
       className={styles.card}
       data-state={state.kind}
       data-compact={mini || undefined}
@@ -3071,11 +3092,16 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
             <h2 key={named ? 'named' : 'unnamed'} className={styles.title}>{named ? draft.name : t('indicator.yourIndicator')}</h2>
             {!building && <span className={styles.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>}
           </Stack>
+          {/* Top right: the expand button (the full view) where a Ready tag used to be; Saved still shows its tag. A
+              mini card is itself the button that opens it, and an earlier version is tagged so. */}
           {!building && (
             superseded ? (
               <Tag color="neutral" size="sm" className={styles.tag}>{t('indicator.earlierTag')}</Tag>
             ) : (
-              <Tag color="success" size="sm" className={styles.tag}>{state.kind === 'saved' ? t('indicator.savedTag') : t('indicator.ready')}</Tag>
+              <Stack direction="horizontal" align="center" gap="08" className={styles.tag}>
+                {state.kind === 'saved' && <Tag color="success" size="sm">{t('indicator.savedTag')}</Tag>}
+                {!mini && <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msOpenInFull} />} aria-label={t('indicator.expand')} onClick={() => setFullView(true)} />}
+              </Stack>
             )
           )}
         </Stack>
@@ -3083,22 +3109,11 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
         <div className={styles.fold} inert={mini || undefined}>
           <div className={styles.foldBody}>
             <Stack gap="12" className={styles.foldContent}>
-              <div className={styles.chart}>
-                {!building && (
-                  <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msOpenInFull} />} aria-label={t('indicator.expand')} onClick={() => setFullView(true)} className={styles.expand} />
-                )}
+              <div className={styles.chart} ref={chartBox} data-lifted={fullView || undefined}>
                 <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} />
               </div>
 
-              {showTags && (named || !building) && (
-                <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
-                  {draft.parts.map((p, i) => (
-                    <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
-                      {p.kind === 'line' && building ? t('indicator.linePart', { name: p.label }) : p.label}
-                    </span>
-                  ))}
-                </Stack>
-              )}
+              {parts}
 
               {building ? (
                 <Stack as="ol" gap="08" className={styles.steps}>
@@ -3111,18 +3126,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
                 </Stack>
               ) : (
                 <>
-                  <div className={styles.notes}>
-                    <button type="button" className={styles.notesToggle} aria-expanded={notesOpen} onClick={() => setNotesOpen((o) => !o)}>
-                      <Icon icon={msError} size={16} />
-                      <span className={styles.notesText}>{t('indicator.notes', { count: draft.notes.length })}</span>
-                      <Icon icon={msKeyboardArrowDown} size={16} className={styles.chevron} />
-                    </button>
-                    {notesOpen && (
-                      <ul className={styles.noteList}>
-                        {draft.notes.map((n) => <li key={n}>{n}</li>)}
-                      </ul>
-                    )}
-                  </div>
+                  {notes}
                   {state.kind === 'ready' && (
                     <Stack direction="horizontal" align="center" gap="08">
                       <Button variant="secondary" fullWidth iconLeft={<Icon icon={msEdit} />} onClick={onModify}>{t('indicator.modify')}</Button>
@@ -3135,16 +3139,267 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           </div>
         </div>
       </div>
-      {fullView && (
-        // The full view: the same chart, taller, in a sheet (tap outside or drag down to close).
-        <Sheet labelledBy={fullViewId} onClose={() => setFullView(false)} header={<BottomSheetHeader headingId={fullViewId} heading={draft.name} description={t('indicator.fullViewDescription', { place: draft.placement, timeframe: timeframeLabel(settings?.timeframe ?? 15) })} />}>
-          <div className={styles.fullChart}>
-            <MiniChart stage="ready" sellTone={sellTone} settings={settings} tall />
-          </div>
-        </Sheet>
+      {fullView && container && chartBox.current && (
+        <IndicatorFullView
+          draft={draft}
+          settings={settings}
+          sellTone={sellTone}
+          container={container}
+          cardChart={chartBox.current}
+          tag={state.kind === 'saved' ? <Tag color="success" size="sm">{t('indicator.savedTag')}</Tag> : undefined}
+          parts={parts}
+          notes={notes}
+          onClose={() => setFullView(false)}
+          onModify={state.kind === 'ready' && onModify ? () => { setFullView(false); onModify() } : undefined}
+          onSave={state.kind === 'ready' && onSave ? () => { setFullView(false); onSave() } : undefined}
+        />
       )}
     </article>
     </>
+  )
+}
+```
+
+### `src/flows/dash/components/IndicatorFullView.module.css`
+
+```css
+/*
+ * The expanded indicator card: a tall sheet over the DASH screen (≈ 88 % of it), top corners 24, the card's padding
+ * (16 here), the scrim behind. The slide and the chart's flight are Web Animations (IndicatorFullView.tsx).
+ */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--l3-surface-overlay);
+  animation: full-view-scrim var(--app-dash-scene) var(--app-dash-scene-easing) both;
+}
+
+.layer[data-closing] .scrim {
+  animation: full-view-scrim var(--app-dash-scene) var(--app-dash-scene-easing) reverse both;
+}
+
+@keyframes full-view-scrim {
+  from { opacity: 0; }
+}
+
+.sheet {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-12);
+  box-sizing: border-box;
+  height: var(--app-dash-full-view-height);
+  padding: var(--l3-spacing-16) var(--l3-spacing-16) calc(var(--os-inset-bottom, 0px) + var(--l3-spacing-16));
+  overflow: hidden;
+  border-radius: var(--l3-radius-24) var(--l3-radius-24) 0 0;
+  background: var(--l3-surface-default);
+}
+
+/* The chart takes all the room left; drags belong to it (nothing else scrolls here). */
+.chart {
+  flex: 1;
+  min-height: 0;
+  margin-left: calc(-1 * var(--l3-spacing-16)); /* the chart runs to the screen's left edge */
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  user-select: none; /* dragging the chart on a laptop doesn't select its labels */
+  -webkit-user-select: none;
+}
+
+.fit {
+  width: 100%;
+  height: 100%;
+}
+
+/* While the chart is flying in (or out), its place in the sheet stays empty. */
+.chart[data-waiting] {
+  visibility: hidden;
+}
+
+/* The chart in flight: above the sheet, its box animated from the card's chart to the sheet's (IndicatorFullView). */
+.flyer {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.chart:active {
+  cursor: grabbing;
+}
+```
+
+### `src/flows/dash/components/IndicatorFullView.tsx`
+
+```tsx
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { Stack } from '@l3/components/Stack'
+import { msCloseFullscreen, msEdit } from '@l3/icons/material'
+import { t } from '../copy'
+import type { IndicatorDraft, IndicatorSettings } from '../indicatorData'
+import { MiniChart } from './MiniChart'
+import card from './IndicatorCard.module.css'
+import styles from './IndicatorFullView.module.css'
+
+/** The expand / collapse (≈ motion duration long): the sheet slides, the chart flies and grows with it. */
+const MOVE_MS = 380
+const EASE_OPEN = 'cubic-bezier(0.2, 0, 0, 1)'
+const EASE_CLOSE = 'cubic-bezier(0.3, 0, 0.8, 0.15)'
+
+type Box = { left: number; top: number; width: number; height: number }
+
+type IndicatorFullViewProps = {
+  draft: IndicatorDraft
+  settings?: IndicatorSettings
+  sellTone?: 'sell' | 'orange'
+  /** Where the sheet opens: the DASH screen the card is on. */
+  container: HTMLElement
+  /** The card's chart: it lifts out of the card and grows into the sheet (and goes back into it on close). */
+  cardChart: HTMLElement
+  /** The card's own pieces, the same here: a Saved tag, the part tags and DASH's notes. */
+  tag?: ReactNode
+  parts?: ReactNode
+  notes?: ReactNode
+  onClose: () => void
+  /** While it's being worked on (ready, not saved yet): the card's Modify and Save indicator. */
+  onModify?: () => void
+  onSave?: () => void
+}
+
+/**
+ * The indicator card, expanded: a tall sheet (≈ 88 % of the screen) with the card's layout kept as it is — the name
+ * and where it goes (collapse at the top right, where expand was), the chart (filling the room, moving / zooming like
+ * Scalper's — no hint: people know these gestures), the part tags, DASH's notes, and Modify / Save indicator.
+ * Motion: the sheet slides up while the card's own chart lifts out of the card and grows into its place in the sheet
+ * — redrawn at every size, so it never stretches — and the reverse on close. Collapse, a tap above the sheet or Esc
+ * closes it; Modify and Save close it and carry on.
+ */
+export function IndicatorFullView({ draft, settings, sellTone, container, cardChart, tag, parts, notes, onClose, onModify, onSave }: IndicatorFullViewProps) {
+  const sheet = useRef<HTMLDivElement>(null)
+  const slot = useRef<HTMLDivElement>(null)
+  const flyer = useRef<HTMLDivElement>(null)
+  /** Where the flying chart is between the card and the sheet (null: it's landed, the sheet's own chart shows). */
+  const [flight, setFlight] = useState<'open' | 'close' | null>('open')
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  /** An element's box in the container's own px (the phone mockup may be scaled on screen). */
+  const boxOf = (el: Element): Box => {
+    const c = container.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    const scale = c.width / container.offsetWidth || 1
+    return { left: (r.left - c.left) / scale, top: (r.top - c.top) / scale, width: r.width / scale, height: r.height / scale }
+  }
+  const frame = (b: Box) => ({ left: `${b.left}px`, top: `${b.top}px`, width: `${b.width}px`, height: `${b.height}px` })
+
+  // Open: measure where the chart lands (the sheet at rest), then slide the sheet up and fly the chart there.
+  useLayoutEffect(() => {
+    const s = sheet.current
+    const f = flyer.current
+    if (!s || !f || !slot.current) return
+    s.getAnimations().forEach((a) => a.cancel()) // dev mode runs this twice
+    f.getAnimations().forEach((a) => a.cancel())
+    const to = boxOf(slot.current)
+    const from = boxOf(cardChart)
+    if (reduced()) return setFlight(null)
+    s.animate([{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: MOVE_MS, easing: EASE_OPEN })
+    const fly = f.animate([frame(from), frame(to)], { duration: MOVE_MS, easing: EASE_OPEN, fill: 'forwards' })
+    fly.onfinish = () => setFlight(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  /** Close: the sheet slides down while its chart flies back into the card; then close (`then`: Modify / Save go on). */
+  const close = (then?: () => void) => {
+    if (flight === 'close') return
+    const done = () => {
+      onClose()
+      then?.()
+    }
+    const s = sheet.current
+    const f = flyer.current
+    if (!s || !f || !slot.current || reduced()) return done()
+    const from = boxOf(slot.current)
+    const to = boxOf(cardChart)
+    setFlight('close')
+    s.animate([{ transform: 'none' }, { transform: 'translateY(100%)' }], { duration: MOVE_MS, easing: EASE_CLOSE, fill: 'forwards' })
+    f.animate([frame(from), frame(to)], { duration: MOVE_MS, easing: EASE_CLOSE, fill: 'forwards' })
+    window.setTimeout(done, MOVE_MS) // on time even where animations don't run (a hidden tab)
+  }
+
+  useLayoutEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
+  return createPortal(
+    <div className={styles.layer} data-closing={flight === 'close' || undefined}>
+      <div className={styles.scrim} onClick={() => close()} aria-hidden="true" />
+      <div className={styles.sheet} ref={sheet} role="dialog" aria-modal="true" aria-label={draft.name}>
+        {/* The card's header, as on the card: name, where it goes, collapse in the expand button's place. */}
+        <Stack direction="horizontal" align="start" justify="between" gap="12">
+          <Stack gap="04" className={card.heading}>
+            <h2 className={card.title}>{draft.name}</h2>
+            <span className={card.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>
+          </Stack>
+          <Stack direction="horizontal" align="center" gap="08">
+            {tag}
+            <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msCloseFullscreen} />} aria-label={t('indicator.collapse')} onClick={() => close()} />
+          </Stack>
+        </Stack>
+        {/* The chart's place: the flying chart lands here, then this one (the same chart, movable) takes over. */}
+        <div className={styles.chart} ref={slot} data-waiting={flight !== null || undefined}>
+          <FitChart sellTone={sellTone} settings={settings} interactive />
+        </div>
+        <Stack gap="12">
+          {parts}
+          {notes}
+          {onSave && (
+            <Stack direction="horizontal" align="center" gap="08">
+              <Button variant="secondary" fullWidth iconLeft={<Icon icon={msEdit} />} onClick={() => close(onModify)}>{t('indicator.modify')}</Button>
+              <Button variant="primary" fullWidth onClick={() => close(onSave)}>{t('indicator.save')}</Button>
+            </Stack>
+          )}
+        </Stack>
+      </div>
+      {/* The chart in flight, above the sheet: from the card to its place in the sheet (or back). */}
+      <div className={styles.flyer} ref={flyer} hidden={flight === null} aria-hidden="true">
+        <FitChart sellTone={sellTone} settings={settings} />
+      </div>
+    </div>,
+    container,
+  )
+}
+
+/** The indicator chart filling its box: its height follows the box's shape (redrawn as the box grows or shrinks). */
+function FitChart({ settings, sellTone, interactive = false }: { settings?: IndicatorSettings; sellTone?: 'sell' | 'orange'; interactive?: boolean }) {
+  const box = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState(150)
+  useLayoutEffect(() => {
+    const el = box.current
+    if (!el) return
+    const fit = () => el.clientWidth > 0 && setHeight(Math.max(120, Math.round((300 * el.clientHeight) / el.clientWidth)))
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div className={styles.fit} ref={box}>
+      <MiniChart stage="ready" sellTone={sellTone} settings={settings} height={height} interactive={interactive} />
+    </div>
   )
 }
 ```
@@ -3158,6 +3413,8 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
  */
 .chart {
   display: block;
+  user-select: none; /* the chart's labels never get selected (dragging it in the full view) */
+  -webkit-user-select: none;
   width: 100%;
   height: auto;
   overflow: visible;
@@ -3333,7 +3590,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
 ### `src/flows/dash/components/MiniChart.tsx`
 
 ```tsx
-import { useMemo, type CSSProperties } from 'react'
+import { useId, useMemo, useRef, useState, type CSSProperties, type Dispatch, type MouseEvent, type PointerEvent, type SetStateAction, type WheelEvent } from 'react'
 import { defaultSettings, ema, sampleCandles, supertrend, timeframeShort, type IndicatorSettings } from '../indicatorData'
 import styles from './MiniChart.module.css'
 
@@ -3344,56 +3601,107 @@ import styles from './MiniChart.module.css'
  */
 export type MiniChartStage = 'sketch' | 'candles' | 'ready'
 
-const W = 300 // viewBox units — the SVG scales to the card's width
-const CARD_H = 150 // the card's chart; the full view draws taller (`tall`)
-const H_TALL = 260
+const W = 300 // viewBox units — the SVG scales to its box's width
+const CARD_H = 150 // the card's chart; the full view passes its own height (`height`)
 const PAD = 8
 const AXIS = 36 // the price axis on the right, past its line (like Scalper's chart)
 const TIME = 16 // the time axis under the plot
 const TIME_EVERY = 12 // a time label every 12 candles
 const SESSION_START = 9 * 60 + 15 // 09:15
 const SESSION = 375 // 09:15 → 15:30, in minutes
+const HISTORY = 240 // candles behind the chart: the full view can slide back through them
+const VISIBLE = 60 // candles on screen (the card; the full view starts here)
+const MIN_VISIBLE = 20 // the full view's closest zoom
+const MAX_VISIBLE = 200 // …and its widest
+const AXIS_DRAG = 120 // px of axis drag that doubles / halves the scale
+
+type MiniChartProps = {
+  stage: MiniChartStage
+  sellTone?: 'sell' | 'orange'
+  settings?: IndicatorSettings
+  /** false: the bare chart (the mini card's thumbnail). */
+  axes?: boolean
+  /** A changed indicator: the ready chart plays its build again (candles up, lines drawing in, then the labels). */
+  redraw?: boolean
+  /** The chart's height in viewBox units (its width is always 300): the full view fills its space with it. */
+  height?: number
+  /** The full view: the chart works like Scalper's (see `useChartGestures`). */
+  interactive?: boolean
+}
+
+/** What the full view's gestures change: the candles on screen and, once the price axis is touched, its scale. */
+type View = {
+  /** Index after the last candle on screen (HISTORY = the latest). */
+  end: number
+  /** Candles on screen (zoom on the time axis). */
+  count: number
+  /** Price range × this (1 = fitted to the candles; > 1 = squashed, < 1 = stretched). */
+  yScale: number
+  /** The price range moved up / down (in prices), once the price axis is set by hand. */
+  yShift: number
+}
+const fitted: View = { end: HISTORY, count: VISIBLE, yScale: 1, yShift: 0 }
 
 /**
  * The live preview on the indicator card: sample candles with the indicator drawn on them — Supertrend (green while
  * up, red while down), the EMA (blue) and BUY / SELL labels — with a price axis on the right (the last price tagged),
  * a time axis under it and the timeframe in the corner, like Scalper's chart. Drawn from `settings`, so a change to
- * the timeframe, the EMA or the Supertrend redraws it. `axes={false}`: the bare chart (the mini card's thumbnail).
+ * the timeframe, the EMA or the Supertrend redraws it. It shows the latest 60 of 240 candles; `interactive` (the full
+ * view) lets the user move and zoom it like a trading chart.
  */
-export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false, tall = false }: { stage: MiniChartStage; sellTone?: 'sell' | 'orange'; settings?: IndicatorSettings; axes?: boolean; /** A changed indicator: the ready chart plays its build again (candles up, lines drawing in, then the labels). */ redraw?: boolean; /** The full view (expanded): a taller chart, same width. */ tall?: boolean }) {
+export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false, height = CARD_H, interactive = false }: MiniChartProps) {
   const { timeframe, emaPeriod, stPeriod, stMultiplier } = settings
-  const H = tall ? H_TALL : CARD_H
+  const H = height
+  const clipId = useId()
+  const [view, setView] = useState<View>(fitted)
+  const { end, count, yScale, yShift } = view
+  const series = useMemo(() => {
+    const candles = sampleCandles(HISTORY, 22650, timeframe)
+    return { candles, avg: ema(candles, emaPeriod), trend: supertrend(candles, stPeriod, stMultiplier) }
+  }, [timeframe, emaPeriod, stPeriod, stMultiplier])
   const data = useMemo(() => {
-    const candles = sampleCandles(60, 22650, timeframe)
-    const avg = ema(candles, emaPeriod)
-    const trend = supertrend(candles, stPeriod, stMultiplier)
-    const from = Math.min(stPeriod, 20)
-    const values = candles.flatMap((c) => [c.high, c.low]).concat(trend.line.slice(from), avg.slice(5))
-    const min = Math.min(...values)
-    const max = Math.max(...values)
+    const first = end - count
+    const { avg, trend } = series
+    const candles = series.candles.slice(first, end)
+    const line = trend.line.slice(first, end)
+    const ema = avg.slice(first, end)
+    const values = candles.flatMap((c) => [c.high, c.low]).concat(line, ema)
+    // Fitted to what's on screen, then scaled / moved if the price axis was set by hand.
+    const mid = (Math.min(...values) + Math.max(...values)) / 2 + yShift
+    const half = ((Math.max(...values) - Math.min(...values)) / 2) * yScale
+    const min = mid - half
+    const max = mid + half
     const plotW = axes ? W - AXIS : W
     const plotH = axes ? H - TIME : H
-    const step = (plotW - PAD * 2) / candles.length
-    const x = (i: number) => PAD + step * (i + 0.5)
+    // The full view runs to the screen's left edge (no gap before the first candle); the card keeps a little room.
+    const padLeft = interactive ? 0 : PAD
+    const step = (plotW - padLeft - PAD) / count
+    const x = (i: number) => padLeft + step * (i + 0.5)
     const y = (v: number) => PAD + (1 - (v - min) / (max - min)) * (plotH - PAD * 2)
-    const path = (vs: number[], start = 0) => vs.slice(start).map((v, i) => `${i ? 'L' : 'M'}${x(i + start).toFixed(1)},${y(v).toFixed(1)}`).join('')
+    const path = (vs: number[], from = 0) => vs.slice(from).map((v, i) => `${i ? 'L' : 'M'}${x(i + from).toFixed(1)},${y(v).toFixed(1)}`).join('')
     // Supertrend as runs of one direction, so each run takes its colour.
+    const up = trend.up.slice(first, end)
     const runs: { up: boolean; d: string }[] = []
-    let start = from
-    for (let i = from + 1; i <= candles.length; i++) {
-      if (i === candles.length || trend.up[i] !== trend.up[start]) {
-        runs.push({ up: trend.up[start], d: path(trend.line.slice(0, i), start) })
+    let start = 0
+    for (let i = 1; i <= count; i++) {
+      if (i === count || up[i] !== up[start]) {
+        runs.push({ up: up[start], d: path(line.slice(0, i), start) })
         start = i
       }
     }
-    const last = candles[candles.length - 1].close
-    const ticks = niceTicks(min, max).filter((v) => y(v) > PAD && y(v) < plotH - PAD && Math.abs(y(v) - y(last)) > 9)
-    const times = candles.map((_, i) => i).filter((i) => i % TIME_EVERY === TIME_EVERY / 2)
-    return { candles, x, y, step, plotW, plotH, last, ticks, times, ema: path(avg, 5), runs, signals: trend.signals.filter((s) => s.index > from) }
-  }, [timeframe, emaPeriod, stPeriod, stMultiplier, axes, H])
+    const last = candles[count - 1].close
+    const ticks = niceTicks(min, max, Math.max(4, Math.round(plotH / 35))).filter((v) => y(v) > PAD && y(v) < plotH - PAD && Math.abs(y(v) - y(last)) > 9)
+    // About five time labels, staying with their candles as the chart moves (every Nth candle of the whole history).
+    const every = Math.max(6, Math.round(count / 5 / 6) * 6)
+    const times = candles.map((_, i) => i).filter((i) => (first + i) % every === every / 2)
+    const signals = trend.signals.filter((s) => s.index > first && s.index < end).map((s) => ({ ...s, index: s.index - first }))
+    return { first, candles, x, y, step, plotW, plotH, min, max, last, ticks, times, ema: path(ema), runs, signals }
+  }, [series, end, count, yScale, yShift, axes, H, interactive])
+
+  const gestures = useChartGestures(interactive, view, setView, data)
 
   return (
-    <svg viewBox={`0 0 ${W} ${axes ? H : H - TIME}`} className={styles.chart} data-stage={stage} data-redraw={redraw || undefined} aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${axes ? H : H - TIME}`} className={styles.chart} data-stage={stage} data-redraw={redraw || undefined} data-interactive={interactive || undefined} aria-hidden="true" {...gestures}>
       {stage === 'sketch' ? (
         <path className={styles.sketch} d={`M${PAD},${H / 2} C 60,${H / 2 - 30} 100,${H / 2 + 30} 150,${H / 2} S 240,${H / 2 - 30} ${W - PAD},${H / 2}`} pathLength={1} />
       ) : (
@@ -3408,7 +3716,7 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
               {data.times.map((i) => (
                 <g key={i}>
                   <line className={styles.axisLine} x1={data.x(i)} x2={data.x(i)} y1={data.plotH} y2={data.plotH + 3} />
-                  <text className={styles.tick} x={data.x(i)} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeAt(i, timeframe, data.times[data.times.indexOf(i) - 1])}</text>
+                  <text className={styles.tick} x={data.x(i)} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeAt(data.first + i, timeframe, data.times[data.times.indexOf(i) - 1] === undefined ? undefined : data.first + data.times[data.times.indexOf(i) - 1])}</text>
                 </g>
               ))}
               <text className={styles.timeframe} x={data.plotW + AXIS / 2} y={data.plotH + 10} textAnchor="middle" dominantBaseline="central">{timeframeShort(timeframe)}</text>
@@ -3418,6 +3726,12 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
               <text className={styles.lastText} x={data.plotW + 3} y={data.y(data.last)} dominantBaseline="central">{data.last.toFixed(1)}</text>
             </g>
           )}
+          <defs>
+            <clipPath id={clipId}>
+              <rect x={0} y={0} width={data.plotW} height={data.plotH} />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${clipId})`}>
           <g className={styles.candles}>
             {data.candles.map((c, i) => {
               const up = c.close >= c.open
@@ -3448,15 +3762,16 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
                 </g>
               )
             })}
+          </g>
         </>
       )}
     </svg>
   )
 }
 
-/** Round price steps (1, 2, 5 × 10ⁿ) for about four labels. */
-function niceTicks(lo: number, hi: number) {
-  const raw = (hi - lo) / 4
+/** Round price steps (1, 2, 5 × 10ⁿ) for about `labels` labels (more on a taller chart). */
+function niceTicks(lo: number, hi: number, labels = 4) {
+  const raw = (hi - lo) / labels
   const pow = 10 ** Math.floor(Math.log10(raw))
   const step = [1, 2, 5, 10].map((m) => m * pow).find((s) => s >= raw) ?? raw
   const first = Math.ceil(lo / step) * step
@@ -3468,16 +3783,115 @@ function niceTicks(lo: number, hi: number) {
  * on a new day shows that day's date instead of a time (like trading charts); daily candles always show the date.
  * The last candle opened at 14:15 today (27 Oct).
  */
-function timeAt(i: number, timeframe: number, previous?: number) {
+function timeAt(g: number, timeframe: number, previous?: number) {
   const date = (daysBack: number) => new Date(2026, 9, 27 - daysBack).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-  const back = 59 - i // candles before the last one
+  const back = HISTORY - 1 - g // candles before the latest one
   if (timeframe >= 1440) return date(Math.round((back * timeframe) / 1440))
   const at = (candlesBack: number) => 14 * 60 + 15 - SESSION_START - candlesBack * timeframe // minutes into today's session (may be < 0)
-  const dayOf = (k: number) => Math.floor(at(59 - k) / SESSION)
-  const day = dayOf(i)
+  const dayOf = (k: number) => Math.floor(at(HISTORY - 1 - k) / SESSION)
+  const day = dayOf(g)
   if (previous !== undefined && dayOf(previous) !== day) return date(-day)
   const t = SESSION_START + (((at(back) % SESSION) + SESSION) % SESSION)
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`
+}
+
+/**
+ * The full view's gestures, like Scalper's trading chart (TradingView-style):
+ * - drag the chart: move it — sideways through time (right = back), up / down once the price axis is set by hand;
+ * - drag the price axis (right) up / down: stretch / squash the prices (it stops fitting itself to the candles);
+ * - drag the time axis (bottom) sideways: zoom — right = fewer, wider candles; left = more, narrower;
+ * - wheel / trackpad: up / down zooms the time, sideways moves it; pinch (two fingers) zooms the time;
+ * - double-tap / double-click: on the price axis, fit the prices again; anywhere else, back to the start.
+ * The latest candle stays at the right edge while zooming the time (like Scalper), unless you've moved back.
+ */
+function useChartGestures(
+  on: boolean,
+  view: View,
+  setView: Dispatch<SetStateAction<View>>,
+  data: { step: number; plotW: number; plotH: number; min: number; max: number },
+) {
+  const start = useRef<{ zone: 'chart' | 'price' | 'time'; x: number; y: number; view: View; pxPerUnit: number } | null>(null)
+  const pointers = useRef(new Map<number, number>()) // pointer id → x, for the pinch
+  const pinch = useRef<{ gap: number; count: number } | null>(null)
+  if (!on) return {}
+
+  const clampView = (v: View): View => {
+    const count = Math.round(Math.max(MIN_VISIBLE, Math.min(MAX_VISIBLE, v.count)))
+    const end = Math.round(Math.max(count, Math.min(HISTORY, v.end)))
+    return { ...v, count, end, yScale: Math.max(0.2, Math.min(5, v.yScale)) }
+  }
+  const zone = (svg: SVGSVGElement, clientX: number, clientY: number) => {
+    const box = svg.getBoundingClientRect()
+    const unit = box.width / W
+    const vx = (clientX - box.left) / unit
+    const vy = (clientY - box.top) / unit
+    return { zone: vx > data.plotW ? ('price' as const) : vy > data.plotH ? ('time' as const) : ('chart' as const), unit }
+  }
+
+  return {
+    onPointerDown: (e: PointerEvent<SVGSVGElement>) => {
+      e.currentTarget.setPointerCapture(e.pointerId)
+      pointers.current.set(e.pointerId, e.clientX)
+      if (pointers.current.size === 2) {
+        const [a, b] = [...pointers.current.values()]
+        pinch.current = { gap: Math.abs(a - b) || 1, count: view.count }
+        start.current = null
+        return
+      }
+      const { zone: z, unit } = zone(e.currentTarget, e.clientX, e.clientY)
+      start.current = { zone: z, x: e.clientX, y: e.clientY, view, pxPerUnit: unit }
+    },
+    onPointerMove: (e: PointerEvent<SVGSVGElement>) => {
+      const svg = e.currentTarget
+      if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, e.clientX)
+      if (pinch.current && pointers.current.size === 2) {
+        const [a, b] = [...pointers.current.values()]
+        const p = pinch.current
+        setView((v) => clampView({ ...v, count: p.count / (Math.abs(a - b) / p.gap) }))
+        return
+      }
+      const s = start.current
+      if (!s) {
+        // Hover: the axes show how they move.
+        const z = zone(svg, e.clientX, e.clientY).zone
+        svg.style.cursor = z === 'price' ? 'ns-resize' : z === 'time' ? 'ew-resize' : 'grab'
+        return
+      }
+      const dx = e.clientX - s.x
+      const dy = e.clientY - s.y
+      if (s.zone === 'price') {
+        setView((v) => clampView({ ...v, yScale: s.view.yScale * Math.pow(2, dy / AXIS_DRAG) }))
+      } else if (s.zone === 'time') {
+        const count = s.view.count * Math.pow(2, -dx / AXIS_DRAG)
+        // Keep the right edge where it is: the latest candle stays put (or wherever you'd moved to).
+        setView((v) => clampView({ ...v, count, end: s.view.end }))
+      } else {
+        const perCandle = data.step * s.pxPerUnit
+        const pricePerPx = (data.max - data.min) / ((data.plotH - PAD * 2) * s.pxPerUnit)
+        const manualY = s.view.yScale !== 1 || s.view.yShift !== 0
+        setView((v) => clampView({ ...v, end: s.view.end - dx / perCandle, yShift: manualY ? s.view.yShift + dy * pricePerPx : v.yShift }))
+      }
+    },
+    onPointerUp: (e: PointerEvent<SVGSVGElement>) => {
+      pointers.current.delete(e.pointerId)
+      if (pointers.current.size < 2) pinch.current = null
+      start.current = null
+    },
+    onPointerCancel: (e: PointerEvent<SVGSVGElement>) => {
+      pointers.current.delete(e.pointerId)
+      pinch.current = null
+      start.current = null
+    },
+    onWheel: (e: WheelEvent<SVGSVGElement>) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) setView((v) => clampView({ ...v, end: v.end + e.deltaX / 6 }))
+      else setView((v) => clampView({ ...v, count: v.count * Math.pow(2, e.deltaY / 300) }))
+    },
+    onDoubleClick: (e: MouseEvent<SVGSVGElement>) => {
+      if (zone(e.currentTarget, e.clientX, e.clientY).zone === 'price') setView((v) => ({ ...v, yScale: 1, yShift: 0 }))
+      else setView(fitted)
+    },
+    style: { touchAction: 'none' as const },
+  }
 }
 ```
 
@@ -4725,7 +5139,8 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "indicator.changeOther": "Done. I’ve made that change to your indicator.",
   "indicator.updatedNote": "Indicator updated",
   "indicator.expand": "View the full chart",
-  "indicator.fullViewDescription": "{place} · {timeframe} candles"
+  "indicator.fullViewDescription": "{place} · {timeframe} candles",
+  "indicator.collapse": "Exit full view"
 }
 ```
 

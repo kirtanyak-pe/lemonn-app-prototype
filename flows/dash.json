@@ -346,6 +346,8 @@
     "src/flows/dash/components/DashScreen.tsx",
     "src/flows/dash/components/IndicatorCard.module.css",
     "src/flows/dash/components/IndicatorCard.tsx",
+    "src/flows/dash/components/IndicatorFullView.module.css",
+    "src/flows/dash/components/IndicatorFullView.tsx",
     "src/flows/dash/components/MiniChart.module.css",
     "src/flows/dash/components/MiniChart.tsx",
     "src/flows/dash/components/QuestionCard.module.css",
