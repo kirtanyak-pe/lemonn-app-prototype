@@ -1,6 +1,6 @@
 # Flow: F&O (`fno`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `4d1c31d` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `571a418` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Equity F&O home: P&L, indices, chart metrics, watchlists, Smart Options, Futures Heatmap and Smart Futures.
 
@@ -77,7 +77,7 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
   Values and candles are illustrative (`data.ts`, traced from the screenshot, high / low pinned to its markers); no
   order is submitted.
 - **Chart tools sheet** (`sheets/ChartToolsSheet`, from either panel's tools button; fno-06 opens with it up): a 96
-  **Side nav** column (Range · Zing NEW · Indicators · Drawings · Templates · Settings; `components/SideNav`) and the
+  **Side nav** column (L3 `SideNav`, discover tone, Zing flag: Range · Zing NEW · Indicators · Drawings · Templates · Settings) and the
   chosen group beside it. Indicators: **Your indicators** (made with DASH AI, Create indicator, or "No indicators
   created yet.") and **Lemonn indicators**, each a starred 32-tall row. DASH's View indicator opens it with the saved
   indicator listed. Picking one closes the sheet and applies it (fno-07): its name under the spot quote and two
@@ -86,9 +86,8 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
 ### L3 components
 
 Scalper: Screen, Button (ghost, tertiary, brand, secondary), Tabs (ribbon, pill group), Stepper, BottomSheet,
-ListCell (card, Small), Icon, Stack. New here, from L3 tokens only:
-- **Side nav** (`components/SideNav`) — vertical icon-over-label tiles that switch the panel beside them. L3 gap:
-  candidate for the design system.
+ListCell (card, Small), SideNav, Icon, Stack. New here, from L3 tokens only:
+- **Side nav** — now L3 `SideNav` 1.0.0 (added to the design system from this sheet; was a flow copy).
 - **Trading pane** (`components/TradingPane`) — L3 gap: L3 Chart is a fixed 360 × 200 picture without high / low
   markers, zoom, a timeframe control or a real-size price axis.
 
@@ -106,6 +105,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
+- 2026-10-27 — Chart-tools sheet uses L3 SideNav 1.0.0 (design system moved to 571a418); the flow's own copy is removed.
 - 2026-10-27 — Scalper rebuilt from the live app's screenshot: measured layout, trading chart panes (price axis, last-price tag, high / low markers, zoom, time axis, timeframe), the tool row with the Active chip, the order dock, and the chart-tools sheet with a new Side nav.
 - 2026-10-26 — Added Equity home and board positions, connected the F&O tab and existing flows, added local selectors, filters, watchlist creation and details sheets.
 - 2026-10-26 — Reused the Stocks home header on F&O, including its scrolled surface and all four actions.
@@ -593,162 +593,6 @@ export function Overview({ onDestination }: { onDestination: (name: string) => v
     </div>
   </Stack>
 }
-```
-
-### `src/flows/fno/components/SideNav.module.css`
-
-```css
-/*
- * Side nav (candidate L3 component). Tiles are square and fill the column's width; 10 between them (live app:
- * 78 × 78 tiles in a 96 column, radius 12).
- */
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: var(--l3-spacing-10);
-}
-
-.tile {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--l3-spacing-08);
-  width: 100%;
-  aspect-ratio: 1;
-  padding: var(--l3-spacing-08) var(--l3-spacing-04);
-  border: 0;
-  border-radius: var(--l3-radius-12);
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
-  color: var(--l3-content-secondary);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
-}
-
-/* Selected: the accent tint fills the tile, no outline, primary text. */
-.tile[aria-selected='true'] {
-  background: var(--l3-surface-accent-us-stock-light);
-  box-shadow: none;
-  color: var(--l3-content-primary);
-}
-
-@media (hover: hover) {
-  .tile[aria-selected='false']:hover {
-    background-image: linear-gradient(var(--l3-state-layer-dark-hover), var(--l3-state-layer-dark-hover));
-  }
-}
-
-.tile:active {
-  transform: scale(var(--l3-motion-scale-press-default));
-}
-
-.tile:focus-visible {
-  outline: var(--l3-spacing-02) solid var(--l3-border-dark);
-  outline-offset: var(--l3-spacing-02);
-}
-
-.icon {
-  display: grid;
-  place-items: center;
-  color: var(--l3-content-secondary);
-}
-
-.tile[aria-selected='true'] .icon {
-  color: var(--l3-content-primary);
-}
-
-.label {
-  max-width: 100%;
-  overflow: hidden;
-  font: var(--l3-text-label-14);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Corner flag ("NEW"): the Zing yellow, tucked into the tile's top-right corner. */
-.flag {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: var(--l3-spacing-02) var(--l3-spacing-06);
-  border-radius: 0 var(--l3-radius-12) 0 var(--l3-radius-08);
-  background: var(--l3-surface-accent-zing-default);
-  color: var(--l3-static-black);
-  font: var(--l3-text-heading-10);
-  letter-spacing: var(--l3-letter-spacing-00);
-}
-```
-
-### `src/flows/fno/components/SideNav.tsx`
-
-```tsx
-import type { ReactNode } from 'react'
-import styles from './SideNav.module.css'
-
-export type SideNavItem<V extends string> = {
-  value: V
-  label: string
-  icon: ReactNode
-  /** A small corner flag, e.g. "NEW". */
-  flag?: string
-}
-
-type SideNavProps<V extends string> = {
-  items: SideNavItem<V>[]
-  value: V
-  onChange: (value: V) => void
-  'aria-label': string
-  className?: string
-}
-
-/**
- * Side nav — a vertical column of square tiles (icon over label) that switches the panel beside it, as in the live
- * app's chart-tools sheet (Range · Zing · Indicators · Drawings · Templates · Settings). Unselected tiles are outlined
- * (border/light); the selected one fills with the accent tint. A tile can carry a corner flag ("NEW").
- * Not in L3 yet: built here from L3 tokens only, product-neutral, ready to move into the design system as "Side nav".
- * Keyboard: a vertical tab list — ↑ / ↓ move between tiles, Home / End jump to the ends.
- */
-export function SideNav<V extends string>({ items, value, onChange, className, ...aria }: SideNavProps<V>) {
-  const move = (from: number, by: number) => {
-    const next = items[(from + by + items.length) % items.length]
-    onChange(next.value)
-    document.getElementById(tileId(next.value))?.focus()
-  }
-  return (
-    <div role="tablist" aria-orientation="vertical" aria-label={aria['aria-label']} className={[styles.nav, className].filter(Boolean).join(' ')}>
-      {items.map((item, i) => {
-        const selected = item.value === value
-        return (
-          <button
-            key={item.value}
-            id={tileId(item.value)}
-            type="button"
-            role="tab"
-            aria-selected={selected}
-            tabIndex={selected ? 0 : -1}
-            className={styles.tile}
-            onClick={() => onChange(item.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') { e.preventDefault(); move(i, 1) }
-              if (e.key === 'ArrowUp') { e.preventDefault(); move(i, -1) }
-              if (e.key === 'Home') { e.preventDefault(); move(0, 0) }
-              if (e.key === 'End') { e.preventDefault(); move(items.length - 1, 0) }
-            }}
-          >
-            {item.flag && <span className={styles.flag}>{item.flag}</span>}
-            <span className={styles.icon} aria-hidden="true">{item.icon}</span>
-            <span className={styles.label}>{item.label}</span>
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
-const tileId = (value: string) => `side-nav-${value}`
 ```
 
 ### `src/flows/fno/components/TradingChart.tsx`
@@ -1932,9 +1776,9 @@ import { useState } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
+import { SideNav } from '@l3/components/SideNav'
 import { Stack } from '@l3/components/Stack'
 import { msAdd, msBookmarkFill, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msSwapHoriz } from '@l3/icons/material'
-import { SideNav } from '../components/SideNav'
 import { t } from '../copy'
 import { lemonnIndicators } from '../data'
 import styles from './ChartToolsSheet.module.css'
@@ -1960,8 +1804,11 @@ export function ChartToolsSheet({ yourIndicators, onCreateIndicator, onPick }: C
     <div className={styles.body}>
       <SideNav<Section>
         aria-label={t('scalper.chartTools')}
+        aria-controls="chart-tools-panel"
         value={section}
         onChange={setSection}
+        selectedTone="discover"
+        flagTone="zing"
         className={styles.nav}
         items={[
           { value: 'range', label: t('tools.range'), icon: <Icon icon={msSpaceBar} /> },
@@ -1972,7 +1819,7 @@ export function ChartToolsSheet({ yourIndicators, onCreateIndicator, onPick }: C
           { value: 'settings', label: t('tools.settings'), icon: <Icon icon={msSettings} /> },
         ]}
       />
-      <section className={styles.panel} role="tabpanel" aria-label={title}>
+      <section id="chart-tools-panel" className={styles.panel} role="tabpanel" aria-label={title}>
         <Stack direction="horizontal" align="center" justify="between" className={styles.titleRow}>
           <h2 className={styles.title}>{title}</h2>
           <Button variant="ghost" size="sm" iconLeft={<Icon icon={msSearch} />} aria-label={t('tools.search', { section: title })} />

@@ -4,7 +4,7 @@
   "description": "Equity F&O home: P&L, indices, chart metrics, watchlists, Smart Options, Futures Heatmap and Smart Futures.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "4d1c31d",
+    "commit": "571a418",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -100,8 +100,6 @@
     "src/flows/fno/components/Heatmap.tsx",
     "src/flows/fno/components/HomeParts.module.css",
     "src/flows/fno/components/Overview.tsx",
-    "src/flows/fno/components/SideNav.module.css",
-    "src/flows/fno/components/SideNav.tsx",
     "src/flows/fno/components/TradingChart.tsx",
     "src/flows/fno/components/TradingPane.module.css",
     "src/flows/fno/components/TradingPane.tsx",

@@ -4,7 +4,7 @@
   "description": "The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "4d1c31d",
+    "commit": "571a418",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
