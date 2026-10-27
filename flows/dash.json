@@ -178,7 +178,10 @@
         "dash-02",
         "dash-15",
         "dash-03",
-        "dash-20"
+        "dash-20",
+        "dash-06",
+        "dash-24",
+        "fno-07"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
     },
@@ -212,7 +215,10 @@
         "dash-02",
         "dash-15",
         "dash-03",
-        "dash-20"
+        "dash-20",
+        "dash-06",
+        "dash-24",
+        "fno-07"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
     },
@@ -362,6 +368,8 @@
     "src/flows/dash/indicatorData.ts",
     "src/flows/dash/screens/ActiveRules.module.css",
     "src/flows/dash/screens/ActiveRules.tsx",
+    "src/flows/dash/screens/CreationCard.module.css",
+    "src/flows/dash/screens/CreationCard.tsx",
     "src/flows/dash/screens/Creations.module.css",
     "src/flows/dash/screens/Creations.tsx",
     "src/flows/dash/screens/DashAI.tsx",
