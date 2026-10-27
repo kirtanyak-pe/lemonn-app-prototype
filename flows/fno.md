@@ -15,8 +15,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-03` | Home · Futures Heatmap | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
 | `fno-04` | Home · Smart Futures | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
 | `fno-05` | Scalper | — | `fno-01`, `dash-20` | From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators. |
-| `fno-06` | Scalper · DASH indicator | — | `dash-25`, `dash-20`, `fno-07` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators. |
-| `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | After choosing the saved DASH AI indicator. The sheet closes and a compact EMA 9 / EMA 21 treatment is overlaid on the NIFTY 50 candle pane. |
+| `fno-06` | Scalper · DASH indicator | — | `fno-01`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list. |
+| `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles. |
 
 ## Spec (README.md)
 
@@ -105,6 +105,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
+- 2026-10-27 — Chart-tools sheet states from the live app: nothing on the chart (“Indicators” · search); some on the chart (“Indicators (N)” · bin · fx with the count · search, each one a blue row with ✕, several at once — tapping toggles, the sheet stays open); search (field in the title's place, results wrap, full height). Focus guide from DASH: dimmed sheet, Your indicators lit, one-line tooltip with ✕. Scalper top as the live light screenshot: grey header band, Zing ring on Add, tools spread with Active cut at the edge, one tools button per chart, “N ▾” at the chart's top-left, reset on the option chart; light mode greys (surface/secondary) the header, the band between the charts and the order dock (dark keeps black).
 - 2026-10-27 — Chart-tools sheet uses L3 SideNav 1.0.0 (design system moved to 571a418); the flow's own copy is removed.
 - 2026-10-27 — Scalper rebuilt from the live app's screenshot: measured layout, trading chart panes (price axis, last-price tag, high / low markers, zoom, time axis, timeframe), the tool row with the Active chip, the order dock, and the chart-tools sheet with a new Side nav.
 - 2026-10-26 — Added Equity home and board positions, connected the F&O tab and existing flows, added local selectors, filters, watchlist creation and details sheets.
@@ -1029,7 +1030,19 @@ function clock(start: string, add: number) {
   "tools.byDash": "Made with DASH AI",
   "tools.lemonn": "Lemonn indicators",
   "tools.favourite": "Add {name} to favourites",
-  "tools.soon": "Pick Indicators to add one to the chart."
+  "tools.soon": "Pick Indicators to add one to the chart.",
+  "tools.guideTip": "Indicators you created with DASH",
+  "tools.indicatorsCount": "Indicators ({count})",
+  "tools.clearAll": "Remove all indicators from the chart",
+  "tools.onChart": "on the chart",
+  "tools.onChartList": "{count} indicators on the chart",
+  "tools.add": "Add {name} to the chart",
+  "tools.remove": "Remove {name} from the chart",
+  "tools.searchPlaceholder": "Search indicators",
+  "tools.closeSearch": "Close search",
+  "tools.noResults": "No indicators match “{query}”.",
+  "scalper.indicatorCount": "{count} indicators on the chart",
+  "scalper.refresh": "Reset the chart"
 }
 ```
 
@@ -1134,7 +1147,7 @@ export const scalperOption: ScalperInstrument = {
 }
 
 /** The Lemonn indicators in the chart-tools sheet (the live app's list, alphabetical). */
-export const lemonnIndicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA', 'EMA', 'Ichimoku Cloud', 'MACD', 'RSI', 'Supertrend', 'VWAP']
+export const lemonnIndicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA', 'EMA', 'Ichimoku Cloud', 'MACD', 'Nifty 5-Star Indicator by Dr. Gokul Chhabra', 'Opening Range Breakout (ORB)', 'RSI', 'Supertrend', 'VWAP']
 ```
 
 ### `src/flows/fno/index.tsx`
@@ -1156,8 +1169,8 @@ export const fno: Flow = {
     { id: 'fno-03', name: 'Home · Futures Heatmap', figma: '11569:41100', tab: true, render: (go) => home(go, 'heatmap') },
     { id: 'fno-04', name: 'Home · Smart Futures', figma: '11569:41100', tab: true, render: (go) => home(go, 'futures') },
     { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} /> },
-    { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators.', render: (go) => <Scalper onBack={() => go('dash-25')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} onApplyIndicator={() => go('fno-07')} /> },
-    { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'After choosing the saved DASH AI indicator. The sheet closes and a compact EMA 9 / EMA 21 treatment is overlaid on the NIFTY 50 candle pane.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
+    { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
+    { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
   ],
 }
 ```
@@ -1247,10 +1260,20 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
  * US-stock blue (the live app's blue tint), Buy the brand lime.
  */
 
+/* Chrome around the charts (header band, the band between the charts, the order dock): surface/secondary in light (the
+   live app's grey separators), surface/default (black) in dark. */
+.screen {
+  --scalper-chrome: var(--l3-surface-default);
+}
+
+:global(html[data-mode='light']) .screen {
+  --scalper-chrome: var(--l3-surface-secondary);
+}
+
 /* ---- Top: header (back · strategy tabs · add) and the tool row ---- */
 .top {
   flex: none;
-  background: var(--l3-surface-default);
+  background: var(--scalper-chrome);
 }
 
 .header {
@@ -1298,7 +1321,8 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   width: var(--l3-size-24);
   height: var(--l3-size-24);
   border-radius: var(--l3-radius-full);
-  box-shadow: inset 0 0 0 1px var(--l3-border-accent-zing-light); /* 1px: Figma stroke weight has no variable */
+  background: var(--l3-surface-accent-zing-light);
+  box-shadow: inset 0 0 0 1px var(--l3-border-accent-zing-default); /* 1px: Figma stroke weight has no variable */
   color: var(--l3-content-primary);
 }
 
@@ -1307,7 +1331,7 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   display: flex;
   align-items: center;
   height: var(--l3-spacing-36);
-  padding-left: var(--l3-spacing-12);
+  padding-left: var(--l3-spacing-20);
   overflow-x: auto;
   background: var(--l3-surface-primary);
   border-bottom: 1px dashed var(--l3-border-intense);
@@ -1323,7 +1347,7 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   flex: none;
   width: 1px;
   height: var(--l3-size-20);
-  margin-inline: var(--l3-spacing-12);
+  margin-inline: var(--l3-spacing-16);
   background: var(--l3-border-light);
 }
 
@@ -1334,7 +1358,7 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   align-items: center;
   gap: var(--l3-spacing-08);
   height: var(--l3-size-32);
-  margin-left: var(--l3-spacing-12);
+  margin-left: var(--l3-spacing-16);
   padding: 0 var(--l3-spacing-24) 0 var(--l3-spacing-12);
   border: 1px solid var(--l3-border-accent-zing-light);
   border-right: 0;
@@ -1439,19 +1463,8 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   font: var(--l3-text-label-14);
 }
 
-.applied {
-  margin-top: var(--l3-spacing-04);
-  color: var(--l3-content-accent-us-stock-default);
-  font: var(--l3-text-label-12);
-}
 
-/* The panes' square buttons: 32 (L3 Small). Chart type in the US-stock blue tint, tools on surface/secondary. */
-.chartType.chartType {
-  --btn-surface: var(--l3-surface-accent-us-stock-light);
-  --btn-content: var(--l3-content-accent-us-stock-default);
-  --btn-border: var(--l3-border-accent-us-stock-light);
-  margin-top: var(--l3-spacing-04);
-}
+/* The pane's tools button: 32 (L3 Small) on surface/secondary. */
 
 .paneButton.paneButton {
   --btn-surface: var(--l3-surface-secondary);
@@ -1460,13 +1473,38 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   margin-top: var(--l3-spacing-04);
 }
 
+/* The chart fills the panel; "N ▾" (indicators on it) sits at its top-left, the reset button at its bottom centre. */
+.chart {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.indicatorCount.indicatorCount {
+  position: absolute;
+  top: var(--l3-spacing-04);
+  left: var(--l3-spacing-16);
+  --btn-content: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
+
+.refresh.refresh {
+  position: absolute;
+  bottom: var(--l3-spacing-40);
+  left: 50%;
+  --btn-content: var(--l3-content-accent-discover-default);
+  --btn-radius: var(--l3-radius-full);
+  transform: translateX(-50%);
+}
+
 /* Between the panes: a 16 band on the page colour with a drag handle. */
 .split {
   display: grid;
   flex: none;
   place-items: center;
   height: var(--l3-size-16);
-  background: var(--l3-surface-default);
+  background: var(--scalper-chrome);
 }
 
 .handle {
@@ -1487,7 +1525,7 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   align-items: center;
   gap: var(--l3-spacing-04);
   padding: var(--l3-spacing-12) var(--l3-spacing-04) var(--l3-spacing-08);
-  background: var(--l3-surface-default);
+  background: var(--scalper-chrome);
 }
 
 .orderType.orderType {
@@ -1526,9 +1564,14 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
   font: var(--l3-text-label-10);
 }
 
-/* The chart-tools sheet brings its own layout: no content padding. */
+/* The chart-tools sheet brings its own layout: no content padding. No top hairline either (L3 draws one above every
+   sheet; over the dimmed screen it read as a stray line) — the sheet keeps its shadow. */
 .sheet [data-sheet-content] {
   padding: 0;
+}
+
+.sheet.sheet.sheet {
+  box-shadow: var(--l3-shadow-elevation-high);
 }
 ```
 
@@ -1542,7 +1585,7 @@ import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
-import { msAdd, msArrowBack, msArrowDropUp, msJoin, msLink, msMonitoring, msPlaylistAdd, msReceiptLong, msShowChart, msSwapHoriz, msUnfoldMore } from '@l3/icons/material'
+import { msAdd, msArrowBack, msArrowDropUp, msJoin, msLink, msMonitoring, msPlaylistAdd, msReceiptLong, msKeyboardArrowDown, msRefresh, msSwapHoriz, msUnfoldMore } from '@l3/icons/material'
 import { Screen } from '../../../shared/ui/Screen'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { TradingPane, type PaneLine } from '../components/TradingPane'
@@ -1575,10 +1618,11 @@ const LOT = 65
  */
 export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator }: ScalperProps) {
   const [sheetOpen, setSheetOpen] = useState(openIndicators ?? Boolean(createdIndicator))
-  const [indicator, setIndicator] = useState<string | null>(initialIndicator ?? null)
+  /** Indicators on the NIFTY 50 chart (the sheet adds and removes them, several at once). */
+  const [applied, setApplied] = useState<string[]>(initialIndicator ? [initialIndicator] : [])
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
   const [quantity, setQuantity] = useState(LOT)
-  const overlay = useMemo<PaneLine[]>(() => (indicator ? [{ values: ema(scalperSpot.candles, 9), tone: 'fast' }, { values: ema(scalperSpot.candles, 21), tone: 'slow' }] : []), [indicator])
+  const overlay = useMemo<PaneLine[]>(() => (applied.length ? [{ values: ema(scalperSpot.candles, 9), tone: 'fast' }, { values: ema(scalperSpot.candles, 21), tone: 'slow' }] : []), [applied.length])
 
   return (
     <Screen
@@ -1641,28 +1685,31 @@ export function Scalper({ onBack, createdIndicator, openIndicators, initialIndic
           <Sheet label={t('scalper.chartTools')} onClose={() => setSheetOpen(false)} className={styles.sheet}>
             <ChartToolsSheet
               yourIndicators={createdIndicator ? [createdIndicator] : []}
+              applied={applied}
+              guide={Boolean(createdIndicator) && openIndicators !== false}
               onCreateIndicator={onCreateIndicator}
-              onPick={(name) => {
-                setIndicator(name)
-                setSheetOpen(false)
-                onApplyIndicator?.(name)
+              onToggle={(name) => {
+                const on = applied.includes(name)
+                setApplied((a) => (on ? a.filter((n) => n !== name) : [...a, name]))
+                if (!on) onApplyIndicator?.(name)
               }}
+              onClearAll={() => setApplied([])}
             />
           </Sheet>
         )
       }
     >
-      <ChartPanel instrument={scalperSpot} lines={overlay} indicator={indicator} chartType onTools={() => setSheetOpen(true)} />
+      <ChartPanel instrument={scalperSpot} lines={overlay} applied={applied.length} onTools={() => setSheetOpen(true)} />
       <div className={styles.split}>
         <button type="button" className={styles.handle} aria-label={t('scalper.resize')} />
       </div>
-      <ChartPanel instrument={scalperOption} onTools={() => setSheetOpen(true)} />
+      <ChartPanel instrument={scalperOption} refresh onTools={() => setSheetOpen(true)} />
     </Screen>
   )
 }
 
 /** One chart pane: the instrument (name ⇅, segment ⇅, link), its price and change, the pane's buttons, the chart. */
-function ChartPanel({ instrument, lines, indicator, chartType, onTools }: { instrument: ScalperInstrument; lines?: PaneLine[]; indicator?: string | null; chartType?: boolean; onTools: () => void }) {
+function ChartPanel({ instrument, lines, applied = 0, refresh, onTools }: { instrument: ScalperInstrument; lines?: PaneLine[]; /** Indicators on this chart: "N ▾" at its top-left (opens the sheet). */ applied?: number; /** The live app's reset button, bottom centre of the option chart. */ refresh?: boolean; onTools: () => void }) {
   const { name, segment, side, price, change, percent } = instrument
   return (
     <section className={styles.panel} aria-label={name}>
@@ -1689,14 +1736,20 @@ function ChartPanel({ instrument, lines, indicator, chartType, onTools }: { inst
               <Icon icon={msArrowDropUp} size={16} />({percent.toFixed(2)}%)
             </span>
           </div>
-          {indicator && <span className={styles.applied}>{indicator}</span>}
         </div>
         <Stack direction="horizontal" gap="08">
-          {chartType && <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msShowChart} />} aria-label={t('scalper.chartType')} className={styles.chartType} />}
           <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msPlaylistAdd} />} aria-label={t('scalper.chartTools')} onClick={onTools} className={styles.paneButton} />
         </Stack>
       </div>
-      <TradingPane candles={instrument.candles} start={instrument.start} minutes={instrument.minutes} lines={lines} label={t('scalper.chartLabel', { name })} />
+      <div className={styles.chart}>
+        <TradingPane candles={instrument.candles} start={instrument.start} minutes={instrument.minutes} lines={lines} label={t('scalper.chartLabel', { name })} />
+        {applied > 0 && (
+          <Button variant="ghost" size="sm" iconRight={<Icon icon={msKeyboardArrowDown} />} aria-label={t('scalper.indicatorCount', { count: applied })} onClick={onTools} className={styles.indicatorCount}>
+            {applied}
+          </Button>
+        )}
+        {refresh && <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msRefresh} />} aria-label={t('scalper.refresh')} className={styles.refresh} />}
+      </div>
     </section>
   )
 }
@@ -1718,13 +1771,21 @@ function ema(candles: ChartCandle[], period: number) {
  * About two thirds of the screen tall (live app: 571 of 872).
  */
 .body {
+  position: relative;
   display: grid;
   grid-template-columns: var(--l3-size-96) minmax(0, 1fr);
   height: calc(var(--l3-size-128) * 4.5); /* 576 — the live sheet's height; L3 has no size this large */
   max-height: 100%;
+  transition: height var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+/* Search: the sheet opens to its full height (the sheet caps it under the status bar). */
+.body[data-search] {
+  height: 100vh;
 }
 
 .nav {
+  --side-nav-flag-content: var(--l3-content-inverted); /* NEW on the Zing yellow: inverted (white in light) */
   padding: var(--l3-spacing-16) var(--l3-spacing-08);
   overflow-y: auto;
   box-shadow: inset -1px 0 0 var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
@@ -1767,20 +1828,93 @@ function ema(candles: ChartCandle[], period: number) {
 }
 
 .star {
-  color: var(--l3-content-accent-us-stock-default);
+  color: var(--l3-content-accent-discover-default);
+}
+
+/* On the chart (live app): the row turns blue — discover tint, edge and text, ✕ to take it off. */
+.row.row.row[data-selected] {
+  background: var(--l3-surface-accent-discover-light);
+  box-shadow: inset 0 0 0 1px var(--l3-border-accent-discover-default); /* 1px: Figma stroke weight has no variable */
+  color: var(--l3-content-accent-discover-default);
+}
+
+.row.row.row[data-selected] :is(span, p, svg) {
+  color: var(--l3-content-accent-discover-default);
+}
+
+/* fx with the count: the discover edge and glyph. */
+.fx.fx {
+  --btn-border: var(--l3-border-accent-discover-default);
+  --btn-content: var(--l3-content-accent-discover-default);
+  --btn-surface: var(--l3-surface-accent-discover-light);
+}
+
+.search {
+  margin-bottom: var(--l3-spacing-16);
+}
+
+/* The coach mark's anchor hugs its content (inline): here it takes the panel's width, like Lemonn indicators below. */
+.yours > * {
+  display: flex;
+  width: 100%;
+}
+
+.yours > * > section {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Focus guide: the sheet dims (surface/overlay); Your indicators stays lit above it on the sheet's own surface. */
+.dim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--l3-surface-overlay);
+  animation: guide-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+/* The lit box is the tooltip's anchor itself, so the tooltip measures from the highlight's edge (its tip touches it). */
+.yours[data-lit] {
+  position: relative;
+  z-index: 2;
+}
+
+.yours[data-lit] > * {
+  box-sizing: border-box;
+  width: auto;
+  max-width: none;
+  margin: calc(-1 * var(--l3-spacing-08));
+  padding: var(--l3-spacing-08);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-primary);
+}
+
+@keyframes guide-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dim {
+    animation: none;
+  }
 }
 ```
 
 ### `src/flows/fno/sheets/ChartToolsSheet.tsx`
 
 ```tsx
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Badge } from '@l3/components/Badge'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
 import { SideNav } from '@l3/components/SideNav'
 import { Stack } from '@l3/components/Stack'
-import { msAdd, msBookmarkFill, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msSwapHoriz } from '@l3/icons/material'
+import { TextField } from '@l3/components/TextField'
+import { Tooltip } from '@l3/components/Tooltip'
+import { msAdd, msBookmarkFill, msClose, msDelete, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msSwapHoriz } from '@l3/icons/material'
 import { t } from '../copy'
 import { lemonnIndicators } from '../data'
 import styles from './ChartToolsSheet.module.css'
@@ -1790,20 +1924,68 @@ type Section = 'range' | 'zing' | 'indicators' | 'drawings' | 'templates' | 'set
 type ChartToolsSheetProps = {
   /** Indicators the user made with DASH AI (Your indicators). */
   yourIndicators: string[]
+  /** Indicators on the chart now, in the order they were added. */
+  applied: string[]
+  /** A row tapped: on the chart → off, off → on. The sheet stays open. */
+  onToggle: (name: string) => void
+  /** The bin in the header: take every indicator off the chart. */
+  onClearAll: () => void
   onCreateIndicator?: () => void
-  onPick: (name: string) => void
+  /**
+   * Focus guide (arriving from DASH's View indicator): the rest of the sheet dims, Your indicators stays lit with a
+   * one-line tooltip above it and a ✕. ✕ (or picking one) ends it. Shown once only.
+   */
+  guide?: boolean
 }
 
 /**
- * Chart tools (live app's sheet from the chart's "add" button): a side nav of tool groups on the left, the chosen group
- * on the right. Only Indicators is built: Your indicators (made with DASH AI, or a line saying there are none, and
- * Create indicator) above the Lemonn indicators, each a starred row. Picking one applies it to the chart.
+ * Chart tools (the chart's "add" button): a Side nav of tool groups on the left, the chosen group on the right. Only
+ * Indicators is built, in the live app's states:
+ * - nothing on the chart: "Indicators" · search;
+ * - some on the chart: "Indicators (2)" · bin (take all off) · fx with the count · search; each one on the chart is a
+ *   blue row with ✕ — tapping a row adds or removes it, several at once;
+ * - search: a search field takes the title's place, the list filters as you type, the sheet opens to full height.
+ * Your indicators (made with DASH AI, or "No indicators created yet." and Create indicator) sit above Lemonn indicators.
  */
-export function ChartToolsSheet({ yourIndicators, onCreateIndicator, onPick }: ChartToolsSheetProps) {
+export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll, onCreateIndicator, guide = false }: ChartToolsSheetProps) {
   const [section, setSection] = useState<Section>('indicators')
+  const [guiding, setGuiding] = useState(() => guide && !guideSeen())
+  // Shown once: as soon as it's up, it's remembered (prototype: in this browser).
+  useEffect(() => { if (guiding) markGuideSeen() }, [guiding])
+  const [searching, setSearching] = useState(false)
+  const [query, setQuery] = useState('')
   const title = t(`tools.${section}`)
+  const count = applied.length
+  const toggle = (name: string) => {
+    setGuiding(false)
+    onToggle(name)
+  }
+
+  const row = (name: string, description?: string, wrap = false) => {
+    const on = applied.includes(name)
+    return (
+      <ListCell
+        key={name}
+        variant="card"
+        size="sm"
+        multiline={wrap}
+        label={name}
+        description={description}
+        iconLeft={<Icon icon={msStar} className={styles.star} />}
+        iconRight={on ? <Icon icon={msClose} /> : undefined}
+        selected={on}
+        onClick={() => toggle(name)}
+        className={styles.row}
+      />
+    )
+  }
+
+  const q = query.trim().toLowerCase()
+  const results = [...yourIndicators, ...lemonnIndicators].filter((name) => name.toLowerCase().includes(q))
+
   return (
-    <div className={styles.body}>
+    <div className={styles.body} data-search={searching || undefined}>
+      {guiding && <div className={styles.dim} aria-hidden="true" />}
       <SideNav<Section>
         aria-label={t('scalper.chartTools')}
         aria-controls="chart-tools-panel"
@@ -1822,42 +2004,69 @@ export function ChartToolsSheet({ yourIndicators, onCreateIndicator, onPick }: C
         ]}
       />
       <section id="chart-tools-panel" className={styles.panel} role="tabpanel" aria-label={title}>
-        <Stack direction="horizontal" align="center" justify="between" className={styles.titleRow}>
-          <h2 className={styles.title}>{title}</h2>
-          <Button variant="ghost" size="sm" iconLeft={<Icon icon={msSearch} />} aria-label={t('tools.search', { section: title })} />
-        </Stack>
-        {section === 'indicators' ? (
-          <Stack gap="24">
-            <Stack as="section" gap="12" aria-label={t('tools.yours')}>
-              <Stack direction="horizontal" align="center" justify="between">
-                <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
-                <Button variant="ghost" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreateIndicator}>{t('tools.create')}</Button>
-              </Stack>
-              {yourIndicators.length ? (
-                <Stack gap="12">
-                  {yourIndicators.map((name) => (
-                    <ListCell key={name} variant="card" size="sm" label={name} description={t('tools.byDash')} iconLeft={<Icon icon={msStar} className={styles.star} />} onClick={() => onPick(name)} className={styles.row} />
-                  ))}
-                </Stack>
-              ) : (
-                <p className={styles.empty}>{t('tools.none')}</p>
+        {section === 'indicators' && searching ? (
+          <TextField
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('tools.searchPlaceholder')}
+            aria-label={t('tools.search', { section: title })}
+            iconLeft={<Icon icon={msSearch} />}
+            iconRight={<Button variant="ghost" size="sm" iconLeft={<Icon icon={msClose} />} aria-label={t('tools.closeSearch')} onClick={() => { setSearching(false); setQuery('') }} />}
+            className={styles.search}
+          />
+        ) : (
+          <Stack direction="horizontal" align="center" justify="between" gap="12" className={styles.titleRow}>
+            <h2 className={styles.title}>{section === 'indicators' && count ? t('tools.indicatorsCount', { count }) : title}</h2>
+            <Stack direction="horizontal" align="center" gap="16">
+              {section === 'indicators' && count > 0 && (
+                <>
+                  <Button variant="ghost" size="sm" iconLeft={<Icon icon={msDelete} />} aria-label={t('tools.clearAll')} onClick={onClearAll} />
+                  <Badge count={count} color="discover" label={t('tools.onChart')}>
+                    <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msFunction} />} aria-label={t('tools.onChartList', { count })} className={styles.fx} />
+                  </Badge>
+                </>
               )}
-            </Stack>
-            <Stack as="section" gap="12" aria-label={t('tools.lemonn')}>
-              <h3 className={styles.subTitle}>{t('tools.lemonn')}</h3>
-              <Stack gap="12">
-                {lemonnIndicators.map((name) => (
-                  <ListCell key={name} variant="card" size="sm" label={name} iconLeft={<Icon icon={msStar} className={styles.star} />} onClick={() => onPick(name)} className={styles.row} />
-                ))}
-              </Stack>
+              <Button variant="ghost" size="sm" iconLeft={<Icon icon={msSearch} />} aria-label={t('tools.search', { section: title })} onClick={() => section === 'indicators' && setSearching(true)} />
             </Stack>
           </Stack>
-        ) : (
+        )}
+
+        {section !== 'indicators' ? (
           <p className={styles.empty}>{t('tools.soon')}</p>
+        ) : searching ? (
+          results.length ? <Stack gap="12">{results.map((name) => row(name, undefined, true))}</Stack> : <p className={styles.empty}>{t('tools.noResults', { query })}</p>
+        ) : (
+          <Stack gap="24">
+            <div className={styles.yours} data-lit={guiding || undefined}>
+              <Tooltip open={guiding} content={t('tools.guideTip')} placement="top" onClose={() => setGuiding(false)}>
+                <Stack as="section" gap="12" aria-label={t('tools.yours')}>
+                  <Stack direction="horizontal" align="center" justify="between">
+                    <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
+                    <Button variant="ghost" size="sm" iconLeft={<Icon icon={msAdd} />} onClick={onCreateIndicator}>{t('tools.create')}</Button>
+                  </Stack>
+                  {yourIndicators.length ? <Stack gap="12">{yourIndicators.map((name) => row(name, t('tools.byDash')))}</Stack> : <p className={styles.empty}>{t('tools.none')}</p>}
+                </Stack>
+              </Tooltip>
+            </div>
+            <Stack as="section" gap="12" aria-label={t('tools.lemonn')}>
+              <h3 className={styles.subTitle}>{t('tools.lemonn')}</h3>
+              <Stack gap="12">{lemonnIndicators.map((name) => row(name))}</Stack>
+            </Stack>
+          </Stack>
         )}
       </section>
     </div>
   )
+}
+
+/** The Your indicators guide shows once per person (here: once per browser). */
+const GUIDE_KEY = 'fno.yourIndicatorsGuideSeen'
+function guideSeen() {
+  try { return localStorage.getItem(GUIDE_KEY) === '1' } catch { return false }
+}
+function markGuideSeen() {
+  try { localStorage.setItem(GUIDE_KEY, '1') } catch { /* storage off: it may show again next visit */ }
 }
 ```
 
@@ -1982,7 +2191,7 @@ export const bankAccount: BankAccount = {
 // Prototype behaviour the flows use — the ONLY way a flow touches the preview (src/preview). In a real app: interactive
 // is always true, `go` is the app's navigation, and useAutoAdvance is "when the server answers, go on" (a loader /
 // polling step).
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext, useEffect, useSyncExternalStore } from 'react'
 
 export type Preview = {
   /**
@@ -2011,6 +2220,44 @@ export function useAutoAdvance(next: string | undefined, ms: number) {
 
 /** How long a loader or "Verifying…" state stays up in the prototype. */
 export const LOADING_MS = 1600
+
+// ---- Flow options (prototype settings such as a design version) ----------------------------------------------------
+// Picked in the preview (desktop panel, or the settings sheet on a phone), remembered per browser. A real app has no
+// such switch: it ships one version.
+
+// The key carries the option's default: when a flow changes its default (e.g. to a new version), earlier picks reset.
+const optionKey = (flow: string, option: string, fallback: string) => `prototype-option:${flow}.${option}@${fallback}`
+const optionListeners = new Set<() => void>()
+
+function readOption(key: string): string | null {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+
+/** The preview sets an option (and every screen reading it re-renders). */
+export function setFlowOption(flow: string, option: string, fallback: string, value: string) {
+  const key = optionKey(flow, option, fallback)
+  try { localStorage.setItem(key, value) } catch { /* storage off: this visit only */ }
+  memory.set(key, value)
+  optionListeners.forEach((l) => l())
+}
+
+const memory = new Map<string, string>()
+
+/** A flow's prototype option: the picked value, or `fallback` (the option's default) when none is picked. */
+export function useFlowOption(flow: string, option: string, fallback: string) {
+  return useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => memory.get(optionKey(flow, option, fallback)) ?? readOption(optionKey(flow, option, fallback)) ?? fallback,
+  )
+}
+
+/**
+ * Typing on a phone uses the phone's own keyboard (a touch screen, `pointer: coarse`) — the prototype's drawn keyboard
+ * stays hidden. On a laptop the drawn keyboard shows (for the look) and the laptop's keys type into the focused field.
+ */
+export function useSystemKeyboard() {
+  return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+}
 ```
 
 ### `src/shared/ui/Rail.module.css`

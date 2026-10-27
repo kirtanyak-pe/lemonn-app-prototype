@@ -1436,7 +1436,7 @@ export const mask = (s: string, keepStart: number, keepEnd: number) =>
 // Prototype behaviour the flows use — the ONLY way a flow touches the preview (src/preview). In a real app: interactive
 // is always true, `go` is the app's navigation, and useAutoAdvance is "when the server answers, go on" (a loader /
 // polling step).
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext, useEffect, useSyncExternalStore } from 'react'
 
 export type Preview = {
   /**
@@ -1465,6 +1465,44 @@ export function useAutoAdvance(next: string | undefined, ms: number) {
 
 /** How long a loader or "Verifying…" state stays up in the prototype. */
 export const LOADING_MS = 1600
+
+// ---- Flow options (prototype settings such as a design version) ----------------------------------------------------
+// Picked in the preview (desktop panel, or the settings sheet on a phone), remembered per browser. A real app has no
+// such switch: it ships one version.
+
+// The key carries the option's default: when a flow changes its default (e.g. to a new version), earlier picks reset.
+const optionKey = (flow: string, option: string, fallback: string) => `prototype-option:${flow}.${option}@${fallback}`
+const optionListeners = new Set<() => void>()
+
+function readOption(key: string): string | null {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+
+/** The preview sets an option (and every screen reading it re-renders). */
+export function setFlowOption(flow: string, option: string, fallback: string, value: string) {
+  const key = optionKey(flow, option, fallback)
+  try { localStorage.setItem(key, value) } catch { /* storage off: this visit only */ }
+  memory.set(key, value)
+  optionListeners.forEach((l) => l())
+}
+
+const memory = new Map<string, string>()
+
+/** A flow's prototype option: the picked value, or `fallback` (the option's default) when none is picked. */
+export function useFlowOption(flow: string, option: string, fallback: string) {
+  return useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => memory.get(optionKey(flow, option, fallback)) ?? readOption(optionKey(flow, option, fallback)) ?? fallback,
+  )
+}
+
+/**
+ * Typing on a phone uses the phone's own keyboard (a touch screen, `pointer: coarse`) — the prototype's drawn keyboard
+ * stays hidden. On a laptop the drawn keyboard shows (for the look) and the laptop's keys type into the focused field.
+ */
+export function useSystemKeyboard() {
+  return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+}
 ```
 
 ### `src/shared/ui/Raised.module.css`

@@ -27,12 +27,13 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-15` | Delete rule? | [5612:42250](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250) | `dash-14`, `dash-16` | Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it). |
 | `dash-16` | Rule deleted | [5612:42455](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455) | `dash-17` | The list behind already has 3 rules. |
 | `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03` | Not a Figma frame: the list once the sheet closes (3 rules). |
-| `dash-20` | Indicator · what to show | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
-| `dash-21` | Indicator · which chart | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | DASH asks only what the prompt didn’t say: the chart… |
-| `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | …and the timeframe. |
-| `dash-23` | Indicator · building | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
-| `dash-24` | Indicator · ready | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25` | Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification. |
-| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02`, `fno-06` | The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators. |
+| `dash-20` | Indicator · what to show | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
+| `dash-21` | Indicator · which chart | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | DASH asks only what the prompt didn’t say: the chart… (Version 2: only for “…on 15-min candles”; then it builds) |
+| `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | …and the timeframe. (Version 2: only for “…on Nifty 50”.) |
+| `dash-23` | Indicator · building | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
+| `dash-24` | Indicator · ready | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification. |
+| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02`, `fno-06` | Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators. |
+| `dash-27` | Indicator · saved sheet | — | `dash-14`, `dash-02`, `fno-06`, `dash-25` | Version 2: Save indicator opens this over the chat — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators. |
 
 ## Spec (README.md)
 
@@ -203,6 +204,16 @@ Not built yet: the live app's DASH mascot with a face and its "Checking 4 rules 
 screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
+
+- 2026-10-27 — Version 2: DASH's reply options are L3 buttons (Medium) — the suggested one primary with ›, the other tertiary — instead of chips. View indicator: Medium secondary with ›. Version 2 is the default; a flow option's remembered pick resets when the flow changes its default.
+- 2026-10-27 — Version 2: the chat has no panel (it sits on DASH's blurred background; the dark disc reaches 3% from the top and ends 14% above the bottom while chatting, so the glow shows around the input). A change asked after Modify shares a **new Indicator card** under DASH's “Updated” reply; the earlier card folds to its mini form, dimmed, tagged “Earlier version”. Indicator card radius 16.
+- 2026-10-27 — **Version 2** (prototype setting “DASH version”, default 2; Version 1 kept as it was): the rule card and
+  the indicator card are turns inside the chat (under DASH's message) instead of pinned above it — they stay in the
+  history (the indicator tagged Saved once saved). Three indicator examples, one per case: “…on any 15-min chart”
+  (DASH asks nothing and builds), “…on Nifty 50” (asks the timeframe), “…on 15-min candles” (asks where it goes);
+  a typed request gets both questions. Modify (both versions) activates the input: focused in the tap, typing state,
+  the drawn keyboard on a laptop (type with the laptop's keys) — on a phone the phone's own keyboard, never the drawn
+  one; the chat scrolls DASH's question back into view above the keyboard.
 
 - 2026-10-23 — Landing option cards: no drop shadow (only the 1px DASH green edge).
 
@@ -2148,11 +2159,11 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 ### `src/flows/dash/components/Chat.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
-import { msArrowUpward } from '@l3/icons/material'
+import { msArrowUpward, msChevronRight } from '@l3/icons/material'
 import sparkle from '../assets/sparkle.svg'
 import { t } from '../copy'
 import styles from './Chat.module.css'
@@ -2173,6 +2184,8 @@ type ChatInputProps = {
   typing?: boolean
   onFocus?: () => void
   autoFocus?: boolean
+  /** The field itself — to focus it in a tap (on a phone, focusing inside the tap is what opens the keyboard). */
+  inputRef?: RefObject<HTMLInputElement | null>
 }
 
 /**
@@ -2181,11 +2194,12 @@ type ChatInputProps = {
  * - Default: border-light edge, placeholder in content/tertiary, Send off (L3 disabled) until there's text.
  * - Typing: the DASH green edge, the text in content/primary, Send on (L3 primary, black).
  */
-export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus }: ChatInputProps) {
+export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef }: ChatInputProps) {
   const [own, setOwn] = useState('')
   const value = controlled ?? own
   const setValue = (v: string) => (onChange ? onChange(v) : setOwn(v))
-  const field = useRef<HTMLInputElement>(null)
+  const ownField = useRef<HTMLInputElement>(null)
+  const field = inputRef ?? ownField
   const send = () => {
     const text = value.trim()
     if (!text || !field.current) return
@@ -2362,7 +2376,18 @@ export function Thinking({ children }: { children: ReactNode }) {
 export type ReplyOption = { label: string; onClick?: () => void; suggested?: boolean }
 
 /** Quick replies under DASH's question: pill chips; the one DASH suggests has the green edge. */
-export function ReplyChips({ options }: { options: ReplyOption[] }) {
+export function ReplyChips({ options, asButtons = false }: { options: ReplyOption[]; /** Version 2: real L3 buttons — the suggested reply primary with ›, the others tertiary — so they read as actions. */ asButtons?: boolean }) {
+  if (asButtons) {
+    return (
+      <Stack direction="horizontal" gap="08" wrap role="group" aria-label={t('replies.label')}>
+        {options.map((o) => (
+          <Button key={o.label} variant={o.suggested ? 'primary' : 'tertiary'} size="md" iconRight={o.suggested ? <Icon icon={msChevronRight} /> : undefined} onClick={o.onClick}>
+            {o.label}
+          </Button>
+        ))}
+      </Stack>
+    )
+  }
   return (
     <Stack direction="horizontal" gap="08" wrap role="group" aria-label={t('replies.label')}>
       {options.map((o) => (
@@ -2448,6 +2473,16 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
   background: var(--l3-surface-default);
   filter: blur(var(--app-dash-glow-blur));
   transform: translateX(-50%);
+  transition:
+    top var(--app-dash-scene) var(--app-dash-scene-easing),
+    bottom var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+/* Chatting (Version 2): the disc reaches higher, so the conversation sits on the calm middle, and ends higher above the
+   bottom, so the glow comes back around the input. */
+.frame[data-chatting] .overlay {
+  top: 3cqh;
+  bottom: 14cqh;
 }
 
 /* "grids": fine lines across the top, 360 × 116.8 on the 360 frame. */
@@ -2484,7 +2519,8 @@ export function ReplyChips({ options }: { options: ReplyOption[] }) {
     animation: none;
   }
 
-  .background {
+  .background,
+  .overlay {
     transition: none;
   }
 }
@@ -2507,6 +2543,8 @@ type DashScreenProps = ComponentProps<typeof Screen> & {
   tone?: DashTone
   /** The keyboard is up: the background ends above it (Figma "3.1 Manual typing" — bg 516 tall on 800). */
   keyboard?: boolean
+  /** Version 2, a conversation on screen: the soft dark disc stretches taller so the chat reads well on it. */
+  chatting?: boolean
 }
 
 /**
@@ -2519,9 +2557,9 @@ type DashScreenProps = ComponentProps<typeof Screen> & {
  * end above it (300 ms, ease-in-out). The page is edge to edge (data-edge-to-edge): it draws under the OS status and
  * navigation bars, which have no fill on DASH pages, so the gradient and its motion show behind them too.
  */
-export function DashScreen({ tone = 'brand', keyboard = false, className, ...screen }: DashScreenProps) {
+export function DashScreen({ tone = 'brand', keyboard = false, chatting = false, className, ...screen }: DashScreenProps) {
   return (
-    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-edge-to-edge="" data-dash="">
+    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-chatting={chatting || undefined} data-edge-to-edge="" data-dash="">
       <div className={styles.background} aria-hidden="true">
         <div className={styles.gradientBox}>
           <img src={gradient} alt="" className={styles.gradient} />
@@ -2546,11 +2584,11 @@ export function DashBar(props: ActionbarProps) {
 ### `src/flows/dash/components/IndicatorCard.module.css`
 
 ```css
-/* Indicator card — the same shell as the rule card (border-light, radius 12, 12 inside), with the mini chart. */
+/* Indicator card — border-light, radius 16 (designer's call, 2026-10-27), 12 inside, with the mini chart. */
 .card {
   overflow: clip;
   border: 1px solid var(--l3-border-light);
-  border-radius: var(--l3-radius-12);
+  border-radius: var(--l3-radius-16);
   background: var(--l3-surface-default);
 }
 
@@ -2818,6 +2856,13 @@ export function DashBar(props: ActionbarProps) {
     transition: none;
   }
 }
+
+/* Version 2: an earlier version, replaced by a newer card below — mini, dimmed, the plain light edge. */
+.card[data-superseded] {
+  border-color: var(--l3-border-light);
+  opacity: var(--l3-opacity-60);
+  transition: opacity var(--app-dash-scene) var(--app-dash-scene-easing);
+}
 ```
 
 ### `src/flows/dash/components/IndicatorCard.tsx`
@@ -2835,7 +2880,8 @@ import { MiniChart } from './MiniChart'
 import styles from './IndicatorCard.module.css'
 
 /** Where the indicator is: being built (with the step reached) or ready to save. */
-export type IndicatorCardState = { kind: 'building'; step: 0 | 1 | 2 } | { kind: 'ready' }
+/** Where the indicator is: being built (step reached), ready to review, or saved (Version 2 keeps it in the chat). */
+export type IndicatorCardState = { kind: 'building'; step: 0 | 1 | 2 } | { kind: 'ready' } | { kind: 'saved' }
 
 type IndicatorCardProps = {
   draft: IndicatorDraft
@@ -2849,6 +2895,8 @@ type IndicatorCardProps = {
   compact?: boolean
   /** Tapping the mini card opens it again. */
   onExpand?: () => void
+  /** Version 2: a newer version was shared below — this one folds to its mini form, dimmed, tagged "Earlier version". */
+  superseded?: boolean
 }
 
 /**
@@ -2860,19 +2908,20 @@ type IndicatorCardProps = {
  * - mini (compact): while the user scrolls the chat, the chart, chips, notes and button fold away
  *   and a small preview slides in beside the name (300 ms, ease in and out) — the chat gets the room. Tap to open.
  */
-export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand }: IndicatorCardProps) {
+export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
   const building = state.kind === 'building'
   const stage = building ? (state.step === 0 ? 'sketch' : 'candles') : 'ready'
-  const mini = compact && !building
+  const mini = (compact || superseded) && !building
 
   return (
     <article
       className={styles.card}
       data-state={state.kind}
       data-compact={mini || undefined}
+      data-superseded={superseded || undefined}
       aria-label={named ? draft.name : t('indicator.yourIndicator')}
-      {...(mini && { role: 'button', tabIndex: 0, 'aria-expanded': false, onClick: onExpand, onKeyDown: (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && onExpand?.() })}
+      {...(mini && onExpand && { role: 'button', tabIndex: 0, 'aria-expanded': false, onClick: onExpand, onKeyDown: (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && onExpand?.() })}
     >
       <div className={styles.body}>
         <Stack direction="horizontal" align={mini ? 'center' : 'start'} justify="between" gap="12">
@@ -2889,7 +2938,11 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
             {!building && <span className={styles.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>}
           </Stack>
           {!building && (
-            <Tag color="success" size="sm" className={styles.tag}>{t('indicator.ready')}</Tag>
+            superseded ? (
+              <Tag color="neutral" size="sm" className={styles.tag}>{t('indicator.earlierTag')}</Tag>
+            ) : (
+              <Tag color="success" size="sm" className={styles.tag}>{state.kind === 'saved' ? t('indicator.savedTag') : t('indicator.ready')}</Tag>
+            )
           )}
         </Stack>
 
@@ -2933,10 +2986,12 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
                       </ul>
                     )}
                   </div>
-                  <Stack direction="horizontal" align="center" gap="08">
-                    <Button variant="secondary" fullWidth iconLeft={<Icon icon={msEdit} />} onClick={onModify}>{t('indicator.modify')}</Button>
-                    <Button variant="primary" fullWidth onClick={onSave}>{t('indicator.save')}</Button>
-                  </Stack>
+                  {state.kind === 'ready' && (
+                    <Stack direction="horizontal" align="center" gap="08">
+                      <Button variant="secondary" fullWidth iconLeft={<Icon icon={msEdit} />} onClick={onModify}>{t('indicator.modify')}</Button>
+                      <Button variant="primary" fullWidth onClick={onSave}>{t('indicator.save')}</Button>
+                    </Stack>
+                  )}
                 </>
               )}
             </Stack>
@@ -4241,7 +4296,19 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
   "indicator.notes": "{count} notes from testing",
   "indicator.modify": "Modify",
   "indicator.save": "Save indicator",
-  "rulesHome.topSuggestions": "Top {count} suggestions"
+  "rulesHome.topSuggestions": "Top {count} suggestions",
+  "indicator.savedTag": "Saved",
+  "indicator.oneQuestion": "One quick question before I build it.",
+  "indicator.noQuestions": "Your message has everything I need — building it now.",
+  "indicator.buildingBelow": "Building it for {chart} on {timeframe} candles — watch it take shape.",
+  "indicator.earlierTag": "Earlier version",
+  "indicator.updatedTitle": "Updated",
+  "indicator.updatedText": "Here’s the new version with your change — the earlier one is folded above.",
+  "indicatorSaved.title": "Your indicator is ready to use",
+  "indicatorSaved.description": "It’s saved to Your indicators — add it to any chart from Scalper.",
+  "indicatorSaved.summary": "{place} · tested on {count} candles",
+  "indicatorSaved.done": "Done",
+  "indicatorSaved.view": "View indicator"
 }
 ```
 
@@ -4351,9 +4418,15 @@ import type { Flow } from '../types'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
 import { DashAI } from './screens/DashAI'
+import type { IndicatorStep } from './screens/IndicatorChat'
 import { DeleteRuleSheet, ReadMoreSheet, RuleCreatedSheet, RuleDeletedSheet } from './sheets/RuleSheets'
+import { IndicatorSavedSheet } from './sheets/IndicatorSheets'
+import { supertrendEma } from './indicatorData'
 
 const maxDailyLossRule = activeRules[0]
+
+/** The indicator chat's steps → its screens (Version 2 decides the next step from the request). */
+const indicatorStep: Record<IndicatorStep, string> = { empty: 'dash-20', chart: 'dash-21', timeframe: 'dash-22', building: 'dash-23', ready: 'dash-24', saved: 'dash-25' }
 
 /**
  * DASH AI · Trading rules — DASH (the in-app AI) turns a trading habit the user describes into a rule, backtests it
@@ -4365,6 +4438,10 @@ export const dash: Flow = {
   title: 'DASH AI · Trading rules',
   description: 'Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.',
   figmaFile: 'nLs24dTJdPz9A5pu3AWMbe',
+  // Prototype setting: Version 1 = the cards (rule, indicator) pinned above the chat, the indicator always asks chart +
+  // timeframe. Version 2 = the cards inside the chat as a turn; three indicator examples (asks nothing / the timeframe /
+  // where it goes).
+  options: [{ id: 'version', label: 'DASH version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' }],
   sections: [
     { id: 'entry', title: 'Entry' },
     { id: 'create', title: 'Create a rule' },
@@ -4395,12 +4472,13 @@ export const dash: Flow = {
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
     { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} /> },
     // ---- Custom indicator (wireframe "AI Indicator") — ONE chat screen in different states (group 'indicator')
-    { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart…', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-24', group: 'dash', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} /> },
-    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} /> },
+    { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart… (Version 2: only for “…on 15-min candles”; then it builds)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe. (Version 2: only for “…on Nifty 50”.)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-24', group: 'dash', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} /> },
+    { id: 'dash-27', group: 'dash', section: 'indicator', name: 'Indicator · saved sheet', figma: '', note: 'Version 2: Save indicator opens this over the chat — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.', render: (go) => <DashAI scene="indicator" step="saved" onYourRules={() => go('dash-14')} onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} sheet={<IndicatorSavedSheet draft={supertrendEma} onDone={() => go('dash-25')} onView={() => go('fno-06')} />} /> },
   ],
 }
 ```
@@ -4417,6 +4495,20 @@ import type { RuleQuestion } from './data'
 export const indicatorPrompts: string[][] = [
   ['Supertrend with a 20 EMA', 'Show the trend with a 50-day average'],
   ['Mark the 15-minute opening range', 'Highlight candles with 2× average volume'],
+]
+
+/** What DASH may ask before building — only what the request didn't say. */
+export type IndicatorAsk = 'chart' | 'timeframe'
+
+/**
+ * Version 2's three example requests — one per case: everything said (DASH asks nothing and builds), no timeframe
+ * (DASH asks the timeframe), no chart (DASH asks where it goes). `chart` / `timeframe` are what the request already says.
+ */
+export type IndicatorPrompt = { text: string; asks: IndicatorAsk[]; chart: string; timeframe: string }
+export const indicatorPromptsV2: IndicatorPrompt[] = [
+  { text: 'Supertrend with a 20 EMA on any 15-min chart', asks: [], chart: 'any chart', timeframe: '15 min' },
+  { text: 'Supertrend with a 20 EMA on Nifty 50', asks: ['timeframe'], chart: 'Nifty 50', timeframe: '15 min' },
+  { text: 'Supertrend with a 20 EMA on 15-min candles', asks: ['chart'], chart: 'Nifty 50', timeframe: '15 min' },
 ]
 
 /** What DASH asks before building (only what the prompt didn't say). */
@@ -4672,12 +4764,13 @@ function RuleItem({ rule, onDelete }: { rule: SavedRule; onDelete: () => void })
 import { useState, type ReactNode } from 'react'
 import { ActionbarAction } from '@l3/components/Actionbar'
 import { msFactCheck } from '@l3/icons/material'
+import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { DashBar, DashScreen } from '../components/DashScreen'
 import { SceneSwap, type SceneMove } from '../components/SceneSwap'
 import { t } from '../copy'
 import { IndicatorScene, type IndicatorChatProps } from './IndicatorChat'
 import { LandingScene, type LandingProps } from './Landing'
-import { RuleScene, type RuleChatProps } from './RuleChat'
+import { RuleScene, type DashVersion, type RuleChatProps } from './RuleChat'
 
 type Common = {
   onBack?: () => void
@@ -4691,8 +4784,8 @@ type Common = {
 
 export type DashAIProps =
   | ({ scene: 'landing' } & LandingProps & Common)
-  | ({ scene: 'rules' } & Omit<RuleChatProps, 'typing' | 'onTyping'> & Common)
-  | ({ scene: 'indicator' } & Omit<IndicatorChatProps, 'typing' | 'onTyping'> & Common)
+  | ({ scene: 'rules' } & Omit<RuleChatProps, 'typing' | 'onTyping' | 'version'> & Common)
+  | ({ scene: 'indicator' } & Omit<IndicatorChatProps, 'typing' | 'onTyping' | 'version'> & Common)
 
 /** Scene order: moving to a later one pushes forward, to an earlier one pushes back. */
 const order = { landing: 0, rules: 1, indicator: 1 } as const
@@ -4709,6 +4802,8 @@ const order = { landing: 0, rules: 1, indicator: 1 } as const
  */
 export function DashAI(props: DashAIProps) {
   const { scene, onBack, onYourRules, sheet } = props
+  /** Prototype setting (flow option "DASH version"): 1 = cards pinned above the chat, 2 = cards inside the chat. */
+  const version = useFlowOption('dash', 'version', '2') as DashVersion
   const [typing, setTyping] = useState(props.typing ?? false)
   const [lastScene, setLastScene] = useState(scene)
   const [move, setMove] = useState<SceneMove>('push')
@@ -4719,17 +4814,20 @@ export function DashAI(props: DashAIProps) {
   }
 
   const tone = props.scene === 'rules' && props.step === 'cost' ? 'loss' : 'brand'
-  const keyboardUp = typing && props.scene !== 'landing' && props.step === 'empty'
+  // The background ends above the drawn keyboard (laptop). Scenes turn typing on only where the keyboard comes up
+  // (the empty chat's input, Modify) and off again when it goes.
+  const keyboardUp = typing && props.scene !== 'landing' && !useSystemKeyboard()
 
   let body: ReactNode
   if (props.scene === 'landing') body = <LandingScene onRules={props.onRules} onIndicator={props.onIndicator} onStrategy={props.onStrategy} />
-  else if (props.scene === 'rules') body = <RuleScene {...props} typing={typing} onTyping={setTyping} />
-  else body = <IndicatorScene {...props} typing={typing} onTyping={setTyping} />
+  else if (props.scene === 'rules') body = <RuleScene {...props} version={version} typing={typing} onTyping={setTyping} />
+  else body = <IndicatorScene {...props} version={version} typing={typing} onTyping={setTyping} />
 
   return (
     <DashScreen
       tone={tone}
       keyboard={keyboardUp}
+      chatting={version === '2' && props.scene !== 'landing' && props.step !== 'empty'}
       top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msFactCheck} label={t('landing.menu')} onClick={() => onYourRules?.()} />} />}
       sheet={sheet}
     >
@@ -4747,8 +4845,10 @@ export function DashAI(props: DashAIProps) {
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Inset } from '@l3/components/Inset'
 import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { msChevronRight } from '@l3/icons/material'
 import { Stack } from '@l3/components/Stack'
-import { usePreview } from '../../../shared/prototype'
+import { usePreview, useSystemKeyboard } from '../../../shared/prototype'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import { AssistantMessage, ChatInput, Thinking, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
@@ -4756,7 +4856,8 @@ import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorC
 import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { t } from '../copy'
-import { chartQuestion, indicatorPrompts, supertrendEma, timeframeQuestion } from '../indicatorData'
+import { chartQuestion, indicatorPrompts, indicatorPromptsV2, supertrendEma, timeframeQuestion, type IndicatorPrompt } from '../indicatorData'
+import type { DashVersion } from './RuleChat'
 // The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
 import styles from './RuleChat.module.css'
 
@@ -4764,7 +4865,11 @@ import styles from './RuleChat.module.css'
 export type IndicatorStep = 'empty' | 'chart' | 'timeframe' | 'building' | 'ready' | 'saved'
 
 export type IndicatorChatProps = {
+  /** DASH design version (prototype setting): '1' pins the card and always asks chart + timeframe; '2' (see below). */
+  version?: DashVersion
   step: IndicatorStep
+  /** Version 2: go to a step of the chat (which question comes next depends on the request). */
+  onStep?: (step: IndicatorStep) => void
   request?: string
   /** 'empty': a prompt sent — DASH asks which chart. */
   onSend?: (message: string) => void
@@ -4774,6 +4879,8 @@ export type IndicatorChatProps = {
   onBuilt?: () => void
   /** Save indicator → saved confirmation. */
   onSaved?: () => void
+  /** Version 2: Save indicator opens the "ready to use" sheet instead (closing it leaves the chat saved). */
+  onSaveSheet?: () => void
   /** View indicator opens the future Scalper destination. */
   onViewIndicator?: () => void
   /** Typing state (input focused, keyboard up) — kept by the DASH screen. */
@@ -4784,6 +4891,8 @@ export type IndicatorChatProps = {
 const THINKING_MS = 1200
 const FLY_MS = 450
 const INTRO_OUT_MS = 300
+/** The drawn keyboard's rise (--app-dash-scene). */
+const KEYBOARD_MS = 320
 /** Each build step (Reading → Writing the logic → Testing). */
 const BUILD_STEP_MS = 1100
 /** How far a finger moves before the swipe counts as a scroll (folds or opens the mini card). */
@@ -4797,11 +4906,16 @@ const SWIPE_PX = 8
  * Ready (BUY / SELL labels, notes, Modify and Save indicator) → saved confirmation. Modify opens a plain-language
  * revision prompt; this prototype keeps the same preview after a submitted change.
  */
-export function IndicatorScene({ step, request: initialRequest = indicatorPrompts[0][0], onSend, onChart, onTimeframe, onBuilt, onSaved, onViewIndicator, typing = false, onTyping }: IndicatorChatProps) {
+export function IndicatorScene({ version = '1', step, onStep, request: initialRequest, onSend, onChart, onTimeframe, onBuilt, onSaved, onSaveSheet, onViewIndicator, typing = false, onTyping }: IndicatorChatProps) {
   const { interactive } = usePreview()
-  const [request, setRequest] = useState(initialRequest)
-  const [chart, setChart] = useState(chartQuestion.options[0])
-  const [timeframe, setTimeframe] = useState(timeframeQuestion.options[1])
+  const v2 = version === '2'
+  const save = v2 && onSaveSheet ? onSaveSheet : onSaved
+  // Version 2: the request decides what DASH asks. Opened straight on a step, it's the example that leads there.
+  const [prompt, setPrompt] = useState<IndicatorPrompt>(() => indicatorPromptsV2[step === 'chart' ? 2 : step === 'timeframe' ? 1 : 0])
+  const asks = v2 ? prompt.asks : (['chart', 'timeframe'] as const)
+  const [request, setRequest] = useState(initialRequest ?? (v2 ? prompt.text : indicatorPrompts[0][0]))
+  const [chart, setChart] = useState(v2 ? prompt.chart : chartQuestion.options[0])
+  const [timeframe, setTimeframe] = useState(v2 ? prompt.timeframe : timeframeQuestion.options[1])
   const [pending, setPending] = useState<(() => void) | null>(null)
   const [buildStep, setBuildStep] = useState<0 | 1 | 2>(0)
   /** Plain-words changes asked through Modify. The preview stays illustrative in this prototype. */
@@ -4813,6 +4927,8 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
   const stage = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
   const keyboard = useRef<HTMLDivElement>(null)
+  const input = useRef<HTMLInputElement>(null)
+  const systemKeyboard = useSystemKeyboard()
   const [draft, setDraft] = useState('')
   // The mini card: scrolling the chat down folds the pinned card; scrolling back to the top (or a tap) opens it.
   // Driven by the user's own wheel / swipe — never by the chat moving itself to its newest message.
@@ -4825,7 +4941,16 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
     setIntroLeaving(true)
     onTyping?.(false)
     window.setTimeout(() => setIntroLeaving(false), INTRO_OUT_MS)
-    setPending(() => () => onSend?.(text)) // DASH reads the prompt, then asks
+    if (v2) {
+      // A typed request (not one of the examples) gets both questions.
+      const next = indicatorPromptsV2.find((p) => p.text === text) ?? { text, asks: ['chart', 'timeframe'], chart: chartQuestion.options[0], timeframe: timeframeQuestion.options[1] }
+      setPrompt(next)
+      setChart(next.chart)
+      setTimeframe(next.timeframe)
+      setPending(() => () => onStep?.(next.asks[0] ?? 'building')) // DASH reads it, then asks — or just builds
+    } else {
+      setPending(() => () => onSend?.(text)) // DASH reads the prompt, then asks
+    }
   }
 
   useLayoutEffect(() => {
@@ -4856,9 +4981,17 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
     return () => timers.forEach(window.clearTimeout)
   }, [step, interactive, onBuilt])
 
+  /** Modify: the input becomes active right away — focused in the tap (a phone opens its keyboard), typing state on. */
+  const modify = () => {
+    input.current?.focus()
+    setRevisionRequested(true)
+    onTyping?.(true)
+  }
+
   const askChange = (text: string) => {
     setChanges((c) => [...c, text])
     setRevisionRequested(false)
+    onTyping?.(false)
     setChanging(true)
     window.setTimeout(() => setChanging(false), THINKING_MS)
   }
@@ -4866,12 +4999,16 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
   // The empty state shows before sending; while DASH reads the prompt it's already the chat.
   const empty = step === 'empty' && !pending
   const chatStarted = step !== 'empty' || pending != null
-  const pinned = step === 'building' || step === 'ready'
+  const built = step === 'building' || step === 'ready' || step === 'saved'
+  // Version 1 pins the card above the chat (until it's saved); Version 2 shows it in the chat, where it stays.
+  const pinned = !v2 && (step === 'building' || step === 'ready')
   const cardState: IndicatorCardState =
-    step === 'building' ? { kind: 'building', step: buildStep } : { kind: 'ready' }
+    step === 'building' ? { kind: 'building', step: buildStep } : step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }
   const asking = !pending && (step === 'chart' || step === 'timeframe')
-  const keyboardUp = empty && typing
-  const compact = compactWanted && step === 'ready'
+  // Typing: the empty chat's input, or a change after Modify. The drawn keyboard only on a laptop; a phone has its own.
+  const typingNow = typing && (empty || revisionRequested)
+  const keyboardUp = typingNow && !systemKeyboard
+  const compact = !v2 && compactWanted && step === 'ready'
   const userScroll = (down: boolean) => {
     const el = scroller.current
     if (!el) return
@@ -4882,6 +5019,12 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
   useLayoutEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' })
   }, [step, pending, changes.length, changing, revisionRequested])
+  // The keyboard takes the bottom of the screen (300 ms): once it's up, bring the newest message back into view.
+  useEffect(() => {
+    if (!keyboardUp) return
+    const timer = window.setTimeout(() => scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' }), KEYBOARD_MS)
+    return () => window.clearTimeout(timer)
+  }, [keyboardUp])
 
   // The keyboard's height, for the screen's background to end above it.
   useLayoutEffect(() => {
@@ -4891,24 +5034,43 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
 
   const turns: { key: string; node: ReactNode }[] = []
   if (chatStarted) turns.push({ key: 'request', node: <UserMessage>{request}</UserMessage> })
-  if (step !== 'empty') turns.push({ key: 'got-it', node: <AssistantMessage title={t('indicator.gotIt')}>{t('indicator.fewQuestions')}</AssistantMessage> })
-  const past = ['timeframe', 'building', 'ready', 'saved'].includes(step) || (step === 'chart' && pending)
+  const intro = asks.length === 0 ? t('indicator.noQuestions') : asks.length === 1 ? t('indicator.oneQuestion') : t('indicator.fewQuestions')
+  if (step !== 'empty') turns.push({ key: 'got-it', node: <AssistantMessage title={t('indicator.gotIt')}>{intro}</AssistantMessage> })
+  const past = asks.includes('chart') && (['timeframe', 'building', 'ready', 'saved'].includes(step) || (step === 'chart' && pending))
   if (past) {
     turns.push({ key: 'q-chart', node: <AssistantMessage>{chartQuestion.question}</AssistantMessage> })
     turns.push({ key: 'a-chart', node: <UserMessage>{chart}</UserMessage> })
   }
-  if (['building', 'ready', 'saved'].includes(step) || (step === 'timeframe' && pending)) {
+  if (asks.includes('timeframe') && (['building', 'ready', 'saved'].includes(step) || (step === 'timeframe' && pending))) {
     turns.push({ key: 'q-timeframe', node: <AssistantMessage>{timeframeQuestion.question}</AssistantMessage> })
     turns.push({ key: 'a-timeframe', node: <UserMessage>{timeframe}</UserMessage> })
   }
-  if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
+  // Version 2: every change shares a new card under DASH's reply; the ones before it fold to "Earlier version".
+  // (Prototype: an updated version shows its SELL labels orange — the sample change.)
+  const versions = changing ? changes.length - 1 : changes.length
+  if (v2 && built) {
+    turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingBelow', { chart, timeframe })}</AssistantMessage> })
+    turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={supertrendEma} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={supertrendEma} state={cardState} onModify={modify} onSave={save} /> })
+  } else if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
   if (step === 'ready' || step === 'saved') turns.push({ key: 'ready', node: <AssistantMessage title={t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
   if (revisionRequested) turns.push({ key: 'revision-prompt', node: <AssistantMessage>{t('indicator.revisionPrompt')}</AssistantMessage> })
   changes.forEach((c, i) => {
     turns.push({ key: `change-${i}`, node: <UserMessage>{c}</UserMessage> })
-    if (!changing || i < changes.length - 1) turns.push({ key: `changed-${i}`, node: <AssistantMessage>{t('indicator.changed')}</AssistantMessage> })
+    if (changing && i === changes.length - 1) return
+    if (!v2) {
+      turns.push({ key: `changed-${i}`, node: <AssistantMessage>{t('indicator.changed')}</AssistantMessage> })
+      return
+    }
+    const latest = i === versions - 1
+    turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{t('indicator.updatedText')}</AssistantMessage> })
+    turns.push({
+      key: `card-${i}`,
+      node: latest
+        ? <IndicatorCard draft={supertrendEma} state={step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }} sellTone="orange" onModify={modify} onSave={save} />
+        : <IndicatorCard draft={supertrendEma} state={{ kind: 'ready' }} sellTone="orange" superseded />,
+    })
   })
-  if (step === 'saved') turns.push({ key: 'saved', node: <Stack gap="12" align="start"><AssistantMessage title={t('indicator.savedTitle')}>{t('indicator.savedText')}</AssistantMessage><Button variant="secondary" size="sm" onClick={onViewIndicator}>{t('indicator.view')}</Button></Stack> })
+  if (step === 'saved') turns.push({ key: 'saved', node: <Stack gap="12" align="start"><AssistantMessage title={t('indicator.savedTitle')}>{t('indicator.savedText')}</AssistantMessage><Button variant="secondary" size="md" iconRight={<Icon icon={msChevronRight} />} onClick={onViewIndicator}>{t('indicator.view')}</Button></Stack> })
 
   const question = step === 'chart' ? chartQuestion : timeframeQuestion
 
@@ -4918,7 +5080,7 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
         <div className={styles.pin}>
           <div className={styles.pinInner}>
             <Inset paddingInline="16" paddingBlock="08">
-              <IndicatorCard draft={supertrendEma} state={cardState} onModify={() => setRevisionRequested(true)} onSave={onSaved} compact={compact} onExpand={() => setCompactWanted(false)} />
+              <IndicatorCard draft={supertrendEma} state={cardState} onModify={modify} onSave={save} compact={compact} onExpand={() => setCompactWanted(false)} />
             </Inset>
           </div>
         </div>
@@ -4927,7 +5089,7 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
       <div
         className={styles.scroll}
         ref={scroller}
-        onClick={keyboardUp ? () => onTyping?.(false) : undefined}
+        onClick={typingNow ? () => onTyping?.(false) : undefined}
         onWheel={(e) => e.deltaY && userScroll(e.deltaY > 0)}
         onTouchStart={(e) => (touchY.current = e.touches[0].clientY)}
         onTouchMove={(e) => {
@@ -4940,11 +5102,11 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
       >
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} typing={keyboardUp} />
+            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={v2 ? indicatorPromptsV2.map((p) => p.text) : undefined} typing={typingNow} />
           </div>
         )}
         {chatStarted && (
-          <div className={styles.panel}>
+          <div className={styles.panel} data-flat={v2 || undefined}>
             <Inset paddingInline="16" paddingBlock="24">
               <Stack gap="16" className={styles.turns}>
                 {turns.map((turn) => (
@@ -4960,10 +5122,10 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
                       onAnswer={(a) => {
                         if (step === 'chart') {
                           setChart(a)
-                          setPending(() => () => onChart?.(a))
+                          setPending(() => () => (v2 ? onStep?.(asks.includes('timeframe') ? 'timeframe' : 'building') : onChart?.(a)))
                         } else {
                           setTimeframe(a)
-                          setPending(() => () => onTimeframe?.(a))
+                          setPending(() => () => (v2 ? onStep?.('building') : onTimeframe?.(a)))
                         }
                       }}
                     />
@@ -4986,9 +5148,10 @@ export function IndicatorScene({ step, request: initialRequest = indicatorPrompt
             key="input"
             value={draft}
             onChange={setDraft}
-            typing={keyboardUp}
-            autoFocus={keyboardUp || revisionRequested}
-            onFocus={empty ? () => onTyping?.(true) : undefined}
+            inputRef={input}
+            typing={typingNow}
+            autoFocus={typingNow}
+            onFocus={empty || revisionRequested ? () => onTyping?.(true) : undefined}
             onSend={empty ? send : step === 'ready' && revisionRequested ? askChange : undefined}
           />
         </Inset>
@@ -5143,6 +5306,12 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
   animation: dash-fade-in var(--app-dash-scene) var(--app-dash-scene-easing) both;
 }
 
+/* Version 2: no panel — the chat sits straight on DASH's background (the soft blurred disc), like the empty state. */
+.panel[data-flat] {
+  border-radius: 0;
+  background: none;
+}
+
 /* The input dock: no surface of its own (the background shows), 16 around. */
 .dock {
   flex: none;
@@ -5266,7 +5435,7 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
-import { usePreview } from '../../../shared/prototype'
+import { usePreview, useSystemKeyboard } from '../../../shared/prototype'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
@@ -5287,7 +5456,11 @@ export type RuleChatStep =
   | 'cost' //       weak: it would have cut trades that ended in profit
   | 'none' //       ready, but there's not enough history to test it
 
+/** DASH design version (prototype setting): '1' pins the rule card above the chat, '2' puts it in the chat. */
+export type DashVersion = '1' | '2'
+
 export type RuleChatProps = {
+  version?: DashVersion
   step: RuleChatStep
   /** What the user asked for (the chip they tapped or what they typed). */
   request?: string
@@ -5324,7 +5497,7 @@ const INTRO_OUT_MS = 300
  *   fades in; DASH thinks, asks (question card rising out of the input's place), and the rule card pins at the top;
  * - the conversation builds up — every message stays; the panel scrolls to the newest.
  */
-export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping }: RuleChatProps) {
+export function RuleScene({ version = '1', step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping }: RuleChatProps) {
   const { interactive } = usePreview()
   /** After an answer or Proceed: DASH thinks on this page before the next step comes (prototype). */
   const [pending, setPending] = useState<(() => void) | null>(null)
@@ -5389,10 +5562,15 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
 
   const backtest: Backtest | undefined = step === 'saved' || step === 'cost' || step === 'none' ? backtests[step] : undefined
   const empty = step === 'empty'
-  const pinned = !empty && step !== 'thinking' && step !== 'question'
+  const hasCard = !empty && step !== 'thinking' && step !== 'question'
+  // Version 1 pins the rule card above the chat; Version 2 shows it inside DASH's message, like any other turn.
+  const pinned = version === '1' && hasCard
+  const card = <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} />
   const thinking = step === 'thinking' || pending != null
   const asking = step === 'question' && !pending
-  const keyboardUp = empty && typing
+  // Typing in the empty chat; the drawn keyboard only on a laptop (a phone opens its own).
+  const typingNow = empty && typing
+  const keyboardUp = typingNow && !useSystemKeyboard()
 
   return (
     <div className={styles.scene} ref={scene}>
@@ -5400,21 +5578,21 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
         <div className={styles.pin}>
           <div className={styles.pinInner}>
             <Inset paddingInline="16" paddingBlock="08">
-              <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} />
+              {card}
             </Inset>
           </div>
         </div>
       )}
 
       {/* Tapping the body puts the keyboard away (Figma "3.1" → "2"). */}
-      <div className={styles.scroll} ref={scroller} onClick={keyboardUp ? () => onTyping?.(false) : undefined}>
+      <div className={styles.scroll} ref={scroller} onClick={typingNow ? () => onTyping?.(false) : undefined}>
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} typing={keyboardUp} top={topSuggestions} />
+            <RulesIntro onPick={empty ? send : undefined} typing={typingNow} top={topSuggestions} />
           </div>
         )}
         {!empty && (
-          <div className={styles.panel}>
+          <div className={styles.panel} data-flat={version === '2' || undefined}>
             <Inset paddingInline="16" paddingBlock="24">
               <Stack gap="16" className={styles.turns}>
                 {conversation(step, request, step === 'question' && pending ? answer : step !== 'thinking' && step !== 'question' ? answer : null, {
@@ -5423,6 +5601,8 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
                   onSave,
                   onImprove,
                   busy: pending != null,
+                  card: version === '2' && hasCard ? card : undefined,
+                  buttons: version === '2',
                 })}
                 {asking && (
                   // DASH's question sits right under its message (visible without scrolling to the bottom).
@@ -5450,7 +5630,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
 
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput value={draft} onChange={setDraft} typing={keyboardUp} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={keyboardUp} onSend={empty ? send : () => {}} />
+          <ChatInput value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} />
         </Inset>
       </div>
 
@@ -5464,7 +5644,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
   )
 }
 
-type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove'> & { onProceed: () => void; busy: boolean }
+type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove'> & { onProceed: () => void; busy: boolean; /** Version 2: replies as buttons. */ buttons?: boolean; /** Version 2: the rule card, inside DASH's preview message. */ card?: ReactNode }
 
 /**
  * The conversation so far — every turn stays, like the live app. Each turn has a stable key, so when the page moves on
@@ -5487,8 +5667,9 @@ function conversation(step: RuleChatStep, request: string, answered: string | nu
     node: (
       <Stack gap="16">
         <AssistantMessage title={t('chat.previewTitle')}>{maxDailyLoss.description}</AssistantMessage>
+        {on.card}
         {!tested && !on.busy && (
-          <ReplyChips options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.proceed'), onClick: on.onProceed, suggested: true }]} />
+          <ReplyChips asButtons={on.buttons} options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.proceed'), onClick: on.onProceed, suggested: true }]} />
         )}
       </Stack>
     ),
@@ -5499,7 +5680,7 @@ function conversation(step: RuleChatStep, request: string, answered: string | nu
       node: (
         <Stack gap="16">
           <AssistantMessage title={t('chat.weakTitle')}>{t('chat.weakText')}</AssistantMessage>
-          <ReplyChips options={[{ label: t('chat.saveAnyway'), onClick: on.onSave }, { label: t('chat.improve'), onClick: on.onImprove, suggested: true }]} />
+          <ReplyChips asButtons={on.buttons} options={[{ label: t('chat.saveAnyway'), onClick: on.onSave }, { label: t('chat.improve'), onClick: on.onImprove, suggested: true }]} />
         </Stack>
       ),
     })
@@ -5509,7 +5690,7 @@ function conversation(step: RuleChatStep, request: string, answered: string | nu
       node: (
         <Stack gap="16">
           <AssistantMessage title={t('chat.readyTitle')}>{t('chat.readyText')}</AssistantMessage>
-          <ReplyChips options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.save'), onClick: on.onSave, suggested: true }]} />
+          <ReplyChips asButtons={on.buttons} options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.save'), onClick: on.onSave, suggested: true }]} />
         </Stack>
       ),
     })
@@ -5524,6 +5705,61 @@ const render = (turns: { key: string; node: ReactNode }[]) =>
       {turn.node}
     </div>
   ))
+```
+
+### `src/flows/dash/sheets/IndicatorSheets.tsx`
+
+```tsx
+import { useId, useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Stack } from '@l3/components/Stack'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { RuleSummary } from '../components/RuleSummary'
+import { SuccessBurst } from '../components/SuccessBurst'
+import { t } from '../copy'
+import type { IndicatorDraft } from '../indicatorData'
+// Same layout as "Your rule is created" (tick burst, title, line, summary, two buttons).
+import styles from './RuleSheets.module.css'
+
+const TICK_FLIP_MS = 150
+
+/**
+ * After Save indicator (Version 2): the indicator is created and saved — the tick bursts, a summary of what was saved,
+ * Done (back to the chat) and View indicator (Scalper's Indicators sheet, with it under Your indicators).
+ */
+export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: IndicatorDraft; onDone?: () => void; onView?: () => void }) {
+  const id = useId()
+  // View indicator: the tick turns away first, then Scalper opens (as View Rules does).
+  const [leaving, setLeaving] = useState(false)
+  const view = () => {
+    setLeaving(true)
+    window.setTimeout(() => onView?.(), TICK_FLIP_MS)
+  }
+  return (
+    <Sheet
+      labelledBy={id}
+      onClose={onDone}
+      footer={
+        <ButtonGroup aria-label={t('indicatorSaved.title')} direction="horizontal">
+          <Button variant="secondary" onClick={onDone}>{t('indicatorSaved.done')}</Button>
+          <Button onClick={view}>{t('indicatorSaved.view')}</Button>
+        </ButtonGroup>
+      }
+    >
+      <Stack gap="24" align="stretch" className={styles.content}>
+        <Stack gap="16" align="center" className={styles.centre}>
+          <SuccessBurst leaving={leaving} />
+          <Stack gap="08" align="center">
+            <h2 id={id} className={styles.title}>{t('indicatorSaved.title')}</h2>
+            <p className={styles.description}>{t('indicatorSaved.description')}</p>
+          </Stack>
+        </Stack>
+        <RuleSummary title={draft.name} description={t('indicatorSaved.summary', { place: draft.placement, count: draft.testedOn })} />
+      </Stack>
+    </Sheet>
+  )
+}
 ```
 
 ### `src/flows/dash/sheets/RuleSheets.module.css`
@@ -5796,7 +6032,7 @@ export const bankAccount: BankAccount = {
 // Prototype behaviour the flows use — the ONLY way a flow touches the preview (src/preview). In a real app: interactive
 // is always true, `go` is the app's navigation, and useAutoAdvance is "when the server answers, go on" (a loader /
 // polling step).
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext, useEffect, useSyncExternalStore } from 'react'
 
 export type Preview = {
   /**
@@ -5825,6 +6061,44 @@ export function useAutoAdvance(next: string | undefined, ms: number) {
 
 /** How long a loader or "Verifying…" state stays up in the prototype. */
 export const LOADING_MS = 1600
+
+// ---- Flow options (prototype settings such as a design version) ----------------------------------------------------
+// Picked in the preview (desktop panel, or the settings sheet on a phone), remembered per browser. A real app has no
+// such switch: it ships one version.
+
+// The key carries the option's default: when a flow changes its default (e.g. to a new version), earlier picks reset.
+const optionKey = (flow: string, option: string, fallback: string) => `prototype-option:${flow}.${option}@${fallback}`
+const optionListeners = new Set<() => void>()
+
+function readOption(key: string): string | null {
+  try { return localStorage.getItem(key) } catch { return null }
+}
+
+/** The preview sets an option (and every screen reading it re-renders). */
+export function setFlowOption(flow: string, option: string, fallback: string, value: string) {
+  const key = optionKey(flow, option, fallback)
+  try { localStorage.setItem(key, value) } catch { /* storage off: this visit only */ }
+  memory.set(key, value)
+  optionListeners.forEach((l) => l())
+}
+
+const memory = new Map<string, string>()
+
+/** A flow's prototype option: the picked value, or `fallback` (the option's default) when none is picked. */
+export function useFlowOption(flow: string, option: string, fallback: string) {
+  return useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => memory.get(optionKey(flow, option, fallback)) ?? readOption(optionKey(flow, option, fallback)) ?? fallback,
+  )
+}
+
+/**
+ * Typing on a phone uses the phone's own keyboard (a touch screen, `pointer: coarse`) — the prototype's drawn keyboard
+ * stays hidden. On a laptop the drawn keyboard shows (for the look) and the laptop's keys type into the focused field.
+ */
+export function useSystemKeyboard() {
+  return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+}
 ```
 
 ### `src/shared/ui/Raised.module.css`

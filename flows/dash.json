@@ -226,7 +226,8 @@
         "dash-22",
         "dash-23",
         "dash-24",
-        "dash-25"
+        "dash-25",
+        "dash-27"
       ],
       "figmaUrl": ""
     },
@@ -234,7 +235,7 @@
       "id": "dash-21",
       "name": "Indicator · which chart",
       "figma": "",
-      "note": "DASH asks only what the prompt didn’t say: the chart…",
+      "note": "DASH asks only what the prompt didn’t say: the chart… (Version 2: only for “…on 15-min candles”; then it builds)",
       "goesTo": [
         "dash-14",
         "dash-02",
@@ -242,7 +243,8 @@
         "dash-22",
         "dash-23",
         "dash-24",
-        "dash-25"
+        "dash-25",
+        "dash-27"
       ],
       "figmaUrl": ""
     },
@@ -250,7 +252,7 @@
       "id": "dash-22",
       "name": "Indicator · which timeframe",
       "figma": "",
-      "note": "…and the timeframe.",
+      "note": "…and the timeframe. (Version 2: only for “…on Nifty 50”.)",
       "goesTo": [
         "dash-14",
         "dash-02",
@@ -258,7 +260,8 @@
         "dash-22",
         "dash-23",
         "dash-24",
-        "dash-25"
+        "dash-25",
+        "dash-27"
       ],
       "figmaUrl": ""
     },
@@ -266,7 +269,7 @@
       "id": "dash-23",
       "name": "Indicator · building",
       "figma": "",
-      "note": "The card pins and builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).",
+      "note": "Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).",
       "goesTo": [
         "dash-14",
         "dash-02",
@@ -274,7 +277,8 @@
         "dash-22",
         "dash-23",
         "dash-24",
-        "dash-25"
+        "dash-25",
+        "dash-27"
       ],
       "figmaUrl": ""
     },
@@ -290,7 +294,8 @@
         "dash-22",
         "dash-23",
         "dash-24",
-        "dash-25"
+        "dash-25",
+        "dash-27"
       ],
       "figmaUrl": ""
     },
@@ -298,11 +303,24 @@
       "id": "dash-25",
       "name": "Indicator · saved",
       "figma": "",
-      "note": "The preview card is removed. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.",
+      "note": "Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.",
       "goesTo": [
         "dash-14",
         "dash-02",
         "fno-06"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "dash-27",
+      "name": "Indicator · saved sheet",
+      "figma": "",
+      "note": "Version 2: Save indicator opens this over the chat — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.",
+      "goesTo": [
+        "dash-14",
+        "dash-02",
+        "fno-06",
+        "dash-25"
       ],
       "figmaUrl": ""
     }
@@ -348,6 +366,7 @@
     "src/flows/dash/screens/Landing.tsx",
     "src/flows/dash/screens/RuleChat.module.css",
     "src/flows/dash/screens/RuleChat.tsx",
+    "src/flows/dash/sheets/IndicatorSheets.tsx",
     "src/flows/dash/sheets/RuleSheets.module.css",
     "src/flows/dash/sheets/RuleSheets.tsx"
   ],

@@ -59,11 +59,10 @@
       "id": "fno-06",
       "name": "Scalper · DASH indicator",
       "figma": "",
-      "note": "From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators and reveals the saved DASH AI indicator in Your indicators.",
+      "note": "From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.",
       "goesTo": [
-        "dash-25",
-        "dash-20",
-        "fno-07"
+        "fno-01",
+        "dash-20"
       ],
       "figmaUrl": ""
     },
@@ -71,7 +70,7 @@
       "id": "fno-07",
       "name": "Scalper · indicator applied",
       "figma": "",
-      "note": "After choosing the saved DASH AI indicator. The sheet closes and a compact EMA 9 / EMA 21 treatment is overlaid on the NIFTY 50 candle pane.",
+      "note": "With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.",
       "goesTo": [
         "fno-01",
         "dash-20"
