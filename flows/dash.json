@@ -21,9 +21,28 @@
         "stocks-01",
         "dash-14",
         "dash-03",
-        "dash-20"
+        "dash-20",
+        "dash-06",
+        "dash-24",
+        "fno-07"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961"
+    },
+    {
+      "id": "dash-28",
+      "name": "DASH home · returning user",
+      "figma": "",
+      "note": "For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too.",
+      "goesTo": [
+        "stocks-01",
+        "dash-14",
+        "dash-03",
+        "dash-20",
+        "dash-06",
+        "dash-24",
+        "fno-07"
+      ],
+      "figmaUrl": ""
     },
     {
       "id": "dash-03",
@@ -337,6 +356,7 @@
     "src/flows/dash/README.md",
     "src/flows/dash/assets/bg-gradient.png",
     "src/flows/dash/assets/grids.svg",
+    "src/flows/dash/assets/pine-script.svg",
     "src/flows/dash/assets/sparkle.svg",
     "src/flows/dash/components/BuildOption.module.css",
     "src/flows/dash/components/BuildOption.tsx",
@@ -380,6 +400,8 @@
     "src/flows/dash/screens/IndicatorChat.tsx",
     "src/flows/dash/screens/Landing.module.css",
     "src/flows/dash/screens/Landing.tsx",
+    "src/flows/dash/screens/Returning.module.css",
+    "src/flows/dash/screens/Returning.tsx",
     "src/flows/dash/screens/RuleChat.module.css",
     "src/flows/dash/screens/RuleChat.tsx",
     "src/flows/dash/sheets/IndicatorSheets.tsx",
