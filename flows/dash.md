@@ -24,10 +24,10 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-11` | Read more · cost | [5612:41268](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41268) | `dash-08` | Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both. |
 | `dash-12` | Read more · no data | [5612:41402](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41402) | `dash-09` |  |
 | `dash-13` | Rule created | [5612:41875](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875) | `dash-07`, `dash-14` | Over the ready screen it was saved from (Figma shows an older card behind it). |
-| `dash-14` | Active rules | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24` | Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule. |
+| `dash-14` | Active rules | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24`, `dash-06` | Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule. |
 | `dash-15` | Delete rule? | [5612:42250](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250) | `dash-02`, `dash-14`, `dash-16` | Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it). |
 | `dash-16` | Rule deleted | [5612:42455](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455) | `dash-02`, `dash-17` | The list behind already has 3 rules. |
-| `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24` | Not a Figma frame: the list once the sheet closes (3 rules). |
+| `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24`, `dash-06` | Not a Figma frame: the list once the sheet closes (3 rules). |
 | `dash-20` | Indicator · what to show | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
 | `dash-21` | Indicator · which chart | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds) |
 | `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | …and the timeframe. (only for “…on Nifty 50”.) |
@@ -6579,7 +6579,11 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.group.strategy": "Your strategies",
   "home2.rulesNote": "{total} · {count} stepped in today",
   "home2.indicatorsNote": "{total} · {count} on a chart",
-  "home2.strategiesSoon": "Coming soon: build a strategy with DASH"
+  "home2.strategiesSoon": "Coming soon: build a strategy with DASH",
+  "details.ruleOn": "Rule on",
+  "details.ruleOnText": "Steps in when its limit is hit",
+  "details.showOnChart": "Show on chart",
+  "details.showOnChartText": "Draws it on your Scalper chart"
 }
 ```
 
@@ -6810,10 +6814,10 @@ export const dash: Flow = {
     { id: 'dash-12', group: 'dash', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <DashAI scene="rules" step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
     { id: 'dash-13', group: 'dash', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <DashAI scene="rules" step="saved" sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-07')} onViewRules={() => go('dash-14')} />} /> },
     // ---- Your rules
-    { id: 'dash-14', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
+    { id: 'dash-14', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} onEditRule={() => go('dash-06')} /> },
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
-    { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
+    { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} onEditRule={() => go('dash-06')} /> },
     // ---- Custom indicator (wireframe "AI Indicator") — ONE chat screen in different states (group 'indicator')
     { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
     { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
@@ -7171,6 +7175,7 @@ type ActiveRulesProps = {
   /** Version 2 · card style New: the details' Edit with DASH / Add to chart. */
   onAddToChart?: () => void
   onEditIndicator?: () => void
+  onEditRule?: () => void
   onBack?: () => void
   onDelete?: (rule: SavedRule) => void
   onCreate?: () => void
@@ -7181,12 +7186,12 @@ type ActiveRulesProps = {
  * Trading rules — the user's saved rules (Figma "Active rules" 5612:42076): one L3 card per rule — its initial, name,
  * what it does and an on / off switch; the footer says what the rule did lately, with Delete. Create New in the dock.
  */
-export function ActiveRules({ rules, onBack, onDelete, onCreate, onCreateIndicator, onAddToChart, onEditIndicator, sheet }: ActiveRulesProps) {
+export function ActiveRules({ rules, onBack, onDelete, onCreate, onCreateIndicator, onAddToChart, onEditIndicator, onEditRule, sheet }: ActiveRulesProps) {
   // History version (its own setting, apart from the chat's): 2 = everything made with DASH, tabbed, on a plain screen
   // (Creations); 1 = this rules list.
   const history = useFlowOption('dash', 'history', '2')
   if (history === '2') {
-    return <Creations rules={dashRules} indicators={savedIndicators} strategies={savedStrategies} onBack={onBack} onDeleteRule={onDelete} onCreateRule={onCreate} onCreateIndicator={onCreateIndicator} onAddToChart={onAddToChart} onEditIndicator={onEditIndicator} sheet={sheet} />
+    return <Creations rules={dashRules} indicators={savedIndicators} strategies={savedStrategies} onBack={onBack} onDeleteRule={onDelete} onCreateRule={onCreate} onCreateIndicator={onCreateIndicator} onAddToChart={onAddToChart} onEditIndicator={onEditIndicator} onEditRule={onEditRule} sheet={sheet} />
   }
   return (
     <DashScreen
@@ -7510,6 +7515,8 @@ type CreationsProps = {
   onAddToChart?: () => void
   /** An indicator's Edit (details sheet): opens it in the DASH chat, ready to change. */
   onEditIndicator?: () => void
+  /** A rule's Edit (details sheet): opens it in the rules chat, ready to change. */
+  onEditRule?: () => void
   /** Version 1's sheets over this screen (unused here: Version 2 opens its own details / delete sheets). */
   sheet?: ReactNode
 }
@@ -7521,7 +7528,7 @@ type CreationsProps = {
  * create one. Rules and indicators are the same card — the name's initial in an L3 Avatar, a switch (on / on the chart), footer: activity + Delete.
  * Create New in the dock makes the kind of the tab (All → a rule).
  */
-export function Creations({ rules, indicators, strategies, onBack, onDeleteRule, onCreateRule, onCreateIndicator, onAddToChart, onEditIndicator, sheet }: CreationsProps) {
+export function Creations({ rules, indicators, strategies, onBack, onDeleteRule, onCreateRule, onCreateIndicator, onAddToChart, onEditIndicator, onEditRule, sheet }: CreationsProps) {
   const [tab, setTab] = useState<Tab>('all')
   const [ruleList, setRuleList] = useState(rules)
   const [list, setList] = useState(indicators)
@@ -7625,8 +7632,9 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
             item={open.item}
             kind={open.of === 'rules' ? 'rule' : 'indicator'}
             on={onMap[open.item.id] ?? open.item.on}
+            onToggle={(on) => toggle(open.item, open.of === 'rules' ? 'rules' : 'indicators', on)}
             onClose={() => setOpen(null)}
-            onEdit={onEditIndicator}
+            onEdit={open.of === 'rules' ? onEditRule : onEditIndicator}
             onDelete={() => setOpen({ kind: 'delete', item: open.item, of: open.of })}
           />
         ) : open?.kind === 'details' ? (
@@ -8941,8 +8949,9 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
   /** One creation card: what it did today / whether it's on a chart (green when active), the name, › — opens its details. */
   const card = (item: SavedRule, k: 'rule' | 'indicator', withKind: boolean) => {
     const triggered = homeTriggers[item.id] ?? 0
-    const status = k === 'rule' ? (triggered ? t('home2.triggered', { count: triggered }) : item.on ? t('home2.notTriggered') : t('cards.paused')) : item.on ? t('cards.onChart') : t('details.notOnChart')
-    const lit = k === 'rule' ? triggered > 0 : item.on
+    const on = isOn(item)
+    const status = k === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
+    const lit = k === 'rule' ? on && triggered > 0 : on
     return (
       <button key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
         <span className={styles.itemTop}>
@@ -8956,6 +8965,9 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
       </button>
     )
   }
+  /** On / off as changed from a details sheet (cards follow it). */
+  const [onMap, setOnMap] = useState<Record<string, boolean>>({})
+  const isOn = (item: SavedRule) => onMap[item.id] ?? item.on
   /** The creation whose details sheet is open. */
   /** Your creations, one row, most active first: rules that stepped in today, then indicators, then the other rules. */
   const creations: { item: SavedRule; kind: 'rule' | 'indicator' }[] = [
@@ -9098,11 +9110,14 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
         <CreationDetailsSheet
           item={details.item}
           kind={details.kind}
-          on={details.item.on}
+          on={isOn(details.item)}
+          onToggle={(on) => setOnMap((m) => ({ ...m, [details.item.id]: on }))}
           onClose={() => setDetails(null)}
           onEdit={() => {
+            const kind = details.kind
             setDetails(null)
-            onOpenIndicator?.()
+            if (kind === 'rule') onOpenRule?.()
+            else onOpenIndicator?.()
           }}
           onDelete={() => setDetails(null)}
         />
@@ -9939,7 +9954,9 @@ import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Icon } from '@l3/components/Icon'
 import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { ListCell } from '@l3/components/ListCell'
 import { Stack } from '@l3/components/Stack'
+import { Switch } from '@l3/components/Switch'
 import { Tag } from '@l3/components/Tag'
 import { msAddChart, msDelete, msEdit } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
@@ -10132,20 +10149,28 @@ export function RuleDeletedSheet({ onOkay }: { onOkay?: () => void }) {
  * - a short list of the other actions — Edit with DASH › (indicators), Delete (red, last, apart from the main action);
  * - the dock: Add to chart (an indicator) or Edit with DASH (a rule). Close: tap outside or drag down.
  */
-export function CreationDetailsSheet({ item, kind, on, onClose, onEdit, onDelete }: {
+export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onClose, onEdit, onDelete }: {
   item: { title: string; summary: string; smart?: boolean; activity: { text: string; strong?: string; after?: string } }
   kind: 'rule' | 'indicator'
   /** As it is now (the card's switch). */
   on: boolean
+  /** The sheet's own switch (Rule on / Show on chart): turn it on or off right here. */
+  onToggle?: (on: boolean) => void
   onClose?: () => void
-  /** Indicators: Edit with DASH (opens it in the chat, ready to change). Rules can't be edited once made. */
+  /** Edit with DASH: opens it in its chat, ready to change (rules and indicators alike). */
   onEdit?: () => void
   onDelete?: () => void
 }) {
   const id = useId()
+  // The switch here and the status follow each other (and the page behind, through onToggle).
+  const [on, setOn] = useState(initialOn)
+  const toggle = (next: boolean) => {
+    setOn(next)
+    onToggle?.(next)
+  }
   const { text, strong, after } = item.activity
   const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
-  // The dock: an indicator has Edit (primary, left) and Delete (secondary, right) side by side; a rule has Delete only. (Adding to a
+  // The dock: Edit (primary, left) and Delete (secondary, right) side by side, for rules and indicators alike. (Adding to a
   // chart is the card's own switch.)
   return (
     <Sheet
@@ -10153,19 +10178,22 @@ export function CreationDetailsSheet({ item, kind, on, onClose, onEdit, onDelete
       onClose={onClose}
       header={<BottomSheetHeader size="lg" headingId={id} heading={item.title} description={item.summary} icon={<DashOrb size="md" />} />}
       footer={
-        kind === 'indicator' ? (
-          <ButtonGroup aria-label={item.title} direction="horizontal">
-            <Button iconLeft={<Icon icon={msEdit} />} onClick={onEdit}>{t('details.edit')}</Button>
-            <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
-          </ButtonGroup>
-        ) : (
-          <ButtonGroup aria-label={item.title}>
-            <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
-          </ButtonGroup>
-        )
+        <ButtonGroup aria-label={item.title} direction="horizontal">
+          <Button iconLeft={<Icon icon={msEdit} />} onClick={onEdit}>{t('details.edit')}</Button>
+          <Button variant="secondary" iconLeft={<Icon icon={msDelete} />} onClick={onDelete}>{t('rules.delete')}</Button>
+        </ButtonGroup>
       }
     >
       <Stack gap="16">
+        {/* Turn it on / off from here (a card row with a switch): Rule on · Show on chart. */}
+        <ListCell
+          variant="card"
+          as="label"
+          label={kind === 'rule' ? t('details.ruleOn') : t('details.showOnChart')}
+          description={kind === 'rule' ? t('details.ruleOnText') : t('details.showOnChartText')}
+          multiline
+          trailing={<Switch checked={on} onChange={(e) => toggle(e.target.checked)} />}
+        />
         <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
           <KeyValueRow label={t('details.status')} value={<Tag color={on ? 'success' : 'neutral'} variant="secondary" size="sm">{status}</Tag>} />
           <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
