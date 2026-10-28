@@ -7682,39 +7682,37 @@ export const dash: Flow = {
     { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
     { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'returning' },
-    // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
-    { id: 'homeCreated', group: 'Home', icon: msRule, label: 'Home cards', values: [{ value: 'none', label: 'New user' }, { value: 'both', label: 'Returning user' }], default: 'both' },
-    // DASH home field: With switch (Rule · Indicator · Strategy inside the field, like Claude Desktop) or Plain.
-    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'above', label: 'Pills above' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
-    { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Returning home: Version 2 (library + live status board) or Version 3. Version 1 (the live layout) stays in the code
     // (ReturningScene) but is off the settings panel.
-    { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '2' },
-    // Returning home V3: what this person has made so far — the kinds not made yet show an invite card.
-    { id: 'homeMade', group: 'Home', icon: msRule, label: 'Made so far (V3)', values: [{ value: 'rules', label: 'Rules only' }, { value: 'both', label: 'Rules + indicators' }], default: 'rules' },
-    // Returning home V3, for testing: hide one section.
-    { id: 'homeHide', group: 'Home', icon: msVisibility, label: 'Hide section (V3)', values: [{ value: 'none', label: 'None' }, { value: 'indicators', label: 'Indicators' }, { value: 'strategies', label: 'Strategies' }], default: 'none' },
+    { id: 'returningHome', showIf: { home: ['returning'] }, group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '2' },
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
-    { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
-    // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
-    { id: 'creationsLayout', group: 'Home', icon: msViewAgenda, label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'mixed' },
+    { id: 'resumeChats', showIf: { returningHome: ['2'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
+    // Returning home V3: what this person has made so far — the kinds not made yet show an invite card.
+    { id: 'homeMade', showIf: { returningHome: ['3'] }, group: 'Home', icon: msRule, label: 'Made so far (V3)', values: [{ value: 'rules', label: 'Rules only' }, { value: 'both', label: 'Rules + indicators' }], default: 'rules' },
+    // Returning home V3, for testing: hide one section.
+    { id: 'homeHide', showIf: { returningHome: ['3'] }, group: 'Home', icon: msVisibility, label: 'Hide section (V3)', values: [{ value: 'none', label: 'None' }, { value: 'indicators', label: 'Indicators' }, { value: 'strategies', label: 'Strategies' }], default: 'none' },
+    // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
+    { id: 'homeCreated', showIf: { home: ['combined'] }, group: 'Home', icon: msRule, label: 'Home cards', values: [{ value: 'none', label: 'New user' }, { value: 'both', label: 'Returning user' }], default: 'both' },
+    { id: 'homeCardStyle', showIf: { home: ['combined'] }, group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
+    // DASH home field: With switch (Rule · Indicator · Strategy inside the field, like Claude Desktop) or Plain.
+    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'above', label: 'Pills above' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
     // The history page (☰ / History in the top bar), set apart from the chat: Version 1 = the Trading rules list,
     // Version 2 = Created with DASH (tabs: rules, indicators, strategies). The two card settings below are for Version 2.
     { id: 'history', group: 'History', icon: msHistory, label: 'History version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     // Version 3 (default): simple — status, name, switch (like the returning home); the name opens the details.
-    { id: 'cardVersion', group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
+    { id: 'cardVersion', showIf: { history: ['2'] }, group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
+    { id: 'cardIcons', showIf: { cardVersion: ['1', '2'] }, group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
-    { id: 'cardIcons', group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
-    // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
-    // (they dim) or with the chat pushed up to make room.
-    { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
-    // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
-    { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'always' },
-    { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
     { id: 'pineScript', group: 'Pine Script', icon: msCode, label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
+    // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
+    // (they dim) or with the chat pushed up to make room.
+    { id: 'pineTip', showIf: { pineScript: ['on'] }, group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
+    // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
+    { id: 'pineTipShow', showIf: { pineScript: ['on'] }, group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'always' },
+    { id: 'pineTipPlace', showIf: { pineScript: ['on'] }, group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
   ],
   sections: [
     { id: 'entry', title: 'Entry' },
@@ -10400,8 +10398,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
   const resumeShown = useFlowOption('dash', 'resumeChats', 'hide') === 'show'
   const [drafts, setDrafts] = useState<HomeDraft[]>(resumeShown ? homeDrafts : [])
   useEffect(() => setDrafts(resumeShown ? homeDrafts : []), [resumeShown])
-  /** Prototype setting "Creations layout": Grouped (a group per kind, its own row) or Mixed (one row, kinds together). */
-  const grouped = useFlowOption('dash', 'creationsLayout', 'mixed') === 'grouped'
+  const grouped = false // Your creations: always Mixed (one row, kinds together); the Grouped code stays for reference
   const rulesTriggered = dashRules.filter((r) => homeTriggers[r.id]).length
   /** Rules that stepped in today first. */
   const rulesSorted = [...dashRules.filter((r) => homeTriggers[r.id]), ...dashRules.filter((r) => !homeTriggers[r.id])]
@@ -12226,6 +12223,34 @@ export function useFlowOption(flow: string, option: string, fallback: string) {
     (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
     () => memory.get(optionKey(flow, option, fallback)) ?? readOption(optionKey(flow, option, fallback)) ?? fallback,
   )
+}
+
+type OptionLike = { id: string; default: string; showIf?: Record<string, string[]> }
+
+/** Every option of a flow as it's set now (the settings panel's show / hide and nesting). */
+export function useFlowOptionValues(flow: { id: string; options?: OptionLike[] }): Record<string, string> {
+  const snap = useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => JSON.stringify(Object.fromEntries((flow.options ?? []).map((o) => {
+      const key = optionKey(flow.id, o.id, o.default)
+      return [o.id, memory.get(key) ?? readOption(key) ?? o.default]
+    }))),
+  )
+  return JSON.parse(snap)
+}
+
+/** Whether an option matters right now (every option it depends on has one of the listed values, all the way up). */
+export function optionShown(options: OptionLike[], option: OptionLike, values: Record<string, string>): boolean {
+  return Object.entries(option.showIf ?? {}).every(([id, allowed]) => {
+    const parent = options.find((o) => o.id === id)
+    return allowed.includes(values[id]) && (!parent || optionShown(options, parent, values))
+  })
+}
+
+/** How deep an option sits under the ones it depends on (0 = top level) — the panel indents it that much. */
+export function optionDepth(options: OptionLike[], option: OptionLike): number {
+  const parents = Object.keys(option.showIf ?? {}).map((id) => options.find((o) => o.id === id)).filter(Boolean) as OptionLike[]
+  return parents.length ? 1 + Math.max(...parents.map((p) => optionDepth(options, p))) : 0
 }
 
 /** How many of a flow's options are off their default (the settings panel's badge). */

@@ -17655,6 +17655,34 @@ export function useFlowOption(flow: string, option: string, fallback: string) {
   )
 }
 
+type OptionLike = { id: string; default: string; showIf?: Record<string, string[]> }
+
+/** Every option of a flow as it's set now (the settings panel's show / hide and nesting). */
+export function useFlowOptionValues(flow: { id: string; options?: OptionLike[] }): Record<string, string> {
+  const snap = useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => JSON.stringify(Object.fromEntries((flow.options ?? []).map((o) => {
+      const key = optionKey(flow.id, o.id, o.default)
+      return [o.id, memory.get(key) ?? readOption(key) ?? o.default]
+    }))),
+  )
+  return JSON.parse(snap)
+}
+
+/** Whether an option matters right now (every option it depends on has one of the listed values, all the way up). */
+export function optionShown(options: OptionLike[], option: OptionLike, values: Record<string, string>): boolean {
+  return Object.entries(option.showIf ?? {}).every(([id, allowed]) => {
+    const parent = options.find((o) => o.id === id)
+    return allowed.includes(values[id]) && (!parent || optionShown(options, parent, values))
+  })
+}
+
+/** How deep an option sits under the ones it depends on (0 = top level) — the panel indents it that much. */
+export function optionDepth(options: OptionLike[], option: OptionLike): number {
+  const parents = Object.keys(option.showIf ?? {}).map((id) => options.find((o) => o.id === id)).filter(Boolean) as OptionLike[]
+  return parents.length ? 1 + Math.max(...parents.map((p) => optionDepth(options, p))) : 0
+}
+
 /** How many of a flow's options are off their default (the settings panel's badge). */
 export function useFlowOptionsChanged(flow: { id: string; options?: { id: string; default: string }[] }) {
   return useSyncExternalStore(
