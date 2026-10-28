@@ -6798,7 +6798,7 @@ export const dash: Flow = {
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     // Version 3 (default): simple — status, name, switch (like the returning home); the name opens the details.
     { id: 'cardVersion', group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
-    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
+    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '1' },
     // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
     // (they dim) or with the chat pushed up to make room.
     { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
@@ -10149,6 +10149,16 @@ export function PineUploadSheet({ onChoose, onClose }: { onChoose: () => void; o
   inset: calc(-1 * var(--l3-spacing-12));
 }
 
+/* Details version 3: the Status row ends in its status and a switch. */
+.statusToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+  cursor: pointer;
+}
+
 /* The other actions: plain rows, a hairline between; Delete last, in the error colour. */
 .actions {
   margin-inline: calc(-1 * var(--l3-spacing-16));
@@ -10387,7 +10397,10 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
     onToggle?.(next)
   }
   // Details version 2 (testing): no switch card; the Status tag itself switches it (tap: On ↔ Paused / On chart ↔ Not on chart).
-  const tagSwitch = useFlowOption('dash', 'detailsVersion', '1') === '2'
+  // Details version 3 (testing): the Status row ends in a switch (with its status beside it) instead of the tag.
+  const detailsVersion = useFlowOption('dash', 'detailsVersion', '1')
+  const tagSwitch = detailsVersion === '2'
+  const rowSwitch = detailsVersion === '3'
   const { text, strong, after } = item.activity
   const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
   // The dock: Edit (primary, left) and Delete (secondary, right) side by side, for rules and indicators alike. (Adding to a
@@ -10409,7 +10422,12 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
         <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
           <KeyValueRow
             label={t('details.status')}
-            value={tagSwitch ? (
+            value={rowSwitch ? (
+              <label className={styles.statusToggle}>
+                <span>{status}</span>
+                <Switch checked={on} onChange={(e) => toggle(e.target.checked)} aria-label={t('details.switchStatus', { status })} />
+              </label>
+            ) : tagSwitch ? (
               <button type="button" className={styles.statusSwitch} onClick={() => toggle(!on)} aria-label={t('details.switchStatus', { status })}>
                 <Tag color={on ? 'success' : 'neutral'} variant="primary" size="sm" iconRight={<Icon icon={lmSwitchArrowVertical} />}>{status}</Tag>
               </button>
@@ -10420,7 +10438,7 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
           <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
         </KeyValueList>
         {/* Under the details: turn it on / off from here (a card row with a switch): Rule on · Show on chart. */}
-        {!tagSwitch && <ListCell
+        {detailsVersion === '1' && <ListCell
           variant="card"
           as="label"
           label={kind === 'rule' ? t('details.ruleOn') : t('details.showOnChart')}
