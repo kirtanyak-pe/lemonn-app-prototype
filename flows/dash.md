@@ -6553,6 +6553,14 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.indicatorsOnLabel": "indicators on a chart",
   "home2.ruleOnLabel": "rule on",
   "home2.indicatorOnLabel": "indicator on a chart",
+  "combined.rules.title": "Rules",
+  "combined.rules.empty": "Warn or stop you before a costly trade.",
+  "combined.rules.create": "Create rule",
+  "combined.indicators.title": "Indicators",
+  "combined.indicators.empty": "Draw your own signals on any chart.",
+  "combined.indicators.create": "Create indicator",
+  "combined.rules.unit": "rules active",
+  "combined.indicators.unit": "on a chart",
   "home.createPrefix": "Create a new",
   "home.word.indicator": "indicator",
   "home.word.rule": "rule",
@@ -6764,7 +6772,7 @@ export const homeTriggers: Record<string, number> = { 'day-pnl-gate': 2, 'expiry
 ### `src/flows/dash/index.tsx`
 
 ```tsx
-import { msChat, msCode, msDashboard, msDescription, msForum, msHistory, msHome, msImage, msLabel, msLayers, msLightbulb, msPlayCircle, msTune, msViewAgenda, msVisibility } from '@l3/icons/material'
+import { msChat, msCode, msDashboard, msDescription, msForum, msHistory, msHome, msImage, msLabel, msLayers, msLightbulb, msPlayCircle, msRule, msTune, msViewAgenda, msVisibility } from '@l3/icons/material'
 import type { Flow } from '../types'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
@@ -6808,7 +6816,10 @@ export const dash: Flow = {
     { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'once' },
     { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
-    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }], default: 'new' },
+    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'new' },
+    // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
+    { id: 'homeCreated', group: 'Home', icon: msRule, label: 'Home cards', values: [{ value: 'none', label: 'New user' }, { value: 'both', label: 'Returning user' }], default: 'both' },
+    { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
     { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
@@ -7766,6 +7777,7 @@ import { IndicatorScene, type IndicatorChatProps } from './IndicatorChat'
 import { LandingScene, type LandingProps } from './Landing'
 import { ReturningScene } from './Returning'
 import { ReturningV2Scene } from './ReturningV2'
+import { HomeCombinedScene } from './HomeCombined'
 import { RuleScene, type DashVersion, type RuleChatProps } from './RuleChat'
 
 type Common = {
@@ -7802,7 +7814,8 @@ export function DashAI(props: DashAIProps) {
    *  chat as a message. Everything else is the same. */
   const version = useFlowOption('dash', 'version', '2') as DashVersion
   /** Prototype setting "DASH home": a new user sees what DASH can build; a returning one sees their own work first. */
-  const returningHome = useFlowOption('dash', 'home', 'new') === 'returning'
+  const homeChoice = useFlowOption('dash', 'home', 'new')
+  const returningHome = homeChoice === 'returning'
   /** …and which returning home: Version 1 (the live layout, all kinds) or Version 2 (library + status board). */
   const returningVersion = useFlowOption('dash', 'returningHome', '2')
   const [typing, setTyping] = useState(props.typing ?? false)
@@ -7833,7 +7846,9 @@ export function DashAI(props: DashAIProps) {
 
   let body: ReactNode
   if (props.scene === 'landing')
-    body = props.returning ?? returningHome
+    body = homeChoice === 'combined' && props.returning === undefined
+      ? <HomeCombinedScene onManage={onYourRules} onRules={props.onRules} onIndicator={props.onIndicator} />
+      : props.returning ?? returningHome
       ? returningVersion === '2'
         ? <ReturningV2Scene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
         : <ReturningScene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
@@ -7853,6 +7868,236 @@ export function DashAI(props: DashAIProps) {
         <>{body}</>
       </SceneSwap>
     </DashScreen>
+  )
+}
+```
+
+### `src/flows/dash/screens/HomeCombined.module.css`
+
+```css
+/* DASH home, Combined: Rules and Indicators, two cards side by side (equal height; the footer button sits at the bottom). */
+.card {
+  height: 100%;
+}
+
+.card > :first-child {
+  flex: 1;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  margin: 0;
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+}
+
+/* Something made: the number leads (count large, "/total" smaller), what it counts under it. */
+/* Made something: the stat sits at the card's bottom (the title stays at the top), large. */
+.body[data-has] {
+  height: 100%;
+  justify-content: space-between;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-02);
+  margin: 0;
+}
+
+.count {
+  font: var(--l3-text-heading-36);
+  color: var(--l3-content-primary);
+}
+
+.total {
+  font: var(--l3-text-heading-20);
+  color: var(--l3-content-tertiary);
+}
+
+.unit {
+  font: var(--l3-text-description-14);
+  color: var(--l3-content-secondary);
+}
+
+/* Nothing made yet: what it's for. */
+.description {
+  margin: 0;
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
+
+/* Green (prototype setting "Home card style"): the DASH green edge and radius of the new-user cards (BuildOption),
+   no fill. Plain keeps L3's white card with the normal stroke. */
+.glow.glow {
+  --card-border: inset 0 0 0 1px var(--app-dash-green); /* 1px: the stroke */
+  border-radius: var(--l3-radius-16);
+  /* A faint DASH-green glow from the right edge, so the space beside the text isn't flat (subtle on purpose). */
+  background-image: radial-gradient(
+    ellipse 70% 90% at 100% 70%,
+    color-mix(in srgb, var(--app-dash-glow-1) var(--app-dash-card-glow), transparent),
+    transparent
+  );
+}
+```
+
+### `src/flows/dash/screens/HomeCombined.tsx`
+
+```tsx
+import { useRef, useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { Card } from '@l3/components/Card'
+import { Grid } from '@l3/components/Grid'
+import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
+import { msChevronRight } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { ChatInput } from '../components/Chat'
+import { openHistoryOn } from '../components/historyFilter'
+import { holdFile } from '../components/pendingFile'
+import { t } from '../copy'
+import { dashRules, firstName, savedIndicators } from '../data'
+import { PineUploadSheet } from '../sheets/PineUploadSheet'
+import type { ReturningProps } from './Returning'
+import home from './ReturningV2.module.css'
+import styles from './HomeCombined.module.css'
+
+/**
+ * DASH home, Combined (prototype setting "DASH home" → Combined): one home for new and returning users.
+ * 1. the header, centred, as on Returning home v2: the DASH orb over the greeting;
+ * 2. two cards, Rules and Indicators. Each card has two states:
+ *    side by side, one small button each (in the footer):
+ *    - nothing made yet: what it's for, and Create rule / Create indicator (opens that chat);
+ *    - something made: the number leads (3/8 rules active); no button — the card opens the history page on that tab;
+ * 3. the field — ask for anything in words.
+ * Prototype setting "Home cards": New user (both cards invite: Create rule / Create indicator) or Returning user (both
+ * show their numbers).
+ */
+export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningProps) {
+  const created = useFlowOption('dash', 'homeCreated', 'both')
+  const hasRules = created !== 'none'
+  const hasIndicators = created !== 'none'
+  const rulesActive = dashRules.filter((r) => r.on).length
+  const indicatorsOn = savedIndicators.filter((x) => x.on).length
+  const viewAll = (tab: 'rules' | 'indicators') => {
+    openHistoryOn(tab)
+    onManage?.()
+  }
+  // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
+  const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
+
+  // Pine Script (prototype setting): the field's + explains itself (a sheet), then picks a file for the indicator chat.
+  const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
+  const fileInput = useRef<HTMLInputElement>(null)
+  const [pineSheet, setPineSheet] = useState(false)
+
+  /** Prototype setting "Home card style": Plain (white, normal stroke) or Green (the DASH green edge of the new-user cards). */
+  const glow = useFlowOption('dash', 'homeCardStyle', 'glow') === 'glow'
+
+  const cards = [
+    {
+      kind: 'rules' as const,
+      title: t('combined.rules.title'),
+      has: hasRules,
+      count: rulesActive,
+      total: dashRules.length,
+      unit: t('combined.rules.unit'),
+      empty: t('combined.rules.empty'),
+      create: t('combined.rules.create'),
+      onCreate: onRules,
+    },
+    {
+      kind: 'indicators' as const,
+      title: t('combined.indicators.title'),
+      has: hasIndicators,
+      count: indicatorsOn,
+      total: savedIndicators.length,
+      unit: t('combined.indicators.unit'),
+      empty: t('combined.indicators.empty'),
+      create: t('combined.indicators.create'),
+      onCreate: onIndicator,
+    },
+  ]
+
+  return (
+    <div className={home.scene}>
+      <div className={home.scroll}>
+        <Inset paddingInline="16" className={home.page}>
+          <Stack gap="40" className={home.content}>
+            {/* 1 · Header: the DASH orb, then the greeting under it (as on Returning home v2's centre stage). */}
+            <Stack gap="16" align="center" className={home.reveal}>
+              <DashOrb size="lg" />
+              <Stack gap="04" className={home.centreHeading}>
+                <p className={home.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
+                <h1 className={home.centreTitle}>{t('home.title')}</h1>
+              </Stack>
+            </Stack>
+
+            {/* 2 · Rules and Indicators, side by side: an invitation until something's made, then the number leads
+                (how many are working, out of how many made) and the card itself opens the list. Only the empty card has a
+                button (Create rule / Create indicator). */}
+            <Grid columns={2} gap="12" className={home.sections}>
+              {cards.map((c) => (
+                <Card
+                  key={c.kind}
+                  className={glow ? `${styles.card} ${styles.glow}` : styles.card}
+                  // Made something: the whole card opens the history page on its tab (no button). Nothing yet: one
+                  // small Create button in the footer.
+                  onClick={c.has ? () => viewAll(c.kind) : undefined}
+                  aria-label={c.has ? `${c.title}: ${c.count}/${c.total} ${c.unit}` : undefined}
+                  footer={c.has ? undefined : <Button size="sm" onClick={c.onCreate}>{c.create}</Button>}
+                >
+                  <Stack gap={c.has ? '24' : '08'} className={styles.body} data-has={c.has || undefined}>
+                    {/* Made something: › after the title says the card opens the list. */}
+                    <h2 className={styles.title}>{c.title}{c.has && <Icon icon={msChevronRight} size={16} />}</h2>
+                    {c.has ? (
+                      <p className={styles.stat}>
+                        <span className={styles.count}>{c.count}<span className={styles.total}>/{c.total}</span></span>
+                        <span className={styles.unit}>{c.unit}</span>
+                      </p>
+                    ) : (
+                      <p className={styles.description}>{c.empty}</p>
+                    )}
+                  </Stack>
+                </Card>
+              ))}
+            </Grid>
+          </Stack>
+        </Inset>
+      </div>
+
+      {/* 3 · Ask DASH: start anything in words. */}
+      <div className={home.dock}>
+        <Inset paddingInline="16" paddingBlock="16">
+          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
+          <input
+            ref={fileInput}
+            type="file"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              e.target.value = ''
+              if (!file) return
+              holdFile({ name: file.name })
+              onIndicator?.()
+            }}
+          />
+          {pineSheet && (
+            <PineUploadSheet
+              onClose={() => setPineSheet(false)}
+              onChoose={() => {
+                setPineSheet(false)
+                fileInput.current?.click()
+              }}
+            />
+          )}
+        </Inset>
+      </div>
+    </div>
   )
 }
 ```

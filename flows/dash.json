@@ -405,6 +405,8 @@
     "src/flows/dash/screens/Creations.module.css",
     "src/flows/dash/screens/Creations.tsx",
     "src/flows/dash/screens/DashAI.tsx",
+    "src/flows/dash/screens/HomeCombined.module.css",
+    "src/flows/dash/screens/HomeCombined.tsx",
     "src/flows/dash/screens/IndicatorChat.tsx",
     "src/flows/dash/screens/Landing.module.css",
     "src/flows/dash/screens/Landing.tsx",
