@@ -1921,6 +1921,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 /* ---- Chat input: Figma "L3: DASH chat field" — 56 min, 16 / 8 inside, radius 28 (full), float shadow.
    Default: border-light edge; Typing: the DASH green edge. The edge changes with the screen (300 ms). */
 .input {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--l3-spacing-08);
@@ -1938,6 +1939,328 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 .input[data-attach] {
   gap: var(--l3-spacing-04);
   padding-left: var(--l3-spacing-08);
+}
+
+/* The +. While the Pine Script highlight is up: a soft DASH-green fill and a green ring pulsing out from it. */
+.attachWrap {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--l3-radius-full);
+}
+
+.attachWrap[data-glow]::before {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--l3-radius-full);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--app-dash-green) 55%, transparent);
+  content: '';
+  animation: attach-glow 1.6s var(--l3-motion-easing-decelerate) infinite;
+  pointer-events: none;
+}
+
+.attachWrap[data-glow] .attach.attach {
+  background: color-mix(in srgb, var(--app-dash-green) 16%, transparent);
+  color: var(--l3-content-accent-success-default);
+}
+
+@keyframes attach-glow {
+  to {
+    box-shadow: 0 0 0 var(--l3-spacing-12) color-mix(in srgb, var(--app-dash-green) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attachWrap[data-glow]::before {
+    animation: none;
+    box-shadow: 0 0 0 var(--l3-spacing-04) color-mix(in srgb, var(--app-dash-green) 35%, transparent);
+  }
+}
+
+/*
+ * The Pine Script FTUX card (custom, designer's call): dark, a DASH green gradient edge that slowly turns, the Pine
+ * Script mark, a title and a line, ✕. It pops out of the + (spring, 450 ms), then floats — a slow
+ * up-and-down bob with a small wiggle every few seconds — and a tail points down at the +. The form is its box.
+ */
+@property --ftux-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.ftux {
+  position: absolute;
+  bottom: calc(100% + var(--l3-spacing-12));
+  left: 0;
+  z-index: 2;
+  width: min(100%, var(--app-dash-ftux-width));
+  transform-origin: var(--l3-spacing-28) 100%;
+  animation:
+    ftux-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both,
+    ftux-float 3.2s ease-in-out var(--app-dash-pop-duration) infinite;
+}
+
+/* The animated tip is wider (its story window), and floats less (it's busy enough inside). */
+.ftux[data-story] {
+  width: min(100%, var(--app-dash-story-card));
+  animation: ftux-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both;
+}
+
+/* The gradient edge: a turning conic gradient behind the card, 1.5 of it showing around. */
+.ftux::before {
+  position: absolute;
+  inset: calc(-1 * var(--app-dash-ftux-edge));
+  border-radius: calc(var(--l3-radius-20) + var(--app-dash-ftux-edge));
+  background: conic-gradient(from var(--ftux-angle), var(--app-dash-glow-1), var(--app-dash-green), var(--app-dash-glow-3), var(--app-dash-glow-1));
+  content: '';
+  animation: ftux-turn 4s linear infinite;
+}
+
+/* The tail: a small turned square under the card, over the +'s middle, in the card's colour, edged like it. */
+.ftux::after {
+  position: absolute;
+  bottom: calc(-1 * var(--l3-spacing-06));
+  left: calc(var(--l3-spacing-28) - var(--l3-spacing-06));
+  width: var(--l3-spacing-12);
+  height: var(--l3-spacing-12);
+  border-right: var(--app-dash-ftux-edge) solid var(--app-dash-glow-1);
+  border-bottom: var(--app-dash-ftux-edge) solid var(--app-dash-glow-1);
+  background: var(--l3-surface-inverted);
+  content: '';
+  transform: rotate(45deg);
+}
+
+.ftuxCard {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--l3-spacing-12);
+  padding: var(--l3-spacing-12) var(--l3-spacing-08) var(--l3-spacing-12) var(--l3-spacing-12);
+  border-radius: var(--l3-radius-20);
+  background: var(--l3-surface-inverted);
+  box-shadow: 0 var(--l3-spacing-08) var(--l3-spacing-24) color-mix(in srgb, var(--app-dash-glow-3) 35%, transparent);
+}
+
+/* The Pine Script mark on a DASH green tile. */
+.ftuxLogo {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-40);
+  height: var(--l3-size-40);
+  border-radius: var(--l3-radius-12);
+  background: var(--app-dash-glow-1);
+  color: var(--l3-static-black);
+}
+
+.ftuxText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  min-width: 0;
+}
+
+.ftuxTitle {
+  color: var(--l3-content-inverted);
+  font: var(--l3-text-heading-14);
+}
+
+.ftuxBody {
+  color: var(--l3-content-inverted-secondary);
+  font: var(--l3-text-description-12);
+}
+
+.ftuxClose {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  margin-top: calc(-1 * var(--l3-spacing-04));
+  padding: 0;
+  border: 0;
+  border-radius: var(--l3-radius-full);
+  background: none;
+  color: var(--l3-content-inverted-secondary);
+  cursor: pointer;
+}
+
+@keyframes ftux-pop {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-12)) scale(0.5);
+  }
+}
+
+/* Floating: up and down, with a small wiggle in the middle of each lap. */
+@keyframes ftux-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  35% { transform: translateY(calc(-1 * var(--l3-spacing-06))) rotate(0deg); }
+  45% { transform: translateY(calc(-1 * var(--l3-spacing-06))) rotate(-1.5deg); }
+  52% { transform: translateY(calc(-1 * var(--l3-spacing-06))) rotate(1.5deg); }
+  60% { transform: translateY(calc(-1 * var(--l3-spacing-04))) rotate(0deg); }
+}
+
+@keyframes ftux-turn {
+  to { --ftux-angle: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ftux,
+  .ftux::before {
+    animation: none;
+  }
+}
+
+.attach.attach {
+  background: color-mix(in srgb, var(--app-dash-green) 16%, transparent);
+  color: var(--l3-content-accent-success-default);
+}
+
+@keyframes attach-glow {
+  to {
+    box-shadow: 0 0 0 var(--l3-spacing-12) color-mix(in srgb, var(--app-dash-green) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attachWrap[data-glow]::before {
+    animation: none;
+    box-shadow: 0 0 0 var(--l3-spacing-04) color-mix(in srgb, var(--app-dash-green) 35%, transparent);
+  }
+}
+
+/* The tooltip's anchor hugs the + (inline). */
+.attachTip {
+  display: inline-flex;
+  flex: none;
+}
+
+.attach.attach {
+  background: var(--l3-surface-inverted);
+  color: var(--l3-content-inverted);
+}
+
+/* The Pine Script bubble: a dark speech bubble above the field's left end, joined to the + by a stem (the + is its
+   foot), so bubble, stem and + read as one shape (designer's reference). It grows out of the + (scale from its corner,
+   250 ms). The form is its positioning box. */
+.tip {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tipBubble {
+  position: absolute;
+  bottom: calc(100% - var(--l3-spacing-04));
+  left: var(--l3-spacing-08);
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  box-sizing: border-box;
+  max-width: calc(100% - 2 * var(--l3-spacing-08));
+  padding: var(--l3-spacing-04) var(--l3-spacing-04) var(--l3-spacing-04) var(--l3-spacing-16);
+  border-radius: var(--l3-radius-24) var(--l3-radius-24) var(--l3-radius-24) 0;
+  background: var(--l3-surface-inverted);
+  pointer-events: auto;
+  transform-origin: bottom left;
+  animation: tip-grow var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+/* The stem: from under the bubble down to the +'s middle, the +'s width; a curve where it meets the bubble's edge. */
+.tipStem {
+  position: absolute;
+  top: calc(-1 * var(--l3-spacing-04));
+  left: var(--l3-spacing-08);
+  width: var(--l3-size-40);
+  height: calc(var(--l3-size-56) / 2 + var(--l3-spacing-04));
+  background: var(--l3-surface-inverted);
+  animation: tip-fade var(--l3-motion-duration-short) var(--l3-motion-easing-standard) both;
+}
+
+.tipStem::after {
+  position: absolute;
+  top: var(--l3-spacing-04);
+  left: 100%;
+  width: var(--l3-spacing-12);
+  height: var(--l3-spacing-12);
+  background: radial-gradient(circle at 100% 100%, transparent var(--l3-spacing-12), var(--l3-surface-inverted) calc(var(--l3-spacing-12) + 0.5px));
+  content: '';
+}
+
+.tipText {
+  min-width: 0;
+  padding: var(--l3-spacing-08) 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-inverted);
+  font: var(--l3-text-label-14);
+  text-align: start;
+  cursor: pointer;
+}
+
+.tipClose {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  padding: 0;
+  border: 0;
+  border-radius: var(--l3-radius-full);
+  background: none;
+  color: var(--l3-content-inverted-secondary);
+  cursor: pointer;
+}
+
+@keyframes tip-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes tip-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tipBubble,
+  .tipStem {
+    animation: none;
+  }
+}
+
+.attach.attach {
+  background: color-mix(in srgb, var(--app-dash-green) 14%, transparent);
+  color: var(--l3-content-accent-success-default);
+}
+
+@keyframes attach-glow {
+  to {
+    box-shadow: 0 0 0 var(--l3-spacing-12) color-mix(in srgb, var(--app-dash-green) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attachWrap[data-glow]::before {
+    animation: none;
+    box-shadow: 0 0 0 var(--l3-spacing-04) color-mix(in srgb, var(--app-dash-green) 35%, transparent);
+  }
+}
+
+/* The coach mark's anchor wraps the + only (it hugs it, inline). */
+.attachTip {
+  display: inline-flex;
+  flex: none;
 }
 
 .attach.attach {
@@ -1986,6 +2309,49 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 .input[data-typing],
 .input:focus-within {
   border-color: var(--app-dash-green);
+}
+
+.fieldWrap {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+/* The animated placeholder sits over the empty field, in its placeholder colour; the word slides up into place. */
+.rotating {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: pre;
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-description-14);
+  pointer-events: none;
+}
+
+.rotatingWord {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.rotatingIn {
+  animation: placeholder-word var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes placeholder-word {
+  from {
+    opacity: 0;
+    transform: translateY(60%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotatingIn {
+    animation: none;
+  }
 }
 
 .field {
@@ -2301,15 +2667,16 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 ### `src/flows/dash/components/Chat.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
-import { msArrowUpward, msChevronRight, msClose } from '@l3/icons/material'
+import { msAdd, msArrowUpward, msChevronRight, msClose, msDescription, msUploadFile } from '@l3/icons/material'
 import pineScript from '../assets/pine-script.svg'
 import sparkle from '../assets/sparkle.svg'
 import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
+import { PineStory } from './PineStory'
 import styles from './Chat.module.css'
 
 /**
@@ -2330,11 +2697,19 @@ type ChatInputProps = {
   autoFocus?: boolean
   /** The field itself — to focus it in a tap (on a phone, focusing inside the tap is what opens the keyboard). */
   inputRef?: RefObject<HTMLInputElement | null>
-  /** Attach (Pine Script): the Pine Script mark at the start of the field; the screen opens its file picker. */
+  /** Attach (Pine Script): the + at the start of the field; the screen opens its file picker. */
   onAttach?: () => void
   /** A picked file, shown as a chip in the field (sendable without text); ✕ takes it off. */
   attachment?: { name: string } | null
   onRemoveAttachment?: () => void
+  /** An animated placeholder while the field is empty: the prefix stays, the last word cycles (slides up), e.g.
+   *  "Create a new" + indicator / rule / strategy. */
+  rotatingPlaceholder?: { prefix: string; words: string[] }
+  /** What the empty field invites, for where the chat is (default "Type here"), e.g. "Describe a change to your indicator". */
+  placeholder?: string
+  /** The Pine Script highlight (first time): the + glows green, a floating card above it; ✕ (or using the +)
+   *  puts it away. */
+  attachTip?: { title: string; text: string; onDone: () => void; /** The animated story version (setting "Pine Script tip"). */ story?: boolean } | null
 }
 
 /**
@@ -2343,7 +2718,7 @@ type ChatInputProps = {
  * - Default: border-light edge, placeholder in content/tertiary, Send off (L3 disabled) until there's text.
  * - Typing: the DASH green edge, the text in content/primary, Send on (L3 primary, black).
  */
-export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment }: ChatInputProps) {
+export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment, rotatingPlaceholder, attachTip, placeholder }: ChatInputProps) {
   const [own, setOwn] = useState('')
   const value = controlled ?? own
   const setValue = (v: string) => (onChange ? onChange(v) : setOwn(v))
@@ -2368,16 +2743,51 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
         send()
       }}
     >
-      {onAttach && <Button type="button" variant="ghost" size="md" iconLeft={<Icon icon={pineScript} />} aria-label={t('input.attach')} onClick={onAttach} className={styles.attach} />}
+      {onAttach && (() => {
+        const add = (
+          <span className={styles.attachWrap} data-glow={attachTip ? '' : undefined}>
+            <Button type="button" variant="ghost" size="md" iconLeft={<Icon icon={msAdd} />} aria-label={t('input.attach')} onClick={() => { attachTip?.onDone(); onAttach() }} className={styles.attach} />
+          </span>
+        )
+        // The Pine Script highlight: the + glows green, and a floating card above it says what it's for.
+        return (
+          <>
+            {add}
+            {attachTip?.story && (
+              <span className={styles.ftux} data-story="">
+                <PineStory title={attachTip.title} onClose={attachTip.onDone} />
+              </span>
+            )}
+            {attachTip && !attachTip.story && (
+              <span className={styles.ftux} role="note">
+                <span className={styles.ftuxCard}>
+                  <span className={styles.ftuxLogo}>
+                    <Icon icon={pineScript} size={20} />
+                  </span>
+                  <span className={styles.ftuxText}>
+                    <span className={styles.ftuxTitle}>{attachTip.title}</span>
+                    <span className={styles.ftuxBody}>{attachTip.text}</span>
+                  </span>
+                  <button type="button" className={styles.ftuxClose} aria-label={t('pineTip.hide')} onClick={attachTip.onDone}>
+                    <Icon icon={msClose} size={16} />
+                  </button>
+                </span>
+              </span>
+            )}
+          </>
+        )
+      })()}
       {attachment && (
         <span className={styles.attachment}>
-          <Icon icon={pineScript} size={16} />
+          <Icon icon={msDescription} size={16} />
           <span className={styles.attachmentName}>{attachment.name}</span>
           <button type="button" className={styles.attachmentRemove} aria-label={t('input.removeAttachment', { name: attachment.name })} onClick={onRemoveAttachment}>
             <Icon icon={msClose} size={12} />
           </button>
         </span>
       )}
+      <span className={styles.fieldWrap}>
+      {rotatingPlaceholder && !value && !attachment && <RotatingPlaceholder {...rotatingPlaceholder} />}
       <input
         ref={field}
         className={styles.field}
@@ -2385,15 +2795,35 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
         onChange={(e) => setValue(e.target.value)}
         onFocus={onFocus}
         autoFocus={autoFocus}
-        placeholder={attachment ? t('input.attachmentPlaceholder') : t('input.placeholder')}
+        placeholder={rotatingPlaceholder ? '' : attachment ? t('input.attachmentPlaceholder') : (placeholder ?? t('input.placeholder'))}
         aria-label={t('input.label')}
         enterKeyHint="send"
         inputMode={touch ? 'none' : undefined}
       />
+      </span>
       <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || (!value.trim() && !attachment)} className={styles.send} />
     </form>
   )
 }
+
+/** The field's animated placeholder: the prefix, then a word that slides up and changes every 2.4 s (still with reduced motion: the first word). */
+function RotatingPlaceholder({ prefix, words }: { prefix: string; words: string[] }) {
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => setI((n) => (n + 1) % words.length), ROTATE_MS)
+    return () => window.clearInterval(timer)
+  }, [words.length])
+  return (
+    <span className={styles.rotating} aria-hidden="true">
+      {prefix}{' '}
+      <span className={styles.rotatingWord}>
+        <span key={i} className={styles.rotatingIn}>{words[i]}</span>
+      </span>
+    </span>
+  )
+}
+const ROTATE_MS = 2400
 
 /** "✦ HERE ARE SOME EXAMPLES ✦": a small caps heading between two DASH sparkles. */
 export function SparkleHeading({ children }: { children: ReactNode }) {
@@ -2462,7 +2892,7 @@ export function SuggestionList({ items, onPick, action }: { items: string[]; onP
         ))}
         {action && (
           <button type="button" className={styles.promptChip} data-size="lg" data-action="" onClick={action.onPick}>
-            <Icon icon={pineScript} size={20} />
+            <Icon icon={msUploadFile} size={20} />
             <span>{action.label}</span>
           </button>
         )}
@@ -2524,7 +2954,7 @@ export function UserFile({ name, caption }: { name: string; caption?: string }) 
   return (
     <Stack direction="horizontal" justify="end">
       <div className={styles.userFile}>
-        <span className={styles.userFileIcon} aria-hidden="true"><Icon icon={pineScript} size={20} /></span>
+        <span className={styles.userFileIcon} aria-hidden="true"><Icon icon={msDescription} size={20} /></span>
         <Stack gap="00" className={styles.userFileText}>
           <p className={styles.userFileName}>{name}</p>
           {caption && <span className={styles.userFileCaption}>{caption}</span>}
@@ -2917,6 +3347,11 @@ export function DashBar(props: ActionbarProps) {
   color: var(--l3-content-tertiary);
 }
 
+.market {
+  display: flex;
+  margin-top: var(--l3-spacing-04);
+}
+
 .tag {
   flex: none;
   animation: card-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both;
@@ -2984,28 +3419,9 @@ export function DashBar(props: ActionbarProps) {
 }
 
 /* Parts: small pills tinted by what they are (wireframe: lime lines, blue labels). */
+/* Part tags: L3 Tags (tertiary, in their colours); they pop in one after another. */
 .part {
-  padding: var(--l3-spacing-02) var(--l3-spacing-08);
-  border-radius: var(--l3-radius-full);
-  background: var(--l3-surface-accent-success-light);
-  color: var(--l3-content-accent-success-default);
-  font: var(--l3-text-label-12);
   animation: card-pop var(--app-dash-pop-duration) var(--app-dash-pop-easing) both;
-}
-
-.part[data-tone='average'] {
-  background: var(--l3-surface-accent-discover-light);
-  color: var(--l3-content-accent-discover-default);
-}
-
-.part[data-tone='buy'] {
-  background: var(--l3-surface-accent-indicator-up-light);
-  color: var(--l3-content-accent-indicator-up-default);
-}
-
-.part[data-tone='sell'] {
-  background: var(--l3-surface-accent-indicator-down-light);
-  color: var(--l3-content-accent-indicator-down-default);
 }
 
 /* Build steps: a spinner on the current one, a tick when done, a ring for the next ones. */
@@ -3148,10 +3564,15 @@ import { Tag } from '@l3/components/Tag'
 import { msCheck, msEdit, msError, msKeyboardArrowDown, msOpenInFull } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { t } from '../copy'
-import { buildSteps, type IndicatorDraft, type IndicatorSettings } from '../indicatorData'
+import { buildSteps, markets, type IndicatorDraft, type IndicatorSettings, type Market } from '../indicatorData'
 import { IndicatorFullView } from './IndicatorFullView'
+import { MarketPicker } from './MarketPicker'
 import { MiniChart } from './MiniChart'
 import styles from './IndicatorCard.module.css'
+
+/** The part tags (L3 Tag, tertiary): each part in its meaning's colour — the trend success, the EMA discover,
+ *  BUY profit, SELL loss. */
+const PART_COLOR = { trend: 'success', average: 'discover', buy: 'profit', sell: 'loss' } as const
 
 /** Where the indicator is: being built (with the step reached) or ready to save. */
 /** Where the indicator is: being built (step reached), ready to review, or saved (Version 2 keeps it in the chat). */
@@ -3194,6 +3615,8 @@ type IndicatorCardProps = {
 export function IndicatorCard({ draft, state, named = state.kind !== 'building' || state.step > 0, sellTone, onModify, onSave, compact = false, onExpand, superseded = false, settings, redrawn = false, updated = 0, steps = buildSteps }: IndicatorCardProps) {
   const [notesOpen, setNotesOpen] = useState(false)
   const [fullView, setFullView] = useState(false)
+  /** The index the chart is drawn on (the picker; the full view shares it). */
+  const [market, setMarket] = useState<Market>(markets[0])
   const card = useRef<HTMLElement>(null)
   // The full view covers the DASH screen the card is on.
   const container = fullView ? card.current?.closest<HTMLElement>('[data-dash]') : null
@@ -3205,12 +3628,11 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
 
   // The part tags and DASH's notes: on the card and in its full view (the same pieces).
   const parts = showTags && (named || !building) ? (
-    
                 <Stack direction="horizontal" gap="08" wrap className={styles.parts}>
                   {draft.parts.map((p, i) => (
-                    <span key={p.label} className={styles.part} data-tone={p.tone} style={{ animationDelay: `${i * 90}ms` }}>
+                    <Tag key={p.label} variant="tertiary" size="sm" color={PART_COLOR[p.tone]} className={styles.part} style={{ animationDelay: `${i * 90}ms` }}>
                       {p.kind === 'line' && building ? t('indicator.linePart', { name: p.label }) : p.label}
-                    </span>
+                    </Tag>
                   ))}
                 </Stack>
   ) : null
@@ -3258,7 +3680,8 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
           <Stack gap="04" className={styles.heading}>
             {building && <span className={styles.eyebrow}>{t('indicator.building')}</span>}
             <h2 key={named ? 'named' : 'unnamed'} className={styles.title}>{named ? draft.name : t('indicator.yourIndicator')}</h2>
-            {!building && <span className={styles.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>}
+            {/* Which index it's drawn on: right under the name (where the description was). Not on the mini card. */}
+            {!building && !mini && <span className={styles.market}><MarketPicker market={market} onChange={setMarket} timeframe={settings?.timeframe} /></span>}
           </Stack>
           {/* Top right: the expand button (the full view) where a Ready tag used to be — on the mini card too; Saved still
               shows its tag. An earlier version is tagged so. */}
@@ -3291,7 +3714,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
             <Stack gap="12" className={styles.foldContent}>
               {/* A tap anywhere on the chart opens the full view too (the expand button is its accessible way). */}
               <div className={styles.chart} data-openable={!building || undefined} onClick={building ? undefined : () => setFullView(true)}>
-                <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} />
+                <MiniChart key={redrawn ? JSON.stringify(settings) : undefined} stage={stage} sellTone={sellTone} settings={settings} redraw={redrawn} market={market} />
               </div>
 
               {parts}
@@ -3324,6 +3747,8 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
         <IndicatorFullView
           draft={draft}
           settings={settings}
+          market={market}
+          onMarket={setMarket}
           sellTone={sellTone}
           container={container}
           cardEl={card.current}
@@ -3420,7 +3845,8 @@ import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { msCloseFullscreen, msEdit } from '@l3/icons/material'
 import { t } from '../copy'
-import type { IndicatorDraft, IndicatorSettings } from '../indicatorData'
+import type { IndicatorDraft, IndicatorSettings, Market } from '../indicatorData'
+import { MarketPicker } from './MarketPicker'
 import { MiniChart } from './MiniChart'
 import card from './IndicatorCard.module.css'
 import styles from './IndicatorFullView.module.css'
@@ -3440,6 +3866,9 @@ type IndicatorFullViewProps = {
   container: HTMLElement
   /** The card itself: the floating card grows out of it and shrinks back into it. */
   cardEl: HTMLElement
+  /** The index it's drawn on, and switching it (shared with the card). */
+  market: Market
+  onMarket: (market: Market) => void
   /** The card's own pieces, the same here: a Saved tag, the part tags and DASH's notes. */
   tag?: ReactNode
   parts?: ReactNode
@@ -3456,10 +3885,10 @@ type IndicatorFullViewProps = {
  * keeps the card's layout as it is: the name and where it goes (collapse at the top right, where expand was), the chart
  * (filling the room, moving / zooming like Scalper's — no hint: people know these gestures), the part tags, DASH's
  * notes, and Modify / Save indicator. The box's size is what animates (not a stretch), so the chart redraws as it
- * grows. Only collapse (or Esc on a laptop) closes it — taps on the chart or outside don't; Modify and Save close it
- * and carry on.
+ * grows. Collapse, a tap on the dark area around it, or Esc closes it (taps on the chart don't); Modify and Save close
+ * it and carry on.
  */
-export function IndicatorFullView({ draft, settings, sellTone, container, cardEl, tag, parts, notes, onClose, onModify, onSave }: IndicatorFullViewProps) {
+export function IndicatorFullView({ draft, settings, sellTone, container, cardEl, market, onMarket, tag, parts, notes, onClose, onModify, onSave }: IndicatorFullViewProps) {
   const panel = useRef<HTMLDivElement>(null)
   const [closing, setClosing] = useState(false)
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -3504,22 +3933,22 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardEl
 
   return createPortal(
     <div className={styles.layer} data-closing={closing || undefined}>
-      {/* A tap outside doesn't close it: only the collapse button (or Esc on a laptop) does. */}
-      <div className={styles.scrim} aria-hidden="true" />
+      {/* A tap on the dark area around it closes it (taps on the card and its chart don't). */}
+      <div className={styles.scrim} onClick={() => close()} aria-hidden="true" />
       <div className={styles.panel} ref={panel} role="dialog" aria-modal="true" aria-label={draft.name}>
         {/* The card's header, as on the card: name, where it goes, collapse in the expand button's place. */}
         <Stack direction="horizontal" align="start" justify="between" gap="12">
           <Stack gap="04" className={card.heading}>
             <h2 className={card.title}>{draft.name}</h2>
-            <span className={card.meta}>{t('indicator.placement', { place: draft.placement, count: draft.testedOn })}</span>
           </Stack>
           <Stack direction="horizontal" align="center" gap="08">
             {tag}
             <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msCloseFullscreen} />} aria-label={t('indicator.collapse')} onClick={() => close()} />
           </Stack>
         </Stack>
+        <MarketPicker market={market} onChange={onMarket} timeframe={settings?.timeframe} />
         <div className={styles.chart}>
-          <FitChart sellTone={sellTone} settings={settings} interactive />
+          <FitChart sellTone={sellTone} settings={settings} market={market} interactive />
         </div>
         <Stack gap="12">
           {parts}
@@ -3538,7 +3967,7 @@ export function IndicatorFullView({ draft, settings, sellTone, container, cardEl
 }
 
 /** The indicator chart filling its box: its height follows the box's shape (redrawn as the box grows or shrinks). */
-function FitChart({ settings, sellTone, interactive = false }: { settings?: IndicatorSettings; sellTone?: 'sell' | 'orange'; interactive?: boolean }) {
+function FitChart({ settings, sellTone, market, interactive = false }: { settings?: IndicatorSettings; sellTone?: 'sell' | 'orange'; market?: Market; interactive?: boolean }) {
   const box = useRef<HTMLDivElement>(null)
   const [height, setHeight] = useState(150)
   useLayoutEffect(() => {
@@ -3552,8 +3981,134 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
   }, [])
   return (
     <div className={styles.fit} ref={box}>
-      <MiniChart stage="ready" sellTone={sellTone} settings={settings} height={height} interactive={interactive} />
+      <MiniChart stage="ready" sellTone={sellTone} settings={settings} height={height} interactive={interactive} market={market} />
     </div>
+  )
+}
+```
+
+### `src/flows/dash/components/MarketPicker.module.css`
+
+```css
+/* The index picker: a bare button around an L3 Tag (the index and a down caret). */
+.wrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--l3-spacing-02);
+}
+
+.picker {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: var(--l3-radius-04);
+  background: none;
+  cursor: pointer;
+}
+
+/* The list: a small menu under the name, drawn over the whole DASH screen (so nothing clips its shadow); a tap
+   outside closes it. Placed by MarketPicker.tsx (left / top). */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.menu {
+  position: absolute;
+  z-index: 6;
+  margin-top: var(--l3-spacing-04);
+  display: flex;
+  flex-direction: column;
+  min-width: var(--app-dash-market-menu);
+  padding: var(--l3-spacing-04);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-default);
+  box-shadow: var(--l3-shadow-elevation-high);
+  animation: market-menu var(--l3-motion-duration-short) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes market-menu {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--l3-spacing-04)));
+  }
+}
+
+/* The options are L3 list cells (Small); the menu's corners round them. */
+.option.option {
+  border-radius: var(--l3-radius-08);
+}
+```
+
+### `src/flows/dash/components/MarketPicker.tsx`
+
+```tsx
+import { useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { Tag } from '@l3/components/Tag'
+import { msCheck, msKeyboardArrowDown } from '@l3/icons/material'
+import { t } from '../copy'
+import { markets, type Market } from '../indicatorData'
+import styles from './MarketPicker.module.css'
+
+/**
+ * Which index the indicator is drawn on: an L3 Tag (tertiary, neutral grey) with the index and a down caret — it's a
+ * dropdown. A tap opens the list of F&O indices (NIFTY 50, BANK NIFTY, SENSEX, FINNIFTY, MIDCPNIFTY); picking
+ * one redraws the chart on it. Each option is an L3 list cell (Small), the chosen one selected with a ✓.
+ */
+export function MarketPicker({ market, onChange }: { market: Market; onChange: (market: Market) => void; timeframe?: number }) {
+  const [open, setOpen] = useState(false)
+  const listId = useId()
+  const trigger = useRef<HTMLButtonElement>(null)
+  // The menu opens over the whole DASH screen (not inside the card, which clips its shadow), under the trigger.
+  const [place, setPlace] = useState<{ host: HTMLElement; left: number; top: number } | null>(null)
+  const toggle = () => {
+    if (open) return setOpen(false)
+    const button = trigger.current
+    const host = button?.closest<HTMLElement>('[data-dash]')
+    if (!button || !host) return
+    const h = host.getBoundingClientRect()
+    const b = button.getBoundingClientRect()
+    const scale = h.width / host.offsetWidth || 1 // the phone mockup may be scaled on screen
+    setPlace({ host, left: (b.left - h.left) / scale, top: (b.bottom - h.top) / scale })
+    setOpen(true)
+  }
+
+  return (
+    <span className={styles.wrap}>
+      <button ref={trigger} type="button" className={styles.picker} aria-haspopup="menu" aria-expanded={open} aria-controls={listId} aria-label={t('market.pick', { name: market.name })} onClick={toggle}>
+        <Tag variant="tertiary" color="neutral" size="md" iconRight={<Icon icon={msKeyboardArrowDown} />}>{market.name}</Tag>
+      </button>
+      {open && place && createPortal(
+        <>
+          <span className={styles.backdrop} onClick={() => setOpen(false)} aria-hidden="true" />
+          <span className={styles.menu} id={listId} role="menu" aria-label={t('market.label')} style={{ left: place.left, top: place.top }}>
+            {markets.map((m) => (
+              <ListCell
+                key={m.id}
+                as="button"
+                size="sm"
+                label={m.name}
+                selected={m.id === market.id}
+                iconRight={m.id === market.id ? <Icon icon={msCheck} /> : undefined}
+                onClick={() => {
+                  onChange(m)
+                  setOpen(false)
+                }}
+                className={styles.option}
+              />
+            ))}
+          </span>
+        </>,
+        place.host,
+      )}
+    </span>
   )
 }
 ```
@@ -3749,7 +4304,7 @@ function FitChart({ settings, sellTone, interactive = false }: { settings?: Indi
 
 ```tsx
 import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type MouseEvent, type PointerEvent, type SetStateAction, type WheelEvent } from 'react'
-import { defaultSettings, ema, sampleCandles, supertrend, timeframeShort, type IndicatorSettings } from '../indicatorData'
+import { defaultSettings, ema, markets, sampleCandles, supertrend, timeframeShort, type IndicatorSettings, type Market } from '../indicatorData'
 import styles from './MiniChart.module.css'
 
 /**
@@ -3784,6 +4339,8 @@ type MiniChartProps = {
   height?: number
   /** The full view: the chart works like Scalper's (see `useChartGestures`). */
   interactive?: boolean
+  /** Which index it's drawn on (the card's picker): its price level and its own sample walk. Default NIFTY 50. */
+  market?: Market
 }
 
 /** What the full view's gestures change: the candles on screen and, once the price axis is touched, its scale. */
@@ -3806,7 +4363,7 @@ const fitted: View = { end: HISTORY, count: VISIBLE, yScale: 1, yShift: 0 }
  * the timeframe, the EMA or the Supertrend redraws it. It shows the latest 60 of 240 candles; `interactive` (the full
  * view) lets the user move and zoom it like a trading chart.
  */
-export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false, height = CARD_H, interactive = false }: MiniChartProps) {
+export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings, axes = true, redraw = false, height = CARD_H, interactive = false, market = markets[0] }: MiniChartProps) {
   const { timeframe, emaPeriod, stPeriod, stMultiplier } = settings
   const H = height
   const clipId = useId()
@@ -3829,9 +4386,9 @@ export function MiniChart({ stage, sellTone = 'sell', settings = defaultSettings
   const AXIS = Math.round(font * 4.4) // the price axis on the right, past its line (fits "22672.7")
   const TIME = Math.round(font * 1.8) // the time axis under the plot
   const series = useMemo(() => {
-    const candles = sampleCandles(HISTORY, 22650, timeframe)
+    const candles = sampleCandles(HISTORY, market.start, timeframe, market.walk)
     return { candles, avg: ema(candles, emaPeriod), trend: supertrend(candles, stPeriod, stMultiplier) }
-  }, [timeframe, emaPeriod, stPeriod, stMultiplier])
+  }, [timeframe, emaPeriod, stPeriod, stMultiplier, market])
   const data = useMemo(() => {
     const first = end - count
     const { avg, trend } = series
@@ -4064,6 +4621,568 @@ function useChartGestures(
       else setView(fitted)
     },
   }
+}
+```
+
+### `src/flows/dash/components/PineStory.module.css`
+
+```css
+/*
+ * The animated Pine Script tip (PineStory.tsx): the FTUX card's dark body (Chat.module.css .ftux adds the green edge,
+ * the tail, the pop and the float) around one light stage — a tiny DASH chat, always white (static colours) so it
+ * reads the same in both themes. Everything on the stage is always there and moves by transitions between the
+ * story's phases, so nothing cuts: one fingertip, one file that travels and becomes the indicator, Scalper pushing in.
+ * Stage geometry is artwork (272 × 172, --app-dash-story-*).
+ */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-12);
+  padding: var(--l3-spacing-12);
+  border-radius: var(--l3-radius-20);
+  background: var(--l3-surface-inverted);
+  box-shadow: 0 var(--l3-spacing-08) var(--l3-spacing-24) color-mix(in srgb, var(--app-dash-glow-3) 35%, transparent);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+}
+
+.logo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-28);
+  height: var(--l3-size-28);
+  border-radius: var(--l3-radius-08);
+  background: var(--app-dash-glow-1);
+  color: var(--l3-static-black);
+}
+
+.title {
+  flex: 1;
+  color: var(--l3-content-inverted);
+  font: var(--l3-text-heading-14);
+}
+
+.close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-28);
+  height: var(--l3-size-28);
+  padding: 0;
+  border: 0;
+  border-radius: var(--l3-radius-full);
+  background: none;
+  color: var(--l3-content-inverted-secondary);
+  cursor: pointer;
+}
+
+/* ---- The stage */
+.stage {
+  --move: var(--app-dash-story-move);
+  --ease: var(--l3-motion-easing-standard);
+  position: relative;
+  display: block;
+  height: var(--app-dash-story-window);
+  overflow: hidden;
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-static-white);
+  color: var(--l3-static-black);
+  font: var(--l3-text-label-12);
+  transition: opacity var(--l3-motion-duration-medium) var(--ease);
+}
+
+/* The loop's end: a soft fade before it starts again. */
+.stage[data-reset] {
+  opacity: 0;
+}
+
+.field {
+  position: absolute;
+  right: var(--l3-spacing-08);
+  bottom: var(--l3-spacing-08);
+  left: var(--l3-spacing-08);
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-06);
+  height: var(--l3-size-40);
+  padding: 0 var(--l3-spacing-04);
+  border: 1px solid var(--app-dash-green);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-static-white);
+}
+
+/* While DASH builds, the field slides away (the chat is the card now). */
+.field {
+  transition: transform var(--move) var(--ease), opacity var(--move) var(--ease);
+}
+
+.field[data-away] {
+  opacity: 0;
+  transform: translateY(calc(100% + var(--l3-spacing-08)));
+}
+
+.plus,
+.send {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--l3-size-28);
+  height: var(--l3-size-28);
+  border-radius: var(--l3-radius-full);
+  background: color-mix(in srgb, var(--app-dash-green) 16%, transparent);
+  color: var(--l3-content-accent-success-default);
+  transition: transform var(--l3-motion-duration-short) var(--ease), background var(--l3-motion-duration-short) var(--ease);
+}
+
+.send {
+  margin-left: auto;
+  background: color-mix(in srgb, var(--l3-static-black) 8%, transparent);
+  color: color-mix(in srgb, var(--l3-static-black) 35%, transparent);
+}
+
+.send[data-on] {
+  background: var(--l3-static-black);
+  color: var(--l3-static-white);
+}
+
+.plus[data-press],
+.send[data-press] {
+  transform: scale(0.82);
+}
+
+.placeholder {
+  color: color-mix(in srgb, var(--l3-static-black) 40%, transparent);
+  font: var(--l3-text-description-12);
+}
+
+/* The file picker: a small sheet over the stage's bottom; the picked row lights up. */
+.picker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-12);
+  border-radius: var(--l3-radius-16) var(--l3-radius-16) 0 0;
+  background: var(--l3-static-white);
+  box-shadow: 0 calc(-1 * var(--l3-spacing-04)) var(--l3-spacing-16) color-mix(in srgb, var(--l3-static-black) 14%, transparent);
+  transform: translateY(105%);
+  transition: transform var(--move) var(--ease);
+}
+
+.picker[data-open] {
+  transform: none;
+}
+
+.pickerTitle {
+  margin-bottom: var(--l3-spacing-04);
+  font: var(--l3-text-heading-12);
+}
+
+.pickerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-06);
+  padding: var(--l3-spacing-06) var(--l3-spacing-08);
+  border-radius: var(--l3-radius-08);
+  transition: background var(--l3-motion-duration-short) var(--ease);
+}
+
+.pickerRow[data-muted] {
+  color: color-mix(in srgb, var(--l3-static-black) 40%, transparent);
+}
+
+.pickerRow[data-picked] {
+  background: color-mix(in srgb, var(--app-dash-green) 18%, transparent);
+}
+
+/* The file: one element that travels — from the field (a chip after the +) up to the message (top right). */
+.file {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--app-dash-story-window) - var(--l3-spacing-08) - var(--l3-size-40) / 2 - var(--l3-spacing-12));
+  left: var(--l3-spacing-48);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-04) var(--l3-spacing-08);
+  border-radius: var(--l3-radius-full);
+  background: color-mix(in srgb, var(--l3-static-black) 7%, transparent);
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    top var(--move) var(--ease),
+    left var(--move) var(--ease),
+    padding var(--move) var(--ease),
+    border-radius var(--move) var(--ease),
+    opacity var(--l3-motion-duration-short) var(--ease);
+}
+
+.file[data-place='field'] {
+  opacity: 1;
+}
+
+/* Sent: it flies up to the top right as the user's message bubble. */
+.file[data-place='message'] {
+  top: var(--l3-spacing-08);
+  left: calc(100% - var(--app-dash-story-bubble) - var(--l3-spacing-08));
+  padding: var(--l3-spacing-08) var(--l3-spacing-12);
+  border-radius: var(--l3-radius-16);
+  opacity: 1;
+}
+
+/* …and as the card unfolds out of it, it fades into the card. */
+.file[data-place][data-gone] {
+  opacity: 0;
+}
+
+/* DASH working: three pulsing dots. */
+.dots {
+  display: inline-flex;
+  gap: var(--l3-spacing-04);
+}
+
+.dots span {
+  width: var(--l3-spacing-06);
+  height: var(--l3-spacing-06);
+  border-radius: var(--l3-radius-full);
+  background: var(--app-dash-green);
+  animation: story-dot 900ms ease-in-out infinite;
+}
+
+.dots span:nth-child(2) { animation-delay: 150ms; }
+.dots span:nth-child(3) { animation-delay: 300ms; }
+
+@keyframes story-dot {
+  50% { opacity: 0.3; transform: translateY(calc(-1 * var(--l3-spacing-02))); }
+}
+
+/* Build: DASH's answer, on the left under the sent file — dots and the line (like the app's thinking). */
+.reply {
+  position: absolute;
+  top: var(--l3-spacing-48);
+  left: var(--l3-spacing-08);
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-06);
+  font: var(--l3-text-heading-12);
+  opacity: 0;
+  transform: translateY(var(--l3-spacing-08));
+  transition: opacity var(--l3-motion-duration-medium) var(--ease), transform var(--l3-motion-duration-medium) var(--ease);
+}
+
+.reply[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Ready: the answer as the indicator card, taking the whole chat (the file and DASH's line fade away first). */
+.result {
+  position: absolute;
+  top: var(--l3-spacing-08);
+  right: var(--l3-spacing-08);
+  bottom: var(--l3-spacing-08);
+  left: var(--l3-spacing-08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-08);
+  border: 1px solid color-mix(in srgb, var(--app-dash-green) 60%, transparent);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-static-white);
+  opacity: 0;
+  transform: translateY(var(--l3-spacing-12));
+  transition: opacity var(--move) var(--ease), transform var(--move) var(--ease);
+}
+
+.result[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Ready: the card's first line, in green. */
+.readyNote {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  color: var(--l3-content-accent-success-default);
+  font: var(--l3-text-heading-12);
+}
+
+/* The fingertip: one for the whole story — it glides between targets, presses (a ring ripples out), and leaves. */
+.cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: var(--l3-spacing-16);
+  height: var(--l3-spacing-16);
+  margin: calc(-1 * var(--l3-spacing-08)) 0 0 calc(-1 * var(--l3-spacing-08));
+  border: var(--l3-spacing-02) solid var(--l3-static-white);
+  border-radius: var(--l3-radius-full);
+  background: color-mix(in srgb, var(--l3-static-black) 70%, transparent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--app-dash-green) 60%, transparent);
+  transform: translate(var(--cx), var(--cy));
+  transition:
+    transform var(--app-dash-story-glide) var(--ease),
+    opacity var(--l3-motion-duration-medium) var(--ease);
+}
+
+.cursor[data-away] {
+  opacity: 0;
+}
+
+.cursor[data-press] {
+  animation: story-tap var(--l3-motion-duration-medium) var(--ease) both;
+}
+
+@keyframes story-tap {
+  40% { transform: translate(var(--cx), var(--cy)) scale(0.75); }
+  100% { transform: translate(var(--cx), var(--cy)) scale(1); box-shadow: 0 0 0 var(--l3-spacing-12) color-mix(in srgb, var(--app-dash-green) 0%, transparent); }
+}
+
+/* ---- Upload · Build · Apply */
+.steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding-top: var(--l3-spacing-08);
+}
+
+.track {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--l3-spacing-02);
+  overflow: hidden;
+  border-radius: var(--l3-radius-full);
+  background: color-mix(in srgb, var(--l3-content-inverted) 18%, transparent);
+}
+
+.track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--app-dash-glow-1);
+  transition: width var(--app-dash-story-move) var(--l3-motion-easing-standard);
+}
+
+.act {
+  color: var(--l3-content-inverted-secondary);
+  font: var(--l3-text-label-12);
+  transition: color var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+.act:nth-child(3) { text-align: center; }
+.act:nth-child(4) { text-align: end; }
+
+.act[data-state='now'] {
+  color: var(--app-dash-glow-1);
+}
+
+.act[data-state='done'] {
+  color: var(--l3-content-inverted);
+}
+
+.caption {
+  color: var(--l3-content-inverted);
+  font: var(--l3-text-label-14);
+  animation: story-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes story-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-04));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage *,
+  .caption,
+  .track span {
+    transition: none;
+    animation: none;
+  }
+}
+```
+
+### `src/flows/dash/components/PineStory.tsx`
+
+```tsx
+import { useEffect, useState, type CSSProperties } from 'react'
+import { Icon } from '@l3/components/Icon'
+import { msAdd, msArrowUpward, msCheck, msClose, msDescription, msStarFill } from '@l3/icons/material'
+import pineScript from '../assets/pine-script.svg'
+import { t } from '../copy'
+import { MiniChart } from './MiniChart'
+import styles from './PineStory.module.css'
+
+/**
+ * The story's timeline (ms from the loop's start). One stage, one fingertip, one file that travels:
+ * the + → the file picker → the file in the field → Send → it flies up as the message → DASH reads it → the message
+ * DASH answers under it, and its answer becomes the indicator card, in the chat → hold → fade, again.
+ */
+const TIMELINE = [
+  { at: 0, phase: 'start' },
+  { at: 300, phase: 'toPlus' },
+  { at: 1000, phase: 'tapPlus' },
+  { at: 1250, phase: 'picker' },
+  { at: 1700, phase: 'toFile' },
+  { at: 2300, phase: 'tapFile' },
+  { at: 2550, phase: 'chip' },
+  { at: 2900, phase: 'toSend' },
+  { at: 3550, phase: 'tapSend' },
+  { at: 3800, phase: 'sent' },
+  { at: 4200, phase: 'building' },
+  { at: 6600, phase: 'ready' },
+  { at: 9400, phase: 'reset' },
+] as const
+const LOOP_MS = 9900
+type Phase = (typeof TIMELINE)[number]['phase']
+const order = TIMELINE.map((s) => s.phase)
+/** The result card's chart drawing height (300 wide, axes off), so the ready card's chart fills the 272 × 172 stage. */
+const RESULT_CHART_H = 116
+/** Reduced motion: the still — the ready indicator card in the chat. */
+const STILL: Phase = 'ready'
+
+/** Where the fingertip is in each phase (stage px; the stage is 272 × 172). */
+const CURSOR: Record<Phase, [number, number]> = {
+  start: [300, 200],
+  toPlus: [26, 144],
+  tapPlus: [26, 144],
+  picker: [26, 144],
+  toFile: [96, 114],
+  tapFile: [96, 114],
+  chip: [96, 114],
+  toSend: [246, 144],
+  tapSend: [246, 144],
+  sent: [246, 144],
+  building: [300, 200],
+  ready: [300, 200],
+  reset: [300, 200],
+}
+
+const ACTS = ['pineStory.actUpload', 'pineStory.actBuild', 'pineStory.actApply'] as const
+const CAPTIONS = ['pineStory.captionUpload', 'pineStory.captionBuild', 'pineStory.captionApply'] as const
+const actOf = (p: Phase) => (order.indexOf(p) < order.indexOf('building') ? 0 : order.indexOf(p) < order.indexOf('ready') ? 1 : 2)
+
+/**
+ * The Pine Script tip, animated (setting "Pine Script tip: Animated"): a floating card above the + with a small
+ * continuous story — one stage, the DASH chat, from start to end (as in the app); one fingertip; one file:
+ * Upload (the + → the file picker → the file in the field → Send) · Build (it's sent; DASH answers under it —
+ * "Converting Pine Script to indicator…") · Ready (the answer becomes the indicator card in the chat: ready, its chart,
+ * on the Scalper chart). A stepper fills as it goes; ✕ hides it.
+ */
+export function PineStory({ title, onClose }: { title: string; onClose: () => void }) {
+  const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const [phase, setPhase] = useState<Phase>(reduced ? STILL : 'start')
+  const [lap, setLap] = useState(0)
+  useEffect(() => {
+    if (reduced) return
+    const timers = TIMELINE.map(({ at, phase: p }) => window.setTimeout(() => setPhase(p), at))
+    timers.push(window.setTimeout(() => setLap((n) => n + 1), LOOP_MS))
+    return () => timers.forEach(window.clearTimeout)
+  }, [lap, reduced])
+
+  const at = (p: Phase) => order.indexOf(phase) >= order.indexOf(p)
+  const act = actOf(phase)
+  const [cx, cy] = CURSOR[phase]
+  const pressing = phase === 'tapPlus' || phase === 'tapFile' || phase === 'tapSend'
+  const stage = {
+    '--cx': `${cx}px`,
+    '--cy': `${cy}px`,
+  } as CSSProperties
+
+  return (
+    <span className={styles.card} role="note">
+      <span className={styles.head}>
+        <span className={styles.logo} aria-hidden="true"><Icon icon={pineScript} size={16} /></span>
+        <span className={styles.title}>{title}</span>
+        <button type="button" className={styles.close} aria-label={t('pineTip.hide')} onClick={onClose}>
+          <Icon icon={msClose} size={16} />
+        </button>
+      </span>
+
+      <span className={styles.stage} style={stage} data-reset={phase === 'reset' || undefined} aria-hidden="true">
+        {/* The chat field: + · the picked file · Send. */}
+        <span className={styles.field} data-away={at('building') || undefined}>
+          <span className={styles.plus} data-press={phase === 'tapPlus' || undefined}><Icon icon={msAdd} size={16} /></span>
+          {!at('chip') && <span className={styles.placeholder}>{t('input.placeholder')}</span>}
+          <span className={styles.send} data-on={(at('chip') && !at('sent')) || undefined} data-press={phase === 'tapSend' || undefined}>
+            <Icon icon={msArrowUpward} size={12} />
+          </span>
+        </span>
+
+        {/* The file picker: slides up from the bottom, the file is tapped, it slides away. */}
+        <span className={styles.picker} data-open={(at('picker') && !at('chip')) || undefined}>
+          <span className={styles.pickerTitle}>{t('pineStory.pickerTitle')}</span>
+          <span className={styles.pickerRow} data-picked={at('tapFile') || undefined}>
+            <Icon icon={msDescription} size={16} />
+            my_strategy.pine
+          </span>
+          <span className={styles.pickerRow} data-muted="">
+            <Icon icon={msDescription} size={16} />
+            notes.txt
+          </span>
+        </span>
+
+        {/* The file: in the field, then up as the sent message — the same element travelling. */}
+        <span
+          className={styles.file}
+          data-place={at('sent') ? 'message' : at('chip') ? 'field' : 'hidden'}
+          data-gone={at('ready') || undefined}
+        >
+          <Icon icon={msDescription} size={12} />
+          my_strategy.pine
+        </span>
+
+        {/* Build: DASH answers in the chat, under the sent file — three dots and what it's doing (as in the app). */}
+        <span className={styles.reply} data-on={(at('building') && !at('ready')) || undefined}>
+          <span className={styles.dots}><span /><span /><span /></span>
+          {t('pineStory.building')}
+        </span>
+
+        {/* Ready: its answer becomes the indicator card, taking the whole chat (the earlier messages fade away) — ready,
+            its chart in full, and on the Scalper chart. */}
+        <span className={styles.result} data-on={at('ready') || undefined}>
+          <span className={styles.readyNote}>
+            <Icon icon={msCheck} size={12} />
+            {t('pineStory.ready')}
+          </span>
+          {at('ready') && <span className={styles.chart}><MiniChart key={`result-${lap}`} stage="ready" redraw axes={false} height={RESULT_CHART_H} /></span>}
+          <span className={styles.applied}>
+            <Icon icon={msStarFill} size={12} />
+            <span className={styles.appliedName}>{t('pineStory.name')}</span>
+            <span className={styles.appliedTag}>{t('pineStory.onScalper')}</span>
+          </span>
+        </span>
+
+        {/* One fingertip for the whole story. */}
+        <span className={styles.cursor} data-press={pressing || undefined} data-away={phase === 'start' || at('building') || undefined} />
+      </span>
+
+      {/* Upload · Build · Apply: the line fills as the story goes. */}
+      <span className={styles.steps} aria-hidden="true">
+        <span className={styles.track}><span style={{ width: `${(act + (at('reset') ? 1 : 0.5)) * 33.34}%` }} /></span>
+        {ACTS.map((a, i) => <span key={a} className={styles.act} data-state={i < act ? 'done' : i === act ? 'now' : 'next'}>{t(a)}</span>)}
+      </span>
+      <span className={styles.caption} key={act}>{t(CAPTIONS[act])}</span>
+    </span>
+  )
 }
 ```
 
@@ -4414,11 +5533,37 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
     animation: none;
   }
 }
+
+
+/* Version 1's pinned card, folded while the chat scrolls: only the title row stays (300 ms, ease in and out). */
+.fold {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+.foldInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.card[data-compact] .fold {
+  grid-template-rows: 0fr;
+}
+
+.card[data-compact] .body {
+  gap: 0;
+}
+
+.card[data-compact] {
+  cursor: pointer;
+}
 ```
 
 ### `src/flows/dash/components/RuleCard.tsx`
 
 ```tsx
+import type { KeyboardEvent } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { msChevronRight, msError, msTrendingDown, msTrendingUp } from '@l3/icons/material'
@@ -4433,6 +5578,9 @@ type RuleCardProps = {
   backtest?: Backtest
   /** The description opens the "read more" sheet. */
   onOpen?: () => void
+  /** Version 1, pinned: the chat was scrolled — it folds to its title row (a tap opens it again). */
+  compact?: boolean
+  onExpand?: () => void
 }
 
 /**
@@ -4440,17 +5588,24 @@ type RuleCardProps = {
  * the user picked (preview) or the rule's description (tap → read more) and what the backtest says, on a strip
  * tinted by the result (saved = green, cost = red, no data = grey).
  */
-export function RuleCard({ rule, backtest, onOpen }: RuleCardProps) {
+export function RuleCard({ rule, backtest, onOpen, compact = false, onExpand }: RuleCardProps) {
   return (
-    <article className={styles.card} aria-label={rule.title}>
+    <article
+      className={styles.card}
+      aria-label={rule.title}
+      data-compact={compact || undefined}
+      {...(compact && onExpand && { role: 'button', tabIndex: 0, 'aria-expanded': false, onClick: onExpand, onKeyDown: (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && onExpand() })}
+    >
       <Stack gap="12" className={styles.body}>
-        <Stack gap="08">
-          <Stack direction="horizontal" align="center" gap="08">
-            <DashOrb size="sm" />
-            <h2 className={styles.title}>{rule.title}</h2>
-          </Stack>
-          <hr className={styles.rule} />
+        <Stack direction="horizontal" align="center" gap="08">
+          <DashOrb size="sm" />
+          <h2 className={styles.title}>{rule.title}</h2>
         </Stack>
+        {/* Everything under the title folds away in the mini card (300 ms). */}
+        <div className={styles.fold} inert={compact || undefined}>
+        <div className={styles.foldInner}>
+        <Stack gap="12">
+        <hr className={styles.rule} />
         {backtest ? (
           <button type="button" className={styles.description} onClick={onOpen} aria-label={`${rule.description} ${t('rule.readMore')}`}>
             <span className={styles.descriptionText}>{rule.description}</span>
@@ -4459,8 +5614,11 @@ export function RuleCard({ rule, backtest, onOpen }: RuleCardProps) {
         ) : (
           <span className={styles.valueChip}>{rule.value}</span>
         )}
+        </Stack>
+        </div>
+        </div>
       </Stack>
-      {backtest && (
+      {backtest && !compact && (
         // Unfolds under the card when the backtest comes back (same page, so it plays once).
         <div className={styles.unfold}>
           <div className={styles.unfoldInner}>
@@ -5084,6 +6242,28 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
 }
 ```
 
+### `src/flows/dash/components/pendingFile.ts`
+
+```ts
+/**
+ * A Pine Script picked somewhere other than the indicator chat (the DASH home's field): held here for a moment, so the
+ * indicator chat opens with it already attached. Prototype only — it's just the file's name; the file never leaves
+ * the device.
+ */
+let pending: { name: string } | null = null
+
+export function holdFile(file: { name: string }) {
+  pending = file
+}
+
+/** The held file, once (the chat takes it as it opens; cleared after this tick, so a dev-mode double render gets it too). */
+export function takeFile() {
+  const file = pending
+  window.setTimeout(() => (pending = null), 0)
+  return file
+}
+```
+
 ### `src/flows/dash/components/stickToBottom.ts`
 
 ```ts
@@ -5337,7 +6517,52 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home.kind.strategy": "Strategy",
   "home.suggestAddToChart": "Add my Supertrend indicator to Bank Nifty",
   "home.suggestTighten": "Make my daily loss rule stricter",
-  "home.suggestNewIndicator": "Create a new indicator"
+  "home.suggestNewIndicator": "Create a new indicator",
+  "home2.hello": "Hey {name}",
+  "home2.helloSub": "Here’s how your DASH tools are doing",
+  "home2.resume": "Pick up where you left off",
+  "home2.continue": "Continue",
+  "home2.today": "Today",
+  "home2.stepIns": "Stepped in {count}× today",
+  "home2.signals": "{count} signal today",
+  "home2.library": "Your library",
+  "home2.rulesOnLabel": "rules on",
+  "home2.indicatorsOnLabel": "indicators on a chart",
+  "home2.ruleOnLabel": "rule on",
+  "home2.indicatorOnLabel": "indicator on a chart",
+  "home.createPrefix": "Create a new",
+  "home.word.indicator": "indicator",
+  "home.word.rule": "rule",
+  "home.word.strategy": "strategy",
+  "pineTip.text": "Tap + to upload it. DASH turns it into an indicator for your charts.",
+  "pineTip.title": "Bring your Pine Script",
+  "pineTip.hide": "Hide",
+  "pineStory.name": "Supertrend (10, 3) with EMA 20",
+  "pineStory.pickerTitle": "Choose a file",
+  "pineStory.actUpload": "Upload",
+  "pineStory.actBuild": "Build",
+  "pineStory.actApply": "Ready",
+  "pineStory.captionUpload": "Upload your Pine Script",
+  "pineStory.captionBuild": "DASH turns it into an indicator",
+  "pineStory.captionApply": "Ready, and on your Scalper chart",
+  "pineStory.building": "Converting Pine Script to indicator",
+  "pineStory.ready": "Your Pine Script indicator is ready",
+  "indicator.pineReadyTitle": "Your Pine Script indicator is ready",
+  "pineStory.onScalper": "On Scalper chart",
+  "market.label": "Index",
+  "market.pick": "Index: {name}. Change",
+  "input.describeIndicator": "Describe the indicator you want",
+  "input.changeIndicator": "Describe a change to your indicator",
+  "input.describeRule": "Describe the rule you want",
+  "input.changeRule": "Describe a change to your rule",
+  "home2.removeDraft": "Delete {name}",
+  "home2.removeTitle": "Delete this draft?",
+  "home2.removeText": "“{name}” isn’t saved yet, so deleting it means it’s gone for good.",
+  "home2.removeConfirm": "Yes, delete",
+  "home2.removeKeep": "No, keep it",
+  "home2.creations": "Your creations",
+  "home2.triggered": "Triggered {count}× today",
+  "home2.notTriggered": "Not triggered today"
 }
 ```
 
@@ -5462,6 +6687,25 @@ export const dashRules: SavedRule[] = [
 
 /** ₹ with Indian grouping, no paise: 18400 → "₹18,400". */
 export const rupees = (n: number) => inr(n, 0)
+
+/**
+ * Returning home v2 · sample status (in the app: from the rules engine and the charts). The draft is an indicator the
+ * user built and didn't save; the events are what their rules and indicators did lately.
+ */
+export type HomeDraft = { id: string; kind: 'rule' | 'indicator'; title: string; meta: string }
+/** Chats left before saving (drafts) — usually none, sometimes one or two. */
+export const homeDrafts: HomeDraft[] = [
+  { id: 'draft-supertrend', kind: 'indicator', title: 'Supertrend (10, 3) with EMA 20', meta: 'Draft, not saved · edited 2 hours ago' },
+  { id: 'draft-max-loss', kind: 'rule', title: 'Max daily loss at ₹5,000', meta: 'Draft, not saved · edited yesterday' },
+]
+export type HomeEvent = { id: string; kind: 'rule' | 'indicator'; text: string; time: string }
+export const homeEvents: HomeEvent[] = [
+  { id: 'cooldown-stop', kind: 'rule', text: 'Expiry Day Options Entry Warning stopped a new entry', time: '11:42' },
+  { id: 'st-buy', kind: 'indicator', text: 'Supertrend gave a BUY on Nifty 50', time: '10:15' },
+  { id: 'pnl-gate', kind: 'rule', text: 'Day P&L Gate warned you at −4.8%', time: 'Yesterday' },
+]
+/** How many times each rule stepped in today (sample; missing = none). */
+export const homeTriggers: Record<string, number> = { 'day-pnl-gate': 2, 'expiry-day-entry': 1 }
 ```
 
 ### `src/flows/dash/index.tsx`
@@ -5501,8 +6745,16 @@ export const dash: Flow = {
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     { id: 'cardVersion', label: 'Card version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
+    // (they dim) or with the chat pushed up to make room.
+    { id: 'pineTip', label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
+    // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
+    { id: 'pineTipShow', label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'once' },
+    { id: 'pineTipPlace', label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
     { id: 'home', label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }], default: 'new' },
+    // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
+    { id: 'returningHome', label: 'Returning home', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
     { id: 'pineScript', label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
     // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
@@ -5537,7 +6789,7 @@ export const dash: Flow = {
     { id: 'dash-12', group: 'dash', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <DashAI scene="rules" step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
     { id: 'dash-13', group: 'dash', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <DashAI scene="rules" step="saved" sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-07')} onViewRules={() => go('dash-14')} />} /> },
     // ---- Your rules
-    { id: 'dash-14', enter: 'fade', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
+    { id: 'dash-14', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
     { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} /> },
@@ -5727,9 +6979,9 @@ export type Candle = { open: number; high: number; low: number; close: number }
  * 60 sample candles around Nifty's level — a deterministic random walk (the same every time for one timeframe; another
  * timeframe gets its own walk, and longer candles move more).
  */
-export function sampleCandles(count = 60, start = 22650, timeframe = 15): Candle[] {
-  let seed = 7 + (timeframe === 15 ? 0 : timeframe * 31)
-  const scale = Math.sqrt(timeframe / 15)
+export function sampleCandles(count = 60, start = 22650, timeframe = 15, walk = 0): Candle[] {
+  let seed = 7 + (timeframe === 15 ? 0 : timeframe * 31) + walk * 977
+  const scale = Math.sqrt(timeframe / 15) * (start / 22650)
   const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
   const candles: Candle[] = []
   let close = start
@@ -5743,6 +6995,19 @@ export function sampleCandles(count = 60, start = 22650, timeframe = 15): Candle
   }
   return candles
 }
+
+/**
+ * The F&O indices the indicator can be tried on (the card's picker, like Scalper's): each has its own price level and
+ * its own sample walk. Sample data.
+ */
+export type Market = { id: string; name: string; start: number; walk: number }
+export const markets: Market[] = [
+  { id: 'nifty', name: 'NIFTY 50', start: 22650, walk: 0 },
+  { id: 'banknifty', name: 'BANK NIFTY', start: 48250, walk: 1 },
+  { id: 'sensex', name: 'SENSEX', start: 74480, walk: 2 },
+  { id: 'finnifty', name: 'FINNIFTY', start: 21390, walk: 3 },
+  { id: 'midcpnifty', name: 'MIDCPNIFTY', start: 12310, walk: 4 },
+]
 
 /** Exponential moving average of the closes. */
 export function ema(candles: Candle[], period: number): number[] {
@@ -6407,6 +7672,7 @@ import { t } from '../copy'
 import { IndicatorScene, type IndicatorChatProps } from './IndicatorChat'
 import { LandingScene, type LandingProps } from './Landing'
 import { ReturningScene } from './Returning'
+import { ReturningV2Scene } from './ReturningV2'
 import { RuleScene, type DashVersion, type RuleChatProps } from './RuleChat'
 
 type Common = {
@@ -6439,10 +7705,13 @@ const order = { landing: 0, rules: 1, indicator: 1 } as const
  */
 export function DashAI(props: DashAIProps) {
   const { scene, onBack, onYourRules, sheet } = props
-  /** Prototype setting (flow option "DASH version"): 1 = cards pinned above the chat, 2 = cards inside the chat. */
+  /** Prototype setting "Chat version": the card's place only — 1 = pinned above the chat (folds on scroll), 2 = in the
+   *  chat as a message. Everything else is the same. */
   const version = useFlowOption('dash', 'version', '2') as DashVersion
   /** Prototype setting "DASH home": a new user sees what DASH can build; a returning one sees their own work first. */
   const returningHome = useFlowOption('dash', 'home', 'new') === 'returning'
+  /** …and which returning home: Version 1 (the live layout, all kinds) or Version 2 (library + status board). */
+  const returningVersion = useFlowOption('dash', 'returningHome', '2')
   const [typing, setTyping] = useState(props.typing ?? false)
   const [lastScene, setLastScene] = useState(scene)
   const [move, setMove] = useState<SceneMove>('push')
@@ -6472,7 +7741,9 @@ export function DashAI(props: DashAIProps) {
   let body: ReactNode
   if (props.scene === 'landing')
     body = props.returning ?? returningHome
-      ? <ReturningScene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
+      ? returningVersion === '2'
+        ? <ReturningV2Scene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
+        : <ReturningScene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
       : <LandingScene onRules={props.onRules} onIndicator={props.onIndicator} onStrategy={props.onStrategy} />
   else if (props.scene === 'rules') body = <RuleScene {...props} version={version} typing={typing} onTyping={setTyping} />
   else body = <IndicatorScene {...props} version={version} typing={typing} onTyping={setTyping} />
@@ -6481,7 +7752,7 @@ export function DashAI(props: DashAIProps) {
     <DashScreen
       tone={tone}
       keyboard={keyboardUp}
-      chatting={version === '2' && props.scene !== 'landing' && props.step !== 'empty'}
+      chatting={props.scene !== 'landing' && props.step !== 'empty'}
       top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msHistory} label={t('landing.menu')} onClick={() => onYourRules?.()} />} />}
       sheet={sheet}
     >
@@ -6506,6 +7777,7 @@ import { useFlowOption, usePreview } from '../../../shared/prototype'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserFile, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
+import { takeFile } from '../components/pendingFile'
 import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
 import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
@@ -6598,8 +7870,23 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   // phone, only its name is used — or pasted Pine is spotted in the text. Either way DASH "reads" it a little longer,
   // asks nothing, and builds the indicator (the usual card, suggestions after).
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
+  // A/B: the first-time tip as a simple card or an animated story; over the suggestions, or with the chat pushed up.
+  const pineStory = useFlowOption('dash', 'pineTip', 'animated') === 'animated'
+  const tipOverlay = useFlowOption('dash', 'pineTipPlace', 'overlay') === 'overlay'
   const fileInput = useRef<HTMLInputElement>(null)
-  const [attachment, setAttachment] = useState<{ name: string } | null>(null)
+  // A file picked on the DASH home arrives attached, ready to send.
+  const [attachment, setAttachment] = useState<{ name: string } | null>(takeFile)
+  // First-time guide for the + (Pine Script): once per person (prototype: per browser), on the empty chat.
+  // Testing (setting "Show Pine Script tip: Always"): it shows every time the chat opens, whatever was seen before.
+  const tipAlways = useFlowOption('dash', 'pineTipShow', 'once') === 'always'
+  const [pineTip, setPineTip] = useState(() => tipAlways || !pineTipSeen())
+  useEffect(() => {
+    if (tipAlways) setPineTip(true)
+  }, [tipAlways])
+  const closePineTip = () => {
+    setPineTip(false)
+    markPineTipSeen()
+  }
   const [pine, setPine] = useState<{ file?: string; pasted?: string } | null>(null)
 
   const send = (typed: string, from: HTMLElement) => {
@@ -6753,7 +8040,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingBelow', { chart, timeframe })}</AssistantMessage> })
     turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={draftFor(base)} settings={base} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={draftFor(base)} settings={base} steps={pine ? pineBuildSteps : undefined} state={cardState} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} /> })
   } else if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
-  if (step === 'ready' || step === 'saved') turns.push({ key: 'ready', node: <AssistantMessage title={t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
+  if (step === 'ready' || step === 'saved') turns.push({ key: 'ready', node: <AssistantMessage title={pine ? t('indicator.pineReadyTitle') : t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
   if (revisionRequested) turns.push({ key: 'revision-prompt', node: <AssistantMessage>{t('indicator.revisionPrompt')}</AssistantMessage> })
   changes.forEach((c, i) => {
     turns.push({ key: `change-${i}`, node: <UserMessage>{c}</UserMessage> })
@@ -6761,7 +8048,8 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     if (!result) return // DASH is still working on it
     const summary = describeChange(result)
     if (!v2) {
-      turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.changed')}>{summary}</AssistantMessage> })
+      // Version 1: the same reply as Version 2 — the pinned card above is what redraws (no card here).
+      turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{summary}</AssistantMessage> })
       return
     }
     turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{`${summary} ${t('indicator.earlierFolded')}`}</AssistantMessage> })
@@ -6820,12 +8108,12 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         }}
       >
         {(empty || introLeaving) && (
-          <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} topAction={pineOn && empty ? { label: t('indicator.uploadPine'), onPick: () => fileInput.current?.click() } : undefined} typing={typingNow} />
+          <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined} data-dimmed={(pineOn && empty && pineTip && !attachment && tipOverlay) || undefined}>
+            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} typing={typingNow} />
           </div>
         )}
         {chatStarted && (
-          <div className={styles.panel} data-flat={v2 || undefined}>
+          <div className={styles.panel} data-flat>
             <Inset paddingInline="16" paddingBlock="24">
               <Stack gap="16" className={styles.turns}>
                 {turns.map((turn) => (
@@ -6861,7 +8149,8 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         )}
       </div>
 
-      <div className={styles.dock}>
+      {/* With the Pine Script bubble up, the dock makes room for it above the field (the chat ends above it). */}
+      <div className={styles.dock} data-tip={(pineOn && empty && pineTip && !attachment && !tipOverlay) ? (pineStory ? 'story' : 'card') : undefined}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput
             key="input"
@@ -6871,8 +8160,11 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
             typing={typingNow}
             autoFocus={typingNow}
             onFocus={empty || canChange ? () => onTyping?.(true) : undefined}
-            onSend={empty ? send : canChange ? askChange : undefined}
-            onAttach={pineOn && empty ? () => fileInput.current?.click() : undefined}
+            // The field says what it's for: describe the indicator; then (built) describe a change to it.
+            placeholder={empty ? t('input.describeIndicator') : built ? t('input.changeIndicator') : undefined}
+            onSend={empty ? send : canChange ? (text) => { askChange(text || attachment?.name || ''); setAttachment(null) } : undefined}
+            onAttach={pineOn ? () => fileInput.current?.click() : undefined}
+            attachTip={pineOn && empty && pineTip && !attachment ? { title: t('pineTip.title'), text: t('pineTip.text'), onDone: closePineTip, story: pineStory } : null}
             attachment={attachment}
             onRemoveAttachment={() => setAttachment(null)}
           />
@@ -6914,6 +8206,15 @@ function describeChange({ settings, changed }: IndicatorChange) {
               : t('indicator.changeOther'),
     )
     .join(' ')
+}
+
+/** The Pine Script guide shows once per person (here: once per browser). */
+const PINE_TIP_KEY = 'dash.pineTipSeen'
+function pineTipSeen() {
+  try { return localStorage.getItem(PINE_TIP_KEY) === '1' } catch { return false }
+}
+function markPineTipSeen() {
+  try { localStorage.setItem(PINE_TIP_KEY, '1') } catch { /* storage off: it may show again next visit */ }
 }
 ```
 
@@ -7160,11 +8461,14 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 ### `src/flows/dash/screens/Returning.tsx`
 
 ```tsx
+import { useRef } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
 import { msChevronRight } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { holdFile } from '../components/pendingFile'
 import { ChatInput, SuggestionList } from '../components/Chat'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators, savedStrategies, type SavedRule } from '../data'
@@ -7204,6 +8508,24 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   const pick = (s: string) => (s === suggestions[0] ? onAddToChart?.() : s === suggestions[1] ? onRules?.() : onIndicator?.())
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
   const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
+
+  // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
+  const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
+  const fileInput = useRef<HTMLInputElement>(null)
+  const picker = (
+    <input
+      ref={fileInput}
+      type="file"
+      hidden
+      onChange={(e) => {
+        const file = e.target.files?.[0]
+        e.target.value = ''
+        if (!file) return
+        holdFile({ name: file.name })
+        onIndicator?.()
+      }}
+    />
+  )
 
   return (
     <div className={styles.scene}>
@@ -7250,7 +8572,465 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
       </div>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={ask} />
+          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => fileInput.current?.click() : undefined} />
+          {picker}
+        </Inset>
+      </div>
+    </div>
+  )
+}
+```
+
+### `src/flows/dash/screens/ReturningV2.module.css`
+
+```css
+/* Returning home v2: the body scrolls over DASH's background, the create dock stays at the bottom. */
+.scene {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: var(--l3-spacing-08) var(--l3-spacing-24);
+}
+
+/* The page fills the scroll area, so the centre-stage layout can centre itself in it. */
+.page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+}
+
+/* Both states sit centred in the space above the field (the resume state too: no empty band left at the bottom). */
+.content {
+  justify-content: center;
+}
+
+/* Centre stage (no draft to resume): Returning home v1's heading — the greeting, then the question in Heading/20. */
+.centreHeading {
+  text-align: center;
+}
+
+.centreGreeting {
+  margin: 0;
+  font: var(--l3-text-label-14);
+  color: var(--l3-content-secondary);
+}
+
+.centreTitle {
+  margin: 0;
+  font: var(--l3-text-heading-20);
+  color: var(--l3-content-primary);
+  text-wrap: balance;
+}
+
+.hello {
+  margin: 0;
+  font: var(--l3-text-heading-18);
+  color: var(--l3-content-primary);
+}
+
+.helloSub {
+  margin: 0;
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
+
+/* Pick up where you left off: one card per draft, side by side and swiped (snapping), edge to edge; one draft fills
+   the width. Each card: the DASH green edge, ✕ at the top right, Continue hugging its label. */
+.drafts {
+  display: flex;
+  gap: var(--l3-spacing-12);
+  margin-inline: calc(-1 * var(--l3-spacing-16));
+  padding-inline: var(--l3-spacing-16);
+  overflow-x: auto;
+  scroll-padding-inline: var(--l3-spacing-16);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+/* Two or more drafts: 85 % wide, so the next one peeks in. Every card is as tall as the tallest one (the row
+   stretches them; each card fills its slot), whatever its text — Continue sits at the bottom of each. */
+.drafts > * {
+  flex: none;
+  width: 85%;
+  scroll-snap-align: start;
+}
+
+/* Only one draft: it fills the width (nothing to swipe to). */
+.drafts[data-single] > * {
+  width: 100%;
+}
+
+.draft {
+  position: relative;
+  display: flex;
+}
+
+.draft > :first-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.draft > :first-child > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.resume.resume {
+  position: relative;
+  box-sizing: border-box;
+  border-color: color-mix(in srgb, var(--app-dash-green) 60%, transparent);
+  transition: background var(--l3-motion-duration-short) var(--l3-motion-easing-standard), transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* The whole card is one tap target (it opens the draft's chat): hover / press anywhere and the card responds as one. */
+.resumeTap {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .resumeTap:hover .resume.resume {
+    background: var(--l3-surface-secondary);
+  }
+}
+
+.resumeTap:active .resume.resume {
+  transform: scale(var(--l3-motion-scale-press-default));
+}
+
+.resumeBody {
+  flex: 1;
+}
+
+/* Continue at the bottom of each card (cards are equal height). */
+.resumeBody > :last-child {
+  margin-top: auto;
+}
+
+/* The text leaves room for the ✕. */
+.resumeText {
+  padding-right: var(--l3-spacing-32);
+}
+
+.resumeClose.resumeClose {
+  position: absolute;
+  top: var(--l3-spacing-08);
+  right: var(--l3-spacing-08);
+  z-index: 1; /* over the card, its own tap target */
+}
+
+.resumeTitle {
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+}
+
+.resumeMeta {
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
+
+.resumeButton.resumeButton {
+  align-self: flex-start;
+}
+
+/* Your library: one sideways row, edge to edge (16 in at both ends), small cards — two lines each. */
+.row {
+  display: flex;
+  gap: var(--l3-spacing-08);
+  margin-inline: calc(-1 * var(--l3-spacing-16));
+  padding-inline: var(--l3-spacing-16);
+  overflow-x: auto;
+  scroll-padding-inline: var(--l3-spacing-16);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.item {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  box-sizing: border-box;
+  width: 62%;
+  padding: var(--l3-spacing-12);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-default);
+  text-align: start;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.item:active {
+  transform: scale(var(--l3-motion-scale-press-default));
+}
+
+/* A creation card's first line: what it did today / whether it's on a chart (green when it's active), and ›. */
+.itemTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--l3-spacing-08);
+  color: var(--l3-content-tertiary);
+}
+
+.itemMeta {
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-description-12);
+}
+
+.itemStatus {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-12);
+}
+
+.itemStatus [data-on] {
+  color: var(--l3-content-accent-success-default);
+}
+
+.itemTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+  -webkit-line-clamp: 2; /* long rule names read in full more often */
+  -webkit-box-orient: vertical;
+}
+
+/* The remove sheet has no content slot, and L3's large header has no bottom space of its own (it expects the
+   content's): 24 here so the description doesn't run into the buttons (local fix; designer to audit L3). */
+.removeSheet header[data-size='lg'] {
+  padding-bottom: var(--l3-spacing-24);
+}
+
+/* The remove sheet's header icon (large header, like Delete rule): the bin in a red circle, 64. */
+.removeIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-64);
+  height: var(--l3-size-64);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-error-light);
+  color: var(--l3-content-accent-error-default);
+}
+
+.dock {
+  flex: none;
+}
+```
+
+### `src/flows/dash/screens/ReturningV2.tsx`
+
+```tsx
+import { useId, useRef, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { msChevronRight, msClose, msDelete } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { holdFile } from '../components/pendingFile'
+import { ChatInput } from '../components/Chat'
+import { t } from '../copy'
+import { dashRules, firstName, homeDrafts, homeTriggers, savedIndicators, type HomeDraft, type SavedRule } from '../data'
+import { CreationDetailsSheet } from '../sheets/RuleSheets'
+import type { ReturningProps } from './Returning'
+import styles from './ReturningV2.module.css'
+
+/**
+ * DASH home for a returning user, Version 2 (prototype setting "Returning home"): what they made and whether it's
+ * working come first, asking DASH is at the bottom:
+ * 1. the header — compact (orb + greeting in a row) while there's a draft to resume; with none (or all deleted), centre
+ *    stage: the big orb and the greeting in the middle, the page centred (like Returning home v1);
+ * 2. Pick up where you left off — chats left before saving (rare: only when there are some), swiped sideways if more
+ *    than one, each with Continue and ✕ (removes it, asking first in a sheet);
+ * 3. Your creations — one sideways row, rules and indicators together (most active first): a rule leads with what it
+ *    did today, an indicator with whether it's on a chart; a card opens its details sheet; View all;
+ * 4. the field — change something or start something new, in words.
+ * Kept to three things so it reads at a glance (designer's call). Status is sample data (the app has no feed yet).
+ */
+export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator }: ReturningProps) {
+  /** Where a draft carries on: its chat. */
+  const open = (kind: 'rule' | 'indicator') => (kind === 'indicator' ? onOpenIndicator : onOpenRule) ?? (() => {})
+  const [drafts, setDrafts] = useState<HomeDraft[]>(homeDrafts)
+  /** The creation whose details sheet is open. */
+  /** Your creations, one row, most active first: rules that stepped in today, then indicators, then the other rules. */
+  const creations: { item: SavedRule; kind: 'rule' | 'indicator' }[] = [
+    ...dashRules.filter((r) => homeTriggers[r.id]).map((item) => ({ item, kind: 'rule' as const })),
+    ...savedIndicators.map((item) => ({ item, kind: 'indicator' as const })),
+    ...dashRules.filter((r) => !homeTriggers[r.id]).map((item) => ({ item, kind: 'rule' as const })),
+  ]
+  /** No draft to resume: the centre-stage layout. */
+  const centre = drafts.length === 0
+  const [details, setDetails] = useState<{ item: SavedRule; kind: 'rule' | 'indicator' } | null>(null)
+  /** The draft whose ✕ was tapped: the sheet asks before it goes. */
+  const [removing, setRemoving] = useState<HomeDraft | null>(null)
+  const sheetId = useId()
+  // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
+  const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
+
+  // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
+  const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
+  const fileInput = useRef<HTMLInputElement>(null)
+  const picker = (
+    <input
+      ref={fileInput}
+      type="file"
+      hidden
+      onChange={(e) => {
+        const file = e.target.files?.[0]
+        e.target.value = ''
+        if (!file) return
+        holdFile({ name: file.name })
+        onIndicator?.()
+      }}
+    />
+  )
+
+  return (
+    <div className={styles.scene}>
+      <div className={styles.scroll}>
+        <Inset paddingInline="16" className={styles.page}>
+          <Stack gap={centre ? '40' : '24'} className={styles.content} data-centre={centre || undefined}>
+            {/* 1 · Header. With a draft to resume: compact (orb + greeting in a row). Without (none, or all deleted):
+                centre stage — the big orb and the greeting in the middle, using the room (like Returning home v1). */}
+            {centre ? (
+              <Stack gap="16" align="center">
+                <DashOrb size="lg" />
+                <Stack gap="04" className={styles.centreHeading}>
+                  <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
+                  <h1 className={styles.centreTitle}>{t('home.title')}</h1>
+                </Stack>
+              </Stack>
+            ) : (
+              <Stack direction="horizontal" align="center" gap="12">
+                <DashOrb size="sm" />
+                <Stack gap="00">
+                  <h1 className={styles.hello}>{t('home2.hello', { name: firstName })}</h1>
+                  <p className={styles.helloSub}>{t('home2.helloSub')}</p>
+                </Stack>
+              </Stack>
+            )}
+
+            {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
+                each, swiped sideways when there are two or more; ✕ removes one (asks first). */}
+            {drafts.length > 0 && (
+              <Stack as="section" gap="12" aria-label={t('home2.resume')}>
+                <SectionHeader title={t('home2.resume')} headingLevel={2} />
+                <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
+                  {drafts.map((d) => (
+                    <div key={d.id} role="listitem" className={styles.draft}>
+                      {/* One tap target: the whole card opens the draft's chat (Continue is its keyboard-reachable button;
+                          the card lights up as one). ✕ is outside the card, with its own touch area. */}
+                      <div className={styles.resumeTap} onClick={open(d.kind)}>
+                      <Card className={styles.resume}>
+                        <Stack gap="12" className={styles.resumeBody}>
+                          <Stack gap="04" className={styles.resumeText}>
+                            <span className={styles.resumeTitle}>{d.title}</span>
+                            <span className={styles.resumeMeta}>{t(`home.kind.${d.kind}`)} · {d.meta}</span>
+                          </Stack>
+                          {/* The card's tap handles it (no second navigation from here). */}
+                          <Button size="sm" iconRight={<Icon icon={msChevronRight} />} className={styles.resumeButton}>{t('home2.continue')}</Button>
+                        </Stack>
+                      </Card>
+                      </div>
+                      <Button variant="ghost" size="sm" iconLeft={<Icon icon={msClose} />} aria-label={t('home2.removeDraft', { name: d.title })} onClick={() => setRemoving(d)} className={styles.resumeClose} />
+                    </div>
+                  ))}
+                </div>
+              </Stack>
+            )}
+
+            {/* 3 · Your creations: one sideways row, rules and indicators together (most active first) — each names its kind,
+                a rule leads with what it did today, an indicator with whether it's on a chart; a card (›) opens its details sheet (as on the
+                history page). View all opens everything made with DASH. */}
+            <Stack as="section" gap="12" aria-label={t('home2.creations')}>
+              <SectionHeader title={t('home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+              <div className={styles.row} role="list">
+                {creations.map(({ item, kind: k }) => {
+                  const triggered = homeTriggers[item.id] ?? 0
+                  const status = k === 'rule' ? (triggered ? t('home2.triggered', { count: triggered }) : item.on ? t('home2.notTriggered') : t('cards.paused')) : item.on ? t('cards.onChart') : t('details.notOnChart')
+                  const lit = k === 'rule' ? triggered > 0 : item.on
+                  return (
+                    <button key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
+                      <span className={styles.itemTop}>
+                        <span className={styles.itemStatus}>
+                          {t(`home.kind.${k}`)} · <span data-on={lit || undefined}>{status}</span>
+                        </span>
+                        <Icon icon={msChevronRight} size={16} />
+                      </span>
+                      <span className={styles.itemTitle}>{item.title}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </Stack>
+          </Stack>
+        </Inset>
+      </div>
+
+      {removing && (
+        <Sheet
+          labelledBy={sheetId}
+          onClose={() => setRemoving(null)}
+          className={styles.removeSheet}
+          header={<BottomSheetHeader size="lg" headingId={sheetId} heading={t('home2.removeTitle')} description={t('home2.removeText', { name: removing.title })} icon={<span className={styles.removeIcon}><Icon icon={msDelete} size={24} /></span>} />}
+          footer={
+            <ButtonGroup aria-label={t('home2.removeTitle')} direction="vertical">
+              <Button
+                onClick={() => {
+                  setDrafts((list) => list.filter((d) => d.id !== removing.id))
+                  setRemoving(null)
+                }}
+              >
+                {t('home2.removeConfirm')}
+              </Button>
+              <Button variant="secondary" onClick={() => setRemoving(null)}>{t('home2.removeKeep')}</Button>
+            </ButtonGroup>
+          }
+        />
+      )}
+
+      {details && (
+        <CreationDetailsSheet
+          item={details.item}
+          kind={details.kind}
+          on={details.item.on}
+          onClose={() => setDetails(null)}
+          onEdit={() => {
+            setDetails(null)
+            onOpenIndicator?.()
+          }}
+          onDelete={() => setDetails(null)}
+        />
+      )}
+
+      {/* 4 · Ask DASH: change something or start something new, in words. */}
+      <div className={styles.dock}>
+        <Inset paddingInline="16" paddingBlock="16">
+          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => fileInput.current?.click() : undefined} />
+          {picker}
         </Inset>
       </div>
     </div>
@@ -7366,6 +9146,21 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   z-index: 1;
   flex: none;
   margin-top: calc(-1 * var(--app-dash-under-dock));
+}
+
+/* The Pine Script tip, "Push up": the chat keeps room for it above the field (the card, or the taller story). */
+.dock[data-tip='card'] {
+  padding-top: var(--l3-size-96);
+}
+
+.dock[data-tip='story'] {
+  padding-top: var(--app-dash-story-room);
+}
+
+/* The Pine Script tip, "Overlay": it sits over the suggestions, which dim behind it. */
+.intro[data-dimmed] {
+  opacity: var(--l3-opacity-40);
+  transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
 }
 
 /* The phone's keyboard: rises with the typing state (its height opens, 300 ms), so everything above moves with it. */
@@ -7569,6 +9364,15 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   const [introLeaving, setIntroLeaving] = useState(false)
   const scene = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
+  // Version 1's pinned card folds while the user scrolls the chat down, and opens at the top (or on a tap).
+  const [compactWanted, setCompactWanted] = useState(false)
+  const touchY = useRef<number | null>(null)
+  const userScroll = (down: boolean) => {
+    const el = scroller.current
+    if (!el) return
+    if (down && el.scrollHeight > el.clientHeight) setCompactWanted(true)
+    else if (!down && el.scrollTop <= 0) setCompactWanted(false)
+  }
   useEdgeFade(scroller)
   // Chat-app scrolling: the newest message stays in view (a new turn glides there; growth keeps it pinned).
   useStickToBottom(scroller, [step, pending, typing])
@@ -7621,9 +9425,10 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   const backtest: Backtest | undefined = step === 'saved' || step === 'cost' || step === 'none' ? backtests[step] : undefined
   const empty = step === 'empty'
   const hasCard = !empty && step !== 'thinking' && step !== 'question'
-  // Version 1 pins the rule card above the chat; Version 2 shows it inside DASH's message, like any other turn.
+  // The only difference between the versions: Version 1 pins the rule card above the chat (it folds to its title row
+  // while the chat is scrolled); Version 2 shows it inside DASH's message, like any other turn.
   const pinned = version === '1' && hasCard
-  const card = <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} />
+  const card = <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} compact={pinned && compactWanted} onExpand={() => setCompactWanted(false)} />
   const thinking = step === 'thinking' || pending != null
   const asking = step === 'question' && !pending
   // Typing in the empty chat; the drawn keyboard only on a laptop (a phone opens its own).
@@ -7643,14 +9448,27 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
       )}
 
       {/* Tapping the body puts the keyboard away (Figma "3.1" → "2"). */}
-      <div className={styles.scroll} ref={scroller} onClick={typingNow ? () => onTyping?.(false) : undefined}>
+      <div
+        className={styles.scroll}
+        ref={scroller}
+        onClick={typingNow ? () => onTyping?.(false) : undefined}
+        onWheel={(e) => e.deltaY && userScroll(e.deltaY > 0)}
+        onTouchStart={(e) => (touchY.current = e.touches[0].clientY)}
+        onTouchMove={(e) => {
+          if (touchY.current === null) return
+          const moved = touchY.current - e.touches[0].clientY
+          if (Math.abs(moved) < 12) return
+          userScroll(moved > 0)
+          touchY.current = e.touches[0].clientY
+        }}
+      >
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined}>
             <RulesIntro onPick={empty ? send : undefined} typing={typingNow} top={topSuggestions} />
           </div>
         )}
         {!empty && (
-          <div className={styles.panel} data-flat={version === '2' || undefined}>
+          <div className={styles.panel} data-flat>
             <Inset paddingInline="16" paddingBlock="24">
               <Stack gap="16" className={styles.turns}>
                 {conversation(step, request, step === 'question' && pending ? answer : step !== 'thinking' && step !== 'question' ? answer : null, {
@@ -7660,7 +9478,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
                   onImprove,
                   busy: pending != null,
                   card: version === '2' && hasCard ? card : undefined,
-                  buttons: version === '2',
+                  buttons: true,
                 })}
                 {asking && (
                   // DASH's question sits right under its message (visible without scrolling to the bottom).
@@ -7688,7 +9506,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
 
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} />
+          <ChatInput value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? t('input.describeRule') : hasCard ? t('input.changeRule') : undefined} />
         </Inset>
       </div>
 

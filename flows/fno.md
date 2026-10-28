@@ -1620,7 +1620,8 @@ const LOT = 65
 export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator }: ScalperProps) {
   const [sheetOpen, setSheetOpen] = useState(openIndicators ?? Boolean(createdIndicator))
   /** Indicators on the NIFTY 50 chart (the sheet adds and removes them, several at once). */
-  const [applied, setApplied] = useState<string[]>(initialIndicator ? [initialIndicator] : [])
+  // An indicator saved with DASH is applied straight away (and a favourite in the sheet), so it's already on the chart.
+  const [applied, setApplied] = useState<string[]>(() => [...new Set([initialIndicator, createdIndicator].filter((n): n is string => Boolean(n)))])
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
   const [quantity, setQuantity] = useState(LOT)
   const overlay = useMemo<PaneLine[]>(() => (applied.length ? [{ values: ema(scalperSpot.candles, 9), tone: 'fast' }, { values: ema(scalperSpot.candles, 21), tone: 'slow' }] : []), [applied.length])
@@ -1811,7 +1812,7 @@ function ema(candles: ChartCandle[], period: number) {
   z-index: 3;
   margin: 0 calc(-1 * var(--l3-spacing-16)) var(--l3-spacing-16);
   padding: var(--l3-spacing-12) var(--l3-spacing-16);
-  background: var(--l3-surface-default);
+  background: var(--l3-surface-primary);
   box-shadow: inset 0 -1px 0 var(--l3-border-light); /* 1px: Figma stroke weight has no variable */
 }
 
@@ -1904,7 +1905,7 @@ function ema(candles: ChartCandle[], period: number) {
 .dim {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 4; /* over the sticky header (3) too: only Your indicators stays lit */
   background: var(--l3-surface-overlay);
   animation: guide-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
 }
@@ -1912,7 +1913,19 @@ function ema(candles: ChartCandle[], period: number) {
 /* The lit box is the tooltip's anchor itself, so the tooltip measures from the highlight's edge (its tip touches it). */
 .yours[data-lit] {
   position: relative;
-  z-index: 2;
+  z-index: 5;
+}
+
+/* The guide's tooltip: white with black text in both themes (static colours), lifted with the high elevation. Its
+   arrow follows --tt-surface. */
+.yours [role='tooltip'] {
+  --tt-surface: var(--l3-static-white);
+  color: var(--l3-static-black);
+  box-shadow: var(--l3-shadow-elevation-high);
+}
+
+.yours [role='tooltip'] :is(button, svg, span) {
+  color: inherit;
 }
 
 .yours[data-lit] > * {
@@ -1950,7 +1963,7 @@ import { SideNav } from '@l3/components/SideNav'
 import { Stack } from '@l3/components/Stack'
 import { TextField } from '@l3/components/TextField'
 import { Tooltip } from '@l3/components/Tooltip'
-import { msAdd, msBookmarkFill, msClose, msDelete, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msSwapHoriz } from '@l3/icons/material'
+import { msAdd, msBookmarkFill, msClose, msDelete, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msStarFill, msSwapHoriz } from '@l3/icons/material'
 import { t } from '../copy'
 import { lemonnIndicators } from '../data'
 import styles from './ChartToolsSheet.module.css'
@@ -1982,7 +1995,7 @@ type ChartToolsSheetProps = {
  *   blue row with ✕ — tapping a row adds or removes it, several at once;
  * - search: a search field takes the title's place, the list filters as you type, the sheet opens to full height.
  * Your indicators ("Made with DASH AI" under the heading; or "No indicators created yet.") and Create indicator sit above
- * Lemonn indicators.
+ * Lemonn indicators. An indicator made with DASH is a favourite from the start (filled star).
  */
 export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll, onCreateIndicator, guide = false }: ChartToolsSheetProps) {
   const [section, setSection] = useState<Section>('indicators')
@@ -2008,7 +2021,7 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
         multiline={wrap}
         label={name}
         description={description}
-        iconLeft={<Icon icon={msStar} className={styles.star} />}
+        iconLeft={<Icon icon={yourIndicators.includes(name) ? msStarFill : msStar} className={styles.star} />}
         iconRight={on ? <Icon icon={msClose} /> : undefined}
         selected={on}
         onClick={() => toggle(name)}
@@ -2078,7 +2091,7 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
         ) : (
           <Stack gap="24">
             <div className={styles.yours} data-lit={guiding || undefined}>
-              <Tooltip open={guiding} content={t('tools.guideTip')} placement="top" onClose={() => setGuiding(false)}>
+              <Tooltip open={guiding} content={t('tools.guideTip')} placement="bottom" onClose={() => setGuiding(false)}>
                 <Stack as="section" gap="12" aria-label={t('tools.yours')}>
                   <Stack direction="horizontal" align="center" justify="between" className={styles.sectionHead}>
                     <Stack gap="00">
