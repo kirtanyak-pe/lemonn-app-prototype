@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-10-28T10:11:44.523Z",
+ "fetchedAt": "2026-10-28T16:26:31.748Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -1971,7 +1971,7 @@
    "changePct": -1.47,
    "dayHigh": 1664.6,
    "dayLow": 1624.8,
-   "high52": 2188.7,
+   "high52": 2150,
    "low52": 1597,
    "volume": 1532314,
    "longName": "Bajaj Finserv Ltd.",
@@ -5779,7 +5779,7 @@
    "changePct": -0.12,
    "dayHigh": 1861.2,
    "dayLow": 1765.5,
-   "high52": 2526,
+   "high52": 2513.6,
    "low52": 1758.2,
    "volume": 3364379,
    "longName": "Hindustan Unilever Limited",
@@ -11492,7 +11492,7 @@
    "dayHigh": 959.55,
    "dayLow": 944,
    "high52": 1234.7,
-   "low52": 917.7,
+   "low52": 930.25,
    "volume": 11010065,
    "longName": "State Bank of India",
    "closes": [
@@ -11764,7 +11764,7 @@
    "dayHigh": 833.95,
    "dayLow": 810.1,
    "high52": 1153.7,
-   "low52": 710.25,
+   "low52": 717.4,
    "volume": 6276805,
    "longName": "Shriram Finance Limited",
    "closes": [
@@ -15307,10 +15307,10 @@
   },
   "sensex": {
    "symbol": "^BSESN",
-   "price": 73291.1,
+   "price": 73246.03,
    "prevClose": 73598.67,
-   "change": -307.57,
-   "changePct": -0.42,
+   "change": -352.64,
+   "changePct": -0.48,
    "dayHigh": 73525.44,
    "dayLow": 72603.57,
    "high52": 86159.02,
