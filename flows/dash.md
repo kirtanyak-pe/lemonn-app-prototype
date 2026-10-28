@@ -7122,15 +7122,20 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "askModes.placeholder.strategy": "Describe a strategy…",
   "askModes.new": "New",
   "home3.new": "New",
-  "home3.empty.rule": "No rules yet",
-  "home3.empty.indicator": "No indicators yet",
-  "home3.empty.strategy": "No strategies yet",
-  "home3.emptyText.rule": "Warn or stop you before a costly trade.",
-  "home3.emptyText.indicator": "Draw your own signals on any chart.",
-  "home3.emptyText.strategy": "Describe a strategy and DASH builds it for you.",
   "home3.create.rule": "Create rule",
   "home3.create.indicator": "Create indicator",
   "home3.create.strategy": "Create strategy",
+  "home3.try": "Try",
+  "home3.strategyStart": "Build a strategy that ",
+  "home3.ex.rule1": "Stop me after 3 losing trades in a day",
+  "home3.ex.rule2": "Warn me when my day loss hits ₹2,000",
+  "home3.ex.rule3": "No new trades in the last 15 minutes",
+  "home3.ex.indicator1": "Supertrend with a 20 EMA on 15 min",
+  "home3.ex.indicator2": "RSI that flags overbought on NIFTY 50",
+  "home3.ex.indicator3": "VWAP with bands for BANK NIFTY",
+  "home3.ex.strategy1": "Buy NIFTY on a 1% dip, exit at 2% profit",
+  "home3.ex.strategy2": "Sell when Supertrend flips red on 15 min",
+  "home3.ex.strategy3": "Enter on an opening range breakout",
   "home.createPrefix": "Create a new",
   "home.word.indicator": "indicator",
   "home.word.rule": "rule",
@@ -7382,10 +7387,13 @@ export const dash: Flow = {
     // DASH home field: With switch (Rule · Indicator · Strategy inside the field, like Claude Desktop) or Plain.
     { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
     { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
-    // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
-    { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '2' },
+    // Returning home: Version 2 (library + live status board) or Version 3. Version 1 (the live layout) stays in the code
+    // (ReturningScene) but is off the settings panel.
+    { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '2' },
     // Returning home V3: what this person has made so far — the kinds not made yet show an invite card.
     { id: 'homeMade', group: 'Home', icon: msRule, label: 'Made so far (V3)', values: [{ value: 'rules', label: 'Rules only' }, { value: 'both', label: 'Rules + indicators' }], default: 'rules' },
+    // Returning home V3, for testing: hide one section.
+    { id: 'homeHide', group: 'Home', icon: msVisibility, label: 'Hide section (V3)', values: [{ value: 'none', label: 'None' }, { value: 'indicators', label: 'Indicators' }, { value: 'strategies', label: 'Strategies' }], default: 'none' },
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
     { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
     // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
@@ -9840,17 +9848,31 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   color: var(--l3-content-secondary);
 }
 
-/* V3 · an invite card for a kind not tried yet: what it is (left), Create (right, small). */
-.inviteRow {
-  display: flex;
-  align-items: center;
-  gap: var(--l3-spacing-12);
-  width: 100%;
+/* V3 · a kind not tried yet: "+ Create" first — dashed, the + on a light DASH-green disc — then example cards. */
+.createCard.createCard {
+  justify-content: center;
+  gap: var(--l3-spacing-08);
+  width: 40%;
+  border-style: dashed;
 }
 
-.inviteText {
-  flex: 1;
-  min-width: 0;
+.createIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  border-radius: var(--l3-radius-full);
+  background: var(--app-dash-tile);
+  color: var(--l3-content-accent-success-default);
+}
+
+/* An example's first line: 💡 Try, in the discover colour. */
+.tryLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  color: var(--l3-content-accent-discover-default);
+  font: var(--l3-text-label-12);
 }
 ```
 
@@ -9867,7 +9889,7 @@ import { Inset } from '@l3/components/Inset'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
-import { msChevronRight, msClose, msDelete } from '@l3/icons/material'
+import { msAdd, msLightbulb, msChevronRight, msClose, msDelete } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
@@ -9899,6 +9921,12 @@ import styles from './ReturningV2.module.css'
 const SHOW_STRATEGIES = true
 /** V3: the kind launched last — marked New on its section and in the field's switch. */
 const NEW_KIND = 'strategy' as const
+/** V3 · what each kind can do, shown on its row until the first one is made (copy keys). */
+const EXAMPLES = {
+  rule: ['home3.ex.rule1', 'home3.ex.rule2', 'home3.ex.rule3'],
+  indicator: ['home3.ex.indicator1', 'home3.ex.indicator2', 'home3.ex.indicator3'],
+  strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
+} as const
 
 export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, typing, onTyping }: ReturningProps & { /** Returning home V3: every kind always has a place (an invite card until one is made) and the newest kind is marked New. */ version3?: boolean }) {
   // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
@@ -9952,10 +9980,23 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
   const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
   // Setting "Ask field": the switch in the field (Rule · Indicator · Strategy) picks where Send goes.
-  const askModes = useAskModes({ onRules, onIndicator, guess: ask, newKind: version3 ? NEW_KIND : undefined })
+  // V3 has no switch in the field (the sections already offer each kind): the plain one-line field there.
+  /** V3 · an example tapped: rules and indicators open their chat; a strategy (no chat yet) goes into the field. */
+  const tryExample = (kind: 'rule' | 'indicator' | 'strategy', text: string) => {
+    if (kind === 'rule') onRules?.()
+    else if (kind === 'indicator') onIndicator?.()
+    else {
+      kb.field.onChange(text)
+      kb.field.onFocus()
+    }
+  }
+  const switchModes = useAskModes({ onRules, onIndicator, guess: ask })
+  const askModes = version3 ? null : switchModes
   // V3: what this person has made so far (setting "Made so far"): rules only, or rules and indicators. No strategies yet.
   const made = useFlowOption('dash', 'homeMade', 'rules')
   const has = { rule: true, indicator: made === 'both', strategy: false }
+  // V3 testing: hide one section (setting "Hide section (V3)": None / Indicators / Strategies).
+  const hidden = useFlowOption('dash', 'homeHide', 'none')
 
   // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
@@ -10035,6 +10076,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                 {(['rule', 'indicator', 'strategy'] as const)
                   .slice()
                   .sort((a, b) => Number(has[b]) - Number(has[a]))
+                  .filter((kind) => kind !== { none: '', indicators: 'indicator', strategies: 'strategy' }[hidden])
                   .map((kind) => {
                     const items = kind === 'rule' ? rulesSorted : kind === 'indicator' ? savedIndicators : []
                     const isNew = kind === NEW_KIND
@@ -10042,8 +10084,8 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                       if (kind === 'rule') onRules?.()
                       else if (kind === 'indicator') onIndicator?.()
                       else {
-                        // No strategy chat yet: the field switches to Strategy and the keyboard comes up.
-                        askModes?.modes.onChange('strategy')
+                        // No strategy chat yet: the field starts the sentence and the keyboard comes up.
+                        kb.field.onChange(t('home3.strategyStart'))
                         kb.field.onFocus()
                       }
                     }
@@ -10060,15 +10102,23 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                             {items.map((item) => card(item, kind as 'rule' | 'indicator', false))}
                           </div>
                         ) : (
-                          <Card className={styles.invite}>
-                            <div className={styles.inviteRow}>
-                              <Stack gap="04" className={styles.inviteText}>
-                                <span className={styles.strategyEmptyTitle}>{t(`home3.empty.${kind}`)}</span>
-                                <span className={styles.strategyEmptyText}>{t(`home3.emptyText.${kind}`)}</span>
-                              </Stack>
-                              <Button size="sm" variant="secondary" onClick={create}>{t(`home3.create.${kind}`)}</Button>
-                            </div>
-                          </Card>
+                          // Not tried yet: a row like the ones above — "+ Create" first (dashed), then a few things this
+                          // kind can do (tap one to start with it), so it teaches as well as invites.
+                          <div className={styles.row} role="list">
+                            <button type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={create}>
+                              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+                              <span className={styles.itemTitle}>{t(`home3.create.${kind}`)}</span>
+                            </button>
+                            {EXAMPLES[kind].map((key) => (
+                              <button key={key} type="button" role="listitem" className={styles.item} onClick={() => tryExample(kind, t(key))}>
+                                <span className={styles.itemTop}>
+                                  <span className={styles.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
+                                  <Icon icon={msChevronRight} size={16} />
+                                </span>
+                                <span className={styles.itemTitle}>{t(key)}</span>
+                              </button>
+                            ))}
+                          </div>
                         )}
                       </Stack>
                     )
