@@ -6242,6 +6242,28 @@ export function flyMessage(origin: FlyOrigin, target: HTMLElement, stage: HTMLEl
 }
 ```
 
+### `src/flows/dash/components/historyFilter.ts`
+
+```ts
+/**
+ * Which tab the history page (Created with DASH) opens on, when another screen asks — the returning home's View all
+ * on Your rules / Your indicators. Held for a moment and taken once as the page opens; otherwise it opens on All.
+ */
+export type HistoryTab = 'all' | 'rules' | 'indicators' | 'strategies'
+let pending: HistoryTab | null = null
+
+export function openHistoryOn(tab: HistoryTab) {
+  pending = tab
+}
+
+/** The asked-for tab (the page takes it as it opens; cleared after this tick, so a dev-mode double render gets it too). */
+export function takeHistoryTab(): HistoryTab {
+  const tab = pending ?? 'all'
+  window.setTimeout(() => (pending = null), 0)
+  return tab
+}
+```
+
 ### `src/flows/dash/components/pendingFile.ts`
 
 ```ts
@@ -6437,9 +6459,9 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "creations.title": "Created with DASH",
   "creations.tabs": "Show",
   "creations.all": "All",
-  "creations.rules": "AI Rules",
-  "creations.indicators": "AI Indicators",
-  "creations.strategies": "AI Strategies",
+  "creations.rules": "Rules",
+  "creations.indicators": "Indicators",
+  "creations.strategies": "Strategies",
   "creations.rulesCount": "AI rules ({count})",
   "creations.indicatorsCount": "AI indicators ({count})",
   "creations.strategiesCount": "AI strategies ({count})",
@@ -6466,6 +6488,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "cards.paused": "Paused",
   "cards.onChart": "On chart",
   "cards.smartInfo": "What's a Smart Rule?",
+  "details.switchStatus": "Status: {status}. Tap to switch",
   "cards.smartTip": "A built-in safety rule, on by default to protect you from big losses.",
   "cards.rulePaused": "Rule paused",
   "cards.ruleOn": "Rule turned on",
@@ -6583,7 +6606,14 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "details.ruleOn": "Rule on",
   "details.ruleOnText": "Steps in when its limit is hit",
   "details.showOnChart": "Show on chart",
-  "details.showOnChartText": "Draws it on your Scalper chart"
+  "details.showOnChartText": "Draws it on your Scalper chart",
+  "creations.filter.rules.all": "All ({count})",
+  "creations.filter.rules.on": "Active ({count})",
+  "creations.filter.rules.off": "Paused ({count})",
+  "creations.filter.indicators.all": "All ({count})",
+  "creations.filter.indicators.on": "On chart ({count})",
+  "creations.filter.indicators.off": "Not on chart ({count})",
+  "creations.filterLabel": "Showing {label}. Change"
 }
 ```
 
@@ -6732,6 +6762,7 @@ export const homeTriggers: Record<string, number> = { 'day-pnl-gate': 2, 'expiry
 ### `src/flows/dash/index.tsx`
 
 ```tsx
+import { msChat, msCode, msDashboard, msDescription, msForum, msHistory, msHome, msImage, msLabel, msLayers, msLightbulb, msPlayCircle, msTune, msViewAgenda, msVisibility } from '@l3/icons/material'
 import type { Flow } from '../types'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
@@ -6759,34 +6790,36 @@ export const dash: Flow = {
   // Prototype setting: Version 1 = the cards (rule, indicator) pinned above the chat. Version 2 = the cards inside the
   // chat as a turn. Both: three indicator examples (asks nothing / the timeframe / where it goes).
   options: [
-    { id: 'version', label: 'Chat version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
     // The history page (☰ / History in the top bar), set apart from the chat: Version 1 = the Trading rules list,
     // Version 2 = Created with DASH (tabs: rules, indicators, strategies). The two card settings below are for Version 2.
-    { id: 'history', label: 'History version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    { id: 'history', group: 'History', icon: msHistory, label: 'History version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
     // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
-    { id: 'cardVersion', label: 'Card version', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    // Version 3 (default): simple — status, name, switch (like the returning home); the name opens the details.
+    { id: 'cardVersion', group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
+    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
     // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
     // (they dim) or with the chat pushed up to make room.
-    { id: 'pineTip', label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
+    { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
     // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
-    { id: 'pineTipShow', label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'once' },
-    { id: 'pineTipPlace', label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
+    { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'once' },
+    { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
-    { id: 'home', label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }], default: 'new' },
+    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }], default: 'new' },
     // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
-    { id: 'returningHome', label: 'Returning home', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
-    { id: 'resumeChats', label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
+    { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
-    { id: 'creationsLayout', label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'grouped' },
+    { id: 'creationsLayout', group: 'Home', icon: msViewAgenda, label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'grouped' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
-    { id: 'pineScript', label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
+    { id: 'pineScript', group: 'Pine Script', icon: msCode, label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
     // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
-    { id: 'messageStyle', label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'plain' },
+    { id: 'messageStyle', group: 'Chat', icon: msForum, label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'plain' },
     // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
-    { id: 'indicatorTags', label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
-    { id: 'cardIcons', label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
+    { id: 'indicatorTags', group: 'Chat', icon: msLabel, label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
+    { id: 'cardIcons', group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
   ],
   sections: [
     { id: 'entry', title: 'Entry' },
@@ -7495,8 +7528,10 @@ import { Screen } from '../../../shared/ui/Screen'
 import { t } from '../copy'
 import type { SavedRule } from '../data'
 import { CreationDetailsSheet, DeleteRuleSheet, RuleDetailsSheet } from '../sheets/RuleSheets'
+import { takeHistoryTab } from '../components/historyFilter'
 import { RuleItem } from './ActiveRules'
 import { CreationCard } from './CreationCard'
+import { SimpleCreationCard } from './SimpleCreationCard'
 import styles from './Creations.module.css'
 
 type Kind = 'rules' | 'indicators' | 'strategies'
@@ -7529,7 +7564,8 @@ type CreationsProps = {
  * Create New in the dock makes the kind of the tab (All → a rule).
  */
 export function Creations({ rules, indicators, strategies, onBack, onDeleteRule, onCreateRule, onCreateIndicator, onAddToChart, onEditIndicator, onEditRule, sheet }: CreationsProps) {
-  const [tab, setTab] = useState<Tab>('all')
+  // Opened from the home's View all on rules / indicators: that tab; otherwise All.
+  const [tab, setTab] = useState<Tab>(takeHistoryTab)
   const [ruleList, setRuleList] = useState(rules)
   const [list, setList] = useState(indicators)
   // One sheet at a time: a creation's details (its ›) or the delete confirmation (rule or indicator).
@@ -7537,7 +7573,10 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
   // Prototype setting "Card icons" (or Shift+P): the initial avatar on the Current card (the New card has none).
   const showIcons = useFlowOption('dash', 'cardIcons', 'show') === 'show'
   // Prototype setting "Card version": 1 (as it was) or 2 (default: paused state, undo toast, details sheet).
-  const modern = useFlowOption('dash', 'cardVersion', '2') === '2'
+  const cardVersion = useFlowOption('dash', 'cardVersion', '3')
+  // Version 2 and the simple Version 3 share the new behaviour (details sheet, toggles, toast); 3 just shows less.
+  const modern = cardVersion !== '1'
+  const simple = cardVersion === '3'
   // On / off per item (New): kept here so the toast can undo a toggle.
   const [onMap, setOnMap] = useState<Record<string, boolean>>(() => Object.fromEntries([...rules, ...indicators].map((r) => [r.id, r.on])))
   const [toast, setToast] = useState<{ key: number; heading: string; undo: () => void } | null>(null)
@@ -7565,8 +7604,15 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
   const section = (kind: Kind) => {
     if (modern && kind !== 'strategies') {
       const of = kind
-      return activeFirst(of === 'rules' ? ruleList : list).map((r) => (
-        <CreationCard key={r.id} item={r} kind={of === 'rules' ? 'rule' : 'indicator'} on={onMap[r.id] ?? r.on} onToggle={(on) => toggle(r, of, on)} onOpen={() => setOpen({ kind: 'details', item: r, of })} />
+      const f = filter[of]
+      return activeFirst(of === 'rules' ? ruleList : list)
+        .filter((r) => f === 'all' || (onMap[r.id] ?? r.on) === (f === 'on'))
+        .map((r) => (
+        simple ? (
+          <SimpleCreationCard key={r.id} item={r} kind={of === 'rules' ? 'rule' : 'indicator'} on={onMap[r.id] ?? r.on} onToggle={(on) => toggle(r, of, on)} onOpen={() => setOpen({ kind: 'details', item: r, of })} />
+        ) : (
+          <CreationCard key={r.id} item={r} kind={of === 'rules' ? 'rule' : 'indicator'} on={onMap[r.id] ?? r.on} onToggle={(on) => toggle(r, of, on)} onOpen={() => setOpen({ kind: 'details', item: r, of })} />
+        )
       ))
     }
     if (kind === 'rules') return ruleList.map((r) => <RuleItem key={r.id} rule={r} hideLeading={!showIcons} onOpen={() => setOpen({ kind: 'details', item: r, of: 'rules' })} onDelete={() => setOpen({ kind: 'delete', item: r, of: 'rules' })} />)
@@ -7590,6 +7636,18 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
     const items = kind === 'rules' ? ruleList : list
     const on = items.filter((r) => onMap[r.id] ?? r.on).length
     return kind === 'rules' ? t('cards.rulesStatus', { on, off: items.length - on }) : t('cards.indicatorsStatus', { on, off: items.length - on })
+  }
+
+  // Quick filter per section (the header's switcher, a tap moves on): All → Active → Paused (indicators: All → On chart
+  // → Not on chart), each with its count.
+  const [filter, setFilter] = useState<Record<'rules' | 'indicators', 'all' | 'on' | 'off'>>({ rules: 'all', indicators: 'all' })
+  const nextFilter = { all: 'on', on: 'off', off: 'all' } as const
+  const filterLabel = (kind: 'rules' | 'indicators') => {
+    const items = kind === 'rules' ? ruleList : list
+    const on = items.filter((r) => onMap[r.id] ?? r.on).length
+    const f = filter[kind]
+    const count = f === 'all' ? items.length : f === 'on' ? on : items.length - on
+    return t(`creations.filter.${kind}.${f}`, { count })
   }
 
   const empty = kinds.length === 0 || kinds.every((k) => counts[k] === 0)
@@ -7675,7 +7733,11 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
               <Stack as="section" gap="16" key={kind} aria-label={t(`creations.${kind}Count`, { count: counts[kind] })}>
                 <SectionHeader
                   title={t(`creations.${kind}Count`, { count: counts[kind] })}
-                  description={modern && kind !== 'strategies' ? status(kind) : undefined}
+                  action={
+                    modern && kind !== 'strategies'
+                      ? { type: 'switcher', label: filterLabel(kind), onClick: () => setFilter((f) => ({ ...f, [kind]: nextFilter[f[kind]] })), 'aria-label': t('creations.filterLabel', { label: filterLabel(kind) }) }
+                      : undefined
+                  }
                 />
                 <Stack as="ul" gap="16" className={styles.list}>{section(kind)}</Stack>
               </Stack>
@@ -8895,6 +8957,32 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 .dock {
   flex: none;
 }
+
+/* Landing: the page's parts appear one after another so each is noticed — the header first, then each section 120 ms
+   apart (fade + rise 12, 400 ms, decelerating). The field is never part of it. */
+.reveal,
+.sections > * {
+  animation: home-reveal var(--app-dash-reveal) var(--l3-motion-easing-decelerate) both;
+}
+
+.sections > :nth-child(1) { animation-delay: calc(1 * var(--app-dash-reveal-step)); }
+.sections > :nth-child(2) { animation-delay: calc(2 * var(--app-dash-reveal-step)); }
+.sections > :nth-child(3) { animation-delay: calc(3 * var(--app-dash-reveal-step)); }
+.sections > :nth-child(4) { animation-delay: calc(4 * var(--app-dash-reveal-step)); }
+
+@keyframes home-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-12));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .sections > * {
+    animation: none;
+  }
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -8913,6 +9001,7 @@ import { msChevronRight, msClose, msDelete } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { openHistoryOn } from '../components/historyFilter'
 import { holdFile } from '../components/pendingFile'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { ChatInput } from '../components/Chat'
@@ -8934,6 +9023,9 @@ import styles from './ReturningV2.module.css'
  * 4. the field — change something or start something new, in words.
  * Kept to three things so it reads at a glance (designer's call). Status is sample data (the app has no feed yet).
  */
+/** Your strategies on the home: off until strategies exist (designer's call). */
+const SHOW_STRATEGIES = false
+
 export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator }: ReturningProps) {
   /** Where a draft carries on: its chat. */
   const open = (kind: 'rule' | 'indicator') => (kind === 'indicator' ? onOpenIndicator : onOpenRule) ?? (() => {})
@@ -9011,7 +9103,7 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
           <Stack gap={centre ? '40' : '48'} className={styles.content} data-centre={centre || undefined}>
             {/* 1 · Header, centred in both states: the DASH orb, then the greeting under it. Big with nothing to resume
                 (centre stage); a size smaller while drafts are shown, so the sections fit. */}
-            <Stack gap="16" align="center">
+            <Stack gap="16" align="center" className={styles.reveal}>
               <DashOrb size={centre ? 'lg' : 'md'} />
               <Stack gap="04" className={styles.centreHeading}>
                 <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
@@ -9019,8 +9111,9 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
               </Stack>
             </Stack>
 
-            {/* The sections, 32 apart (the header sits 48 above them). */}
-            <Stack gap="32">
+            {/* The sections, 32 apart (the header sits 48 above them). On landing they appear one after another, after
+                the header (the field below is there from the start). */}
+            <Stack gap="32" className={styles.sections}>
             {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
                 each, swiped sideways when there are two or more; ✕ removes one (asks first). */}
             {drafts.length > 0 && (
@@ -9060,16 +9153,30 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
                   { kind: 'indicator' as const, items: savedIndicators, note: t('home2.indicatorsNote', { total: savedIndicators.length, count: savedIndicators.filter((x) => x.on).length }) },
                 ].map((g) => (
                   <Stack key={g.kind} as="section" gap="12" aria-label={t(`home2.group.${g.kind}`)}>
-                    <SectionHeader title={t(`home2.group.${g.kind}`)} description={g.note} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+                    <SectionHeader
+                      title={t(`home2.group.${g.kind}`)}
+                      headingLevel={2}
+                      action={{
+                        type: 'view-all',
+                        // The history page, on this kind's tab.
+                        onClick: () => {
+                          openHistoryOn(g.kind === 'rule' ? 'rules' : 'indicators')
+                          onManage?.()
+                        },
+                      }}
+                    />
                     <div className={styles.row} role="list">
                       {g.items.map((item) => card(item, g.kind, false))}
                     </div>
                   </Stack>
                 ))}
-                <Stack as="section" gap="12" aria-label={t('home2.group.strategy')}>
-                  <SectionHeader title={t('home2.group.strategy')} headingLevel={2} />
-                  <span className={styles.soon}>{t('home2.strategiesSoon')}</span>
-                </Stack>
+                {/* Your strategies: hidden for now (strategies aren't built yet). */}
+                {SHOW_STRATEGIES && (
+                  <Stack as="section" gap="12" aria-label={t('home2.group.strategy')}>
+                    <SectionHeader title={t('home2.group.strategy')} headingLevel={2} />
+                    <span className={styles.soon}>{t('home2.strategiesSoon')}</span>
+                  </Stack>
+                )}
               </>
             ) : (
               <Stack as="section" gap="12" aria-label={t('home2.creations')}>
@@ -9689,6 +9796,108 @@ const render = (turns: { key: string; node: ReactNode }[]) =>
   ))
 ```
 
+### `src/flows/dash/screens/SimpleCreationCard.module.css`
+
+```css
+/* History, Card version 3: a card row — status + name (one tap target, opens details) on the left, a switch right. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-12);
+  width: 100%;
+  text-align: start;
+}
+
+.open {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--l3-spacing-04);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+}
+
+.status {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-12);
+}
+
+.status[data-on] {
+  color: var(--l3-content-accent-success-default);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  color: var(--l3-content-primary);
+}
+
+.nameText {
+  min-width: 0;
+  font: var(--l3-text-heading-14);
+}
+
+/* Off: the text dims a little (the switch says it plainly). */
+.card[data-off] .name {
+  color: var(--l3-content-secondary);
+}
+
+.switch {
+  flex: none;
+}
+```
+
+### `src/flows/dash/screens/SimpleCreationCard.tsx`
+
+```tsx
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { Switch } from '@l3/components/Switch'
+import { msChevronRight } from '@l3/icons/material'
+import { t } from '../copy'
+import { homeTriggers, type SavedRule } from '../data'
+import styles from './SimpleCreationCard.module.css'
+
+type SimpleCreationCardProps = {
+  item: SavedRule
+  kind: 'rule' | 'indicator'
+  on: boolean
+  onToggle: (on: boolean) => void
+  /** The status and the name: open the details sheet. */
+  onOpen: () => void
+}
+
+/**
+ * History, Card version 3 (simple, like the returning home): one line of what it's doing (a rule: triggered today /
+ * not / paused; an indicator: on chart / not), the name, ›, and a switch on the right. The status + name is one tap
+ * target that opens the details sheet; the switch has its own and only turns it on / off.
+ */
+export function SimpleCreationCard({ item, kind, on, onToggle, onOpen }: SimpleCreationCardProps) {
+  const triggered = homeTriggers[item.id] ?? 0
+  const status = kind === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
+  const lit = kind === 'rule' ? on && triggered > 0 : on
+  return (
+    <Card className={styles.card} data-off={!on || undefined}>
+      <div className={styles.row}>
+      <button type="button" className={styles.open} onClick={onOpen}>
+        <span className={styles.status} data-on={lit || undefined}>{status}</span>
+        <span className={styles.name}>
+          <span className={styles.nameText}>{item.title}</span>
+          <Icon icon={msChevronRight} size={16} />
+        </span>
+      </button>
+      <Switch checked={on} onChange={(e) => onToggle(e.target.checked)} aria-label={kind === 'rule' ? t('rules.toggleLabel', { name: item.title }) : t('creations.onChart', { name: item.title })} className={styles.switch} />
+      </div>
+    </Card>
+  )
+}
+```
+
 ### `src/flows/dash/sheets/IndicatorSheets.tsx`
 
 ```tsx
@@ -9920,17 +10129,20 @@ export function PineUploadSheet({ onChoose, onClose }: { onChoose: () => void; o
   color: var(--l3-content-primary);
 }
 
-.smartInline {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--l3-spacing-08);
-  margin: 0;
-  color: var(--l3-content-secondary);
-  font: var(--l3-text-description-12);
+/* Details version 2: the Status tag is the switch (a plain button around the L3 Tag; tap target grows past the tag). */
+.statusSwitch {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 }
 
-.smartInline > :first-child {
-  flex: none;
+.statusSwitch::after {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--l3-spacing-12));
 }
 
 /* The other actions: plain rows, a hairline between; Delete last, in the error colour. */
@@ -9958,7 +10170,9 @@ import { ListCell } from '@l3/components/ListCell'
 import { Stack } from '@l3/components/Stack'
 import { Switch } from '@l3/components/Switch'
 import { Tag } from '@l3/components/Tag'
+import { lmSwitchArrowVertical } from '@l3/components/icons/glyphs'
 import { msAddChart, msDelete, msEdit } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { BacktestStrip } from '../components/RuleCard'
@@ -10168,6 +10382,8 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
     setOn(next)
     onToggle?.(next)
   }
+  // Details version 2 (testing): no switch card; the Status tag itself switches it (tap: On ↔ Paused / On chart ↔ Not on chart).
+  const tagSwitch = useFlowOption('dash', 'detailsVersion', '1') === '2'
   const { text, strong, after } = item.activity
   const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
   // The dock: Edit (primary, left) and Delete (secondary, right) side by side, for rules and indicators alike. (Adding to a
@@ -10176,7 +10392,8 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
     <Sheet
       labelledBy={id}
       onClose={onClose}
-      header={<BottomSheetHeader size="lg" headingId={id} heading={item.title} description={item.summary} icon={<DashOrb size="md" />} />}
+      header={<BottomSheetHeader size="lg" headingId={id} heading={item.title} description={item.summary} icon={<DashOrb size="md" />}
+        tag={item.smart ? <Tag color="success" variant="secondary" size="sm">{t('rules.smart')}</Tag> : undefined} />}
       footer={
         <ButtonGroup aria-label={item.title} direction="horizontal">
           <Button iconLeft={<Icon icon={msEdit} />} onClick={onEdit}>{t('details.edit')}</Button>
@@ -10185,25 +10402,28 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
       }
     >
       <Stack gap="16">
-        {/* Turn it on / off from here (a card row with a switch): Rule on · Show on chart. */}
-        <ListCell
+        <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
+          <KeyValueRow
+            label={t('details.status')}
+            value={tagSwitch ? (
+              <button type="button" className={styles.statusSwitch} onClick={() => toggle(!on)} aria-label={t('details.switchStatus', { status })}>
+                <Tag color={on ? 'success' : 'neutral'} variant="primary" size="sm" iconRight={<Icon icon={lmSwitchArrowVertical} />}>{status}</Tag>
+              </button>
+            ) : (
+              <Tag color={on ? 'success' : 'neutral'} variant="secondary" size="sm">{status}</Tag>
+            )}
+          />
+          <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
+        </KeyValueList>
+        {/* Under the details: turn it on / off from here (a card row with a switch): Rule on · Show on chart. */}
+        {!tagSwitch && <ListCell
           variant="card"
           as="label"
           label={kind === 'rule' ? t('details.ruleOn') : t('details.showOnChart')}
           description={kind === 'rule' ? t('details.ruleOnText') : t('details.showOnChartText')}
           multiline
           trailing={<Switch checked={on} onChange={(e) => toggle(e.target.checked)} />}
-        />
-        <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
-          <KeyValueRow label={t('details.status')} value={<Tag color={on ? 'success' : 'neutral'} variant="secondary" size="sm">{status}</Tag>} />
-          <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
-        </KeyValueList>
-        {item.smart && (
-          <p className={styles.smartInline}>
-            <Tag color="success" variant="secondary" size="sm">{t('rules.smart')}</Tag>
-            <span>{t('cards.smartTip')}</span>
-          </p>
-        )}
+        />}
       </Stack>
     </Sheet>
   )
@@ -10351,6 +10571,17 @@ export function useFlowOption(flow: string, option: string, fallback: string) {
   return useSyncExternalStore(
     (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
     () => memory.get(optionKey(flow, option, fallback)) ?? readOption(optionKey(flow, option, fallback)) ?? fallback,
+  )
+}
+
+/** How many of a flow's options are off their default (the settings panel's badge). */
+export function useFlowOptionsChanged(flow: { id: string; options?: { id: string; default: string }[] }) {
+  return useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => (flow.options ?? []).filter((o) => {
+      const key = optionKey(flow.id, o.id, o.default)
+      return (memory.get(key) ?? readOption(key) ?? o.default) !== o.default
+    }).length,
   )
 }
 

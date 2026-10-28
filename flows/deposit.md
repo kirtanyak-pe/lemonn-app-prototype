@@ -489,6 +489,17 @@ export function useFlowOption(flow: string, option: string, fallback: string) {
   )
 }
 
+/** How many of a flow's options are off their default (the settings panel's badge). */
+export function useFlowOptionsChanged(flow: { id: string; options?: { id: string; default: string }[] }) {
+  return useSyncExternalStore(
+    (onChange) => { optionListeners.add(onChange); return () => { optionListeners.delete(onChange) } },
+    () => (flow.options ?? []).filter((o) => {
+      const key = optionKey(flow.id, o.id, o.default)
+      return (memory.get(key) ?? readOption(key) ?? o.default) !== o.default
+    }).length,
+  )
+}
+
 /**
  * Typing on a phone uses the phone's own keyboard (a touch screen, `pointer: coarse`) — the prototype's drawn keyboard
  * stays hidden. On a laptop the drawn keyboard shows (for the look) and the laptop's keys type into the focused field.
