@@ -9842,9 +9842,13 @@ const render = (turns: { key: string; node: ReactNode }[]) =>
   font: var(--l3-text-heading-14);
 }
 
-/* Off: the text dims a little (the switch says it plainly). */
-.card[data-off] .name {
+/* Off: the name drops from heading (bold) to label (medium) and dims a little; the switch says it plainly. */
+.row[data-off] .name {
   color: var(--l3-content-secondary);
+}
+
+.row[data-off] .nameText {
+  font: var(--l3-text-label-14);
 }
 
 .switch {
@@ -9882,8 +9886,8 @@ export function SimpleCreationCard({ item, kind, on, onToggle, onOpen }: SimpleC
   const status = kind === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
   const lit = kind === 'rule' ? on && triggered > 0 : on
   return (
-    <Card className={styles.card} data-off={!on || undefined}>
-      <div className={styles.row}>
+    <Card className={styles.card}>
+      <div className={styles.row} data-off={!on || undefined}>
       <button type="button" className={styles.open} onClick={onOpen}>
         <span className={styles.status} data-on={lit || undefined}>{status}</span>
         <span className={styles.name}>
