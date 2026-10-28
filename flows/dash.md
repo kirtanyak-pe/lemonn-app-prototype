@@ -10,8 +10,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `stocks-01`, `dash-14`, `dash-03`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
-| `dash-28` | DASH home · returning user | — | `stocks-01`, `dash-14`, `dash-03`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too. |
+| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `dash-03`, `stocks-01`, `dash-14`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
+| `dash-28` | DASH home · returning user | — | `dash-03`, `stocks-01`, `dash-14`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too. |
 | `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-04` | Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules. |
 | `dash-26` | Rules · typing | [6494:30768](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6494-30768) | `dash-02`, `dash-14`, `dash-04` | Figma “DASH AI - better layout” 3.1 (file 9r61YQp7QQZAQovDyz8hLF): the input tapped — heading and examples fold away, the orb stays centred, the input turns green, the keyboard rises and the background ends above it (300 ms). Tap the body to go back. |
 | `dash-04` | Thinking | [5612:40517](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517) | `dash-02`, `dash-14`, `dash-05` | Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies). |
@@ -2709,7 +2709,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
    row. The Pine Script highlight (first time) still lights it green. */
 .input[data-modes] .attachWrap:not([data-glow]) .attach.attach {
   background: none;
-  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the outline */
+  box-shadow: inset 0 0 0 1px var(--l3-border-intense); /* 1px: the outline (border/intense, so it holds its own beside Send) */
   color: var(--l3-content-primary);
 }
 
@@ -2734,6 +2734,11 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 /* Chat input "Pills above": the switch row over the field, 8 above it. */
 .modesAbove {
   margin-bottom: var(--l3-spacing-08);
+}
+
+/* With the switch: 4 more between the + and Send (the row's 4 gap + 4 = 8). */
+.input[data-modes] .attachWrap {
+  margin-right: var(--l3-spacing-04);
 }
 ```
 
@@ -3117,6 +3122,31 @@ export function ReplyChips({ options, asButtons = false, glow = false }: { optio
 }
 ```
 
+### `src/flows/dash/components/DashDock.tsx`
+
+```tsx
+import { createContext, useContext, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+
+/**
+ * One place for the DASH input (and the drawn keyboard): a fixed area at the bottom of the DASH screen, outside the
+ * part that changes. Every scene (homes, chats) renders its field into it through <DashDock>, so moving between
+ * scenes never slides or fades the input — only the body above it changes. A scene that's on its way out (SceneSwap's
+ * leaving layer) renders none, so there's only ever one.
+ */
+export const DockHost = createContext<HTMLElement | null>(null)
+/** Set by SceneSwap on each layer: the leaving one doesn't render its dock. */
+export const SceneRole = createContext<'enter' | 'exit' | 'current'>('current')
+
+export function DashDock({ children }: { children: ReactNode }) {
+  const host = useContext(DockHost)
+  const role = useContext(SceneRole)
+  if (role === 'exit') return null
+  // No host (a scene shown on its own): render in place, as before.
+  return host ? createPortal(children, host) : <>{children}</>
+}
+```
+
 ### `src/flows/dash/components/DashScreen.module.css`
 
 ```css
@@ -3270,7 +3300,7 @@ export function ReplyChips({ options, asButtons = false, glow = false }: { optio
 ### `src/flows/dash/components/DashScreen.tsx`
 
 ```tsx
-import type { ComponentProps } from 'react'
+import { useEffect, useRef, type ComponentProps } from 'react'
 import { Actionbar, type ActionbarProps } from '@l3/components/Actionbar'
 import { Screen } from '../../../shared/ui/Screen'
 import gradient from '../assets/bg-gradient.png'
@@ -3299,10 +3329,18 @@ type DashScreenProps = ComponentProps<typeof Screen> & {
  * navigation bars, which have no fill on DASH pages, so the gradient and its motion show behind them too.
  */
 export function DashScreen({ tone = 'brand', keyboard = false, chatting = false, className, ...screen }: DashScreenProps) {
+  // The turning colour glow: normal speed for the first 5 s on DASH, then half speed (it slows from where it is — the
+  // running animation's playback rate, so nothing jumps). The frame stays mounted across DASH screens, so this is
+  // once per visit to DASH.
+  const glow = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const id = window.setTimeout(() => glow.current?.getAnimations().forEach((a) => { a.playbackRate = GLOW_SLOW_RATE }), GLOW_FULL_SPEED_MS)
+    return () => window.clearTimeout(id)
+  }, [])
   return (
     <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-chatting={chatting || undefined} data-edge-to-edge="" data-dash="">
       <div className={styles.background} aria-hidden="true">
-        <div className={styles.gradientBox}>
+        <div ref={glow} className={styles.gradientBox}>
           <img src={gradient} alt="" className={styles.gradient} />
         </div>
         <span className={styles.overlay} />
@@ -3321,6 +3359,10 @@ export function DashScreen({ tone = 'brand', keyboard = false, chatting = false,
 export function DashBar(props: ActionbarProps) {
   return <Actionbar {...props} className={styles.bar} />
 }
+
+/** The background glow turns at full speed this long after arriving on DASH, then at GLOW_SLOW_RATE. */
+const GLOW_FULL_SPEED_MS = 5000
+const GLOW_SLOW_RATE = 0.5
 ```
 
 ### `src/flows/dash/components/IndicatorCard.module.css`
@@ -3660,7 +3702,6 @@ import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { msCheck, msEdit, msError, msKeyboardArrowDown, msOpenInFull } from '@l3/icons/material'
-import { useFlowOption } from '../../../shared/prototype'
 import { t } from '../copy'
 import { buildSteps, markets, type IndicatorDraft, type IndicatorSettings, type Market } from '../indicatorData'
 import { IndicatorFullView } from './IndicatorFullView'
@@ -3718,8 +3759,7 @@ export function IndicatorCard({ draft, state, named = state.kind !== 'building' 
   const card = useRef<HTMLElement>(null)
   // The full view covers the DASH screen the card is on.
   const container = fullView ? card.current?.closest<HTMLElement>('[data-dash]') : null
-  // Prototype setting "Indicator tags": the part tags under the chart, shown or hidden.
-  const showTags = useFlowOption('dash', 'indicatorTags', 'show') === 'show'
+  const showTags = true // the part tags (Supertrend · EMA 20 · BUY · SELL) always show
   const building = state.kind === 'building'
   const stage = building ? (state.step === 0 ? 'sketch' : 'candles') : 'ready'
   const mini = (compact || superseded) && !building
@@ -6248,6 +6288,7 @@ export function RulesIntro({ onPick, title = t('rulesHome.title', { name: firstN
 
 ```tsx
 import { useEffect, useRef, useState, type ReactElement } from 'react'
+import { SceneRole } from './DashDock'
 import styles from './SceneSwap.module.css'
 
 /** How one scene replaces another (Figma prototype): push (landing ↔ chat) or dissolve. */
@@ -6292,7 +6333,7 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
       {layers.map((l) => (
         <div key={l.key} className={styles.scene} data-role={l.role} data-move={lastMove} inert={l.role === 'exit'}>
           {/* the scene on show always renders the latest props; the one leaving keeps its last look */}
-          {l.role === 'exit' ? l.node : children}
+          <SceneRole.Provider value={l.role}>{l.role === 'exit' ? l.node : children}</SceneRole.Provider>
         </div>
       ))}
     </div>
@@ -6417,7 +6458,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
     el.style.left = `${picked.offsetLeft}px`
     el.style.width = `${picked.offsetWidth}px`
     first.current = false
-  }, [value, fill])
+  }, [value, fill, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
   const withBadges = items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : item))
   return (
     <span ref={track} className={styles.track} data-fill={fill || undefined}>
@@ -6615,7 +6656,7 @@ export function SuccessBurst({ leaving = false }: { leaving?: boolean }) {
 ### `src/flows/dash/components/askModes.ts`
 
 ```ts
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFlowOption } from '../../../shared/prototype'
 import { t } from '../copy'
 
@@ -6645,6 +6686,30 @@ export function useAskModes({ onRules, onIndicator, guess, newKind }: { onRules?
     placeholder: t(`askModes.placeholder.${mode}`),
     // Rules and indicators open their chat; a strategy (no chat yet) goes by what was typed.
     send: (text: string) => (mode === 'rule' ? onRules?.() : mode === 'indicator' ? onIndicator?.() : guess(text)),
+  }
+}
+
+/**
+ * Inside a chat: the same two-row field as the home's, always with all three pills — they tell people what DASH can
+ * make (the AI adapts to whatever is typed; the pick isn't a filter). Before anything is sent (switcher given), a pick
+ * flips the chat's suggestions (or opens the other chat); once the conversation has started, a pick only moves the
+ * highlight. Plain field (setting "Chat input: Previous") → none.
+ */
+export function useChatKind(kind: Mode, switcher?: { onChange: (kind: Mode) => void } | null) {
+  const field = useFlowOption('dash', 'askField', 'switch')
+  // The highlighted pill: this chat's kind, or what was picked during the conversation.
+  const [picked, setPicked] = useState<Mode>(kind)
+  useEffect(() => setPicked(kind), [kind])
+  if (field === 'plain') return null
+  return {
+    value: picked,
+    label: t('askModes.label'),
+    items: (['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`) })),
+    onChange: (v: string) => {
+      if (switcher) switcher.onChange(v as Mode)
+      else setPicked(v as Mode)
+    },
+    display: field === 'above' ? ('above' as const) : ('pills' as const),
   }
 }
 ```
@@ -6898,6 +6963,31 @@ export function takeMessage() {
   const text = pending
   window.setTimeout(() => (pending = null), 0)
   return text
+}
+
+/**
+ * Switching what to build from a chat's empty state (the field's Rule · Indicator · Strategy): the next chat opens in
+ * that kind (Strategy opens the rules chat in its strategy mode) and the DASH screen cross-fades the body only.
+ */
+let pendingKind: 'rule' | 'strategy' | null = null
+let switching = false
+
+export function switchKind(kind: 'rule' | 'strategy' | 'indicator') {
+  pendingKind = kind === 'indicator' ? null : kind
+  switching = true
+  window.setTimeout(() => (switching = false), 400) // past the screen change (the route updates after this tick)
+}
+
+/** Is a switch under way? (the DASH screen cross-fades instead of pushing) */
+export function isSwitchingKind() {
+  return switching
+}
+
+/** The kind the rules chat opens in, once (cleared after this tick, for a dev-mode double render). */
+export function takeKind() {
+  const kind = pendingKind
+  window.setTimeout(() => (pendingKind = null), 0)
+  return kind
 }
 ```
 
@@ -7179,7 +7269,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "landing.indicatorDescription": "Describe what your chart should show and DASH draws it.",
   "indicator.title": "Custom indicator",
   "indicator.history": "Your indicators",
-  "indicator.emptyTitle": "What should your chart show?",
+  "indicator.emptyTitle": "Hello, {name}!\nWhat should your chart show?",
   "indicator.emptyDescription": "Describe it in plain words. DASH builds the indicator and draws it on your chart.",
   "indicator.gotIt": "Got it!",
   "indicator.fewQuestions": "Two quick questions before I build it.",
@@ -7347,6 +7437,8 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home3.ex.strategy1": "Buy NIFTY on a 1% dip, exit at 2% profit",
   "home3.ex.strategy2": "Sell when Supertrend flips red on 15 min",
   "home3.ex.strategy3": "Enter on an opening range breakout",
+  "strategyHome.title": "Hello, {name}!\nWhat strategy should DASH build?",
+  "strategyHome.description": "Describe your entries, exits and risk. DASH builds it and shows how it would have done.",
   "home.createPrefix": "Create a new",
   "home.word.indicator": "indicator",
   "home.word.rule": "rule",
@@ -7560,6 +7652,7 @@ export const homeTriggers: Record<string, number> = { 'day-pnl-gate': 2, 'expiry
 ```tsx
 import { msChat, msCode, msDashboard, msDescription, msForum, msHistory, msHome, msImage, msLabel, msLayers, msLightbulb, msPlayCircle, msRule, msTune, msViewAgenda, msVisibility } from '@l3/icons/material'
 import type { Flow } from '../types'
+import { switchKind } from './components/pendingMessage'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
 import { DashAI } from './screens/DashAI'
@@ -7587,10 +7680,6 @@ export const dash: Flow = {
   // chat as a turn. Both: three indicator examples (asks nothing / the timeframe / where it goes).
   options: [
     { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
-    // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
-    { id: 'messageStyle', group: 'Chat', icon: msForum, label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'bubbles' },
-    // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
-    { id: 'indicatorTags', group: 'Chat', icon: msLabel, label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
     { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'returning' },
     // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
@@ -7636,10 +7725,10 @@ export const dash: Flow = {
   ],
   screens: [
     // ---- Entry
-    { id: 'dash-02', group: 'dash', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <DashAI scene="landing" onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
-    { id: 'dash-28', group: 'dash', section: 'entry', name: 'DASH home · returning user', figma: '', note: 'For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too.', render: (go) => <DashAI scene="landing" returning onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-02', group: 'dash', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <DashAI scene="landing" onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-28', group: 'dash', section: 'entry', name: 'DASH home · returning user', figma: '', note: 'For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too.', render: (go) => <DashAI scene="landing" returning onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
     // ---- Create a rule
-    { id: 'dash-03', group: 'dash', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules.', render: (go) => <DashAI scene="rules" step="empty" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onSend={() => go('dash-04')} /> },
+    { id: 'dash-03', group: 'dash', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules.', render: (go) => <DashAI scene="rules" step="empty" onSwitchKind={(k) => go(k === 'indicator' ? 'dash-20' : 'dash-03')} onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onSend={() => go('dash-04')} /> },
     { id: 'dash-26', group: 'dash', section: 'create', name: 'Rules · typing', figma: '6494:30768', note: 'Figma “DASH AI - better layout” 3.1 (file 9r61YQp7QQZAQovDyz8hLF): the input tapped — heading and examples fold away, the orb stays centred, the input turns green, the keyboard rises and the background ends above it (300 ms). Tap the body to go back.', render: (go) => <DashAI scene="rules" step="empty" typing onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onSend={() => go('dash-04')} /> },
     { id: 'dash-04', group: 'dash', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <DashAI scene="rules" step="thinking" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onThought={() => go('dash-05')} /> },
     { id: 'dash-05', group: 'dash', section: 'create', name: 'DASH asks the limit', figma: '5612:40650', note: 'The question card takes the input’s place. Any answer (or one typed) builds the preview.', render: (go) => <DashAI scene="rules" step="question" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onAnswer={() => go('dash-06')} /> },
@@ -7658,7 +7747,7 @@ export const dash: Flow = {
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
     { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} onEditRule={() => go('dash-06')} /> },
     // ---- Custom indicator (wireframe "AI Indicator") — ONE chat screen in different states (group 'indicator')
-    { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onSwitchKind={(k) => go(k === 'indicator' ? 'dash-20' : 'dash-03')} onYourRules={() => go('dash-14')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
     { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
     { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe. (only for “…on Nifty 50”.)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
     { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
@@ -8556,6 +8645,20 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
 }
 ```
 
+### `src/flows/dash/screens/DashAI.module.css`
+
+```css
+/* The DASH input's fixed place at the bottom of the screen (DashDock): the field, then the drawn keyboard, stacked.
+   It stays put while the body above changes; above the body, so a field's tip or its edge over the chat shows. */
+.dockHost {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+```
+
 ### `src/flows/dash/screens/DashAI.tsx`
 
 ```tsx
@@ -8565,7 +8668,9 @@ import { msHistory } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashBar, DashScreen } from '../components/DashScreen'
 import { SceneSwap, type SceneMove } from '../components/SceneSwap'
-import { hasHeldMessage } from '../components/pendingMessage'
+import { isSwitchingKind } from '../components/pendingMessage'
+import { DockHost } from '../components/DashDock'
+import styles from './DashAI.module.css'
 import { t } from '../copy'
 import { IndicatorScene, type IndicatorChatProps } from './IndicatorChat'
 import { LandingScene, type LandingProps } from './Landing'
@@ -8613,12 +8718,36 @@ export function DashAI(props: DashAIProps) {
   /** …and which returning home: Version 1 (the live layout, all kinds) or Version 2 (library + status board). */
   const returningVersion = useFlowOption('dash', 'returningHome', '2')
   const [typing, setTyping] = useState(props.typing ?? false)
+  const [dockHost, setDockHost] = useState<HTMLDivElement | null>(null)
+  // The field rises into place when the screen had none before (the new user's home → a chat): it slides up from the
+  // bottom with a fade (300 ms); from one field to the next (home → chat) it simply stays.
+  useEffect(() => {
+    if (!dockHost) return
+    let had = dockHost.childElementCount > 0
+    const watch = new MutationObserver(() => {
+      const has = dockHost.childElementCount > 0
+      if (has && !had && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        ;[...dockHost.children].forEach((el) =>
+          el.animate([{ transform: 'translateY(100%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(0.2, 0, 0, 1)' }),
+        )
+      }
+      had = has
+    })
+    watch.observe(dockHost, { childList: true })
+    return () => watch.disconnect()
+  }, [dockHost])
   const [lastScene, setLastScene] = useState(scene)
   const [move, setMove] = useState<SceneMove>('push')
   if (lastScene !== scene) {
     setLastScene(scene)
-    // A message sent from the home: the chat carries on in place — the body cross-fades, the bar and background stay.
-    setMove(lastScene === 'landing' && hasHeldMessage() ? 'fade' : order[scene] < order[lastScene] ? 'back' : 'push')
+    // One DASH screen, only the body changes:
+    // - the new user's home (big cards, no field) ↔ a chat: the body pushes (cards out to the left, the chat in from the
+    //   right; back the other way) and the field rises from the bottom (dock animation below);
+    // - a home with the field ↔ a chat, or switching kind in the field: the body cross-fades, the field stays put;
+    // - otherwise push / back by order.
+    const newUserHome = !(('returning' in props ? props.returning : undefined) ?? returningHome) && homeChoice !== 'combined'
+    const touchesHome = lastScene === 'landing' || scene === 'landing'
+    setMove(touchesHome && newUserHome ? (scene === 'landing' ? 'back' : 'push') : touchesHome || isSwitchingKind() ? 'fade' : order[scene] < order[lastScene] ? 'back' : 'push')
     setTyping(false)
   }
 
@@ -8658,12 +8787,16 @@ export function DashAI(props: DashAIProps) {
       tone={tone}
       keyboard={keyboardUp}
       chatting={props.scene !== 'landing' && props.step !== 'empty'}
+      // The input's fixed place (DashDock): every scene renders its field here, so it stays put while the body changes.
+      bottom={<div ref={setDockHost} className={styles.dockHost} />}
       top={<DashBar onBack={onBack} actions={<ActionbarAction icon={msHistory} label={t('landing.menu')} onClick={() => onYourRules?.()} />} />}
       sheet={sheet}
     >
-      <SceneSwap sceneKey={scene} move={move}>
-        <>{body}</>
-      </SceneSwap>
+      <DockHost.Provider value={dockHost}>
+        <SceneSwap sceneKey={scene} move={move}>
+          <>{body}</>
+        </SceneSwap>
+      </DockHost.Provider>
     </DashScreen>
   )
 }
@@ -8765,6 +8898,7 @@ import { useAskModes } from '../components/askModes'
 import { openHistoryOn } from '../components/historyFilter'
 import { usePineTip } from '../components/pineTip'
 import { holdFile } from '../components/pendingFile'
+import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators } from '../data'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
@@ -8806,7 +8940,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
   const [pineSheet, setPineSheet] = useState(false)
   // The first-time Pine Script tip on the field's + (as in the indicator chat): over the cards (they dim) or pushed up.
   const tip = usePineTip()
-  const tipOn = pineOn && tip.show && (!askModes || askModes.mode === 'indicator')
+  const tipOn = pineOn && tip.show
 
   /** Prototype setting "Home card style": Plain (white, normal stroke) or Green (the DASH green edge of the new-user cards). */
   const glow = useFlowOption('dash', 'homeCardStyle', 'glow') === 'glow'
@@ -8884,6 +9018,8 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
       </div>
 
       {/* 3 · Ask DASH: start anything in words. */}
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
       <div className={home.dock} data-tip={tipOn && !tip.overlay ? (tip.story ? 'story' : 'card') : undefined}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput
@@ -8891,8 +9027,8 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
             onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
             placeholder={askModes?.placeholder}
-            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // With the switch, the + (Pine Script) is only there while Indicator is picked.
-            onAttach={pineOn && (!askModes || askModes.mode === 'indicator') ? () => setPineSheet(true) : undefined}
+            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // The + (Pine Script upload) is always there, whatever is picked — a script always becomes an indicator.
+            onAttach={pineOn ? () => setPineSheet(true) : undefined}
             attachTip={tipOn ? { title: t('pineTip.title'), text: t('pineTip.text'), onDone: tip.close, story: tip.story } : null}
           />
           <input
@@ -8919,6 +9055,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
         </Inset>
       </div>
       {kb.keyboard}
+      </DashDock>
     </div>
   )
 }
@@ -8945,8 +9082,11 @@ import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
 import { useStickToBottom } from '../components/stickToBottom'
-import { takeMessage } from '../components/pendingMessage'
+import { switchKind, takeMessage } from '../components/pendingMessage'
+import { DashDock } from '../components/DashDock'
+import { useChatKind } from '../components/askModes'
 import { t } from '../copy'
+import { firstName } from '../data'
 import { applyChange, chartQuestion, defaultSettings, draftFor, indicatorPrompts, indicatorPromptsV2, looksLikePine, minutesOf, pineBuildSteps, timeframeLabel, timeframeQuestion, type IndicatorChange, type IndicatorPrompt, type IndicatorSettings } from '../indicatorData'
 import type { DashVersion } from './RuleChat'
 // The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
@@ -8977,6 +9117,8 @@ export type IndicatorChatProps = {
   /** Typing state (input focused, keyboard up) — kept by the DASH screen. */
   typing?: boolean
   onTyping?: (typing: boolean) => void
+  /** The field's switch, before anything is sent: open the rules chat (as rules or a strategy) instead. */
+  onSwitchKind?: (kind: 'rule' | 'indicator' | 'strategy') => void
 }
 
 const THINKING_MS = 1200
@@ -8999,7 +9141,15 @@ const SWIPE_PX = 8
  * Ready (BUY / SELL labels, notes, Modify and Save indicator) → saved confirmation. Modify opens a plain-language
  * revision prompt; this prototype keeps the same preview after a submitted change.
  */
-export function IndicatorScene({ version = '1', step, onStep, request: initialRequest, onSend, onChart, onTimeframe, onBuilt, onSaved, onSaveSheet, onViewIndicator, typing = false, onTyping }: IndicatorChatProps) {
+export function IndicatorScene({ version = '1', step, onStep, request: initialRequest, onSend, onChart, onTimeframe, onBuilt, onSaved, onSaveSheet, onViewIndicator, typing = false, onTyping, onSwitchKind }: IndicatorChatProps) {
+  // The field keeps the home's shape: one pill naming this chat's kind where the home has its switch.
+  const chatKind = useChatKind('indicator', step === 'empty' ? {
+    onChange: (k) => {
+      if (k === 'indicator') return
+      switchKind(k)
+      onSwitchKind?.(k)
+    },
+  } : null)
   const { interactive } = usePreview()
   const v2 = version === '2'
   // Save opens the saved sheet (both versions; onSaved is the fallback where a screen has no sheet).
@@ -9273,7 +9423,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
       >
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined} data-dimmed={(pineOn && empty && pineTip && !attachment && tipOverlay) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle')} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} typing={typingNow} />
+            <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle', { name: firstName })} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} typing={typingNow} />
           </div>
         )}
         {chatStarted && (
@@ -9313,11 +9463,14 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         )}
       </div>
 
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
       {/* With the Pine Script bubble up, the dock makes room for it above the field (the chat ends above it). */}
       <div className={styles.dock} data-tip={(pineOn && empty && pineTip && !attachment && !tipOverlay) ? (pineStory ? 'story' : 'card') : undefined}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput
             key="input"
+            modes={chatKind ?? undefined}
             value={draft}
             onChange={setDraft}
             inputRef={input}
@@ -9360,6 +9513,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
           <TextKeyboard onKey={(k) => setDraft((d) => typeText(d, k))} />
         </div>
       </div>
+      </DashDock>
     </div>
   )
 }
@@ -9443,8 +9597,9 @@ export type LandingProps = {
 
 /**
  * DASH's home — a scene of the one DASH screen (Figma "1. Flow start – Landing screen"): the orb, a greeting, and what
- * DASH can build (Trading rules · Custom indicator · Custom strategy). The body is centred, 40 between the parts. Picking
- * an option pushes the body to the chat while the background and the top bar stay (DashAI).
+ * DASH can build (Trading rules · Custom indicator · Custom strategy). No field here (nothing made yet: the cards are the
+ * way in). Picking an option cross-fades the body to the chat while the background and the top bar stay, and the
+ * chat's field rises into the screen's input place from the bottom (DashAI).
  */
 export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps) {
   return (
@@ -9636,6 +9791,7 @@ import { holdFile } from '../components/pendingFile'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { useHomeKeyboard } from '../components/homeKeyboard'
 import { ChatInput, SuggestionList } from '../components/Chat'
+import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators, savedStrategies, type SavedRule } from '../data'
 import styles from './Returning.module.css'
@@ -9743,6 +9899,8 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
           </Inset>
         </Stack>
       </div>
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput {...kb.field} onSend={kb.sending(ask)} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
@@ -9759,6 +9917,7 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
         </Inset>
       </div>
       {kb.keyboard}
+      </DashDock>
     </div>
   )
 }
@@ -10202,6 +10361,7 @@ import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { useHomeKeyboard } from '../components/homeKeyboard'
 import { ChatInput } from '../components/Chat'
 import { useAskModes } from '../components/askModes'
+import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
 import { dashRules, firstName, homeDrafts, homeTriggers, savedIndicators, type HomeDraft, type SavedRule } from '../data'
 import { CreationDetailsSheet } from '../sheets/RuleSheets'
@@ -10580,6 +10740,8 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
       )}
 
       {/* 4 · Ask DASH: change something or start something new, in words. */}
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput
@@ -10587,8 +10749,8 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
             onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
             placeholder={askModes?.placeholder}
-            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // With the switch, the + (Pine Script) is only there while Indicator is picked.
-            onAttach={pineOn && (!askModes || askModes.mode === 'indicator') ? () => setPineSheet(true) : undefined} />
+            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // The + (Pine Script upload) is always there, whatever is picked — a script always becomes an indicator.
+            onAttach={pineOn ? () => setPineSheet(true) : undefined} />
           {picker}
           {pineSheet && (
             <PineUploadSheet
@@ -10602,6 +10764,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
         </Inset>
       </div>
       {kb.keyboard}
+      </DashDock>
     </div>
   )
 }
@@ -10877,9 +11040,11 @@ import { RuleCard } from '../components/RuleCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
 import { useStickToBottom } from '../components/stickToBottom'
-import { takeMessage } from '../components/pendingMessage'
+import { switchKind, takeKind, takeMessage } from '../components/pendingMessage'
+import { DashDock } from '../components/DashDock'
+import { useChatKind } from '../components/askModes'
 import { t } from '../copy'
-import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions } from '../data'
+import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions, firstName } from '../data'
 import styles from './RuleChat.module.css'
 
 /** Where the conversation is. */
@@ -10914,6 +11079,8 @@ export type RuleChatProps = {
   /** Typing state (the input focused, keyboard up) — kept by the DASH screen, which shrinks the background. */
   typing?: boolean
   onTyping?: (typing: boolean) => void
+  /** The field's switch, before anything is sent: open the indicator chat instead. */
+  onSwitchKind?: (kind: 'rule' | 'indicator' | 'strategy') => void
 }
 
 /** How long DASH "thinks" before replying (prototype; the live app takes 1.5–3 s). */
@@ -10933,7 +11100,22 @@ const INTRO_OUT_MS = 300
  *   fades in; DASH thinks, asks (question card rising out of the input's place), and the rule card pins at the top;
  * - the conversation builds up — every message stays; the panel scrolls to the newest.
  */
-export function RuleScene({ version = '1', step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping }: RuleChatProps) {
+/** Strategy suggestions for the empty chat in strategy mode. */
+const strategyTop = [t('home3.ex.strategy1'), t('home3.ex.strategy2'), t('home3.ex.strategy3')]
+
+export function RuleScene({ version = '1', step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping, onSwitchKind }: RuleChatProps) {
+  // The field keeps the home's shape: one pill naming this chat's kind where the home has its switch.
+  // The empty chat can be about a strategy too (picked in the field's switch, or arriving from the indicator chat's):
+  // its own heading, suggestions and placeholder; sending carries on in this chat (no strategy builder yet).
+  const [strategy, setStrategy] = useState(() => takeKind() === 'strategy')
+  const chatKind = useChatKind(strategy ? 'strategy' : 'rule', step === 'empty' ? {
+    onChange: (k) => {
+      if (k === 'indicator') {
+        switchKind('indicator')
+        onSwitchKind?.('indicator')
+      } else setStrategy(k === 'strategy')
+    },
+  } : null)
   const { interactive } = usePreview()
   /** After an answer or Proceed: DASH thinks on this page before the next step comes (prototype). */
   const [pending, setPending] = useState<(() => void) | null>(null)
@@ -11056,7 +11238,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
       >
         {(empty || introLeaving) && (
           <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined}>
-            <RulesIntro onPick={empty ? send : undefined} typing={typingNow} top={topSuggestions} />
+            <RulesIntro onPick={empty ? send : undefined} typing={typingNow} top={strategy ? strategyTop : topSuggestions} {...(strategy ? { title: t('strategyHome.title', { name: firstName }), description: t('strategyHome.description'), examples: [strategyTop] } : {})} />
           </div>
         )}
         {!empty && (
@@ -11096,9 +11278,11 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
         )}
       </div>
 
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? t('input.describeRule') : hasCard ? t('input.changeRule') : undefined} />
+          <ChatInput modes={chatKind ?? undefined} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
         </Inset>
       </div>
 
@@ -11108,6 +11292,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
           <TextKeyboard onKey={(k) => setDraft((d) => typeText(d, k))} />
         </div>
       </div>
+      </DashDock>
     </div>
   )
 }
