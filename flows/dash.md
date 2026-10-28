@@ -9265,7 +9265,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   useEffect(() => {
     if (step !== 'empty') return
     const held = takeMessage()
-    const from = stage.current?.querySelector<HTMLElement>('form input:not([type=file])')
+    const from = stage.current?.closest('[data-dash]')?.querySelector<HTMLElement>('form input:not([type=file])') // the field lives in the screen's input place (DashDock), not in this scene
     if (held && from) send(held, from)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -11156,7 +11156,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   useEffect(() => {
     if (step !== 'empty') return
     const held = takeMessage()
-    const from = scene.current?.querySelector<HTMLElement>('form input:not([type=file])')
+    const from = scene.current?.closest('[data-dash]')?.querySelector<HTMLElement>('form input:not([type=file])') // the field lives in the screen's input place (DashDock), not in this scene
     if (held && from) send(held, from)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
