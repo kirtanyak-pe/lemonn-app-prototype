@@ -6702,6 +6702,8 @@ export type SavedRule = {
   on: boolean
   /** What happened lately / when it was made — the card's footer line. `strong` is the part in bold. */
   activity: { text: string; strong?: string; after?: string }
+  /** What Activity says once it's turned off, when that's different (e.g. an indicator taken off its chart). */
+  activityOff?: { text: string; strong?: string; after?: string }
 }
 
 export const activeRules: SavedRule[] = [
@@ -6719,7 +6721,7 @@ export const rulesAfterDelete = activeRules.filter((r) => r.id !== 'max-daily-lo
  * Strategies: none yet (that tab shows its empty state).
  */
 export const savedIndicators: SavedRule[] = [
-  { id: 'supertrend-ema', title: 'Supertrend (10, 3) with EMA 20', summary: 'On the price chart · 15 min candles', on: true, activity: { text: 'On your ', strong: 'Nifty 50', after: ' chart' } },
+  { id: 'supertrend-ema', title: 'Supertrend (10, 3) with EMA 20', summary: 'On the price chart · 15 min candles', on: true, activity: { text: 'On your ', strong: 'Nifty 50', after: ' chart' }, activityOff: { text: 'Removed from your ', strong: 'Nifty 50', after: ' chart' } },
   { id: 'opening-range', title: '15-min opening range', summary: 'Marks the first 15 minutes’ high and low', on: false, activity: { text: 'Created on 22 Oct’26' } },
 ]
 export const savedStrategies: SavedRule[] = []
@@ -10378,7 +10380,7 @@ export function RuleDeletedSheet({ onOkay }: { onOkay?: () => void }) {
  * - the dock: Add to chart (an indicator) or Edit with DASH (a rule). Close: tap outside or drag down.
  */
 export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onClose, onEdit, onDelete }: {
-  item: { title: string; summary: string; smart?: boolean; activity: { text: string; strong?: string; after?: string } }
+  item: { title: string; summary: string; smart?: boolean; activity: { text: string; strong?: string; after?: string }; activityOff?: { text: string; strong?: string; after?: string } }
   kind: 'rule' | 'indicator'
   /** As it is now (the card's switch). */
   on: boolean
@@ -10401,7 +10403,8 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
   const detailsVersion = useFlowOption('dash', 'detailsVersion', '1')
   const tagSwitch = detailsVersion === '2'
   const rowSwitch = detailsVersion === '3'
-  const { text, strong, after } = item.activity
+  // Activity follows the switch: an indicator taken off says so (activityOff), instead of still reading "On your … chart".
+  const { text, strong, after } = !on && item.activityOff ? item.activityOff : item.activity
   const status = kind === 'rule' ? (on ? t('details.on') : t('cards.paused')) : on ? t('cards.onChart') : t('details.notOnChart')
   // The dock: Edit (primary, left) and Delete (secondary, right) side by side, for rules and indicators alike. (Adding to a
   // chart is the card's own switch.)
