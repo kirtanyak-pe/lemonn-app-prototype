@@ -412,6 +412,8 @@
     "src/flows/dash/screens/RuleChat.module.css",
     "src/flows/dash/screens/RuleChat.tsx",
     "src/flows/dash/sheets/IndicatorSheets.tsx",
+    "src/flows/dash/sheets/PineUploadSheet.module.css",
+    "src/flows/dash/sheets/PineUploadSheet.tsx",
     "src/flows/dash/sheets/RuleSheets.module.css",
     "src/flows/dash/sheets/RuleSheets.tsx"
   ],

@@ -6562,7 +6562,18 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.removeKeep": "No, keep it",
   "home2.creations": "Your creations",
   "home2.triggered": "Triggered {count}× today",
-  "home2.notTriggered": "Not triggered today"
+  "home2.notTriggered": "Not triggered today",
+  "pineSheet.title": "Upload a Pine Script",
+  "pineSheet.description": "Bring an indicator you wrote on TradingView. DASH turns it into an indicator for your Lemonn charts.",
+  "pineSheet.step1": "Pick your script",
+  "pineSheet.step1Text": "A Pine Script file, like my_strategy.pine",
+  "pineSheet.step2": "DASH converts it",
+  "pineSheet.step2Text": "It reads the script and builds the same indicator",
+  "pineSheet.step3": "It’s on your Scalper chart",
+  "pineSheet.step3Text": "Applied right away, and saved under Your indicators",
+  "pineSheet.paste": "You can also paste the script straight into the chat.",
+  "pineSheet.choose": "Choose a file",
+  "pineSheet.notNow": "Not now"
 }
 ```
 
@@ -7778,6 +7789,7 @@ import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserFile, UserMessage } from '../components/Chat'
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
 import { takeFile } from '../components/pendingFile'
+import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
 import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
@@ -7876,6 +7888,8 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   const fileInput = useRef<HTMLInputElement>(null)
   // A file picked on the DASH home arrives attached, ready to send.
   const [attachment, setAttachment] = useState<{ name: string } | null>(takeFile)
+  // The + explains itself first (a sheet: what a Pine Script upload does), then Choose a file opens the picker.
+  const [pineSheet, setPineSheet] = useState(false)
   // First-time guide for the + (Pine Script): once per person (prototype: per browser), on the empty chat.
   // Testing (setting "Show Pine Script tip: Always"): it shows every time the chat opens, whatever was seen before.
   const tipAlways = useFlowOption('dash', 'pineTipShow', 'once') === 'always'
@@ -8163,11 +8177,20 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
             // The field says what it's for: describe the indicator; then (built) describe a change to it.
             placeholder={empty ? t('input.describeIndicator') : built ? t('input.changeIndicator') : undefined}
             onSend={empty ? send : canChange ? (text) => { askChange(text || attachment?.name || ''); setAttachment(null) } : undefined}
-            onAttach={pineOn ? () => fileInput.current?.click() : undefined}
+            onAttach={pineOn ? () => setPineSheet(true) : undefined}
             attachTip={pineOn && empty && pineTip && !attachment ? { title: t('pineTip.title'), text: t('pineTip.text'), onDone: closePineTip, story: pineStory } : null}
             attachment={attachment}
             onRemoveAttachment={() => setAttachment(null)}
           />
+          {pineSheet && (
+            <PineUploadSheet
+              onClose={() => setPineSheet(false)}
+              onChoose={() => {
+                setPineSheet(false)
+                fileInput.current?.click()
+              }}
+            />
+          )}
           {/* The Pine Script picker (prototype: any file is accepted) — it stays on the device, only its name is shown. */}
           <input
             ref={fileInput}
@@ -8461,7 +8484,7 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 ### `src/flows/dash/screens/Returning.tsx`
 
 ```tsx
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
@@ -8469,6 +8492,7 @@ import { msChevronRight } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { holdFile } from '../components/pendingFile'
+import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { ChatInput, SuggestionList } from '../components/Chat'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators, savedStrategies, type SavedRule } from '../data'
@@ -8512,6 +8536,8 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
   const fileInput = useRef<HTMLInputElement>(null)
+  // The + explains itself first (a sheet), then Choose a file opens the picker.
+  const [pineSheet, setPineSheet] = useState(false)
   const picker = (
     <input
       ref={fileInput}
@@ -8572,8 +8598,17 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
       </div>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => fileInput.current?.click() : undefined} />
+          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
           {picker}
+          {pineSheet && (
+            <PineUploadSheet
+              onClose={() => setPineSheet(false)}
+              onChoose={() => {
+                setPineSheet(false)
+                fileInput.current?.click()
+              }}
+            />
+          )}
         </Inset>
       </div>
     </div>
@@ -8851,6 +8886,7 @@ import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { holdFile } from '../components/pendingFile'
+import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { ChatInput } from '../components/Chat'
 import { t } from '../copy'
 import { dashRules, firstName, homeDrafts, homeTriggers, savedIndicators, type HomeDraft, type SavedRule } from '../data'
@@ -8893,6 +8929,8 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
   // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
   const fileInput = useRef<HTMLInputElement>(null)
+  // The + explains itself first (a sheet), then Choose a file opens the picker.
+  const [pineSheet, setPineSheet] = useState(false)
   const picker = (
     <input
       ref={fileInput}
@@ -8912,7 +8950,7 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
     <div className={styles.scene}>
       <div className={styles.scroll}>
         <Inset paddingInline="16" className={styles.page}>
-          <Stack gap={centre ? '40' : '24'} className={styles.content} data-centre={centre || undefined}>
+          <Stack gap={centre ? '40' : '32'} className={styles.content} data-centre={centre || undefined}>
             {/* 1 · Header. With a draft to resume: compact (orb + greeting in a row). Without (none, or all deleted):
                 centre stage — the big orb and the greeting in the middle, using the room (like Returning home v1). */}
             {centre ? (
@@ -9029,8 +9067,17 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
       {/* 4 · Ask DASH: change something or start something new, in words. */}
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => fileInput.current?.click() : undefined} />
+          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
           {picker}
+          {pineSheet && (
+            <PineUploadSheet
+              onClose={() => setPineSheet(false)}
+              onChoose={() => {
+                setPineSheet(false)
+                fileInput.current?.click()
+              }}
+            />
+          )}
         </Inset>
       </div>
     </div>
@@ -9633,6 +9680,85 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
         </Stack>
         <RuleSummary title={draft.name} description={t('indicatorSaved.summary', { place: draft.placement, count: draft.testedOn })} />
       </Stack>
+    </Sheet>
+  )
+}
+```
+
+### `src/flows/dash/sheets/PineUploadSheet.module.css`
+
+```css
+/* The Pine Script sheet: the mark on a DASH green tile (64, the large header's icon size), three how-it-works rows,
+   a short note under them. */
+.logo {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-64);
+  height: var(--l3-size-64);
+  border-radius: var(--l3-radius-16);
+  background: var(--app-dash-glow-1);
+  color: var(--l3-static-black);
+}
+
+/* Plain rows bring their own 16 side padding: the list steps out of the sheet's content padding. */
+.steps {
+  margin-inline: calc(-1 * var(--l3-spacing-16));
+}
+
+.note {
+  margin: var(--l3-spacing-08) 0 0;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+  text-align: center;
+}
+```
+
+### `src/flows/dash/sheets/PineUploadSheet.tsx`
+
+```tsx
+import { useId } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { msAutorenew, msMonitoring, msUploadFile } from '@l3/icons/material'
+import { Sheet } from '../../../shared/ui/Sheet'
+import pineScript from '../assets/pine-script.svg'
+import { t } from '../copy'
+import styles from './PineUploadSheet.module.css'
+
+/**
+ * What the + in the chat field is for (so it's clear even without the first-time tip): uploading a Pine Script.
+ * Large header with the Pine Script mark, then how it works in three lines (L3 list cells) — pick the script, DASH
+ * converts it, it's on your Scalper chart — and a note that pasting it works too. Choose a file opens the picker; Not
+ * now closes it.
+ */
+export function PineUploadSheet({ onChoose, onClose }: { onChoose: () => void; onClose: () => void }) {
+  const id = useId()
+  const steps = [
+    { icon: msUploadFile, label: t('pineSheet.step1'), description: t('pineSheet.step1Text') },
+    { icon: msAutorenew, label: t('pineSheet.step2'), description: t('pineSheet.step2Text') },
+    { icon: msMonitoring, label: t('pineSheet.step3'), description: t('pineSheet.step3Text') },
+  ]
+  return (
+    <Sheet
+      labelledBy={id}
+      onClose={onClose}
+      header={<BottomSheetHeader size="lg" headingId={id} heading={t('pineSheet.title')} description={t('pineSheet.description')} icon={<span className={styles.logo}><Icon icon={pineScript} size={24} /></span>} />}
+      footer={
+        <ButtonGroup aria-label={t('pineSheet.title')} direction="vertical">
+          <Button onClick={onChoose}>{t('pineSheet.choose')}</Button>
+          <Button variant="secondary" onClick={onClose}>{t('pineSheet.notNow')}</Button>
+        </ButtonGroup>
+      }
+    >
+      <div className={styles.steps}>
+        {steps.map((s) => (
+          <ListCell key={s.label} size="sm" multiline iconLeft={<Icon icon={s.icon} />} label={s.label} description={s.description} />
+        ))}
+      </div>
+      <p className={styles.note}>{t('pineSheet.paste')}</p>
     </Sheet>
   )
 }
