@@ -23,7 +23,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-10` | Read more · saved | [5612:41133](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41133) | `dash-07` |  |
 | `dash-11` | Read more · cost | [5612:41268](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41268) | `dash-08` | Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both. |
 | `dash-12` | Read more · no data | [5612:41402](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41402) | `dash-09` |  |
-| `dash-13` | Rule created | [5612:41875](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875) | `dash-07`, `dash-14` | Over the ready screen it was saved from (Figma shows an older card behind it). |
+| `dash-13` | Rule created | [5612:41875](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875) | `dash-29`, `dash-14` | Over the ready screen it was saved from (Figma shows an older card behind it). |
+| `dash-29` | Rule saved · chat | — | `dash-02`, `dash-14`, `dash-10` | Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more). |
 | `dash-14` | Active rules | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24`, `dash-06` | Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule. |
 | `dash-15` | Delete rule? | [5612:42250](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250) | `dash-02`, `dash-14`, `dash-16` | Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it). |
 | `dash-16` | Rule deleted | [5612:42455](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455) | `dash-02`, `dash-17` | The list behind already has 3 rules. |
@@ -7235,6 +7236,9 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "chat.readyTitle": "Your rule is ready! 🎉",
   "chat.readyText": "Do you want to save this rule?",
   "chat.save": "Yes, save it",
+  "chat.createdTitle": "Your rule is saved",
+  "chat.createdText": "It’s on now. I’ll step in only at the line you set.",
+  "chat.viewRules": "View rules",
   "chat.weakTitle": "Your rule looks weak to me!",
   "chat.weakText": "I would suggest you improve your rule.",
   "chat.saveAnyway": "No, save as it is",
@@ -7251,6 +7255,8 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "readMore.okay": "Okay",
   "created.title": "Your rule is created",
   "created.description": "Trade as normal. I’ll step in only at the line you set.",
+  "created.viewRule": "View rule",
+  "created.close": "Close",
   "created.cancel": "Cancel",
   "created.viewRules": "View Rules",
   "rules.title": "Trading rules",
@@ -7738,7 +7744,8 @@ export const dash: Flow = {
     { id: 'dash-10', group: 'dash', section: 'result', name: 'Read more · saved', figma: '5612:41133', render: (go) => <DashAI scene="rules" step="saved" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.saved} onClose={() => go('dash-07')} />} /> },
     { id: 'dash-11', group: 'dash', section: 'result', name: 'Read more · cost', figma: '5612:41268', note: 'Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both.', render: (go) => <DashAI scene="rules" step="cost" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.cost} onClose={() => go('dash-08')} />} /> },
     { id: 'dash-12', group: 'dash', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <DashAI scene="rules" step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
-    { id: 'dash-13', group: 'dash', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <DashAI scene="rules" step="saved" sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-07')} onViewRules={() => go('dash-14')} />} /> },
+    { id: 'dash-13', group: 'dash', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <DashAI scene="rules" step="saved" created sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-29')} onViewRules={() => go('dash-14')} />} /> },
+    { id: 'dash-29', group: 'dash', section: 'result', name: 'Rule saved · chat', figma: '', note: 'Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more).', render: (go) => <DashAI scene="rules" step="saved" created onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onReadMore={() => go('dash-10')} onViewRules={() => go('dash-14')} /> },
     // ---- Your rules
     { id: 'dash-14', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} onEditRule={() => go('dash-06')} /> },
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
@@ -11071,6 +11078,10 @@ export type RuleChatProps = {
   onProceed?: () => void
   onSave?: () => void
   onImprove?: () => void
+  /** The rule has been saved (Your rule is created, then back to the chat): no "Yes, save it" any more — DASH says
+   *  it's saved and offers View rules. */
+  created?: boolean
+  onViewRules?: () => void
   /** The rule card's description: opens the read-more sheet. */
   onReadMore?: () => void
   /** Typing state (the input focused, keyboard up) — kept by the DASH screen, which shrinks the background. */
@@ -11100,7 +11111,7 @@ const INTRO_OUT_MS = 300
 /** Strategy suggestions for the empty chat in strategy mode. */
 const strategyTop = [t('home3.ex.strategy1'), t('home3.ex.strategy2'), t('home3.ex.strategy3')]
 
-export function RuleScene({ version = '1', step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping, onSwitchKind }: RuleChatProps) {
+export function RuleScene({ version = '1', step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping, onSwitchKind, created = false, onViewRules }: RuleChatProps) {
   // The field keeps the home's shape: one pill naming this chat's kind where the home has its switch.
   // The empty chat can be about a strategy too (picked in the field's switch, or arriving from the indicator chat's):
   // its own heading, suggestions and placeholder; sending carries on in this chat (no strategy builder yet).
@@ -11247,6 +11258,8 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
                   onProceed: thinkThen(onProceed),
                   onSave,
                   onImprove,
+                  created,
+                  onViewRules,
                   busy: pending != null,
                   card: version === '2' && hasCard ? card : undefined,
                   buttons: true,
@@ -11294,7 +11307,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   )
 }
 
-type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove'> & { onProceed: () => void; busy: boolean; /** Version 2: replies as buttons. */ buttons?: boolean; /** Version 2: the rule card, inside DASH's preview message. */ card?: ReactNode }
+type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove' | 'created' | 'onViewRules'> & { onProceed: () => void; busy: boolean; /** Version 2: replies as buttons. */ buttons?: boolean; /** Version 2: the rule card, inside DASH's preview message. */ card?: ReactNode }
 
 /**
  * The conversation so far — every turn stays, like the live app. Each turn has a stable key, so when the page moves on
@@ -11324,7 +11337,18 @@ function conversation(step: RuleChatStep, request: string, answered: string | nu
       </Stack>
     ),
   })
-  if (step === 'cost') {
+  if (on.created && tested) {
+    // Saved: the save / improve choices are done with — DASH confirms it, and the rule list is a tap away.
+    turns.push({
+      key: 'created',
+      node: (
+        <Stack gap="16">
+          <AssistantMessage title={t('chat.createdTitle')}>{t('chat.createdText')}</AssistantMessage>
+          <ReplyChips asButtons={on.buttons} options={[{ label: t('chat.viewRules'), onClick: on.onViewRules, suggested: true }]} />
+        </Stack>
+      ),
+    })
+  } else if (step === 'cost') {
     turns.push({
       key: 'weak',
       node: (
@@ -11498,9 +11522,10 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
       labelledBy={id}
       onClose={onDone}
       footer={
-        <ButtonGroup aria-label={t('indicatorSaved.title')} direction="horizontal">
-          <Button variant="secondary" onClick={onDone}>{t('indicatorSaved.done')}</Button>
+        // Vertical dock, like Your rule is created: View indicator (primary) on top, Close (secondary) under it.
+        <ButtonGroup aria-label={t('indicatorSaved.title')} direction="vertical">
           <Button onClick={view}>{t('indicatorSaved.view')}</Button>
+          <Button variant="secondary" onClick={onDone}>{t('created.close')}</Button>
         </ButtonGroup>
       }
     >
@@ -11860,9 +11885,10 @@ export function RuleCreatedSheet({ rule, onCancel, onViewRules }: { rule: DraftR
       labelledBy={id}
       onClose={onCancel}
       footer={
-        <ButtonGroup aria-label={t('created.title')} direction="horizontal">
-          <Button variant="secondary" onClick={onCancel}>{t('created.cancel')}</Button>
-          <Button onClick={viewRules}>{t('created.viewRules')}</Button>
+        // Vertical dock: View rule (primary) on top, Close (secondary) under it.
+        <ButtonGroup aria-label={t('created.title')} direction="vertical">
+          <Button onClick={viewRules}>{t('created.viewRule')}</Button>
+          <Button variant="secondary" onClick={onCancel}>{t('created.close')}</Button>
         </ButtonGroup>
       }
     >

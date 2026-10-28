@@ -183,10 +183,22 @@
       "figma": "5612:41875",
       "note": "Over the ready screen it was saved from (Figma shows an older card behind it).",
       "goesTo": [
-        "dash-07",
+        "dash-29",
         "dash-14"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875"
+    },
+    {
+      "id": "dash-29",
+      "name": "Rule saved · chat",
+      "figma": "",
+      "note": "Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more).",
+      "goesTo": [
+        "dash-02",
+        "dash-14",
+        "dash-10"
+      ],
+      "figmaUrl": ""
     },
     {
       "id": "dash-14",
