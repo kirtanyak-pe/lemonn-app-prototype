@@ -1028,6 +1028,12 @@ function clock(start: string, add: number) {
   "tools.create": "Create",
   "tools.none": "No indicators created yet.",
   "tools.byDash": "Made with DASH AI",
+  "tools.longPressHint": "Long press for more options",
+  "tools.showOnChart": "Show on chart",
+  "tools.isOnChart": "It’s on this chart",
+  "tools.notOnChart": "Not on this chart",
+  "tools.openInDash": "Open in DASH",
+  "tools.detailsDone": "Done",
   "tools.lemonn": "Lemonn indicators",
   "tools.favourite": "Add {name} to favourites",
   "tools.soon": "Pick Indicators to add one to the chart.",
@@ -1949,12 +1955,48 @@ function ema(candles: ChartCandle[], period: number) {
     animation: none;
   }
 }
+
+/* Your indicators' rows: a long press opens the details (no text selection / callout while holding). */
+.pressable {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* The line under Your indicators: each hint slides up into place as it changes. */
+.hint {
+  display: inline-block;
+  animation: tools-hint var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes tools-hint {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-06));
+  }
+}
+
+/* The details sheet's header icon: a ★ on a light discover tile (the colour Your indicators use). */
+.detailsIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-64);
+  height: var(--l3-size-64);
+  border-radius: var(--l3-radius-16);
+  background: var(--l3-surface-accent-discover-light);
+  color: var(--l3-content-accent-discover-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint {
+    animation: none;
+  }
+}
 ```
 
 ### `src/flows/fno/sheets/ChartToolsSheet.tsx`
 
 ```tsx
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge } from '@l3/components/Badge'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
@@ -1966,6 +2008,7 @@ import { Tooltip } from '@l3/components/Tooltip'
 import { msAdd, msBookmarkFill, msClose, msDelete, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msStarFill, msSwapHoriz } from '@l3/icons/material'
 import { t } from '../copy'
 import { lemonnIndicators } from '../data'
+import { IndicatorDetailsSheet } from './IndicatorDetailsSheet'
 import styles from './ChartToolsSheet.module.css'
 
 type Section = 'range' | 'zing' | 'indicators' | 'drawings' | 'templates' | 'settings'
@@ -2011,9 +2054,46 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
     onToggle(name)
   }
 
+  // Your indicators: a long press (½ s) opens its details sheet instead of adding / removing it.
+  const [details, setDetails] = useState<string | null>(null)
+  const pressTimer = useRef<number | undefined>(undefined)
+  const longPressed = useRef(false)
+  const root = useRef<HTMLDivElement>(null)
+  const longPress = (name: string) => ({
+    onPointerDown: () => {
+      longPressed.current = false
+      window.clearTimeout(pressTimer.current)
+      pressTimer.current = window.setTimeout(() => {
+        longPressed.current = true
+        setDetails(name)
+      }, LONG_PRESS_MS)
+    },
+    onPointerUp: () => window.clearTimeout(pressTimer.current),
+    onPointerLeave: () => window.clearTimeout(pressTimer.current),
+    onPointerCancel: () => window.clearTimeout(pressTimer.current),
+    onContextMenu: (e: { preventDefault: () => void }) => e.preventDefault(),
+    // the click that ends a long press doesn't also toggle the row
+    onClickCapture: (e: { stopPropagation: () => void; preventDefault: () => void }) => {
+      if (!longPressed.current) return
+      longPressed.current = false
+      e.stopPropagation()
+      e.preventDefault()
+    },
+  })
+
+  // "Made with DASH AI" ⇄ "Long press for more options" under Your indicators, every 3 s.
+  const hints = [t('tools.byDash'), t('tools.longPressHint')]
+  const [hint, setHint] = useState(0)
+  useEffect(() => {
+    if (!yourIndicators.length) return
+    const id = window.setInterval(() => setHint((h) => (h + 1) % hints.length), HINT_MS)
+    return () => window.clearInterval(id)
+  }, [yourIndicators.length, hints.length])
+
   const row = (name: string, description?: string, wrap = false) => {
     const on = applied.includes(name)
-    return (
+    const mine = yourIndicators.includes(name)
+    const cell = (
       <ListCell
         key={name}
         variant="card"
@@ -2028,13 +2108,14 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
         className={styles.row}
       />
     )
+    return mine ? <div key={name} className={styles.pressable} {...longPress(name)}>{cell}</div> : cell
   }
 
   const q = query.trim().toLowerCase()
   const results = [...yourIndicators, ...lemonnIndicators].filter((name) => name.toLowerCase().includes(q))
 
   return (
-    <div className={styles.body} data-search={searching || undefined}>
+    <div ref={root} className={styles.body} data-search={searching || undefined}>
       {guiding && <div className={styles.dim} aria-hidden="true" />}
       <SideNav<Section>
         selectedTone="discover"
@@ -2096,7 +2177,9 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
                   <Stack direction="horizontal" align="center" justify="between" className={styles.sectionHead}>
                     <Stack gap="00">
                       <h3 className={styles.subTitle}>{t('tools.yours')}</h3>
-                      <p className={styles.subDescription}>{t('tools.byDash')}</p>
+                      <p className={styles.subDescription} aria-live="polite">
+                        <span key={hint} className={styles.hint}>{yourIndicators.length ? hints[hint] : t('tools.byDash')}</span>
+                      </p>
                     </Stack>
                     <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msAdd} />} aria-label={t('tools.createLabel')} onClick={onCreateIndicator}>{t('tools.create')}</Button>
                   </Stack>
@@ -2111,9 +2194,27 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
           </Stack>
         )}
       </section>
+      {details && (
+        <IndicatorDetailsSheet
+          name={details}
+          onChart={applied.includes(details)}
+          onToggle={() => onToggle(details)}
+          onOpenInDash={() => {
+            setDetails(null)
+            onCreateIndicator?.()
+          }}
+          onClose={() => setDetails(null)}
+          // Inside the Chart tools sheet's own layer, so it opens on top of it (over the same phone screen).
+          container={root.current?.closest<HTMLElement>('[role="dialog"]')?.parentElement ?? undefined}
+        />
+      )}
     </div>
   )
 }
+
+/** Long press to open an indicator's details; how often the hint under Your indicators changes. */
+const LONG_PRESS_MS = 500
+const HINT_MS = 3000
 
 /** The Your indicators guide shows once per person (here: once per browser). */
 const GUIDE_KEY = 'fno.yourIndicatorsGuideSeen'
@@ -2159,6 +2260,60 @@ export function DetailSheet({ title, contract, onClose }: { title: string; contr
   return <Sheet labelledBy={id} onClose={onClose} header={<BottomSheetHeader heading={title} description={contract?.description ?? t('prototype.description')} headingId={id} />} footer={<ButtonGroup aria-label={title}><Button onClick={onClose}>{t('close')}</Button></ButtonGroup>}>
     {contract && <Inset paddingInline="16" paddingBlock="16"><Stack><ListCell label={t('contract.price')} trailing={inr(contract.price, 2)} /><ListCell label={t('contract.change')} trailing={<PriceChange value={contract.change} unit="percent" size="sm" />} /><ListCell label={t('contract.volume')} trailing={contract.volume.toLocaleString('en-IN')} /></Stack></Inset>}
   </Sheet>
+}
+```
+
+### `src/flows/fno/sheets/IndicatorDetailsSheet.tsx`
+
+```tsx
+import { useId } from 'react'
+import { BottomSheet, BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { Switch } from '@l3/components/Switch'
+import { msStarFill } from '@l3/icons/material'
+import { t } from '../copy'
+import styles from './ChartToolsSheet.module.css'
+
+/**
+ * Your indicator's details, from a long press on it in Chart tools: the large header (★ on a tile, its name, "Made
+ * with DASH AI"), one switch card — Show on chart (adds / removes it, like a tap on its row) — and Open in DASH (to
+ * change it) / Done. Opens over the Chart tools sheet, inside the phone.
+ */
+export function IndicatorDetailsSheet({ name, onChart, onToggle, onOpenInDash, onClose, container }: {
+  name: string
+  onChart: boolean
+  onToggle: () => void
+  onOpenInDash?: () => void
+  onClose: () => void
+  container?: HTMLElement | null
+}) {
+  const id = useId()
+  return (
+    <BottomSheet
+      open
+      onClose={onClose}
+      container={container}
+      aria-labelledby={id}
+      header={<BottomSheetHeader size="lg" headingId={id} heading={name} description={t('tools.byDash')} icon={<span className={styles.detailsIcon}><Icon icon={msStarFill} size={24} /></span>} />}
+      footer={
+        <ButtonGroup aria-label={name} direction="horizontal">
+          <Button variant="secondary" onClick={onClose}>{t('tools.detailsDone')}</Button>
+          <Button onClick={onOpenInDash}>{t('tools.openInDash')}</Button>
+        </ButtonGroup>
+      }
+    >
+      <ListCell
+        variant="card"
+        as="label"
+        label={t('tools.showOnChart')}
+        description={onChart ? t('tools.isOnChart') : t('tools.notOnChart')}
+        trailing={<Switch checked={onChart} onChange={onToggle} aria-label={t('tools.showOnChart')} />}
+      />
+    </BottomSheet>
+  )
 }
 ```
 

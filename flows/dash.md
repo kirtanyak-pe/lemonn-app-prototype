@@ -2730,6 +2730,11 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
     animation: none;
   }
 }
+
+/* Chat input "Pills above": the switch row over the field, 8 above it. */
+.modesAbove {
+  margin-bottom: var(--l3-spacing-08);
+}
 ```
 
 ### `src/flows/dash/components/Chat.tsx`
@@ -2784,7 +2789,7 @@ type ChatInputProps = {
    * What to build, chosen in the field itself (DASH home, setting "Ask field: With switch"; like Claude Desktop's
    * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, md: the 40 of the + and Send) · Send.
    */
-  modes?: { value: string; items: { value: string; label: string; /** Just launched: a New dot (pills) / New after the name (dropdown). */ isNew?: boolean }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group; menu: one pill that opens a dropdown (room for more). */ display?: 'pills' | 'menu' }
+  modes?: { value: string; items: { value: string; label: string; /** Just launched: a New dot (pills) / New after the name (dropdown). */ isNew?: boolean }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group inside the field; menu: one pill that opens a dropdown (room for more); above: the pill group outside, full width over the field. */ display?: 'pills' | 'menu' | 'above' }
 }
 
 /**
@@ -2809,11 +2814,18 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
     setValue('')
   }
   return (
+    <>
+    {/* Chat input "Pills above": the switch sits outside, full width just over the field (equal pills). */}
+    {modes?.display === 'above' && (
+      <div className={styles.modesAbove}>
+        <SlidingPills value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} newLabel={t('askModes.new')} fill />
+      </div>
+    )}
     <form
       className={styles.input}
       data-typing={typing || undefined}
       data-attach={onAttach ? '' : undefined}
-      data-modes={modes ? '' : undefined}
+      data-modes={modes && modes.display !== 'above' ? '' : undefined}
       onSubmit={(e) => {
         e.preventDefault()
         send()
@@ -2877,7 +2889,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
         inputMode={touch ? 'none' : undefined}
       />
       </span>
-      {modes && (
+      {modes && modes.display !== 'above' && (
         <span className={styles.modes}>
           {modes.display === 'menu' ? (
             <ModeMenu value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} />
@@ -2888,6 +2900,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
       )}
       <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || (!value.trim() && !attachment)} className={styles.send} />
     </form>
+    </>
   )
 }
 
@@ -4920,17 +4933,6 @@ export function ModeMenu({ value, items, onChange, label }: { value: string; ite
 ### `src/flows/dash/components/PineActions.module.css`
 
 ```css
-/* The Pine Script mark on a small DASH green tile (as on the upload sheet, at list-cell size). */
-.mark {
-  display: grid;
-  place-items: center;
-  width: var(--l3-size-32);
-  height: var(--l3-size-32);
-  border-radius: var(--l3-radius-08);
-  background: var(--app-dash-glow-1);
-  color: var(--l3-static-black);
-}
-
 .buttons {
   display: inline-flex;
   gap: var(--l3-spacing-08);
@@ -4944,43 +4946,56 @@ import { useEffect, useState } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
-import { msCheck, msContentCopy, msDownload } from '@l3/icons/material'
-import pineMark from '../assets/pine-script.svg'
+import { msCheck, msContentCopy, msDownload, msShare } from '@l3/icons/material'
 import { t } from '../copy'
 import type { IndicatorSettings } from '../indicatorData'
-import { copyPine, downloadPine, pineScriptFor } from './pineExport'
+import { copyPine, downloadPine, pineScriptFor, sharePine } from './pineExport'
 import styles from './PineActions.module.css'
 
 /**
- * Get the Pine Script of an indicator DASH built: a row with the Pine Script mark, "Pine Script · Use it on
- * TradingView", and Copy + Download (icon buttons). Copy turns into a tick and the line says "Copied" for 2 s.
+ * Export the Pine Script of an indicator DASH built: a row (no icon) with "Export your Pine Script ·
+ * Download, copy or share it for TradingView", then Copy · Share (tertiary) and Download (primary, the main action)
+ * as small icon buttons. Copy / Share confirm with a ✓ on the button for 2 s (the text never changes).
  * In the Indicator saved sheet and the history details sheet — not in the chat (the card has enough on it).
  */
 export function PineActions({ name, settings }: { name: string; settings?: IndicatorSettings }) {
-  const [copied, setCopied] = useState(false)
+  // What just happened (Copied / Shared): that button's icon turns into a ✓ for 2 s (the text stays put, so the row
+  // never changes height).
+  const [done, setDone] = useState<'copied' | 'shared' | null>(null)
   useEffect(() => {
-    if (!copied) return
-    const id = window.setTimeout(() => setCopied(false), 2000)
+    if (!done) return
+    const id = window.setTimeout(() => setDone(null), 2000)
     return () => window.clearTimeout(id)
-  }, [copied])
+  }, [done])
   const script = () => pineScriptFor(name, settings)
   return (
     <ListCell
       variant="card"
       size="sm"
-      iconLeft={<span className={styles.mark}><Icon icon={pineMark} size={16} /></span>}
+      multiline
       label={t('pineExport.title')}
-      description={copied ? t('pineExport.copied') : t('pineExport.text')}
+      description={t('pineExport.text')}
       trailing={
         <span className={styles.buttons}>
           <Button
             variant="tertiary"
             size="sm"
-            iconLeft={<Icon icon={copied ? msCheck : msContentCopy} />}
-            aria-label={t('pineExport.copy')}
-            onClick={async () => setCopied(await copyPine(script()))}
+            iconLeft={<Icon icon={done === 'copied' ? msCheck : msContentCopy} />}
+            aria-label={done === 'copied' ? t('pineExport.copied') : t('pineExport.copy')}
+            onClick={async () => setDone((await copyPine(script())) ? 'copied' : null)}
           />
-          <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msDownload} />} aria-label={t('pineExport.download')} onClick={() => downloadPine(name, script())} />
+          <Button
+            variant="tertiary"
+            size="sm"
+            iconLeft={<Icon icon={done === 'shared' ? msCheck : msShare} />}
+            aria-label={done === 'shared' ? t('pineExport.shared') : t('pineExport.share')}
+            onClick={async () => {
+              const result = await sharePine(name, script())
+              setDone(result === 'cancelled' ? null : result)
+            }}
+          />
+          {/* The main thing to do with it: download the .pine file (primary). */}
+          <Button size="sm" iconLeft={<Icon icon={msDownload} />} aria-label={t('pineExport.download')} onClick={() => downloadPine(name, script())} />
         </span>
       }
     />
@@ -6353,6 +6368,19 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
     0 1px 2px var(--raise-drop),
     var(--l3-shadow-elevation-low);
 }
+
+/* Full width (Chat input "Pills above"): the track and the L3 group stretch; the pills share it equally. */
+.track[data-fill] {
+  display: flex;
+  width: 100%;
+  /* over the DASH background, outside the field: white, with a 1px edge so it reads as its own control */
+  background: var(--l3-surface-primary);
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the edge */
+}
+
+.track[data-fill] .tabs {
+  flex: 1;
+}
 ```
 
 ### `src/flows/dash/components/SlidingPills.tsx`
@@ -6368,12 +6396,14 @@ import styles from './SlidingPills.module.css'
  * pill's black doesn't flip from one pill to the next, it glides there (250 ms) and the labels swap colour as it
  * passes. The pills themselves are transparent here; the grey track and the thumb are drawn behind them.
  */
-export function SlidingPills({ value, items, onChange, label, newLabel }: {
+export function SlidingPills({ value, items, onChange, label, newLabel, fill = false }: {
   value: string
   items: { value: string; label: string; isNew?: boolean }[]
   onChange: (value: string) => void
   label: string
   newLabel: string
+  /** Full width, the pills sharing it equally (Chat input "Pills above"). */
+  fill?: boolean
 }) {
   const track = useRef<HTMLSpanElement>(null)
   const thumb = useRef<HTMLSpanElement>(null)
@@ -6387,12 +6417,12 @@ export function SlidingPills({ value, items, onChange, label, newLabel }: {
     el.style.left = `${picked.offsetLeft}px`
     el.style.width = `${picked.offsetWidth}px`
     first.current = false
-  }, [value])
+  }, [value, fill])
   const withBadges = items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : item))
   return (
-    <span ref={track} className={styles.track}>
+    <span ref={track} className={styles.track} data-fill={fill || undefined}>
       <span ref={thumb} className={styles.thumb} aria-hidden="true" />
-      <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
+      <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width={fill ? 'fill' : 'hug'} items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
     </span>
   )
 }
@@ -6609,8 +6639,8 @@ export function useAskModes({ onRules, onIndicator, guess, newKind }: { onRules?
       label: t('askModes.label'),
       items: (['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`), isNew: value === newKind })),
       onChange: (v: string) => setMode(v as Mode),
-      // Dropdown: one pill (↕) that opens a menu; Pills: all three side by side.
-      display: field === 'menu' ? ('menu' as const) : ('pills' as const),
+      // Dropdown: one pill (↕) that opens a menu; Pills: all three side by side in the field; Pills above: over it.
+      display: field === 'menu' ? ('menu' as const) : field === 'above' ? ('above' as const) : ('pills' as const),
     },
     placeholder: t(`askModes.placeholder.${mode}`),
     // Rules and indicators open their chat; a strategy (no chat yet) goes by what was typed.
@@ -6944,9 +6974,28 @@ export async function copyPine(script: string): Promise<boolean> {
   }
 }
 
+/** The file name: "<name>.pine" (letters and digits, underscores between). */
+const fileName = (name: string) => `${name.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'indicator'}.pine`
+
+/**
+ * Shares the script through the phone's share sheet (as a .pine file where the browser can, else as text). Where there's
+ * no share sheet (most laptops), it copies instead. Resolves what happened: 'shared' · 'copied' · 'cancelled'.
+ */
+export async function sharePine(name: string, script: string): Promise<'shared' | 'copied' | 'cancelled'> {
+  const file = new File([script], fileName(name), { type: 'text/plain' })
+  try {
+    if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: name })
+    else if (navigator.share) await navigator.share({ title: name, text: script })
+    else return (await copyPine(script)) ? 'copied' : 'cancelled'
+    return 'shared'
+  } catch {
+    return 'cancelled' // closed the share sheet
+  }
+}
+
 /** Saves the script as "<name>.pine" (made on the phone — nothing is sent anywhere). */
 export function downloadPine(name: string, script: string) {
-  const file = `${name.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'indicator'}.pine`
+  const file = fileName(name)
   const url = URL.createObjectURL(new Blob([script], { type: 'text/plain' }))
   const a = document.createElement('a')
   a.href = url
@@ -7268,9 +7317,11 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "combined.indicators.create": "Create indicator",
   "combined.rules.unit": "rules active",
   "combined.indicators.unit": "on a chart",
-  "pineExport.title": "Pine Script",
-  "pineExport.text": "Use it on TradingView",
+  "pineExport.title": "Export your Pine Script",
+  "pineExport.text": "Download, copy or share it for TradingView",
   "pineExport.copied": "Copied",
+  "pineExport.shared": "Shared",
+  "pineExport.share": "Share Pine Script",
   "pineExport.copy": "Copy Pine Script",
   "pineExport.download": "Download Pine Script",
   "askModes.label": "What to build",
@@ -7545,7 +7596,7 @@ export const dash: Flow = {
     // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
     { id: 'homeCreated', group: 'Home', icon: msRule, label: 'Home cards', values: [{ value: 'none', label: 'New user' }, { value: 'both', label: 'Returning user' }], default: 'both' },
     // DASH home field: With switch (Rule · Indicator · Strategy inside the field, like Claude Desktop) or Plain.
-    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
+    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'above', label: 'Pills above' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
     { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Returning home: Version 2 (library + live status board) or Version 3. Version 1 (the live layout) stays in the code
     // (ReturningScene) but is off the settings panel.
@@ -8792,7 +8843,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
           <Stack gap="40" className={home.content}>
             {/* 1 · Header: the DASH orb, then the greeting under it (as on Returning home v2's centre stage). */}
             <Stack gap="16" align="center" className={home.reveal}>
-              <DashOrb size="lg" />
+              <span className={home.orbNudge}><DashOrb size="lg" /></span>
               <Stack gap="04" className={home.centreHeading}>
                 <p className={home.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
                 <h1 className={home.centreTitle}>{t('home.title')}</h1>
@@ -10037,15 +10088,14 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 /* The create card's outline: 1px, border/intense, in longer dashes (6 on, 4 off) than a CSS dashed border can draw. */
 .createOutline {
   position: absolute;
-  inset: -1px; /* over the card's own (transparent) 1px border */
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
-  overflow: visible;
+  inset: 0; /* inside the card's edge (drawn inward), so nothing outside it can trim it */
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
 .createOutline rect {
-  width: calc(100% - 1px);
+  width: calc(100% - 1px); /* the 1px stroke sits on the half-pixel inside each edge */
   height: calc(100% - 1px);
   fill: none;
   stroke: var(--l3-border-intense);
@@ -10109,11 +10159,23 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   overflow-clip-margin: var(--l3-spacing-16);
 }
 
+/* Shown (keyboard down): nothing clips up / down; only folding away for the keyboard needs the clip. */
+.sectionsFold:not([data-folded]) .sectionsFoldInner {
+  overflow-y: visible;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sectionsFold,
   .sectionsFold[data-folded] {
     transition: none;
   }
+}
+
+/* The DASH orb on the home: nudged 8 right — its ring sits left in the art's box (the leaves fill the right), so the
+   ring lines up with the centred greeting. */
+.orbNudge {
+  display: inline-flex;
+  translate: var(--l3-spacing-08) 0;
 }
 ```
 
@@ -10332,7 +10394,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
           // kind can do (tap one to start with it), so it teaches as well as invites.
           <div className={styles.row} role="list">
             <button type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={create}>
-              <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="12" /></svg>
+              <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
                               <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
               <span className={styles.itemTitle}>{t(`home3.create.${kind}`)}</span>
             </button>
@@ -10359,7 +10421,8 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
             {/* 1 · Header, centred in both states: the DASH orb, then the greeting under it. Big with nothing to resume
                 (centre stage); a size smaller while drafts are shown, so the sections fit. */}
             <Stack gap="16" align="center" className={styles.reveal}>
-              <DashOrb size={centre ? 'lg' : 'md'} />
+              {/* 8 to the right: the ring sits left of the art's box (the leaves fill its right), so it reads centred */}
+              <span className={styles.orbNudge}><DashOrb size={centre ? 'lg' : 'md'} /></span>
               <Stack gap="04" className={styles.centreHeading}>
                 <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
                 <h1 className={styles.centreTitle}>{t('home.title')}</h1>
@@ -10461,7 +10524,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                   {/* Strategy picked: none made yet, so "+ Create strategy" leads the row. */}
                   {shown === 'strategy' && (
                     <button data-key="create-strategy" type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={() => { kb.field.onChange(t('home3.strategyStart')); kb.field.onFocus() }}>
-                      <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="12" /></svg>
+                      <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
                               <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
                       <span className={styles.itemTitle}>{t('home3.create.strategy')}</span>
                     </button>
@@ -11267,9 +11330,12 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
             <p className={styles.description}>{t('indicatorSaved.description')}</p>
           </Stack>
         </Stack>
-        <RuleSummary title={draft.name} description={t('indicatorSaved.summary', { place: draft.placement, count: draft.testedOn })} />
-        {/* Its Pine Script: Copy / Download (kept out of the chat; here and in the history details sheet). */}
-        <PineActions name={draft.name} />
+        {/* The indicator, then its Pine Script (Copy / Share / Download — kept out of the chat; here and in the history
+            details sheet), 16 apart. */}
+        <Stack gap="16">
+          <RuleSummary title={draft.name} description={t('indicatorSaved.summary', { place: draft.placement, count: draft.testedOn })} />
+          <PineActions name={draft.name} />
+        </Stack>
       </Stack>
     </Sheet>
   )

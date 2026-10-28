@@ -111,7 +111,8 @@
     "src/flows/fno/screens/Scalper.tsx",
     "src/flows/fno/sheets/ChartToolsSheet.module.css",
     "src/flows/fno/sheets/ChartToolsSheet.tsx",
-    "src/flows/fno/sheets/HomeSheets.tsx"
+    "src/flows/fno/sheets/HomeSheets.tsx",
+    "src/flows/fno/sheets/IndicatorDetailsSheet.tsx"
   ],
   "shared": [
     "src/shared/copy.ts",
