@@ -2687,6 +2687,24 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   min-width: 0;
 }
 
+/* Lower row: the switch first (left), then the + (only for indicators) right beside Send. */
+.input[data-modes] .modes { order: 1; }
+.input[data-modes] .attachWrap { order: 2; }
+.input[data-modes] .send.send { order: 3; }
+
+/* The Pine Script tip, when the + sits next to Send: the card lines up with the field's right edge and its tail points
+   down at the + (8 field padding + Send 40 + 8 gap + half the + 20 from the right). */
+.input[data-modes] .ftux {
+  right: 0;
+  left: auto;
+  transform-origin: calc(100% - var(--l3-spacing-08) - var(--l3-size-40) - var(--l3-spacing-08) - var(--l3-spacing-20)) 100%;
+}
+
+.input[data-modes] .ftux::after {
+  right: calc(var(--l3-spacing-08) + var(--l3-size-40) + var(--l3-spacing-08) + var(--l3-spacing-20) - var(--l3-spacing-06));
+  left: auto;
+}
+
 /* With the switch: the + is outlined (no green fill — it was pulling the eye), like the other two 40 controls in the
    row. The Pine Script highlight (first time) still lights it green. */
 .input[data-modes] .attachWrap:not([data-glow]) .attach.attach {
@@ -2701,6 +2719,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 ```tsx
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Button } from '@l3/components/Button'
+import { Badge } from '@l3/components/Badge'
 import { Icon } from '@l3/components/Icon'
 import { Tabs } from '@l3/components/Tabs'
 import { Stack } from '@l3/components/Stack'
@@ -2748,7 +2767,7 @@ type ChatInputProps = {
    * What to build, chosen in the field itself (DASH home, setting "Ask field: With switch"; like Claude Desktop's
    * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, md: the 40 of the + and Send) · Send.
    */
-  modes?: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group; menu: one pill that opens a dropdown (room for more). */ display?: 'pills' | 'menu' }
+  modes?: { value: string; items: { value: string; label: string; /** Just launched: a New dot (pills) / New after the name (dropdown). */ isNew?: boolean }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group; menu: one pill that opens a dropdown (room for more). */ display?: 'pills' | 'menu' }
 }
 
 /**
@@ -2846,7 +2865,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
           {modes.display === 'menu' ? (
             <ModeMenu value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} />
           ) : (
-            <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={modes.items} value={modes.value} onChange={modes.onChange} />
+            <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={modes.items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={t('askModes.new')} /> } : item))} value={modes.value} onChange={modes.onChange} />
           )}
         </span>
       )}
@@ -4737,6 +4756,31 @@ function useChartGestures(
 .option.option :is(span) {
   font: var(--l3-text-label-16);
 }
+
+/*
+ * Raised, like the filled (primary) buttons (src/shared/ui/Raised.module.css, on while <html data-buttons="raised">):
+ * a sheen lighter at the top and darker at the bottom under the state layer, the lit-from-above bevel and a small
+ * drop shadow; pressed, it goes in. Flat when the experiment is off.
+ */
+:root[data-buttons='raised'] .pill.pill {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+  background-image:
+    linear-gradient(var(--tab-layer), var(--tab-layer)),
+    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
+  box-shadow:
+    inset 0 1px 0 var(--raise-highlight),
+    inset 0 -1px 0 var(--raise-shade),
+    0 1px 2px var(--raise-drop),
+    var(--l3-shadow-elevation-low);
+}
+
+:root[data-buttons='raised'] .pill.pill:active {
+  box-shadow: inset 0 1px 2px var(--raise-shade);
+}
 ```
 
 ### `src/flows/dash/components/ModeMenu.tsx`
@@ -4759,7 +4803,7 @@ import styles from './ModeMenu.module.css'
  * (Small) in the opposite theme so they read white on black, the chosen one ✓. Picking, or a tap outside, folds it
  * back into the chip. Room for a 4th option, unlike the pill group.
  */
-export function ModeMenu({ value, items, onChange, label }: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string }) {
+export function ModeMenu({ value, items, onChange, label }: { value: string; items: { value: string; label: string; isNew?: boolean }[]; onChange: (value: string) => void; label: string }) {
   const listId = useId()
   const trigger = useRef<HTMLSpanElement>(null)
   const menu = useRef<HTMLSpanElement>(null)
@@ -4840,6 +4884,7 @@ export function ModeMenu({ value, items, onChange, label }: { value: string; ite
                 as="button"
                 size="sm"
                 label={item.label}
+                labelSuffix={item.isNew ? 'New' : undefined}
                 selected={item.value === value}
                 iconRight={item.value === value ? <Icon icon={msCheck} /> : undefined}
                 onClick={() => close(item.value)}
@@ -6414,23 +6459,25 @@ import { useState } from 'react'
 import { useFlowOption } from '../../../shared/prototype'
 import { t } from '../copy'
 
-type Mode = 'rule' | 'indicator' | 'strategy'
+export type Mode = 'rule' | 'indicator' | 'strategy'
 
 /**
  * The DASH home field's "what to build" switch (setting "Chat input": Pills / Dropdown / Previous). With the switch, the
  * field always shows Rule · Indicator · Strategy — so someone who has only made rules still sees what else DASH
  * builds — and the placeholder and where Send goes follow the pick. Plain: the rotating placeholder, Send guesses.
  */
-export function useAskModes({ onRules, onIndicator, guess }: { onRules?: () => void; onIndicator?: () => void; guess: (text: string) => void }) {
+export function useAskModes({ onRules, onIndicator, guess, newKind }: { onRules?: () => void; onIndicator?: () => void; guess: (text: string) => void; /** The kind launched last: marked New in the switch (returning home V3). */ newKind?: Mode }) {
   const field = useFlowOption('dash', 'askField', 'switch')
   const on = field !== 'plain'
   const [mode, setMode] = useState<Mode>('rule')
   if (!on) return null
   return {
+    /** The pick: the + (Pine Script upload) only shows for indicators. */
+    mode,
     modes: {
       value: mode,
       label: t('askModes.label'),
-      items: (['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`) })),
+      items: (['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`), isNew: value === newKind })),
       onChange: (v: string) => setMode(v as Mode),
       // Dropdown: one pill (↕) that opens a menu; Pills: all three side by side.
       display: field === 'menu' ? ('menu' as const) : ('pills' as const),
@@ -7073,6 +7120,17 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "askModes.placeholder.rule": "Describe a rule…",
   "askModes.placeholder.indicator": "Describe an indicator…",
   "askModes.placeholder.strategy": "Describe a strategy…",
+  "askModes.new": "New",
+  "home3.new": "New",
+  "home3.empty.rule": "No rules yet",
+  "home3.empty.indicator": "No indicators yet",
+  "home3.empty.strategy": "No strategies yet",
+  "home3.emptyText.rule": "Warn or stop you before a costly trade.",
+  "home3.emptyText.indicator": "Draw your own signals on any chart.",
+  "home3.emptyText.strategy": "Describe a strategy and DASH builds it for you.",
+  "home3.create.rule": "Create rule",
+  "home3.create.indicator": "Create indicator",
+  "home3.create.strategy": "Create strategy",
   "home.createPrefix": "Create a new",
   "home.word.indicator": "indicator",
   "home.word.rule": "rule",
@@ -7313,20 +7371,10 @@ export const dash: Flow = {
   // chat as a turn. Both: three indicator examples (asks nothing / the timeframe / where it goes).
   options: [
     { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
-    // The history page (☰ / History in the top bar), set apart from the chat: Version 1 = the Trading rules list,
-    // Version 2 = Created with DASH (tabs: rules, indicators, strategies). The two card settings below are for Version 2.
-    { id: 'history', group: 'History', icon: msHistory, label: 'History version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
-    // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
-    // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
-    // Version 3 (default): simple — status, name, switch (like the returning home); the name opens the details.
-    { id: 'cardVersion', group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
-    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
-    // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
-    // (they dim) or with the chat pushed up to make room.
-    { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
-    // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
-    { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'always' },
-    { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
+    // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
+    { id: 'messageStyle', group: 'Chat', icon: msForum, label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'bubbles' },
+    // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
+    { id: 'indicatorTags', group: 'Chat', icon: msLabel, label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
     { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'returning' },
     // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
@@ -7335,18 +7383,30 @@ export const dash: Flow = {
     { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
     { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
-    { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
+    { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '2' },
+    // Returning home V3: what this person has made so far — the kinds not made yet show an invite card.
+    { id: 'homeMade', group: 'Home', icon: msRule, label: 'Made so far (V3)', values: [{ value: 'rules', label: 'Rules only' }, { value: 'both', label: 'Rules + indicators' }], default: 'rules' },
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
     { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
     // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
     { id: 'creationsLayout', group: 'Home', icon: msViewAgenda, label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'mixed' },
+    // The history page (☰ / History in the top bar), set apart from the chat: Version 1 = the Trading rules list,
+    // Version 2 = Created with DASH (tabs: rules, indicators, strategies). The two card settings below are for Version 2.
+    { id: 'history', group: 'History', icon: msHistory, label: 'History version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
+    // Version 2 · Created with DASH, Current card: the initial avatar (Shift+P flips it there too). The New card has none.
+    // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
+    // Version 3 (default): simple — status, name, switch (like the returning home); the name opens the details.
+    { id: 'cardVersion', group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
+    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
+    { id: 'cardIcons', group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
+    // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
+    // (they dim) or with the chat pushed up to make room.
+    { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
+    // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
+    { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'always' },
+    { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
     { id: 'pineScript', group: 'Pine Script', icon: msCode, label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
-    // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
-    { id: 'messageStyle', group: 'Chat', icon: msForum, label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'bubbles' },
-    // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
-    { id: 'indicatorTags', group: 'Chat', icon: msLabel, label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
-    { id: 'cardIcons', group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
   ],
   sections: [
     { id: 'entry', title: 'Entry' },
@@ -8363,7 +8423,9 @@ export function DashAI(props: DashAIProps) {
     body = homeChoice === 'combined' && props.returning === undefined
       ? <HomeCombinedScene typing={typing} onTyping={setTyping} onManage={onYourRules} onRules={props.onRules} onIndicator={props.onIndicator} />
       : props.returning ?? returningHome
-      ? returningVersion === '2'
+      ? returningVersion === '3'
+        ? <ReturningV2Scene version3 typing={typing} onTyping={setTyping} onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
+        : returningVersion === '2'
         ? <ReturningV2Scene typing={typing} onTyping={setTyping} onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
         : <ReturningScene typing={typing} onTyping={setTyping} onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
       : <LandingScene onRules={props.onRules} onIndicator={props.onIndicator} onStrategy={props.onStrategy} />
@@ -8523,7 +8585,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
   const [pineSheet, setPineSheet] = useState(false)
   // The first-time Pine Script tip on the field's + (as in the indicator chat): over the cards (they dim) or pushed up.
   const tip = usePineTip()
-  const tipOn = pineOn && tip.show
+  const tipOn = pineOn && tip.show && (!askModes || askModes.mode === 'indicator')
 
   /** Prototype setting "Home card style": Plain (white, normal stroke) or Green (the DASH green edge of the new-user cards). */
   const glow = useFlowOption('dash', 'homeCardStyle', 'glow') === 'glow'
@@ -8608,7 +8670,8 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTy
             onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
             placeholder={askModes?.placeholder}
-            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined}
+            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // With the switch, the + (Pine Script) is only there while Indicator is picked.
+            onAttach={pineOn && (!askModes || askModes.mode === 'indicator') ? () => setPineSheet(true) : undefined}
             attachTip={tipOn ? { title: t('pineTip.title'), text: t('pineTip.text'), onDone: tip.close, story: tip.story } : null}
           />
           <input
@@ -9776,6 +9839,19 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   font: var(--l3-text-description-12);
   color: var(--l3-content-secondary);
 }
+
+/* V3 · an invite card for a kind not tried yet: what it is (left), Create (right, small). */
+.inviteRow {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-12);
+  width: 100%;
+}
+
+.inviteText {
+  flex: 1;
+  min-width: 0;
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -9790,6 +9866,7 @@ import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
+import { Tag } from '@l3/components/Tag'
 import { msChevronRight, msClose, msDelete } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
@@ -9820,8 +9897,10 @@ import styles from './ReturningV2.module.css'
  */
 /** Your strategies on the home: shown (none saved yet — an empty card that points to the field). */
 const SHOW_STRATEGIES = true
+/** V3: the kind launched last — marked New on its section and in the field's switch. */
+const NEW_KIND = 'strategy' as const
 
-export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, typing, onTyping }: ReturningProps) {
+export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, typing, onTyping }: ReturningProps & { /** Returning home V3: every kind always has a place (an invite card until one is made) and the newest kind is marked New. */ version3?: boolean }) {
   // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
   const kb = useHomeKeyboard({ typing, onTyping })
   /** Where a draft carries on: its chat. */
@@ -9873,7 +9952,10 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
   const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
   // Setting "Ask field": the switch in the field (Rule · Indicator · Strategy) picks where Send goes.
-  const askModes = useAskModes({ onRules, onIndicator, guess: ask })
+  const askModes = useAskModes({ onRules, onIndicator, guess: ask, newKind: version3 ? NEW_KIND : undefined })
+  // V3: what this person has made so far (setting "Made so far"): rules only, or rules and indicators. No strategies yet.
+  const made = useFlowOption('dash', 'homeMade', 'rules')
+  const has = { rule: true, indicator: made === 'both', strategy: false }
 
   // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
@@ -9945,7 +10027,54 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
             {/* 3 · What they made. Grouped (default): a section per kind — Your rules / Your indicators / Your strategies,
                 each with its count and what's active, View all, and its own row. Mixed: one "Your creations" row, kinds
                 together (each card names its kind). A card (›) opens its details sheet (as on the history page). */}
-            {grouped ? (
+            {version3 ? (
+              // V3 · every kind has a place: what they made first (as in V2's grouped rows), then an invite card for
+              // each kind they haven't tried — so someone with only rules still sees indicators and strategies. The
+              // newest kind (NEW_KIND) is tagged New. A new kind later is one more entry here.
+              <>
+                {(['rule', 'indicator', 'strategy'] as const)
+                  .slice()
+                  .sort((a, b) => Number(has[b]) - Number(has[a]))
+                  .map((kind) => {
+                    const items = kind === 'rule' ? rulesSorted : kind === 'indicator' ? savedIndicators : []
+                    const isNew = kind === NEW_KIND
+                    const create = () => {
+                      if (kind === 'rule') onRules?.()
+                      else if (kind === 'indicator') onIndicator?.()
+                      else {
+                        // No strategy chat yet: the field switches to Strategy and the keyboard comes up.
+                        askModes?.modes.onChange('strategy')
+                        kb.field.onFocus()
+                      }
+                    }
+                    return (
+                      <Stack key={kind} as="section" gap="12" aria-label={t(`home2.group.${kind}`)}>
+                        <SectionHeader
+                          title={t(`home2.group.${kind}`)}
+                          headingLevel={2}
+                          tag={isNew ? <Tag color="discover" variant="secondary" size="sm">{t('home3.new')}</Tag> : undefined}
+                          action={has[kind] ? { type: 'view-all', onClick: () => { openHistoryOn(kind === 'rule' ? 'rules' : 'indicators'); onManage?.() } } : undefined}
+                        />
+                        {has[kind] ? (
+                          <div className={styles.row} role="list">
+                            {items.map((item) => card(item, kind as 'rule' | 'indicator', false))}
+                          </div>
+                        ) : (
+                          <Card className={styles.invite}>
+                            <div className={styles.inviteRow}>
+                              <Stack gap="04" className={styles.inviteText}>
+                                <span className={styles.strategyEmptyTitle}>{t(`home3.empty.${kind}`)}</span>
+                                <span className={styles.strategyEmptyText}>{t(`home3.emptyText.${kind}`)}</span>
+                              </Stack>
+                              <Button size="sm" variant="secondary" onClick={create}>{t(`home3.create.${kind}`)}</Button>
+                            </div>
+                          </Card>
+                        )}
+                      </Stack>
+                    )
+                  })}
+              </>
+            ) : grouped ? (
               <>
                 {[
                   { kind: 'rule' as const, items: rulesSorted, note: t('home2.rulesNote', { total: dashRules.length, count: rulesTriggered }) },
@@ -10043,7 +10172,8 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
             onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
             placeholder={askModes?.placeholder}
-            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
+            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // With the switch, the + (Pine Script) is only there while Indicator is picked.
+            onAttach={pineOn && (!askModes || askModes.mode === 'indicator') ? () => setPineSheet(true) : undefined} />
           {picker}
           {pineSheet && (
             <PineUploadSheet
