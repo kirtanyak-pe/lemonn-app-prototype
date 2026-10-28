@@ -10537,6 +10537,18 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
   margin-inline: calc(-1 * var(--l3-spacing-16));
 }
 
+/* Each step's icon on a light DASH-green tile (40, radius 12), the glyph in success green — so the three read clearly.
+   (data-avatar: L3 ListCell keeps an avatar-sized item at its own size instead of the 16 icon box.) */
+.stepIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-40);
+  height: var(--l3-size-40);
+  border-radius: var(--l3-radius-12);
+  background: var(--app-dash-tile);
+  color: var(--l3-content-accent-success-default);
+}
+
 .note {
   margin: var(--l3-spacing-08) 0 0;
   color: var(--l3-content-secondary);
@@ -10587,7 +10599,7 @@ export function PineUploadSheet({ onChoose, onClose }: { onChoose: () => void; o
     >
       <div className={styles.steps}>
         {steps.map((s) => (
-          <ListCell key={s.label} size="sm" multiline iconLeft={<Icon icon={s.icon} />} label={s.label} description={s.description} />
+          <ListCell key={s.label} size="sm" multiline iconLeft={<span className={styles.stepIcon} data-avatar=""><Icon icon={s.icon} size={20} /></span>} label={s.label} description={s.description} />
         ))}
       </div>
       <p className={styles.note}>{t('pineSheet.paste')}</p>
