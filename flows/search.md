@@ -1887,18 +1887,79 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   color: var(--l3-content-inverted);
 }
 
-.key :is(svg, span) {
+.key :is(svg, span):not(.popup) {
   width: var(--l3-icon-size-20);
   height: var(--l3-icon-size-20);
 }
 
-.key:active {
+/* Function keys (Shift, Delete, ?123, Space, Enter): pressed, they darken and give a little. */
+.key:not([data-kind='letter'])[data-held] {
+  background-image: linear-gradient(var(--l3-state-layer-dark-pressed), var(--l3-state-layer-dark-pressed));
   transform: scale(var(--l3-motion-scale-press-default));
 }
 
+/*
+ * Letter keys: while held, a magnified bubble of the key pops up above it (Gboard / iPhone): the key's width plus a
+ * little, two keys tall, the character large near its top; it grows out of the key (120 ms). The key itself dims under
+ * it. Keys at a row's ends keep the bubble inside the keyboard's edge.
+ */
+.key {
+  position: relative;
+}
+
+.key[data-kind='letter'][data-held] {
+  background: var(--l3-surface-tertiary);
+}
+
+.popup {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  width: calc(100% + var(--l3-spacing-12));
+  height: calc(var(--l3-size-40) * 2 + var(--l3-spacing-08));
+  padding-top: var(--l3-spacing-06);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-high);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-28);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: key-pop var(--l3-motion-duration-short) var(--l3-motion-easing-decelerate) both;
+}
+
+.key[data-edge='start'] .popup {
+  left: 0;
+  transform: none;
+  transform-origin: 0 100%;
+}
+
+.key[data-edge='end'] .popup {
+  right: 0;
+  left: auto;
+  transform: none;
+  transform-origin: 100% 100%;
+}
+
+@keyframes key-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .key:active {
+  .key:not([data-kind='letter'])[data-held] {
     transform: none;
+  }
+
+  .popup {
+    animation: none;
   }
 }
 ```
@@ -1906,7 +1967,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 ### `src/shared/ui/TextKeyboard.tsx`
 
 ```tsx
-import type { PointerEvent } from 'react'
+import { useState, type PointerEvent } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { msArrowUpward, msBackspace, msKeyboardTab } from '@l3/icons/material'
 import styles from './TextKeyboard.module.css'
@@ -1928,22 +1989,37 @@ const ROWS: Key[][] = [
  * bar below it to take the keyboard's grey.
  */
 export function TextKeyboard({ onKey }: { onKey?: (key: string) => void }) {
+  // The key being held: a letter / digit / punctuation key shows its pop-up (a magnified bubble above it, like Gboard and
+  // the iPhone keyboard) until the finger lifts; function keys just darken.
+  const [held, setHeld] = useState<string | null>(null)
+  const release = () => setHeld(null)
   return (
     <div className={styles.keyboard} role="group" aria-label="Keyboard" data-surface="secondary">
       {ROWS.map((row, i) => (
         <div key={i} className={styles.row} data-row={i}>
-          {row.map((k) => (
+          {row.map((k, j) => (
             <button
               key={k.key}
               type="button"
               className={styles.key}
               data-kind={k.kind ?? 'letter'}
               data-wide={k.wide || undefined}
+              data-held={held === k.key || undefined}
+              data-edge={j === 0 ? 'start' : j === row.length - 1 ? 'end' : undefined}
               aria-label={label(k)}
-              onPointerDown={keepFocus}
+              onPointerDown={(e) => {
+                keepFocus(e)
+                setHeld(k.key)
+              }}
+              onPointerUp={release}
+              onPointerLeave={release}
+              onPointerCancel={release}
               onClick={() => onKey?.(k.key)}
             >
               {k.key === 'Shift' ? <Icon icon={msArrowUpward} /> : k.key === 'Backspace' ? <Icon icon={msBackspace} /> : k.key === 'Enter' ? <Icon icon={msKeyboardTab} /> : (k.label ?? k.key)}
+              {(k.kind ?? 'letter') === 'letter' && held === k.key && (
+                <span className={styles.popup} aria-hidden="true">{k.label ?? k.key}</span>
+              )}
             </button>
           ))}
         </div>

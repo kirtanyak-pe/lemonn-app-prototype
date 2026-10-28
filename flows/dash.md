@@ -6654,6 +6654,7 @@ export function takeHistoryTab(): HistoryTab {
 import { useLayoutEffect, useRef, useState } from 'react'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import chat from '../screens/RuleChat.module.css'
+import { holdMessage } from './pendingMessage'
 
 /**
  * The drawn keyboard on the DASH home screens (returning v1 / v2, combined), as in the chats: tapping the field turns
@@ -6675,6 +6676,8 @@ export function useHomeKeyboard({ typing = false, onTyping }: { typing?: boolean
     close: typing ? () => onTyping?.(false) : undefined,
     /** Wraps Send: the keyboard goes once the message is sent. */
     sending: <A extends unknown[]>(send: (...args: A) => void) => (...args: A) => {
+      // The typed message goes with it: the chat that opens sends it (pendingMessage).
+      if (typeof args[0] === 'string') holdMessage(args[0])
       onTyping?.(false)
       send(...args)
     },
@@ -6708,6 +6711,33 @@ export function takeFile() {
   const file = pending
   window.setTimeout(() => (pending = null), 0)
   return file
+}
+```
+
+### `src/flows/dash/components/pendingMessage.ts`
+
+```ts
+/**
+ * A message sent from the DASH home's field: held here for a moment, so the chat it opens sends it straight away (it
+ * flies up from the field as the first message and DASH starts on it) — the conversation carries on instead of
+ * starting over on an empty chat. Prototype only.
+ */
+let pending: string | null = null
+
+export function holdMessage(text: string) {
+  pending = text.trim() || null
+}
+
+/** Is a message waiting? (The DASH screen cross-fades the body instead of pushing a new screen.) */
+export function hasHeldMessage() {
+  return pending != null
+}
+
+/** The held message, once (the chat takes it as it opens; cleared after this tick, so a dev-mode double render gets it too). */
+export function takeMessage() {
+  const text = pending
+  window.setTimeout(() => (pending = null), 0)
+  return text
 }
 ```
 
@@ -8354,6 +8384,7 @@ import { msHistory } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashBar, DashScreen } from '../components/DashScreen'
 import { SceneSwap, type SceneMove } from '../components/SceneSwap'
+import { hasHeldMessage } from '../components/pendingMessage'
 import { t } from '../copy'
 import { IndicatorScene, type IndicatorChatProps } from './IndicatorChat'
 import { LandingScene, type LandingProps } from './Landing'
@@ -8405,7 +8436,8 @@ export function DashAI(props: DashAIProps) {
   const [move, setMove] = useState<SceneMove>('push')
   if (lastScene !== scene) {
     setLastScene(scene)
-    setMove(order[scene] < order[lastScene] ? 'back' : 'push')
+    // A message sent from the home: the chat carries on in place — the body cross-fades, the bar and background stay.
+    setMove(lastScene === 'landing' && hasHeldMessage() ? 'fade' : order[scene] < order[lastScene] ? 'back' : 'push')
     setTyping(false)
   }
 
@@ -8732,6 +8764,7 @@ import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
 import { useStickToBottom } from '../components/stickToBottom'
+import { takeMessage } from '../components/pendingMessage'
 import { t } from '../copy'
 import { applyChange, chartQuestion, defaultSettings, draftFor, indicatorPrompts, indicatorPromptsV2, looksLikePine, minutesOf, pineBuildSteps, timeframeLabel, timeframeQuestion, type IndicatorChange, type IndicatorPrompt, type IndicatorSettings } from '../indicatorData'
 import type { DashVersion } from './RuleChat'
@@ -8895,6 +8928,16 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     field?.focus()
     requestAnimationFrame(() => field?.setSelectionRange(prefix.length, prefix.length))
   }
+
+  // Sent from the DASH home: the chat opens and sends it right away — it flies up from this field as the first
+  // message (the conversation carries on; no empty chat in between).
+  useEffect(() => {
+    if (step !== 'empty') return
+    const held = takeMessage()
+    const from = stage.current?.querySelector<HTMLElement>('form input:not([type=file])')
+    if (held && from) send(held, from)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const askChange = (text: string) => {
     setChanges((c) => [...c, text])
@@ -10390,6 +10433,18 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
   overflow: hidden;
 }
 
+/* Once the keyboard is fully up, stop clipping, so a key's pop-up can rise above the top row. Closing clips again
+   straight away (the fold needs it). */
+.keyboard[data-open] .keyboardInner {
+  animation: keyboard-unclip 0s linear var(--app-dash-scene) forwards;
+}
+
+@keyframes keyboard-unclip {
+  to {
+    overflow: visible;
+  }
+}
+
 /* A new turn: fades up 8 into place (250 ms). Turns already on the page keep their key, so they don't replay it. */
 .appear {
   animation: dash-appear var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
@@ -10506,6 +10561,7 @@ import { RuleCard } from '../components/RuleCard'
 import { RulesIntro } from '../components/RulesIntro'
 import { useEdgeFade } from '../components/edgeFade'
 import { useStickToBottom } from '../components/stickToBottom'
+import { takeMessage } from '../components/pendingMessage'
 import { t } from '../copy'
 import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions } from '../data'
 import styles from './RuleChat.module.css'
@@ -10596,6 +10652,16 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
     window.setTimeout(() => setIntroLeaving(false), INTRO_OUT_MS)
     onSend?.(text)
   }
+
+  // Sent from the DASH home: the chat opens and sends it right away — it flies up from this field as the first
+  // message (the conversation carries on; no empty chat in between).
+  useEffect(() => {
+    if (step !== 'empty') return
+    const held = takeMessage()
+    const from = scene.current?.querySelector<HTMLElement>('form input:not([type=file])')
+    if (held && from) send(held, from)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // The chat has started: fly the message from where it was sent to its place (measured once both exist).
   useLayoutEffect(() => {
@@ -12049,18 +12115,79 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   color: var(--l3-content-inverted);
 }
 
-.key :is(svg, span) {
+.key :is(svg, span):not(.popup) {
   width: var(--l3-icon-size-20);
   height: var(--l3-icon-size-20);
 }
 
-.key:active {
+/* Function keys (Shift, Delete, ?123, Space, Enter): pressed, they darken and give a little. */
+.key:not([data-kind='letter'])[data-held] {
+  background-image: linear-gradient(var(--l3-state-layer-dark-pressed), var(--l3-state-layer-dark-pressed));
   transform: scale(var(--l3-motion-scale-press-default));
 }
 
+/*
+ * Letter keys: while held, a magnified bubble of the key pops up above it (Gboard / iPhone): the key's width plus a
+ * little, two keys tall, the character large near its top; it grows out of the key (120 ms). The key itself dims under
+ * it. Keys at a row's ends keep the bubble inside the keyboard's edge.
+ */
+.key {
+  position: relative;
+}
+
+.key[data-kind='letter'][data-held] {
+  background: var(--l3-surface-tertiary);
+}
+
+.popup {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  width: calc(100% + var(--l3-spacing-12));
+  height: calc(var(--l3-size-40) * 2 + var(--l3-spacing-08));
+  padding-top: var(--l3-spacing-06);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-high);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-28);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: key-pop var(--l3-motion-duration-short) var(--l3-motion-easing-decelerate) both;
+}
+
+.key[data-edge='start'] .popup {
+  left: 0;
+  transform: none;
+  transform-origin: 0 100%;
+}
+
+.key[data-edge='end'] .popup {
+  right: 0;
+  left: auto;
+  transform: none;
+  transform-origin: 100% 100%;
+}
+
+@keyframes key-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .key:active {
+  .key:not([data-kind='letter'])[data-held] {
     transform: none;
+  }
+
+  .popup {
+    animation: none;
   }
 }
 ```
@@ -12068,7 +12195,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 ### `src/shared/ui/TextKeyboard.tsx`
 
 ```tsx
-import type { PointerEvent } from 'react'
+import { useState, type PointerEvent } from 'react'
 import { Icon } from '@l3/components/Icon'
 import { msArrowUpward, msBackspace, msKeyboardTab } from '@l3/icons/material'
 import styles from './TextKeyboard.module.css'
@@ -12090,22 +12217,37 @@ const ROWS: Key[][] = [
  * bar below it to take the keyboard's grey.
  */
 export function TextKeyboard({ onKey }: { onKey?: (key: string) => void }) {
+  // The key being held: a letter / digit / punctuation key shows its pop-up (a magnified bubble above it, like Gboard and
+  // the iPhone keyboard) until the finger lifts; function keys just darken.
+  const [held, setHeld] = useState<string | null>(null)
+  const release = () => setHeld(null)
   return (
     <div className={styles.keyboard} role="group" aria-label="Keyboard" data-surface="secondary">
       {ROWS.map((row, i) => (
         <div key={i} className={styles.row} data-row={i}>
-          {row.map((k) => (
+          {row.map((k, j) => (
             <button
               key={k.key}
               type="button"
               className={styles.key}
               data-kind={k.kind ?? 'letter'}
               data-wide={k.wide || undefined}
+              data-held={held === k.key || undefined}
+              data-edge={j === 0 ? 'start' : j === row.length - 1 ? 'end' : undefined}
               aria-label={label(k)}
-              onPointerDown={keepFocus}
+              onPointerDown={(e) => {
+                keepFocus(e)
+                setHeld(k.key)
+              }}
+              onPointerUp={release}
+              onPointerLeave={release}
+              onPointerCancel={release}
               onClick={() => onKey?.(k.key)}
             >
               {k.key === 'Shift' ? <Icon icon={msArrowUpward} /> : k.key === 'Backspace' ? <Icon icon={msBackspace} /> : k.key === 'Enter' ? <Icon icon={msKeyboardTab} /> : (k.label ?? k.key)}
+              {(k.kind ?? 'letter') === 'letter' && held === k.key && (
+                <span className={styles.popup} aria-hidden="true">{k.label ?? k.key}</span>
+              )}
             </button>
           ))}
         </div>
