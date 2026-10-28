@@ -2686,6 +2686,14 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   flex: 1;
   min-width: 0;
 }
+
+/* With the switch: the + is outlined (no green fill — it was pulling the eye), like the other two 40 controls in the
+   row. The Pine Script highlight (first time) still lights it green. */
+.input[data-modes] .attachWrap:not([data-glow]) .attach.attach {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the outline */
+  color: var(--l3-content-primary);
+}
 ```
 
 ### `src/flows/dash/components/Chat.tsx`
@@ -2737,7 +2745,7 @@ type ChatInputProps = {
   attachTip?: { title: string; text: string; onDone: () => void; /** The animated story version (setting "Pine Script tip"). */ story?: boolean } | null
   /**
    * What to build, chosen in the field itself (DASH home, setting "Ask field: With switch"; like Claude Desktop's
-   * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, sm) · Send.
+   * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, md: the 40 of the + and Send) · Send.
    */
   modes?: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string }
 }
@@ -2834,7 +2842,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
       </span>
       {modes && (
         <span className={styles.modes}>
-          <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="sm" width="hug" items={modes.items} value={modes.value} onChange={modes.onChange} />
+          <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={modes.items} value={modes.value} onChange={modes.onChange} />
         </span>
       )}
       <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || (!value.trim() && !attachment)} className={styles.send} />
@@ -6869,12 +6877,10 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.notTriggered": "Not triggered today",
   "pineSheet.title": "Upload a Pine Script",
   "pineSheet.description": "Bring an indicator you wrote on TradingView. DASH turns it into an indicator for your Lemonn charts.",
-  "pineSheet.step1": "Pick your script",
-  "pineSheet.step1Text": "A Pine Script file, like my_strategy.pine",
-  "pineSheet.step2": "DASH converts it",
-  "pineSheet.step2Text": "It reads the script and builds the same indicator",
-  "pineSheet.step3": "It’s on your Scalper chart",
-  "pineSheet.step3Text": "Applied right away, and saved under Your indicators",
+  "pineSheet.step1": "Pick your Pine Script file",
+  "pineSheet.step2": "DASH converts it into an indicator",
+  "pineSheet.step3": "It’s added to your Scalper chart",
+  "pineSheet.how": "How it works",
   "pineSheet.paste": "You can also paste the script straight into the chat.",
   "pineSheet.choose": "Choose a file",
   "pineSheet.notNow": "Not now",
@@ -10520,7 +10526,7 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
 ### `src/flows/dash/sheets/PineUploadSheet.module.css`
 
 ```css
-/* The Pine Script sheet: the mark on a DASH green tile (64, the large header's icon size), three how-it-works rows,
+/* The Pine Script sheet: the mark (white) on a success-green tile (64, the large header's icon size), three how-it-works rows,
    a short note under them. */
 .logo {
   display: grid;
@@ -10528,29 +10534,50 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
   width: var(--l3-size-64);
   height: var(--l3-size-64);
   border-radius: var(--l3-radius-16);
-  background: var(--app-dash-glow-1);
-  color: var(--l3-static-black);
+  background: var(--l3-surface-accent-success-default);
+  color: var(--l3-static-white);
 }
 
 /* Plain rows bring their own 16 side padding: the list steps out of the sheet's content padding. */
-.steps {
-  margin-inline: calc(-1 * var(--l3-spacing-16));
+/* A soft DASH-green wash behind the header, fading into the sheet (as Kill Switch's warm one); 8 under the text
+   (the content's 16 top space follows: 24 in all — L3's lg header has no bottom padding). */
+.header.header {
+  padding-bottom: var(--l3-spacing-08);
+  background: linear-gradient(to bottom, var(--l3-surface-accent-success-light), transparent);
 }
 
-/* Each step's icon on a light DASH-green tile (40, radius 12), the glyph in success green — so the three read clearly.
-   (data-avatar: L3 ListCell keeps an avatar-sized item at its own size instead of the 16 icon box.) */
+/* How it works (the Kill Switch "info" card): rows 12 apart; each a 32 grey icon box (radius 8), 12 gap, Description/14. */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--l3-spacing-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-12);
+  min-height: var(--l3-size-32);
+  font: var(--l3-text-description-14);
+  color: var(--l3-content-primary);
+}
+
 .stepIcon {
   display: grid;
+  flex: none;
   place-items: center;
-  width: var(--l3-size-40);
-  height: var(--l3-size-40);
-  border-radius: var(--l3-radius-12);
-  background: var(--app-dash-tile);
-  color: var(--l3-content-accent-success-default);
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  border-radius: var(--l3-radius-08);
+  background: var(--l3-surface-secondary);
+  color: var(--l3-content-secondary);
 }
 
 .note {
-  margin: var(--l3-spacing-08) 0 0;
+  margin: 0;
   color: var(--l3-content-secondary);
   font: var(--l3-text-description-12);
   text-align: center;
@@ -10564,8 +10591,8 @@ import { useId } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
-import { ListCell } from '@l3/components/ListCell'
 import { msAutorenew, msMonitoring, msUploadFile } from '@l3/icons/material'
 import { Sheet } from '../../../shared/ui/Sheet'
 import pineScript from '../assets/pine-script.svg'
@@ -10574,35 +10601,42 @@ import styles from './PineUploadSheet.module.css'
 
 /**
  * What the + in the chat field is for (so it's clear even without the first-time tip): uploading a Pine Script.
- * Large header with the Pine Script mark, then how it works in three lines (L3 list cells) — pick the script, DASH
- * converts it, it's on your Scalper chart — and a note that pasting it works too. Choose a file opens the picker; Not
+ * Laid out like the Kill Switch info sheet (~/kill-switch-l3 "Protect your trades"): a soft DASH-green wash behind the
+ * large header (Pine Script mark, title, line), then how it works as three single lines in one card, each with a grey
+ * icon box — pick the script, DASH converts it, it's on your Scalper chart — and a note that pasting it works too. Choose a file opens the picker; Not
  * now closes it.
  */
 export function PineUploadSheet({ onChoose, onClose }: { onChoose: () => void; onClose: () => void }) {
   const id = useId()
   const steps = [
-    { icon: msUploadFile, label: t('pineSheet.step1'), description: t('pineSheet.step1Text') },
-    { icon: msAutorenew, label: t('pineSheet.step2'), description: t('pineSheet.step2Text') },
-    { icon: msMonitoring, label: t('pineSheet.step3'), description: t('pineSheet.step3Text') },
+    { icon: msUploadFile, text: t('pineSheet.step1') },
+    { icon: msAutorenew, text: t('pineSheet.step2') },
+    { icon: msMonitoring, text: t('pineSheet.step3') },
   ]
   return (
     <Sheet
       labelledBy={id}
       onClose={onClose}
-      header={<BottomSheetHeader size="lg" headingId={id} heading={t('pineSheet.title')} description={t('pineSheet.description')} icon={<span className={styles.logo}><Icon icon={pineScript} size={24} /></span>} />}
+      header={<BottomSheetHeader size="lg" className={styles.header} headingId={id} heading={t('pineSheet.title')} description={t('pineSheet.description')} icon={<span className={styles.logo}><Icon icon={pineScript} size={24} /></span>} />}
       footer={
+        // The paste note sits in the dock, right above Choose a file.
         <ButtonGroup aria-label={t('pineSheet.title')} direction="vertical">
+          <p className={styles.note}>{t('pineSheet.paste')}</p>
           <Button onClick={onChoose}>{t('pineSheet.choose')}</Button>
           <Button variant="secondary" onClick={onClose}>{t('pineSheet.notNow')}</Button>
         </ButtonGroup>
       }
     >
-      <div className={styles.steps}>
-        {steps.map((s) => (
-          <ListCell key={s.label} size="sm" multiline iconLeft={<span className={styles.stepIcon} data-avatar=""><Icon icon={s.icon} size={20} /></span>} label={s.label} description={s.description} />
-        ))}
-      </div>
-      <p className={styles.note}>{t('pineSheet.paste')}</p>
+      <Card as="section" aria-label={t('pineSheet.how')}>
+        <ul className={styles.steps}>
+          {steps.map((step) => (
+            <li key={step.text} className={styles.step}>
+              <span className={styles.stepIcon}><Icon icon={step.icon} size={16} /></span>
+              {step.text}
+            </li>
+          ))}
+        </ul>
+      </Card>
     </Sheet>
   )
 }
