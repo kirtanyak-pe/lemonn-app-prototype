@@ -1027,7 +1027,7 @@ function clock(start: string, add: number) {
   "tools.yours": "Your indicators",
   "tools.create": "Create",
   "tools.none": "No indicators created yet.",
-  "tools.byDash": "Made with DASH AI",
+  "tools.byDash": "Made with DASH Ai",
   "tools.longPressHint": "Long press for more options",
   "tools.showOnChart": "Show on chart",
   "tools.isOnChart": "It’s on this chart",

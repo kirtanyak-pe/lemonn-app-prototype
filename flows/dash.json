@@ -1,6 +1,6 @@
 {
   "id": "dash",
-  "title": "DASH AI · Trading rules",
+  "title": "DASH Ai · Trading rules",
   "description": "Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",

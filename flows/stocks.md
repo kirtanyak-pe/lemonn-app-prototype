@@ -1397,8 +1397,8 @@ export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIn
   "disclosure.readMore": "Read More",
   "disclosure.readLess": "Read Less",
   "top.dash": "DASH",
-  "top.dashLabel": "Open DASH AI",
-  "dashIntro.heading": "DASH AI",
+  "top.dashLabel": "Open DASH Ai",
+  "dashIntro.heading": "DASH Ai",
   "dashIntro.body": "DASH helps you build your rules and strategies.",
   "dashIntro.gotIt": "Got it!"
 }

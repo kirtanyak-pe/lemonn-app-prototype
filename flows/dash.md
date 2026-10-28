@@ -1,4 +1,4 @@
-# Flow: DASH AI · Trading rules (`dash`)
+# Flow: DASH Ai · Trading rules (`dash`)
 
 > One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `571a418` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
@@ -7218,18 +7218,18 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "creations.rules": "Rules",
   "creations.indicators": "Indicators",
   "creations.strategies": "Strategies",
-  "creations.rulesCount": "AI rules ({count})",
-  "creations.indicatorsCount": "AI indicators ({count})",
-  "creations.strategiesCount": "AI strategies ({count})",
+  "creations.rulesCount": "Ai rules ({count})",
+  "creations.indicatorsCount": "Ai indicators ({count})",
+  "creations.strategiesCount": "Ai strategies ({count})",
   "creations.onChart": "{name} on the chart",
   "creations.deleteIndicator": "Are you sure you want to delete this indicator?",
   "creations.emptyAll": "Nothing created yet",
   "creations.emptyAllText": "Ask DASH for a trading rule, an indicator or a strategy and it builds it for you.",
-  "creations.emptyRules": "No AI rules yet",
+  "creations.emptyRules": "No Ai rules yet",
   "creations.emptyRulesText": "Describe a trading habit and DASH turns it into a rule that steps in for you.",
-  "creations.emptyIndicators": "No AI indicators yet",
+  "creations.emptyIndicators": "No Ai indicators yet",
   "creations.emptyIndicatorsText": "Describe what your chart should show and DASH draws it.",
-  "creations.emptyStrategies": "No AI strategies yet",
+  "creations.emptyStrategies": "No Ai strategies yet",
   "creations.emptyStrategiesText": "Describe your strategy and DASH builds it for you.",
   "creations.createRule": "Create a rule",
   "creations.createIndicator": "Create an indicator",
@@ -7580,7 +7580,7 @@ const indicatorStep: Record<IndicatorStep, string> = { empty: 'dash-20', chart: 
  */
 export const dash: Flow = {
   id: 'dash',
-  title: 'DASH AI · Trading rules',
+  title: 'DASH Ai · Trading rules',
   description: 'Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.',
   figmaFile: 'nLs24dTJdPz9A5pu3AWMbe',
   // Prototype setting: Version 1 = the cards (rule, indicator) pinned above the chat. Version 2 = the cards inside the
