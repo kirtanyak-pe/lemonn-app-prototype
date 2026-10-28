@@ -390,6 +390,8 @@
     "src/flows/dash/components/RulesIntro.tsx",
     "src/flows/dash/components/SceneSwap.module.css",
     "src/flows/dash/components/SceneSwap.tsx",
+    "src/flows/dash/components/SlidingPills.module.css",
+    "src/flows/dash/components/SlidingPills.tsx",
     "src/flows/dash/components/SuccessBurst.module.css",
     "src/flows/dash/components/SuccessBurst.tsx",
     "src/flows/dash/components/askModes.ts",

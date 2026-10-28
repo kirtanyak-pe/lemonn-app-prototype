@@ -2719,9 +2719,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 ```tsx
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Button } from '@l3/components/Button'
-import { Badge } from '@l3/components/Badge'
 import { Icon } from '@l3/components/Icon'
-import { Tabs } from '@l3/components/Tabs'
 import { Stack } from '@l3/components/Stack'
 import { msAdd, msArrowUpward, msChevronRight, msClose, msDescription, msUploadFile } from '@l3/icons/material'
 import pineScript from '../assets/pine-script.svg'
@@ -2729,6 +2727,7 @@ import sparkle from '../assets/sparkle.svg'
 import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
 import { ModeMenu } from './ModeMenu'
+import { SlidingPills } from './SlidingPills'
 import { PineStory } from './PineStory'
 import styles from './Chat.module.css'
 
@@ -2865,7 +2864,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
           {modes.display === 'menu' ? (
             <ModeMenu value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} />
           ) : (
-            <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={modes.items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={t('askModes.new')} /> } : item))} value={modes.value} onChange={modes.onChange} />
+            <SlidingPills value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} newLabel={t('askModes.new')} />
           )}
         </span>
       )}
@@ -6264,6 +6263,96 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
         </div>
       ))}
     </div>
+  )
+}
+```
+
+### `src/flows/dash/components/SlidingPills.module.css`
+
+```css
+/* The grey track (the pill group's own background, drawn here so the thumb can sit between it and the labels). */
+.track {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-secondary);
+}
+
+/* The black thumb under the picked pill; it glides to the next one (left / width, 250 ms). */
+.thumb {
+  position: absolute;
+  top: var(--l3-spacing-04);
+  bottom: var(--l3-spacing-04);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-inverted);
+}
+
+.thumb[data-ready='yes'] {
+  transition:
+    left var(--l3-motion-duration-medium) var(--l3-motion-easing-standard),
+    width var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+/* The L3 group and its pills go transparent: the track and thumb show through; the labels swap colour as it passes. */
+.tabs.tabs {
+  position: relative;
+  background: transparent;
+}
+
+.tabs [role='tab'] {
+  --tab-surface: transparent;
+  box-shadow: none;
+  background-image: none;
+  transition: color var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb[data-ready='yes'],
+  .tabs [role='tab'] {
+    transition: none;
+  }
+}
+```
+
+### `src/flows/dash/components/SlidingPills.tsx`
+
+```tsx
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { Badge } from '@l3/components/Badge'
+import { Tabs } from '@l3/components/Tabs'
+import styles from './SlidingPills.module.css'
+
+/**
+ * The field's "what to build" pill group (L3 Tabs, pill-group · toggle · md) with a sliding black thumb: the picked
+ * pill's black doesn't flip from one pill to the next, it glides there (250 ms) and the labels swap colour as it
+ * passes. The pills themselves are transparent here; the grey track and the thumb are drawn behind them.
+ */
+export function SlidingPills({ value, items, onChange, label, newLabel }: {
+  value: string
+  items: { value: string; label: string; isNew?: boolean }[]
+  onChange: (value: string) => void
+  label: string
+  newLabel: string
+}) {
+  const track = useRef<HTMLSpanElement>(null)
+  const thumb = useRef<HTMLSpanElement>(null)
+  const first = useRef(true)
+  useLayoutEffect(() => {
+    const picked = track.current?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')
+    const el = thumb.current
+    if (!picked || !el) return
+    // The first placement doesn't animate; every change after does (CSS transition on left / width).
+    el.dataset.ready = first.current ? '' : 'yes'
+    el.style.left = `${picked.offsetLeft}px`
+    el.style.width = `${picked.offsetWidth}px`
+    first.current = false
+  }, [value])
+  const withBadges = items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : item))
+  return (
+    <span ref={track} className={styles.track}>
+      <span ref={thumb} className={styles.thumb} aria-hidden="true" />
+      <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
+    </span>
   )
 }
 ```
@@ -9918,16 +10007,53 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   font: var(--l3-text-label-12);
 }
 
-/* Typing with the keyboard up: the sections are hidden (the Stack's own display would otherwise win over [hidden]). */
-.sections[hidden] {
-  display: none;
+/*
+ * Typing with the keyboard up: the sections fade out fast and fold away over the keyboard's rise (300 ms, the same
+ * curve), and the space above them (the content's gap) closes too — so the greeting glides to its place. Closing the
+ * keyboard reverses it; the cards fade back in once there's room.
+ */
+.sectionsFold {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* the column stays the page's width (a sideways row would widen it) */
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--app-dash-scene) var(--app-dash-scene-easing),
+    margin-top var(--app-dash-scene) var(--app-dash-scene-easing),
+    opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard) var(--l3-motion-duration-short);
+}
+
+.sectionsFold[data-folded] {
+  grid-template-rows: 0fr;
+  margin-top: calc(-1 * var(--stk-gap));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    grid-template-rows var(--app-dash-scene) var(--app-dash-scene-easing),
+    margin-top var(--app-dash-scene) var(--app-dash-scene-easing),
+    opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.sectionsFoldInner {
+  min-width: 0;
+  min-height: 0;
+  /* clip only top / bottom: the creation rows bleed to the screen's edges sideways */
+  overflow-x: visible;
+  overflow-y: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sectionsFold,
+  .sectionsFold[data-folded] {
+    transition: none;
+  }
 }
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
 
 ```tsx
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
@@ -9997,7 +10123,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
     const status = k === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
     const lit = k === 'rule' ? on && triggered > 0 : on
     return (
-      <button key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
+      <button key={item.id} data-key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
         <span className={styles.itemTop}>
           <span className={styles.itemStatus}>
             {withKind && <>{t(`home.kind.${k}`)} · </>}
@@ -10066,6 +10192,83 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
     />
   )
 
+  /** The kind picked in the field's switch: its creations come first (everything stays — only the order changes). */
+  const picked = askModes?.mode
+  const firstOrder = (kind: 'rule' | 'indicator' | 'strategy') => (picked && kind === picked ? -1 : 0)
+  // A new pick: the row scrolls back to its start, so the kind that now leads is in view…
+  const mixedRow = useRef<HTMLDivElement>(null)
+  // …and each card slides from where it was to its new place (FLIP: positions inside the row, so the scroll back to
+  // the start doesn't skew them); a card that wasn't there ("+ Create strategy") pops in.
+  const lastSpots = useRef<Record<string, number>>({})
+  useLayoutEffect(() => {
+    const row = mixedRow.current
+    if (!row) return
+    const cards = [...row.querySelectorAll<HTMLElement>('[data-key]')]
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    cards.forEach((el) => {
+      const was = lastSpots.current[el.dataset.key!]
+      if (reduce) return
+      if (was === undefined) {
+        if (Object.keys(lastSpots.current).length) el.animate([{ opacity: 0, transform: 'scale(0.92)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
+      } else if (was !== el.offsetLeft) {
+        el.animate([{ transform: `translateX(${was - el.offsetLeft}px)` }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
+      }
+    })
+    lastSpots.current = Object.fromEntries(cards.map((el) => [el.dataset.key!, el.offsetLeft]))
+    row.scrollTo({ left: 0, behavior: reduce ? 'auto' : 'smooth' })
+  }, [picked])
+
+  /**
+   * One kind's section — made: its cards (V2's row) and View all; not made: "+ Create" and a few "Try" examples. Used
+   * by V3 (every kind).
+   */
+  const kindSection = (kind: 'rule' | 'indicator' | 'strategy', made: boolean) => {
+    const items = kind === 'rule' ? rulesSorted : kind === 'indicator' ? savedIndicators : []
+    const isNew = version3 && kind === NEW_KIND
+    const create = () => {
+      if (kind === 'rule') onRules?.()
+      else if (kind === 'indicator') onIndicator?.()
+      else {
+        // No strategy chat yet: the field starts the sentence and the keyboard comes up.
+        kb.field.onChange(t('home3.strategyStart'))
+        kb.field.onFocus()
+      }
+    }
+    return (
+      <Stack key={kind} as="section" gap="12" aria-label={t(`home2.group.${kind}`)}>
+        <SectionHeader
+          title={t(`home2.group.${kind}`)}
+          headingLevel={2}
+          tag={isNew ? <Tag color="discover" variant="secondary" size="sm">{t('home3.new')}</Tag> : undefined}
+          action={made ? { type: 'view-all', onClick: () => { openHistoryOn(kind === 'rule' ? 'rules' : 'indicators'); onManage?.() } } : undefined}
+        />
+        {made ? (
+          <div className={styles.row} role="list">
+            {items.map((item) => card(item, kind as 'rule' | 'indicator', false))}
+          </div>
+        ) : (
+          // Not tried yet: a row like the ones above — "+ Create" first (dashed), then a few things this
+          // kind can do (tap one to start with it), so it teaches as well as invites.
+          <div className={styles.row} role="list">
+            <button type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={create}>
+              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+              <span className={styles.itemTitle}>{t(`home3.create.${kind}`)}</span>
+            </button>
+            {EXAMPLES[kind].map((key) => (
+              <button key={key} type="button" role="listitem" className={styles.item} onClick={() => tryExample(kind, t(key))}>
+                <span className={styles.itemTop}>
+                  <span className={styles.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
+                  <Icon icon={msChevronRight} size={16} />
+                </span>
+                <span className={styles.itemTitle}>{t(key)}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </Stack>
+    )
+  }
+
   return (
     <div className={styles.scene}>
       <div className={styles.scroll} onClick={kb.close}>
@@ -10083,8 +10286,11 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
 
             {/* The sections, 32 apart (the header sits 48 above them). On landing they appear one after another, after
                 the header (the field below is there from the start). */}
-            {/* Typing (keyboard up): the sections step aside — the greeting and the field get the room. */}
-            <Stack gap="32" className={styles.sections} hidden={typing || undefined}>
+            {/* Typing (keyboard up): the sections fade and fold away with the keyboard's rise (and come back as it goes),
+                so the greeting glides to its place instead of jumping. */}
+            <div className={styles.sectionsFold} data-folded={typing || undefined}>
+            <div className={styles.sectionsFoldInner}>
+            <Stack gap="32" className={styles.sections}>
             {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
                 each, swiped sideways when there are two or more; ✕ removes one (asks first). */}
             {drafts.length > 0 && (
@@ -10126,52 +10332,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                   .slice()
                   .sort((a, b) => Number(has[b]) - Number(has[a]))
                   .filter((kind) => kind !== { none: '', indicators: 'indicator', strategies: 'strategy' }[hidden])
-                  .map((kind) => {
-                    const items = kind === 'rule' ? rulesSorted : kind === 'indicator' ? savedIndicators : []
-                    const isNew = kind === NEW_KIND
-                    const create = () => {
-                      if (kind === 'rule') onRules?.()
-                      else if (kind === 'indicator') onIndicator?.()
-                      else {
-                        // No strategy chat yet: the field starts the sentence and the keyboard comes up.
-                        kb.field.onChange(t('home3.strategyStart'))
-                        kb.field.onFocus()
-                      }
-                    }
-                    return (
-                      <Stack key={kind} as="section" gap="12" aria-label={t(`home2.group.${kind}`)}>
-                        <SectionHeader
-                          title={t(`home2.group.${kind}`)}
-                          headingLevel={2}
-                          tag={isNew ? <Tag color="discover" variant="secondary" size="sm">{t('home3.new')}</Tag> : undefined}
-                          action={has[kind] ? { type: 'view-all', onClick: () => { openHistoryOn(kind === 'rule' ? 'rules' : 'indicators'); onManage?.() } } : undefined}
-                        />
-                        {has[kind] ? (
-                          <div className={styles.row} role="list">
-                            {items.map((item) => card(item, kind as 'rule' | 'indicator', false))}
-                          </div>
-                        ) : (
-                          // Not tried yet: a row like the ones above — "+ Create" first (dashed), then a few things this
-                          // kind can do (tap one to start with it), so it teaches as well as invites.
-                          <div className={styles.row} role="list">
-                            <button type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={create}>
-                              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
-                              <span className={styles.itemTitle}>{t(`home3.create.${kind}`)}</span>
-                            </button>
-                            {EXAMPLES[kind].map((key) => (
-                              <button key={key} type="button" role="listitem" className={styles.item} onClick={() => tryExample(kind, t(key))}>
-                                <span className={styles.itemTop}>
-                                  <span className={styles.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
-                                  <Icon icon={msChevronRight} size={16} />
-                                </span>
-                                <span className={styles.itemTitle}>{t(key)}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </Stack>
-                    )
-                  })}
+                  .map((kind) => kindSection(kind, has[kind]))}
               </>
             ) : grouped ? (
               <>
@@ -10179,7 +10340,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                   { kind: 'rule' as const, items: rulesSorted, note: t('home2.rulesNote', { total: dashRules.length, count: rulesTriggered }) },
                   { kind: 'indicator' as const, items: savedIndicators, note: t('home2.indicatorsNote', { total: savedIndicators.length, count: savedIndicators.filter((x) => x.on).length }) },
                 ].map((g) => (
-                  <Stack key={g.kind} as="section" gap="12" aria-label={t(`home2.group.${g.kind}`)}>
+                  <Stack key={g.kind} as="section" gap="12" aria-label={t(`home2.group.${g.kind}`)} style={{ order: firstOrder(g.kind) }}>
                     <SectionHeader
                       title={t(`home2.group.${g.kind}`)}
                       headingLevel={2}
@@ -10199,7 +10360,7 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                 ))}
                 {/* Your strategies: none saved yet, so an empty card (no View all). */}
                 {SHOW_STRATEGIES && (
-                  <Stack as="section" gap="12" aria-label={t('home2.group.strategy')}>
+                  <Stack as="section" gap="12" aria-label={t('home2.group.strategy')} style={{ order: firstOrder('strategy') }}>
                     <SectionHeader title={t('home2.group.strategy')} headingLevel={2} />
                     {/* None saved yet (strategies aren't built yet): say so, and point to the field below. */}
                     <Card className={styles.strategyEmpty}>
@@ -10214,12 +10375,21 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
             ) : (
               <Stack as="section" gap="12" aria-label={t('home2.creations')}>
                 <SectionHeader title={t('home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
-                <div className={styles.row} role="list">
-                  {creations.map(({ item, kind: k }) => card(item, k, true))}
+                <div ref={mixedRow} className={styles.row} role="list">
+                  {/* Strategy picked: none made yet, so "+ Create strategy" leads the row. */}
+                  {picked === 'strategy' && (
+                    <button data-key="create-strategy" type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={() => { kb.field.onChange(t('home3.strategyStart')); kb.field.onFocus() }}>
+                      <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+                      <span className={styles.itemTitle}>{t('home3.create.strategy')}</span>
+                    </button>
+                  )}
+                  {[...creations].sort((a, b) => Number(b.kind === picked) - Number(a.kind === picked)).map(({ item, kind: k }) => card(item, k, true))}
                 </div>
               </Stack>
             )}
             </Stack>
+            </div>
+            </div>
           </Stack>
         </Inset>
       </div>
@@ -10949,7 +11119,7 @@ export function SimpleCreationCard({ item, kind, on, onToggle, onOpen }: SimpleC
   const status = kind === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
   const lit = kind === 'rule' ? on && triggered > 0 : on
   return (
-    <Card className={styles.card}>
+    <Card className={styles.card} surface="primary">
       <div className={styles.row} data-off={!on || undefined}>
       <button type="button" className={styles.open} onClick={onOpen}>
         <span className={styles.status} data-on={lit || undefined}>{status}</span>
