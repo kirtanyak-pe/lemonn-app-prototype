@@ -2709,6 +2709,7 @@ import pineScript from '../assets/pine-script.svg'
 import sparkle from '../assets/sparkle.svg'
 import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
+import { ModeMenu } from './ModeMenu'
 import { PineStory } from './PineStory'
 import styles from './Chat.module.css'
 
@@ -2747,7 +2748,7 @@ type ChatInputProps = {
    * What to build, chosen in the field itself (DASH home, setting "Ask field: With switch"; like Claude Desktop's
    * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, md: the 40 of the + and Send) · Send.
    */
-  modes?: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string }
+  modes?: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group; menu: one pill that opens a dropdown (room for more). */ display?: 'pills' | 'menu' }
 }
 
 /**
@@ -2842,7 +2843,11 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
       </span>
       {modes && (
         <span className={styles.modes}>
-          <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={modes.items} value={modes.value} onChange={modes.onChange} />
+          {modes.display === 'menu' ? (
+            <ModeMenu value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} />
+          ) : (
+            <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="md" width="hug" items={modes.items} value={modes.value} onChange={modes.onChange} />
+          )}
         </span>
       )}
       <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || (!value.trim() && !attachment)} className={styles.send} />
@@ -4668,6 +4673,188 @@ function useChartGestures(
 }
 ```
 
+### `src/flows/dash/components/ModeMenu.module.css`
+
+```css
+/* The "what to build" pill: hugs its label, sits after the + in the field's lower row. */
+.wrap {
+  display: inline-flex;
+  flex: none;
+}
+
+/* The pill: black and 40 — the height of the + and Send beside it (an L3 md pill is 32; in a pill group the group's 4
+   padding makes it 40). */
+.pill.pill {
+  height: var(--l3-size-40);
+  padding-inline: var(--l3-spacing-16); /* a little more room either side than the md pill's 12 */
+  /* The black chip (the pill group's selected look: surface/inverted, inverted text), flat — no shadow or sheen. */
+  --tab-surface: var(--l3-surface-inverted);
+  --tab-content: var(--l3-content-inverted);
+  --tab-border: transparent;
+  --tab-layer-default: var(--l3-state-layer-light-default);
+  --tab-layer-hover: var(--l3-state-layer-light-hover);
+  --tab-layer-pressed: var(--l3-state-layer-light-pressed);
+  box-shadow: none;
+}
+
+/* While the panel is open it sits over the chip (it grew out of it): the chip itself steps back. */
+.wrap[data-open] .pill {
+  visibility: hidden;
+}
+
+/*
+ * The panel the chip grows into: drawn over the DASH screen, its bottom-left corner on the chip's, black (the opposite
+ * theme's surface — set on the panel through data-product / data-mode) with round corners; the options are L3 list
+ * cells (Small). ModeMenu.tsx animates its clip-path from the chip's box to the full panel and back.
+ */
+.menu {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  width: var(--app-dash-mode-menu); /* one width whatever is picked, so it never wobbles */
+  padding: var(--l3-spacing-04);
+  border-radius: var(--l3-radius-20);
+  background: var(--l3-surface-primary);
+  color: var(--l3-content-primary);
+}
+
+.option.option {
+  border-radius: var(--l3-radius-16);
+  background-color: transparent;
+}
+
+.option.option[data-selected] {
+  background-color: var(--l3-surface-secondary);
+}
+
+/* Text 2 up from L3's 14 (Label/16) on the chip and in the panel. */
+.pill.pill,
+.pill.pill * {
+  font: var(--l3-text-label-16);
+}
+
+.option.option :is(span) {
+  font: var(--l3-text-label-16);
+}
+```
+
+### `src/flows/dash/components/ModeMenu.tsx`
+
+```tsx
+import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Icon } from '@l3/components/Icon'
+import { lmSwitchArrowVertical } from '@l3/components/icons/glyphs'
+import { ListCell } from '@l3/components/ListCell'
+import { Tab } from '@l3/components/Tabs'
+import { msCheck } from '@l3/icons/material'
+import pickerStyles from './MarketPicker.module.css'
+import styles from './ModeMenu.module.css'
+
+/**
+ * "What to build" as one pill (setting "Chat input: Dropdown"): the current pick and a ↕ — an L3 action pill (Tab,
+ * pill · md), black, 40 like the + and Send. A tap grows the chip itself into the menu: a black, round-cornered panel
+ * opens up out of the chip's spot (its corner stays put, the rest unfolds — 250 ms), with the options as L3 list cells
+ * (Small) in the opposite theme so they read white on black, the chosen one ✓. Picking, or a tap outside, folds it
+ * back into the chip. Room for a 4th option, unlike the pill group.
+ */
+export function ModeMenu({ value, items, onChange, label }: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string }) {
+  const listId = useId()
+  const trigger = useRef<HTMLSpanElement>(null)
+  const menu = useRef<HTMLSpanElement>(null)
+  const [place, setPlace] = useState<{ host: HTMLElement; left: number; bottom: number; chipW: number; chipH: number; product?: string; mode?: string } | null>(null)
+  const [closing, setClosing] = useState(false)
+  const current = items.find((i) => i.value === value) ?? items[0]
+
+  const open = () => {
+    const chip = trigger.current
+    const host = chip?.closest<HTMLElement>('[data-dash]')
+    if (!chip || !host) return
+    const h = host.getBoundingClientRect()
+    const b = chip.getBoundingClientRect()
+    const scale = h.width / host.offsetWidth || 1 // the phone mockup may be scaled on screen
+    // The menu takes the opposite theme of the page (white text on the black panel; in dark mode, the other way).
+    const root = document.documentElement.dataset
+    setPlace({
+      host,
+      left: (b.left - h.left) / scale,
+      bottom: (h.bottom - b.bottom) / scale,
+      chipW: b.width / scale,
+      chipH: b.height / scale,
+      product: root.product,
+      mode: root.mode === 'dark' ? 'light' : 'dark',
+    })
+  }
+
+  /** The chip's own box inside the open panel (bottom left), as a clip-path: where the panel grows from / folds to. */
+  const chipClip = (el: HTMLElement) => {
+    if (!place) return ''
+    return `inset(${el.offsetHeight - place.chipH}px ${el.offsetWidth - place.chipW}px 0 0 round ${place.chipH / 2}px)`
+  }
+  const fullClip = 'inset(0 0 0 0 round var(--l3-radius-20))'
+
+  // Opening: unfold from the chip.
+  useLayoutEffect(() => {
+    const el = menu.current
+    if (!el || !place || closing) return
+    el.getAnimations().forEach((a) => a.cancel())
+    el.animate([{ clipPath: chipClip(el) }, { clipPath: fullClip }], { duration: 250, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [place])
+
+  const close = (pick?: string) => {
+    const el = menu.current
+    if (pick) onChange(pick)
+    if (!el) return setPlace(null)
+    setClosing(true)
+    el.getAnimations().forEach((a) => a.cancel())
+    const fold = el.animate([{ clipPath: fullClip }, { clipPath: chipClip(el) }], { duration: 200, easing: 'cubic-bezier(0.3, 0, 1, 1)', fill: 'forwards' })
+    fold.onfinish = () => {
+      setPlace(null)
+      setClosing(false)
+    }
+  }
+
+  return (
+    <span ref={trigger} className={styles.wrap} data-open={place ? '' : undefined}>
+      <Tab type="button" action appearance="pill" emphasis="tertiary" size="md" iconRight={<Icon icon={lmSwitchArrowVertical} />} aria-haspopup="menu" aria-expanded={!!place} aria-controls={listId} aria-label={`${label}: ${current.label}`} onClick={() => (place ? close() : open())} className={styles.pill}>
+        {current.label}
+      </Tab>
+      {place && createPortal(
+        <>
+          <span className={pickerStyles.backdrop} onClick={() => close()} aria-hidden="true" />
+          <span
+            ref={menu}
+            className={styles.menu}
+            id={listId}
+            role="menu"
+            aria-label={label}
+            data-product={place.product}
+            data-mode={place.mode}
+            style={{ left: place.left, bottom: place.bottom }}
+          >
+            {items.map((item) => (
+              <ListCell
+                key={item.value}
+                as="button"
+                size="sm"
+                label={item.label}
+                selected={item.value === value}
+                iconRight={item.value === value ? <Icon icon={msCheck} /> : undefined}
+                onClick={() => close(item.value)}
+                className={styles.option}
+              />
+            ))}
+          </span>
+        </>,
+        place.host,
+      )}
+    </span>
+  )
+}
+```
+
 ### `src/flows/dash/components/PineActions.module.css`
 
 ```css
@@ -6230,12 +6417,13 @@ import { t } from '../copy'
 type Mode = 'rule' | 'indicator' | 'strategy'
 
 /**
- * The DASH home field's "what to build" switch (setting "Ask field": With switch / Plain). With the switch, the
+ * The DASH home field's "what to build" switch (setting "Chat input": Pills / Dropdown / Previous). With the switch, the
  * field always shows Rule · Indicator · Strategy — so someone who has only made rules still sees what else DASH
  * builds — and the placeholder and where Send goes follow the pick. Plain: the rotating placeholder, Send guesses.
  */
 export function useAskModes({ onRules, onIndicator, guess }: { onRules?: () => void; onIndicator?: () => void; guess: (text: string) => void }) {
-  const on = useFlowOption('dash', 'askField', 'switch') === 'switch'
+  const field = useFlowOption('dash', 'askField', 'switch')
+  const on = field !== 'plain'
   const [mode, setMode] = useState<Mode>('rule')
   if (!on) return null
   return {
@@ -6244,6 +6432,8 @@ export function useAskModes({ onRules, onIndicator, guess }: { onRules?: () => v
       label: t('askModes.label'),
       items: (['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`) })),
       onChange: (v: string) => setMode(v as Mode),
+      // Dropdown: one pill (↕) that opens a menu; Pills: all three side by side.
+      display: field === 'menu' ? ('menu' as const) : ('pills' as const),
     },
     placeholder: t(`askModes.placeholder.${mode}`),
     // Rules and indicators open their chat; a strategy (no chat yet) goes by what was typed.
@@ -7142,7 +7332,7 @@ export const dash: Flow = {
     // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
     { id: 'homeCreated', group: 'Home', icon: msRule, label: 'Home cards', values: [{ value: 'none', label: 'New user' }, { value: 'both', label: 'Returning user' }], default: 'both' },
     // DASH home field: With switch (Rule · Indicator · Strategy inside the field, like Claude Desktop) or Plain.
-    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'New' }], default: 'switch' },
+    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'Pills' }, { value: 'menu', label: 'Dropdown' }], default: 'switch' },
     { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
     { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },

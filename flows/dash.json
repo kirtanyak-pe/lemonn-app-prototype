@@ -374,6 +374,8 @@
     "src/flows/dash/components/MarketPicker.tsx",
     "src/flows/dash/components/MiniChart.module.css",
     "src/flows/dash/components/MiniChart.tsx",
+    "src/flows/dash/components/ModeMenu.module.css",
+    "src/flows/dash/components/ModeMenu.tsx",
     "src/flows/dash/components/PineActions.module.css",
     "src/flows/dash/components/PineActions.tsx",
     "src/flows/dash/components/PineStory.module.css",
