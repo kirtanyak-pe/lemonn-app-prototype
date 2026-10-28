@@ -3013,7 +3013,7 @@ export function UserFile({ name, caption }: { name: string; caption?: string }) 
  * style" (A/B): Plain = no bubble (default); Bubbles = in a bubble on the left, like the user's on the right.
  */
 export function AssistantMessage({ title, children, faded }: { title?: ReactNode; children?: ReactNode; faded?: boolean }) {
-  const bubble = useFlowOption('dash', 'messageStyle', 'plain') === 'bubbles'
+  const bubble = useFlowOption('dash', 'messageStyle', 'bubbles') === 'bubbles'
   return (
     <Stack gap="08" className={styles.assistant} data-faded={faded || undefined} data-bubble={bubble || undefined}>
       {title && <p className={styles.assistantTitle}>{title}</p>}
@@ -6411,6 +6411,47 @@ export function takeHistoryTab(): HistoryTab {
 }
 ```
 
+### `src/flows/dash/components/homeKeyboard.tsx`
+
+```tsx
+import { useLayoutEffect, useRef, useState } from 'react'
+import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
+import chat from '../screens/RuleChat.module.css'
+
+/**
+ * The drawn keyboard on the DASH home screens (returning v1 / v2, combined), as in the chats: tapping the field turns
+ * the typing state on and the prototype's keyboard rises (a phone's own keyboard stays closed — ChatInput sets
+ * inputMode none on touch); the drawn keys type into the field; tapping the page or sending puts it away. The
+ * screen's background ends above it (--dash-kb). Typing is kept by the DASH screen (DashAI).
+ */
+export function useHomeKeyboard({ typing = false, onTyping }: { typing?: boolean; onTyping?: (typing: boolean) => void }) {
+  const [draft, setDraft] = useState('')
+  const box = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const screen = box.current?.closest<HTMLElement>('[data-dash]')
+    if (screen && box.current) screen.style.setProperty('--dash-kb', `${(box.current.firstElementChild as HTMLElement | null)?.offsetHeight ?? 0}px`)
+  }, [typing])
+  return {
+    /** Spread on the ChatInput. */
+    field: { value: draft, onChange: setDraft, typing, onFocus: () => onTyping?.(true) },
+    /** On the page: a tap puts the keyboard away. */
+    close: typing ? () => onTyping?.(false) : undefined,
+    /** Wraps Send: the keyboard goes once the message is sent. */
+    sending: <A extends unknown[]>(send: (...args: A) => void) => (...args: A) => {
+      onTyping?.(false)
+      send(...args)
+    },
+    keyboard: (
+      <div className={chat.keyboard} data-open={typing || undefined}>
+        <div className={chat.keyboardInner} ref={box}>
+          <TextKeyboard onKey={(k) => setDraft((d) => typeText(d, k))} />
+        </div>
+      </div>
+    ),
+  }
+}
+```
+
 ### `src/flows/dash/components/pendingFile.ts`
 
 ```ts
@@ -6532,7 +6573,7 @@ import { useFlowOption } from '../../../shared/prototype'
 export function usePineTip() {
   const story = useFlowOption('dash', 'pineTip', 'animated') === 'animated'
   const overlay = useFlowOption('dash', 'pineTipPlace', 'overlay') === 'overlay'
-  const always = useFlowOption('dash', 'pineTipShow', 'once') === 'always'
+  const always = useFlowOption('dash', 'pineTipShow', 'always') === 'always'
   const [show, setShow] = useState(() => always || !pineTipSeen())
   useEffect(() => {
     if (always) setShow(true)
@@ -7081,7 +7122,7 @@ export const dash: Flow = {
   // Prototype setting: Version 1 = the cards (rule, indicator) pinned above the chat. Version 2 = the cards inside the
   // chat as a turn. Both: three indicator examples (asks nothing / the timeframe / where it goes).
   options: [
-    { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
+    { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
     // The history page (☰ / History in the top bar), set apart from the chat: Version 1 = the Trading rules list,
     // Version 2 = Created with DASH (tabs: rules, indicators, strategies). The two card settings below are for Version 2.
     { id: 'history', group: 'History', icon: msHistory, label: 'History version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
@@ -7094,7 +7135,7 @@ export const dash: Flow = {
     // (they dim) or with the chat pushed up to make room.
     { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
     // Testing: the tip normally shows once per person; Always brings it back every time the chat opens.
-    { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'once' },
+    { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'always' },
     { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
     { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'returning' },
@@ -7108,11 +7149,11 @@ export const dash: Flow = {
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
     { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
     // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
-    { id: 'creationsLayout', group: 'Home', icon: msViewAgenda, label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'grouped' },
+    { id: 'creationsLayout', group: 'Home', icon: msViewAgenda, label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'mixed' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
     { id: 'pineScript', group: 'Pine Script', icon: msCode, label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
     // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
-    { id: 'messageStyle', group: 'Chat', icon: msForum, label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'plain' },
+    { id: 'messageStyle', group: 'Chat', icon: msForum, label: 'Message style', values: [{ value: 'plain', label: 'Plain' }, { value: 'bubbles', label: 'Bubbles' }], default: 'bubbles' },
     // The indicator card's part tags (Supertrend · EMA 20 · BUY · SELL): shown or hidden, to test the card without them.
     { id: 'indicatorTags', group: 'Chat', icon: msLabel, label: 'Indicator tags', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     { id: 'cardIcons', group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
@@ -8095,7 +8136,7 @@ export function DashAI(props: DashAIProps) {
   const { scene, onBack, onYourRules, sheet } = props
   /** Prototype setting "Chat version": the card's place only — 1 = pinned above the chat (folds on scroll), 2 = in the
    *  chat as a message. Everything else is the same. */
-  const version = useFlowOption('dash', 'version', '2') as DashVersion
+  const version = useFlowOption('dash', 'version', '1') as DashVersion
   /** Prototype setting "DASH home": a new user sees what DASH can build; a returning one sees their own work first. */
   const homeChoice = useFlowOption('dash', 'home', 'returning')
   const returningHome = homeChoice === 'returning'
@@ -8125,16 +8166,16 @@ export function DashAI(props: DashAIProps) {
   const tone = props.scene === 'rules' && props.step === 'cost' ? 'loss' : 'brand'
   // The background ends above the drawn keyboard (laptop). Scenes turn typing on only where the keyboard comes up
   // (the empty chat's input, Modify) and off again when it goes.
-  const keyboardUp = typing && props.scene !== 'landing' // the drawn keyboard, on a phone too
+  const keyboardUp = typing // the drawn keyboard, on a phone too (the home screens' field included)
 
   let body: ReactNode
   if (props.scene === 'landing')
     body = homeChoice === 'combined' && props.returning === undefined
-      ? <HomeCombinedScene onManage={onYourRules} onRules={props.onRules} onIndicator={props.onIndicator} />
+      ? <HomeCombinedScene typing={typing} onTyping={setTyping} onManage={onYourRules} onRules={props.onRules} onIndicator={props.onIndicator} />
       : props.returning ?? returningHome
       ? returningVersion === '2'
-        ? <ReturningV2Scene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
-        : <ReturningScene onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
+        ? <ReturningV2Scene typing={typing} onTyping={setTyping} onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
+        : <ReturningScene typing={typing} onTyping={setTyping} onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onAddToChart={props.onAddToChart} />
       : <LandingScene onRules={props.onRules} onIndicator={props.onIndicator} onStrategy={props.onStrategy} />
   else if (props.scene === 'rules') body = <RuleScene {...props} version={version} typing={typing} onTyping={setTyping} />
   else body = <IndicatorScene {...props} version={version} typing={typing} onTyping={setTyping} />
@@ -8245,6 +8286,7 @@ import { Stack } from '@l3/components/Stack'
 import { msChevronRight } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { useHomeKeyboard } from '../components/homeKeyboard'
 import { ChatInput } from '../components/Chat'
 import { useAskModes } from '../components/askModes'
 import { openHistoryOn } from '../components/historyFilter'
@@ -8268,7 +8310,9 @@ import styles from './HomeCombined.module.css'
  * Prototype setting "Home cards": New user (both cards invite: Create rule / Create indicator) or Returning user (both
  * show their numbers).
  */
-export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningProps) {
+export function HomeCombinedScene({ onManage, onRules, onIndicator, typing, onTyping }: ReturningProps) {
+  // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
+  const kb = useHomeKeyboard({ typing, onTyping })
   const created = useFlowOption('dash', 'homeCreated', 'both')
   const hasRules = created !== 'none'
   const hasIndicators = created !== 'none'
@@ -8321,7 +8365,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningP
 
   return (
     <div className={home.scene}>
-      <div className={home.scroll}>
+      <div className={home.scroll} onClick={kb.close}>
         <Inset paddingInline="16" className={home.page}>
           <Stack gap="40" className={home.content}>
             {/* 1 · Header: the DASH orb, then the greeting under it (as on Returning home v2's centre stage). */}
@@ -8370,7 +8414,8 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningP
       <div className={home.dock} data-tip={tipOn && !tip.overlay ? (tip.story ? 'story' : 'card') : undefined}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput
-            onSend={askModes?.send ?? ask}
+            {...kb.field}
+            onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
             placeholder={askModes?.placeholder}
             rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined}
@@ -8399,6 +8444,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningP
           )}
         </Inset>
       </div>
+      {kb.keyboard}
     </div>
   )
 }
@@ -9103,6 +9149,7 @@ import { useFlowOption } from '../../../shared/prototype'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { holdFile } from '../components/pendingFile'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
+import { useHomeKeyboard } from '../components/homeKeyboard'
 import { ChatInput, SuggestionList } from '../components/Chat'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators, savedStrategies, type SavedRule } from '../data'
@@ -9119,6 +9166,9 @@ export type ReturningProps = {
   onIndicator?: () => void
   /** "Add my … to a chart": Scalper, its indicators. */
   onAddToChart?: () => void
+  /** Typing state (field focused, the drawn keyboard up) — kept by the DASH screen. */
+  typing?: boolean
+  onTyping?: (typing: boolean) => void
 }
 
 type Recent = SavedRule & { kind: 'rule' | 'indicator' | 'strategy' }
@@ -9132,7 +9182,9 @@ type Recent = SavedRule & { kind: 'rule' | 'indicator' | 'strategy' }
  * - suggestions built from what they have (add the indicator to a chart, tighten a rule, start something new);
  * - the field: ask anything or change something they made.
  */
-export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onAddToChart }: ReturningProps) {
+export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onAddToChart, typing, onTyping }: ReturningProps) {
+  // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
+  const kb = useHomeKeyboard({ typing, onTyping })
   const recent: Recent[] = [
     ...savedIndicators.map((i) => ({ ...i, kind: 'indicator' as const })),
     ...dashRules.slice(0, 4).map((r) => ({ ...r, kind: 'rule' as const })),
@@ -9165,7 +9217,7 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 
   return (
     <div className={styles.scene}>
-      <div className={styles.scroll}>
+      <div className={styles.scroll} onClick={kb.close}>
         <Stack gap="32" className={styles.body}>
           <Stack gap="16" align="center">
             <DashOrb size="md" />
@@ -9208,7 +9260,7 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
       </div>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
+          <ChatInput {...kb.field} onSend={kb.sending(ask)} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
           {picker}
           {pineSheet && (
             <PineUploadSheet
@@ -9221,6 +9273,7 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
           )}
         </Inset>
       </div>
+      {kb.keyboard}
     </div>
   )
 }
@@ -9554,6 +9607,7 @@ import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { openHistoryOn } from '../components/historyFilter'
 import { holdFile } from '../components/pendingFile'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
+import { useHomeKeyboard } from '../components/homeKeyboard'
 import { ChatInput } from '../components/Chat'
 import { useAskModes } from '../components/askModes'
 import { t } from '../copy'
@@ -9577,7 +9631,9 @@ import styles from './ReturningV2.module.css'
 /** Your strategies on the home: shown (none saved yet — an empty card that points to the field). */
 const SHOW_STRATEGIES = true
 
-export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator }: ReturningProps) {
+export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, typing, onTyping }: ReturningProps) {
+  // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
+  const kb = useHomeKeyboard({ typing, onTyping })
   /** Where a draft carries on: its chat. */
   const open = (kind: 'rule' | 'indicator') => (kind === 'indicator' ? onOpenIndicator : onOpenRule) ?? (() => {})
   // Prototype setting "Resume chats": Show (the sample drafts) / Hide (none — the centre-stage state).
@@ -9585,7 +9641,7 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
   const [drafts, setDrafts] = useState<HomeDraft[]>(resumeShown ? homeDrafts : [])
   useEffect(() => setDrafts(resumeShown ? homeDrafts : []), [resumeShown])
   /** Prototype setting "Creations layout": Grouped (a group per kind, its own row) or Mixed (one row, kinds together). */
-  const grouped = useFlowOption('dash', 'creationsLayout', 'grouped') === 'grouped'
+  const grouped = useFlowOption('dash', 'creationsLayout', 'mixed') === 'grouped'
   const rulesTriggered = dashRules.filter((r) => homeTriggers[r.id]).length
   /** Rules that stepped in today first. */
   const rulesSorted = [...dashRules.filter((r) => homeTriggers[r.id]), ...dashRules.filter((r) => !homeTriggers[r.id])]
@@ -9651,7 +9707,7 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
 
   return (
     <div className={styles.scene}>
-      <div className={styles.scroll}>
+      <div className={styles.scroll} onClick={kb.close}>
         <Inset paddingInline="16" className={styles.page}>
           <Stack gap={centre ? '40' : '48'} className={styles.content} data-centre={centre || undefined}>
             {/* 1 · Header, centred in both states: the DASH orb, then the greeting under it. Big with nothing to resume
@@ -9793,7 +9849,8 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
           <ChatInput
-            onSend={askModes?.send ?? ask}
+            {...kb.field}
+            onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
             placeholder={askModes?.placeholder}
             rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
@@ -9809,6 +9866,7 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
           )}
         </Inset>
       </div>
+      {kb.keyboard}
     </div>
   )
 }

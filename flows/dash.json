@@ -394,6 +394,7 @@
     "src/flows/dash/components/edgeFade.ts",
     "src/flows/dash/components/flyMessage.ts",
     "src/flows/dash/components/historyFilter.ts",
+    "src/flows/dash/components/homeKeyboard.tsx",
     "src/flows/dash/components/pendingFile.ts",
     "src/flows/dash/components/pineExport.ts",
     "src/flows/dash/components/pineTip.ts",
