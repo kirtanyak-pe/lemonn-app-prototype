@@ -6573,7 +6573,13 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "pineSheet.step3Text": "Applied right away, and saved under Your indicators",
   "pineSheet.paste": "You can also paste the script straight into the chat.",
   "pineSheet.choose": "Choose a file",
-  "pineSheet.notNow": "Not now"
+  "pineSheet.notNow": "Not now",
+  "home2.group.rule": "Your rules",
+  "home2.group.indicator": "Your indicators",
+  "home2.group.strategy": "Your strategies",
+  "home2.rulesNote": "{total} · {count} stepped in today",
+  "home2.indicatorsNote": "{total} · {count} on a chart",
+  "home2.strategiesSoon": "Coming soon: build a strategy with DASH"
 }
 ```
 
@@ -6766,6 +6772,10 @@ export const dash: Flow = {
     { id: 'home', label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }], default: 'new' },
     // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
     { id: 'returningHome', label: 'Returning home', values: [{ value: '1', label: 'Version 1' }, { value: '2', label: 'Version 2' }], default: '2' },
+    // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
+    { id: 'resumeChats', label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
+    // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
+    { id: 'creationsLayout', label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'grouped' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
     { id: 'pineScript', label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
     // A/B: DASH's replies as plain text (default) or in a bubble, like the user's messages.
@@ -8824,6 +8834,16 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   color: var(--l3-content-tertiary);
 }
 
+/* Strategies (not built yet): a quiet dashed placeholder. */
+.soon {
+  display: block;
+  padding: var(--l3-spacing-12);
+  border: 1px dashed var(--l3-border-light);
+  border-radius: var(--l3-radius-12);
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-description-12);
+}
+
 .itemMeta {
   color: var(--l3-content-tertiary);
   font: var(--l3-text-description-12);
@@ -8872,7 +8892,7 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 ### `src/flows/dash/screens/ReturningV2.tsx`
 
 ```tsx
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
@@ -8909,7 +8929,33 @@ import styles from './ReturningV2.module.css'
 export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator }: ReturningProps) {
   /** Where a draft carries on: its chat. */
   const open = (kind: 'rule' | 'indicator') => (kind === 'indicator' ? onOpenIndicator : onOpenRule) ?? (() => {})
-  const [drafts, setDrafts] = useState<HomeDraft[]>(homeDrafts)
+  // Prototype setting "Resume chats": Show (the sample drafts) / Hide (none — the centre-stage state).
+  const resumeShown = useFlowOption('dash', 'resumeChats', 'show') === 'show'
+  const [drafts, setDrafts] = useState<HomeDraft[]>(resumeShown ? homeDrafts : [])
+  useEffect(() => setDrafts(resumeShown ? homeDrafts : []), [resumeShown])
+  /** Prototype setting "Creations layout": Grouped (a group per kind, its own row) or Mixed (one row, kinds together). */
+  const grouped = useFlowOption('dash', 'creationsLayout', 'grouped') === 'grouped'
+  const rulesTriggered = dashRules.filter((r) => homeTriggers[r.id]).length
+  /** Rules that stepped in today first. */
+  const rulesSorted = [...dashRules.filter((r) => homeTriggers[r.id]), ...dashRules.filter((r) => !homeTriggers[r.id])]
+  /** One creation card: what it did today / whether it's on a chart (green when active), the name, › — opens its details. */
+  const card = (item: SavedRule, k: 'rule' | 'indicator', withKind: boolean) => {
+    const triggered = homeTriggers[item.id] ?? 0
+    const status = k === 'rule' ? (triggered ? t('home2.triggered', { count: triggered }) : item.on ? t('home2.notTriggered') : t('cards.paused')) : item.on ? t('cards.onChart') : t('details.notOnChart')
+    const lit = k === 'rule' ? triggered > 0 : item.on
+    return (
+      <button key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
+        <span className={styles.itemTop}>
+          <span className={styles.itemStatus}>
+            {withKind && <>{t(`home.kind.${k}`)} · </>}
+            <span data-on={lit || undefined}>{status}</span>
+          </span>
+          <Icon icon={msChevronRight} size={16} />
+        </span>
+        <span className={styles.itemTitle}>{item.title}</span>
+      </button>
+    )
+  }
   /** The creation whose details sheet is open. */
   /** Your creations, one row, most active first: rules that stepped in today, then indicators, then the other rules. */
   const creations: { item: SavedRule; kind: 'rule' | 'indicator' }[] = [
@@ -8992,30 +9038,35 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
               </Stack>
             )}
 
-            {/* 3 · Your creations: one sideways row, rules and indicators together (most active first) — each names its kind,
-                a rule leads with what it did today, an indicator with whether it's on a chart; a card (›) opens its details sheet (as on the
-                history page). View all opens everything made with DASH. */}
-            <Stack as="section" gap="12" aria-label={t('home2.creations')}>
-              <SectionHeader title={t('home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
-              <div className={styles.row} role="list">
-                {creations.map(({ item, kind: k }) => {
-                  const triggered = homeTriggers[item.id] ?? 0
-                  const status = k === 'rule' ? (triggered ? t('home2.triggered', { count: triggered }) : item.on ? t('home2.notTriggered') : t('cards.paused')) : item.on ? t('cards.onChart') : t('details.notOnChart')
-                  const lit = k === 'rule' ? triggered > 0 : item.on
-                  return (
-                    <button key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
-                      <span className={styles.itemTop}>
-                        <span className={styles.itemStatus}>
-                          {t(`home.kind.${k}`)} · <span data-on={lit || undefined}>{status}</span>
-                        </span>
-                        <Icon icon={msChevronRight} size={16} />
-                      </span>
-                      <span className={styles.itemTitle}>{item.title}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </Stack>
+            {/* 3 · What they made. Grouped (default): a section per kind — Your rules / Your indicators / Your strategies,
+                each with its count and what's active, View all, and its own row. Mixed: one "Your creations" row, kinds
+                together (each card names its kind). A card (›) opens its details sheet (as on the history page). */}
+            {grouped ? (
+              <>
+                {[
+                  { kind: 'rule' as const, items: rulesSorted, note: t('home2.rulesNote', { total: dashRules.length, count: rulesTriggered }) },
+                  { kind: 'indicator' as const, items: savedIndicators, note: t('home2.indicatorsNote', { total: savedIndicators.length, count: savedIndicators.filter((x) => x.on).length }) },
+                ].map((g) => (
+                  <Stack key={g.kind} as="section" gap="12" aria-label={t(`home2.group.${g.kind}`)}>
+                    <SectionHeader title={t(`home2.group.${g.kind}`)} description={g.note} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+                    <div className={styles.row} role="list">
+                      {g.items.map((item) => card(item, g.kind, false))}
+                    </div>
+                  </Stack>
+                ))}
+                <Stack as="section" gap="12" aria-label={t('home2.group.strategy')}>
+                  <SectionHeader title={t('home2.group.strategy')} headingLevel={2} />
+                  <span className={styles.soon}>{t('home2.strategiesSoon')}</span>
+                </Stack>
+              </>
+            ) : (
+              <Stack as="section" gap="12" aria-label={t('home2.creations')}>
+                <SectionHeader title={t('home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+                <div className={styles.row} role="list">
+                  {creations.map(({ item, kind: k }) => card(item, k, true))}
+                </div>
+              </Stack>
+            )}
             </Stack>
           </Stack>
         </Inset>
