@@ -8897,8 +8897,8 @@ import styles from './ReturningV2.module.css'
 /**
  * DASH home for a returning user, Version 2 (prototype setting "Returning home"): what they made and whether it's
  * working come first, asking DASH is at the bottom:
- * 1. the header — compact (orb + greeting in a row) while there's a draft to resume; with none (or all deleted), centre
- *    stage: the big orb and the greeting in the middle, the page centred (like Returning home v1);
+ * 1. the header, centred: the DASH orb over the greeting — big with nothing to resume (centre stage, like Returning
+ *    home v1), a size smaller while drafts show; 48 down to the sections (32 apart);
  * 2. Pick up where you left off — chats left before saving (rare: only when there are some), swiped sideways if more
  *    than one, each with Continue and ✕ (removes it, asking first in a sheet);
  * 3. Your creations — one sideways row, rules and indicators together (most active first): a rule leads with what it
@@ -8950,27 +8950,19 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
     <div className={styles.scene}>
       <div className={styles.scroll}>
         <Inset paddingInline="16" className={styles.page}>
-          <Stack gap={centre ? '40' : '32'} className={styles.content} data-centre={centre || undefined}>
-            {/* 1 · Header. With a draft to resume: compact (orb + greeting in a row). Without (none, or all deleted):
-                centre stage — the big orb and the greeting in the middle, using the room (like Returning home v1). */}
-            {centre ? (
-              <Stack gap="16" align="center">
-                <DashOrb size="lg" />
-                <Stack gap="04" className={styles.centreHeading}>
-                  <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
-                  <h1 className={styles.centreTitle}>{t('home.title')}</h1>
-                </Stack>
+          <Stack gap={centre ? '40' : '48'} className={styles.content} data-centre={centre || undefined}>
+            {/* 1 · Header, centred in both states: the DASH orb, then the greeting under it. Big with nothing to resume
+                (centre stage); a size smaller while drafts are shown, so the sections fit. */}
+            <Stack gap="16" align="center">
+              <DashOrb size={centre ? 'lg' : 'md'} />
+              <Stack gap="04" className={styles.centreHeading}>
+                <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
+                <h1 className={styles.centreTitle}>{t('home.title')}</h1>
               </Stack>
-            ) : (
-              <Stack direction="horizontal" align="center" gap="12">
-                <DashOrb size="sm" />
-                <Stack gap="00">
-                  <h1 className={styles.hello}>{t('home2.hello', { name: firstName })}</h1>
-                  <p className={styles.helloSub}>{t('home2.helloSub')}</p>
-                </Stack>
-              </Stack>
-            )}
+            </Stack>
 
+            {/* The sections, 32 apart (the header sits 48 above them). */}
+            <Stack gap="32">
             {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
                 each, swiped sideways when there are two or more; ✕ removes one (asks first). */}
             {drafts.length > 0 && (
@@ -9023,6 +9015,7 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
                   )
                 })}
               </div>
+            </Stack>
             </Stack>
           </Stack>
         </Inset>
