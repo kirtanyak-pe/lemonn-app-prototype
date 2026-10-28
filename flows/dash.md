@@ -2712,6 +2712,24 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the outline */
   color: var(--l3-content-primary);
 }
+
+/* With the switch: Indicator picked → the + pops in beside Send (grows from nothing with a slight overshoot, 250 ms). */
+.input[data-modes] .attachWrap {
+  animation: attach-pop var(--l3-motion-duration-medium) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes attach-pop {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input[data-modes] .attachWrap {
+    animation: none;
+  }
+}
 ```
 
 ### `src/flows/dash/components/Chat.tsx`
@@ -6270,7 +6288,8 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
 ### `src/flows/dash/components/SlidingPills.module.css`
 
 ```css
-/* The grey track (the pill group's own background, drawn here so the thumb can sit between it and the labels). */
+/* The track: the pill group's grey container (drawn here so the thumb can sit between it and the labels). The pills
+   themselves have no fill. */
 .track {
   position: relative;
   display: inline-flex;
@@ -6293,14 +6312,17 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
     width var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
 }
 
-/* The L3 group and its pills go transparent: the track and thumb show through; the labels swap colour as it passes. */
+/* The L3 group and its pills go transparent: the thumb shows through; the labels swap colour as it passes. */
 .tabs.tabs {
   position: relative;
   background: transparent;
 }
 
-.tabs [role='tab'] {
+/* Every pill transparent — the picked one too (L3 would paint it black itself, flipping instantly while the thumb
+   is still sliding): only the thumb is black. */
+.tabs.tabs [role='tab'][role='tab'][role='tab'] { /* outranks L3's picked-pill rule */
   --tab-surface: transparent;
+  --tab-border: transparent;
   box-shadow: none;
   background-image: none;
   transition: color var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
@@ -6311,6 +6333,25 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
   .tabs [role='tab'] {
     transition: none;
   }
+}
+
+/*
+ * Raised, like the filled (primary) buttons (src/shared/ui/Raised.module.css, on while <html data-buttons="raised">):
+ * a sheen lighter at the top and darker at the bottom, the lit-from-above bevel and a small drop shadow. Flat when the
+ * experiment is off.
+ */
+:root[data-buttons='raised'] .thumb {
+  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
+  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
+  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
+  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
+  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
+  background-image: linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
+  box-shadow:
+    inset 0 1px 0 var(--raise-highlight),
+    inset 0 -1px 0 var(--raise-shade),
+    0 1px 2px var(--raise-drop),
+    var(--l3-shadow-elevation-low);
 }
 ```
 
@@ -9844,6 +9885,10 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   gap: var(--l3-spacing-08);
   margin-inline: calc(-1 * var(--l3-spacing-16));
   padding-inline: var(--l3-spacing-16);
+  /* Room above and below inside the scroller (a sideways scroller clips up / down too), handed back by the margins:
+     the cards' slide down / up when the field's pick changes isn't cut off. */
+  margin-block: calc(-1 * var(--l3-spacing-16));
+  padding-block: var(--l3-spacing-16);
   overflow-x: auto;
   scroll-padding-inline: var(--l3-spacing-16);
   scroll-snap-type: x mandatory;
@@ -9980,12 +10025,32 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   color: var(--l3-content-secondary);
 }
 
-/* V3 · a kind not tried yet: "+ Create" first — dashed, the + on a light DASH-green disc — then example cards. */
+/* V3 · a kind not tried yet: "+ Create" first — a 1px dashed outline (border/intense), the + on a light DASH-green disc — then example cards. */
 .createCard.createCard {
   justify-content: center;
   gap: var(--l3-spacing-08);
   width: 40%;
-  border-style: dashed;
+  position: relative;
+  border-color: transparent; /* the outline is drawn by .createOutline */
+}
+
+/* The create card's outline: 1px, border/intense, in longer dashes (6 on, 4 off) than a CSS dashed border can draw. */
+.createOutline {
+  position: absolute;
+  inset: -1px; /* over the card's own (transparent) 1px border */
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.createOutline rect {
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+  fill: none;
+  stroke: var(--l3-border-intense);
+  stroke-width: 1px;
+  stroke-dasharray: 6 4;
 }
 
 .createIcon {
@@ -10037,9 +10102,11 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 .sectionsFoldInner {
   min-width: 0;
   min-height: 0;
-  /* clip only top / bottom: the creation rows bleed to the screen's edges sideways */
+  /* clip only top / bottom: the creation rows bleed to the screen's edges sideways — with 16 to spare, so the cards'
+     slide (and their row's room) isn't cut */
   overflow-x: visible;
   overflow-y: clip;
+  overflow-clip-margin: var(--l3-spacing-16);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -10197,26 +10264,40 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
   const firstOrder = (kind: 'rule' | 'indicator' | 'strategy') => (picked && kind === picked ? -1 : 0)
   // A new pick: the row scrolls back to its start, so the kind that now leads is in view…
   const mixedRow = useRef<HTMLDivElement>(null)
-  // …and each card slides from where it was to its new place (FLIP: positions inside the row, so the scroll back to
-  // the start doesn't skew them); a card that wasn't there ("+ Create strategy") pops in.
-  const lastSpots = useRef<Record<string, number>>({})
+  // …in a short sequence: the cards on show slide down and fade one after another, then the row takes the new order
+  // (back at its start) and the new first cards rise in from below, one after another. Fast: ≈ 0.45 s in all.
+  const [shown, setShown] = useState(picked)
+  const visibleCards = (row: HTMLElement) =>
+    [...row.querySelectorAll<HTMLElement>('[data-key]')].filter((el) => el.offsetLeft - row.scrollLeft < row.clientWidth)
+  useEffect(() => {
+    const row = mixedRow.current
+    if (picked === shown) return
+    if (!row || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setShown(picked)
+    let live = true
+    const out = visibleCards(row).map((el, i) =>
+      el.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(var(--l3-spacing-16))', opacity: 0 }], { duration: 120, delay: i * 40, easing: 'cubic-bezier(0.3, 0, 1, 1)', fill: 'forwards' }).finished,
+    )
+    Promise.all(out).then(() => live && setShown(picked))
+    return () => {
+      live = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [picked])
+  const firstShow = useRef(true)
   useLayoutEffect(() => {
     const row = mixedRow.current
-    if (!row) return
+    if (firstShow.current || !row) {
+      firstShow.current = false
+      return
+    }
+    row.scrollLeft = 0
     const cards = [...row.querySelectorAll<HTMLElement>('[data-key]')]
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    cards.forEach((el) => {
-      const was = lastSpots.current[el.dataset.key!]
-      if (reduce) return
-      if (was === undefined) {
-        if (Object.keys(lastSpots.current).length) el.animate([{ opacity: 0, transform: 'scale(0.92)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
-      } else if (was !== el.offsetLeft) {
-        el.animate([{ transform: `translateX(${was - el.offsetLeft}px)` }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
-      }
-    })
-    lastSpots.current = Object.fromEntries(cards.map((el) => [el.dataset.key!, el.offsetLeft]))
-    row.scrollTo({ left: 0, behavior: reduce ? 'auto' : 'smooth' })
-  }, [picked])
+    cards.forEach((el) => el.getAnimations().forEach((an) => an.cancel()))
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    visibleCards(row).forEach((el, i) =>
+      el.animate([{ transform: 'translateY(var(--l3-spacing-16))', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 180, delay: i * 50, easing: 'cubic-bezier(0.2, 0, 0, 1)', fill: 'backwards' }),
+    )
+  }, [shown])
 
   /**
    * One kind's section — made: its cards (V2's row) and View all; not made: "+ Create" and a few "Try" examples. Used
@@ -10251,7 +10332,8 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
           // kind can do (tap one to start with it), so it teaches as well as invites.
           <div className={styles.row} role="list">
             <button type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={create}>
-              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+              <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="12" /></svg>
+                              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
               <span className={styles.itemTitle}>{t(`home3.create.${kind}`)}</span>
             </button>
             {EXAMPLES[kind].map((key) => (
@@ -10377,13 +10459,14 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                 <SectionHeader title={t('home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
                 <div ref={mixedRow} className={styles.row} role="list">
                   {/* Strategy picked: none made yet, so "+ Create strategy" leads the row. */}
-                  {picked === 'strategy' && (
+                  {shown === 'strategy' && (
                     <button data-key="create-strategy" type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={() => { kb.field.onChange(t('home3.strategyStart')); kb.field.onFocus() }}>
-                      <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+                      <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="12" /></svg>
+                              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
                       <span className={styles.itemTitle}>{t('home3.create.strategy')}</span>
                     </button>
                   )}
-                  {[...creations].sort((a, b) => Number(b.kind === picked) - Number(a.kind === picked)).map(({ item, kind: k }) => card(item, k, true))}
+                  {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).map(({ item, kind: k }) => card(item, k, true))}
                 </div>
               </Stack>
             )}
