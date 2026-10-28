@@ -9874,6 +9874,11 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   color: var(--l3-content-accent-discover-default);
   font: var(--l3-text-label-12);
 }
+
+/* Typing with the keyboard up: the sections are hidden (the Stack's own display would otherwise win over [hidden]). */
+.sections[hidden] {
+  display: none;
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -10035,7 +10040,8 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
 
             {/* The sections, 32 apart (the header sits 48 above them). On landing they appear one after another, after
                 the header (the field below is there from the start). */}
-            <Stack gap="32" className={styles.sections}>
+            {/* Typing (keyboard up): the sections step aside — the greeting and the field get the room. */}
+            <Stack gap="32" className={styles.sections} hidden={typing || undefined}>
             {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
                 each, swiped sideways when there are two or more; ✕ removes one (asks first). */}
             {drafts.length > 0 && (
