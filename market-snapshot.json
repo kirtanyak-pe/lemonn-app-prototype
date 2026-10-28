@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-10-28T10:02:37.586Z",
+ "fetchedAt": "2026-10-28T10:11:44.523Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -69,7 +69,7 @@
    "dayLow": 2442.8,
    "high52": 3245,
    "low52": 1753,
-   "volume": 1878463,
+   "volume": 1862967,
    "longName": "Adani Enterprises Limited",
    "closes": [
     {
@@ -341,7 +341,7 @@
    "dayLow": 1265.4,
    "high52": 1631.5,
    "low52": 765,
-   "volume": 1366929,
+   "volume": 1357268,
    "longName": "Adani Green Energy Limited",
    "closes": [
     {
@@ -613,7 +613,7 @@
    "dayLow": 1727.6,
    "high52": 1891.1,
    "low52": 1292,
-   "volume": 2587947,
+   "volume": 2490650,
    "longName": "Adani Ports and Special Economic Zone Limited",
    "closes": [
     {
@@ -885,7 +885,7 @@
    "dayLow": 183.26,
    "high52": 254.2,
    "low52": 128.1,
-   "volume": 12536257,
+   "volume": 12343757,
    "longName": "Adani Power Limited",
    "closes": [
     {
@@ -1157,7 +1157,7 @@
    "dayLow": 2239.1,
    "high52": 2985.7,
    "low52": 2115,
-   "volume": 662423,
+   "volume": 621836,
    "longName": "Asian Paints Limited",
    "closes": [
     {
@@ -1429,7 +1429,7 @@
    "dayLow": 1200,
    "high52": 1418.3,
    "low52": 1150.3,
-   "volume": 3959348,
+   "volume": 3783723,
    "longName": "Axis Bank Limited",
    "closes": [
     {
@@ -1701,7 +1701,7 @@
    "dayLow": 10420,
    "high52": 12470,
    "low52": 8605,
-   "volume": 976416,
+   "volume": 967659,
    "longName": "Bajaj Auto Limited",
    "closes": [
     {
@@ -1973,7 +1973,7 @@
    "dayLow": 1624.8,
    "high52": 2188.7,
    "low52": 1597,
-   "volume": 1594641,
+   "volume": 1532314,
    "longName": "Bajaj Finserv Ltd.",
    "closes": [
     {
@@ -2245,7 +2245,7 @@
    "dayLow": 899.15,
    "high52": 1176.4,
    "low52": 787.9,
-   "volume": 5834072,
+   "volume": 5460255,
    "longName": "Bajaj Finance Limited",
    "closes": [
     {
@@ -2517,7 +2517,7 @@
    "dayLow": 361.9,
    "high52": 473.45,
    "low52": 354.55,
-   "volume": 8295050,
+   "volume": 7994514,
    "longName": "Bharat Electronics Limited",
    "closes": [
     {
@@ -2789,7 +2789,7 @@
    "dayLow": 1926.6,
    "high52": 2174.5,
    "low52": 1726.3,
-   "volume": 15083515,
+   "volume": 14501247,
    "longName": "Bharti Airtel Limited",
    "closes": [
     {
@@ -3061,7 +3061,7 @@
    "dayLow": 391.2,
    "high52": 491.25,
    "low52": 369.6,
-   "volume": 5244875,
+   "volume": 5064097,
    "longName": "Coal India Limited",
    "closes": [
     {
@@ -3333,7 +3333,7 @@
    "dayLow": 9370,
    "high52": 9740,
    "low52": 5647.5,
-   "volume": 754901,
+   "volume": 744981,
    "longName": "Divi's Laboratories Limited",
    "closes": [
     {
@@ -3605,7 +3605,7 @@
    "dayLow": 3113.6,
    "high52": 4644,
    "low52": 3102.3,
-   "volume": 1336650,
+   "volume": 1325330,
    "longName": "Avenue Supermarts Limited",
    "closes": [
     {
@@ -3877,7 +3877,7 @@
    "dayLow": 7124.5,
    "high52": 8230,
    "low52": 6442,
-   "volume": 400911,
+   "volume": 377143,
    "longName": "Eicher Motors Limited",
    "closes": [
     {
@@ -4149,7 +4149,7 @@
    "dayLow": 323.8,
    "high52": 344.4,
    "low52": 212.6,
-   "volume": 22560807,
+   "volume": 21734586,
    "longName": "Eternal Limited",
    "closes": [
     {
@@ -4421,7 +4421,7 @@
    "dayLow": 2876.3,
    "high52": 3411.1,
    "low52": 2502.5,
-   "volume": 606290,
+   "volume": 541620,
    "longName": "Grasim Industries Limited",
    "closes": [
     {
@@ -4693,7 +4693,7 @@
    "dayLow": 4748,
    "high52": 5149.9,
    "low52": 3479.1,
-   "volume": 464615,
+   "volume": 442994,
    "longName": "Hindustan Aeronautics Limited",
    "closes": [
     {
@@ -4965,7 +4965,7 @@
    "dayLow": 1364,
    "high52": 1780.1,
    "low52": 1030,
-   "volume": 2005278,
+   "volume": 1870997,
    "longName": "HCL Technologies Limited",
    "closes": [
     {
@@ -5237,7 +5237,7 @@
    "dayLow": 669.2,
    "high52": 1017.5,
    "low52": 669.2,
-   "volume": 29672854,
+   "volume": 28532277,
    "longName": "HDFC Bank Limited",
    "closes": [
     {
@@ -5509,7 +5509,7 @@
    "dayLow": 890.45,
    "high52": 1176,
    "low52": 770.15,
-   "volume": 3150077,
+   "volume": 2990000,
    "longName": "Hindalco Industries Limited",
    "closes": [
     {
@@ -5781,7 +5781,7 @@
    "dayLow": 1765.5,
    "high52": 2526,
    "low52": 1758.2,
-   "volume": 3445607,
+   "volume": 3364379,
    "longName": "Hindustan Unilever Limited",
    "closes": [
     {
@@ -6053,7 +6053,7 @@
    "dayLow": 494.5,
    "high52": 733,
    "low52": 453.5,
-   "volume": 4315231,
+   "volume": 4254547,
    "longName": "Hindustan Zinc Limited",
    "closes": [
     {
@@ -6325,7 +6325,7 @@
    "dayLow": 1361.4,
    "high52": 1480,
    "low52": 1187.6,
-   "volume": 10026265,
+   "volume": 9519268,
    "longName": "ICICI Bank Limited",
    "closes": [
     {
@@ -6597,7 +6597,7 @@
    "dayLow": 11.82,
    "high52": 15.79,
    "low52": 8.13,
-   "volume": 295001436,
+   "volume": 292149256,
    "longName": "Vodafone Idea Limited",
    "closes": [
     {
@@ -6869,7 +6869,7 @@
    "dayLow": 4581.3,
    "high52": 5970,
    "low52": 3895.2,
-   "volume": 352569,
+   "volume": 331421,
    "longName": "InterGlobe Aviation Limited",
    "closes": [
     {
@@ -7141,7 +7141,7 @@
    "dayLow": 1103.4,
    "high52": 1728,
    "low52": 980.4,
-   "volume": 15987133,
+   "volume": 15631325,
    "longName": "Infosys Limited",
    "closes": [
     {
@@ -7413,7 +7413,7 @@
    "dayLow": 129.2,
    "high52": 188.96,
    "low52": 124.92,
-   "volume": 5645677,
+   "volume": 5280878,
    "longName": "Indian Oil Corporation Limited",
    "closes": [
     {
@@ -7685,7 +7685,7 @@
    "dayLow": 73.21,
    "high52": 137.17,
    "low52": 73.14,
-   "volume": 8822364,
+   "volume": 8773402,
    "longName": "Indian Railway Finance Corporation Limited",
    "closes": [
     {
@@ -7957,7 +7957,7 @@
    "dayLow": 252.8,
    "high52": 426.4,
    "low52": 252.8,
-   "volume": 15538295,
+   "volume": 15159483,
    "longName": "ITC Limited",
    "closes": [
     {
@@ -8229,7 +8229,7 @@
    "dayLow": 1231,
    "high52": 1351,
    "low52": 1073.2,
-   "volume": 1874948,
+   "volume": 1770913,
    "longName": "JSW Steel Limited",
    "closes": [
     {
@@ -8501,7 +8501,7 @@
    "dayLow": 438.3,
    "high52": 453.1,
    "low52": 345.5,
-   "volume": 17771106,
+   "volume": 16832669,
    "longName": "Kotak Mahindra Bank Limited",
    "closes": [
     {
@@ -8773,7 +8773,7 @@
    "dayLow": 384.4,
    "high52": 468.48,
    "low52": 360.75,
-   "volume": 4853053,
+   "volume": 4803921,
    "longName": "Life Insurance Corporation of India",
    "closes": [
     {
@@ -9045,7 +9045,7 @@
    "dayLow": 3770,
    "high52": 4440,
    "low52": 3288.1,
-   "volume": 6229003,
+   "volume": 6173500,
    "longName": "Larsen & Toubro Limited",
    "closes": [
     {
@@ -9317,7 +9317,7 @@
    "dayLow": 2826,
    "high52": 3839.9,
    "low52": 2744.3,
-   "volume": 1456916,
+   "volume": 1387189,
    "longName": "Mahindra & Mahindra Limited",
    "closes": [
     {
@@ -9589,7 +9589,7 @@
    "dayLow": 11250,
    "high52": 17370,
    "low52": 10985,
-   "volume": 952231,
+   "volume": 938013,
    "longName": "Maruti Suzuki India Limited",
    "closes": [
     {
@@ -9861,7 +9861,7 @@
    "dayLow": 1147.4,
    "high52": 1553,
    "low52": 1147.4,
-   "volume": 1317782,
+   "volume": 1243536,
    "longName": "Nestlé India Limited",
    "closes": [
     {
@@ -10133,7 +10133,7 @@
    "dayLow": 72.12,
    "high52": 87.23,
    "low52": 68.79,
-   "volume": 9014343,
+   "volume": 8762909,
    "longName": "NHPC Limited",
    "closes": [
     {
@@ -10405,7 +10405,7 @@
    "dayLow": 299.4,
    "high52": 414.4,
    "low52": 292.05,
-   "volume": 7766692,
+   "volume": 7481801,
    "longName": "NTPC Limited",
    "closes": [
     {
@@ -10677,7 +10677,7 @@
    "dayLow": 223.1,
    "high52": 307.5,
    "low52": 218.53,
-   "volume": 7199366,
+   "volume": 6807923,
    "longName": "Oil and Natural Gas Corporation Limited",
    "closes": [
     {
@@ -10949,7 +10949,7 @@
    "dayLow": 248.8,
    "high52": 324.95,
    "low52": 242.3,
-   "volume": 6151043,
+   "volume": 5741415,
    "longName": "Power Grid Corporation of India Limited",
    "closes": [
     {
@@ -11221,7 +11221,7 @@
    "dayLow": 1156.4,
    "high52": 1611.8,
    "low52": 1152.2,
-   "volume": 22342448,
+   "volume": 21853733,
    "longName": "Reliance Industries Limited",
    "closes": [
     {
@@ -11493,7 +11493,7 @@
    "dayLow": 944,
    "high52": 1234.7,
    "low52": 917.7,
-   "volume": 11226663,
+   "volume": 11010065,
    "longName": "State Bank of India",
    "closes": [
     {
@@ -11765,7 +11765,7 @@
    "dayLow": 810.1,
    "high52": 1153.7,
    "low52": 710.25,
-   "volume": 6571632,
+   "volume": 6276805,
    "longName": "Shriram Finance Limited",
    "closes": [
     {
@@ -12037,7 +12037,7 @@
    "dayLow": 19041,
    "high52": 22700,
    "low52": 11646,
-   "volume": 115610,
+   "volume": 113725,
    "longName": "Solar Industries India Limited",
    "closes": [
     {
@@ -12309,7 +12309,7 @@
    "dayLow": 53.54,
    "high52": 56.25,
    "low52": 33.38,
-   "volume": 12534352,
+   "volume": 12533872,
    "longName": "The South Indian Bank Limited",
    "closes": [
     {
@@ -12581,7 +12581,7 @@
    "dayLow": 1726.2,
    "high52": 2046.9,
    "low52": 1583.7,
-   "volume": 1124878,
+   "volume": 1056713,
    "longName": "Sun Pharmaceutical Industries Limited",
    "closes": [
     {
@@ -12853,7 +12853,7 @@
    "dayLow": 36.73,
    "high52": 61.5,
    "low52": 36.31,
-   "volume": 78884104,
+   "volume": 78281501,
    "longName": "Suzlon Energy Limited",
    "closes": [
     {
@@ -13125,7 +13125,7 @@
    "dayLow": 168.09,
    "high52": 224.4,
    "low52": 160.06,
-   "volume": 13673511,
+   "volume": 12887499,
    "longName": "Tata Steel Limited",
    "closes": [
     {
@@ -13397,7 +13397,7 @@
    "dayLow": 2408.2,
    "high52": 3350,
    "low52": 1976.8,
-   "volume": 2616826,
+   "volume": 2539929,
    "longName": "Tata Consultancy Services Limited",
    "closes": [
     {
@@ -13669,7 +13669,7 @@
    "dayLow": 4270.5,
    "high52": 5186.7,
    "low52": 3667.3,
-   "volume": 563947,
+   "volume": 527923,
    "longName": "Titan Company Limited",
    "closes": [
     {
@@ -13941,7 +13941,7 @@
    "dayLow": 4486.6,
    "high52": 5250,
    "low52": 3532.6,
-   "volume": 238803,
+   "volume": 226143,
    "longName": "Torrent Pharmaceuticals Limited",
    "closes": [
     {
@@ -14213,7 +14213,7 @@
    "dayLow": 4070,
    "high52": 4484.5,
    "low52": 3228,
-   "volume": 1449433,
+   "volume": 1341807,
    "longName": "TVS Motor Company Limited",
    "closes": [
     {
@@ -14485,7 +14485,7 @@
    "dayLow": 11023,
    "high52": 13110,
    "low52": 10325,
-   "volume": 223545,
+   "volume": 213675,
    "longName": "UltraTech Cement Limited",
    "closes": [
     {
@@ -14757,7 +14757,7 @@
    "dayLow": 182.25,
    "high52": 273.1,
    "low52": 156.79,
-   "volume": 19625128,
+   "volume": 19210678,
    "longName": "Wipro Limited",
    "closes": [
     {
@@ -15029,7 +15029,7 @@
    "dayLow": 15.53,
    "high52": 25.78,
    "low52": 15.52,
-   "volume": 98076877,
+   "volume": 96396776,
    "longName": "Yes Bank Limited",
    "closes": [
     {
@@ -15307,10 +15307,10 @@
   },
   "sensex": {
    "symbol": "^BSESN",
-   "price": 73280.01,
+   "price": 73291.1,
    "prevClose": 73598.67,
-   "change": -318.66,
-   "changePct": -0.43,
+   "change": -307.57,
+   "changePct": -0.42,
    "dayHigh": 73525.44,
    "dayLow": 72603.57,
    "high52": 86159.02,
