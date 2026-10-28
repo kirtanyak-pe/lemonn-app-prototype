@@ -2662,6 +2662,30 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 .reply:active {
   transform: scale(var(--l3-motion-scale-press-default));
 }
+
+/*
+ * The field with a "what to build" switch (DASH home): two rows in a rounded box — the text across the top, then + on
+ * the left, the switch after it and Send on the right (like Claude Desktop's field).
+ */
+.input[data-modes] {
+  flex-wrap: wrap;
+  row-gap: var(--l3-spacing-08);
+  padding: var(--l3-spacing-12) var(--l3-spacing-08) var(--l3-spacing-08);
+  border-radius: var(--l3-radius-24);
+}
+
+.input[data-modes] .fieldWrap {
+  order: -1;
+  flex-basis: 100%;
+  min-height: var(--l3-size-32);
+  padding-inline: var(--l3-spacing-08);
+}
+
+.modes {
+  display: inline-flex;
+  flex: 1;
+  min-width: 0;
+}
 ```
 
 ### `src/flows/dash/components/Chat.tsx`
@@ -2670,6 +2694,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Button } from '@l3/components/Button'
 import { Icon } from '@l3/components/Icon'
+import { Tabs } from '@l3/components/Tabs'
 import { Stack } from '@l3/components/Stack'
 import { msAdd, msArrowUpward, msChevronRight, msClose, msDescription, msUploadFile } from '@l3/icons/material'
 import pineScript from '../assets/pine-script.svg'
@@ -2710,6 +2735,11 @@ type ChatInputProps = {
   /** The Pine Script highlight (first time): the + glows green, a floating card above it; ✕ (or using the +)
    *  puts it away. */
   attachTip?: { title: string; text: string; onDone: () => void; /** The animated story version (setting "Pine Script tip"). */ story?: boolean } | null
+  /**
+   * What to build, chosen in the field itself (DASH home, setting "Ask field: With switch"; like Claude Desktop's
+   * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, sm) · Send.
+   */
+  modes?: { value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; label: string }
 }
 
 /**
@@ -2718,7 +2748,7 @@ type ChatInputProps = {
  * - Default: border-light edge, placeholder in content/tertiary, Send off (L3 disabled) until there's text.
  * - Typing: the DASH green edge, the text in content/primary, Send on (L3 primary, black).
  */
-export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment, rotatingPlaceholder, attachTip, placeholder }: ChatInputProps) {
+export function ChatInput({ onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment, rotatingPlaceholder, attachTip, placeholder, modes }: ChatInputProps) {
   const [own, setOwn] = useState('')
   const value = controlled ?? own
   const setValue = (v: string) => (onChange ? onChange(v) : setOwn(v))
@@ -2738,6 +2768,7 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
       className={styles.input}
       data-typing={typing || undefined}
       data-attach={onAttach ? '' : undefined}
+      data-modes={modes ? '' : undefined}
       onSubmit={(e) => {
         e.preventDefault()
         send()
@@ -2801,6 +2832,11 @@ export function ChatInput({ onSend, value: controlled, onChange, typing = false,
         inputMode={touch ? 'none' : undefined}
       />
       </span>
+      {modes && (
+        <span className={styles.modes}>
+          <Tabs aria-label={modes.label} appearance="pill-group" behavior="toggle" size="sm" width="hug" items={modes.items} value={modes.value} onChange={modes.onChange} />
+        </span>
+      )}
       <Button type="submit" variant="primary" size="md" iconLeft={<Icon icon={msArrowUpward} />} aria-label={t('input.send')} disabled={!onSend || (!value.trim() && !attachment)} className={styles.send} />
     </form>
   )
@@ -4624,6 +4660,77 @@ function useChartGestures(
 }
 ```
 
+### `src/flows/dash/components/PineActions.module.css`
+
+```css
+/* The Pine Script mark on a small DASH green tile (as on the upload sheet, at list-cell size). */
+.mark {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  border-radius: var(--l3-radius-08);
+  background: var(--app-dash-glow-1);
+  color: var(--l3-static-black);
+}
+
+.buttons {
+  display: inline-flex;
+  gap: var(--l3-spacing-08);
+}
+```
+
+### `src/flows/dash/components/PineActions.tsx`
+
+```tsx
+import { useEffect, useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { msCheck, msContentCopy, msDownload } from '@l3/icons/material'
+import pineMark from '../assets/pine-script.svg'
+import { t } from '../copy'
+import type { IndicatorSettings } from '../indicatorData'
+import { copyPine, downloadPine, pineScriptFor } from './pineExport'
+import styles from './PineActions.module.css'
+
+/**
+ * Get the Pine Script of an indicator DASH built: a row with the Pine Script mark, "Pine Script · Use it on
+ * TradingView", and Copy + Download (icon buttons). Copy turns into a tick and the line says "Copied" for 2 s.
+ * In the Indicator saved sheet and the history details sheet — not in the chat (the card has enough on it).
+ */
+export function PineActions({ name, settings }: { name: string; settings?: IndicatorSettings }) {
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (!copied) return
+    const id = window.setTimeout(() => setCopied(false), 2000)
+    return () => window.clearTimeout(id)
+  }, [copied])
+  const script = () => pineScriptFor(name, settings)
+  return (
+    <ListCell
+      variant="card"
+      size="sm"
+      iconLeft={<span className={styles.mark}><Icon icon={pineMark} size={16} /></span>}
+      label={t('pineExport.title')}
+      description={copied ? t('pineExport.copied') : t('pineExport.text')}
+      trailing={
+        <span className={styles.buttons}>
+          <Button
+            variant="tertiary"
+            size="sm"
+            iconLeft={<Icon icon={copied ? msCheck : msContentCopy} />}
+            aria-label={t('pineExport.copy')}
+            onClick={async () => setCopied(await copyPine(script()))}
+          />
+          <Button variant="tertiary" size="sm" iconLeft={<Icon icon={msDownload} />} aria-label={t('pineExport.download')} onClick={() => downloadPine(name, script())} />
+        </span>
+      }
+    />
+  )
+}
+```
+
 ### `src/flows/dash/components/PineStory.module.css`
 
 ```css
@@ -6105,6 +6212,38 @@ export function SuccessBurst({ leaving = false }: { leaving?: boolean }) {
 }
 ```
 
+### `src/flows/dash/components/askModes.ts`
+
+```ts
+import { useState } from 'react'
+import { useFlowOption } from '../../../shared/prototype'
+import { t } from '../copy'
+
+type Mode = 'rule' | 'indicator' | 'strategy'
+
+/**
+ * The DASH home field's "what to build" switch (setting "Ask field": With switch / Plain). With the switch, the
+ * field always shows Rule · Indicator · Strategy — so someone who has only made rules still sees what else DASH
+ * builds — and the placeholder and where Send goes follow the pick. Plain: the rotating placeholder, Send guesses.
+ */
+export function useAskModes({ onRules, onIndicator, guess }: { onRules?: () => void; onIndicator?: () => void; guess: (text: string) => void }) {
+  const on = useFlowOption('dash', 'askField', 'switch') === 'switch'
+  const [mode, setMode] = useState<Mode>('rule')
+  if (!on) return null
+  return {
+    modes: {
+      value: mode,
+      label: t('askModes.label'),
+      items: (['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`) })),
+      onChange: (v: string) => setMode(v as Mode),
+    },
+    placeholder: t(`askModes.placeholder.${mode}`),
+    // Rules and indicators open their chat; a strategy (no chat yet) goes by what was typed.
+    send: (text: string) => (mode === 'rule' ? onRules?.() : mode === 'indicator' ? onIndicator?.() : guess(text)),
+  }
+}
+```
+
 ### `src/flows/dash/components/edgeFade.ts`
 
 ```ts
@@ -6283,6 +6422,128 @@ export function takeFile() {
   const file = pending
   window.setTimeout(() => (pending = null), 0)
   return file
+}
+```
+
+### `src/flows/dash/components/pineExport.ts`
+
+```ts
+import { defaultSettings, type IndicatorSettings } from '../indicatorData'
+
+/**
+ * The Pine Script (v5) behind an indicator DASH built, for Copy / Download (prototype: written from the indicator's
+ * settings — the real app gets it from DASH). Supertrend + EMA by default; the opening-range sample has its own.
+ */
+export function pineScriptFor(name: string, settings: IndicatorSettings = defaultSettings): string {
+  if (/opening range/i.test(name)) {
+    return [
+      '//@version=5',
+      `indicator("${name}", overlay = true)`,
+      '',
+      '// The first 15 minutes of the session: its high and low, drawn for the rest of the day',
+      'rangeMinutes = input.int(15, "Opening range (minutes)")',
+      'session = input.session("0915-1530", "Market hours")',
+      '',
+      'inSession = not na(time(timeframe.period, session))',
+      'start = ta.valuewhen(inSession and not inSession[1], time, 0)',
+      'inRange = inSession and time < start + rangeMinutes * 60 * 1000',
+      '',
+      'var float orHigh = na',
+      'var float orLow = na',
+      'if inSession and not inSession[1]',
+      '    orHigh := high',
+      '    orLow := low',
+      'else if inRange',
+      '    orHigh := math.max(orHigh, high)',
+      '    orLow := math.min(orLow, low)',
+      '',
+      'plot(inSession ? orHigh : na, "Range high", color.green, 2, plot.style_linebr)',
+      'plot(inSession ? orLow : na, "Range low", color.red, 2, plot.style_linebr)',
+      '',
+    ].join('\n')
+  }
+  const { stPeriod, stMultiplier, emaPeriod } = settings
+  return [
+    '//@version=5',
+    `indicator("${name}", overlay = true)`,
+    '',
+    '// Built with DASH on Lemonn',
+    `atrPeriod = input.int(${stPeriod}, "Supertrend ATR period")`,
+    `factor = input.float(${stMultiplier}, "Supertrend multiplier", step = 0.1)`,
+    `emaLength = input.int(${emaPeriod}, "EMA length")`,
+    '',
+    '[supertrend, direction] = ta.supertrend(factor, atrPeriod)',
+    'ema = ta.ema(close, emaLength)',
+    '',
+    'plot(direction < 0 ? supertrend : na, "Up trend", color.green, 2, plot.style_linebr)',
+    'plot(direction < 0 ? na : supertrend, "Down trend", color.red, 2, plot.style_linebr)',
+    'plot(ema, "EMA", color.orange, 1)',
+    '',
+    '// BUY when the trend turns up above the EMA, SELL when it turns down below it',
+    'buy = ta.change(direction) < 0 and close > ema',
+    'sell = ta.change(direction) > 0 and close < ema',
+    'plotshape(buy, "BUY", shape.labelup, location.belowbar, color.green, text = "BUY", textcolor = color.white)',
+    'plotshape(sell, "SELL", shape.labeldown, location.abovebar, color.red, text = "SELL", textcolor = color.white)',
+    '',
+  ].join('\n')
+}
+
+/** Copies the script; resolves false if the browser won't (no clipboard access). */
+export async function copyPine(script: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(script)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** Saves the script as "<name>.pine" (made on the phone — nothing is sent anywhere). */
+export function downloadPine(name: string, script: string) {
+  const file = `${name.replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'indicator'}.pine`
+  const url = URL.createObjectURL(new Blob([script], { type: 'text/plain' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = file
+  a.click()
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+```
+
+### `src/flows/dash/components/pineTip.ts`
+
+```ts
+import { useEffect, useState } from 'react'
+import { useFlowOption } from '../../../shared/prototype'
+
+/**
+ * The Pine Script first-time tip on the field's + (the indicator chat and the DASH home): once per person (prototype:
+ * per browser) — seeing it in one place counts for the other. Settings: "Pine Script tip" (simple card / animated story),
+ * "Show Pine Script tip" (Once / Always, for testing) and "Tip placement" (over the content, which dims / pushed up).
+ */
+export function usePineTip() {
+  const story = useFlowOption('dash', 'pineTip', 'animated') === 'animated'
+  const overlay = useFlowOption('dash', 'pineTipPlace', 'overlay') === 'overlay'
+  const always = useFlowOption('dash', 'pineTipShow', 'once') === 'always'
+  const [show, setShow] = useState(() => always || !pineTipSeen())
+  useEffect(() => {
+    if (always) setShow(true)
+  }, [always])
+  const close = () => {
+    setShow(false)
+    markPineTipSeen()
+  }
+  return { show, story, overlay, close }
+}
+
+const KEY = 'dash.pineTipSeen'
+
+function pineTipSeen() {
+  try { return localStorage.getItem(KEY) === '1' } catch { return false }
+}
+
+function markPineTipSeen() {
+  try { localStorage.setItem(KEY, '1') } catch { /* storage off: shows again next visit */ }
 }
 ```
 
@@ -6561,6 +6822,18 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "combined.indicators.create": "Create indicator",
   "combined.rules.unit": "rules active",
   "combined.indicators.unit": "on a chart",
+  "pineExport.title": "Pine Script",
+  "pineExport.text": "Use it on TradingView",
+  "pineExport.copied": "Copied",
+  "pineExport.copy": "Copy Pine Script",
+  "pineExport.download": "Download Pine Script",
+  "askModes.label": "What to build",
+  "askModes.rule": "Rule",
+  "askModes.indicator": "Indicator",
+  "askModes.strategy": "Strategy",
+  "askModes.placeholder.rule": "Describe a rule…",
+  "askModes.placeholder.indicator": "Describe an indicator…",
+  "askModes.placeholder.strategy": "Describe a strategy…",
   "home.createPrefix": "Create a new",
   "home.word.indicator": "indicator",
   "home.word.rule": "rule",
@@ -6610,6 +6883,8 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.group.strategy": "Your strategies",
   "home2.rulesNote": "{total} · {count} stepped in today",
   "home2.indicatorsNote": "{total} · {count} on a chart",
+  "home2.strategiesEmpty": "No strategies yet",
+  "home2.strategiesEmptyText": "Describe a strategy below and DASH builds it for you.",
   "home2.strategiesSoon": "Coming soon: build a strategy with DASH",
   "details.ruleOn": "Rule on",
   "details.ruleOnText": "Steps in when its limit is hit",
@@ -6808,7 +7083,7 @@ export const dash: Flow = {
     // Version 2 · Created with DASH: the card — Version 1, or Version 2 (default: no avatar, paused state, undo toast, details).
     // Version 3 (default): simple — status, name, switch (like the returning home); the name opens the details.
     { id: 'cardVersion', group: 'History', icon: msLayers, label: 'Card version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
-    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '1' },
+    { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
     // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
     // (they dim) or with the chat pushed up to make room.
     { id: 'pineTip', group: 'Pine Script', icon: msLightbulb, label: 'Pine Script tip', values: [{ value: 'simple', label: 'Simple' }, { value: 'animated', label: 'Animated' }], default: 'animated' },
@@ -6816,14 +7091,16 @@ export const dash: Flow = {
     { id: 'pineTipShow', group: 'Pine Script', icon: msVisibility, label: 'Show Pine Script tip', values: [{ value: 'once', label: 'Once' }, { value: 'always', label: 'Always' }], default: 'once' },
     { id: 'pineTipPlace', group: 'Pine Script', icon: msTune, label: 'Tip placement', values: [{ value: 'overlay', label: 'Overlay' }, { value: 'push', label: 'Push up' }], default: 'overlay' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
-    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'new' },
+    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'returning' },
     // DASH home · Combined: both cards as a new user sees them (Create rule / Create indicator) or a returning one (the numbers).
     { id: 'homeCreated', group: 'Home', icon: msRule, label: 'Home cards', values: [{ value: 'none', label: 'New user' }, { value: 'both', label: 'Returning user' }], default: 'both' },
+    // DASH home field: With switch (Rule · Indicator · Strategy inside the field, like Claude Desktop) or Plain.
+    { id: 'askField', group: 'Home', icon: msChat, label: 'Chat input', values: [{ value: 'plain', label: 'Previous' }, { value: 'switch', label: 'New' }], default: 'switch' },
     { id: 'homeCardStyle', group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Returning home: Version 1 (the live layout, rules + indicators) or Version 2 (library + live status board).
     { id: 'returningHome', group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '2' },
     // Returning home v2 · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
-    { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
+    { id: 'resumeChats', group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
     // Returning home v2 · Your creations: Grouped (a group per kind: Rules · Indicators · Strategies) or Mixed (one row).
     { id: 'creationsLayout', group: 'Home', icon: msViewAgenda, label: 'Creations layout', values: [{ value: 'grouped', label: 'Grouped' }, { value: 'mixed', label: 'Mixed' }], default: 'grouped' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
@@ -7814,7 +8091,7 @@ export function DashAI(props: DashAIProps) {
    *  chat as a message. Everything else is the same. */
   const version = useFlowOption('dash', 'version', '2') as DashVersion
   /** Prototype setting "DASH home": a new user sees what DASH can build; a returning one sees their own work first. */
-  const homeChoice = useFlowOption('dash', 'home', 'new')
+  const homeChoice = useFlowOption('dash', 'home', 'returning')
   const returningHome = homeChoice === 'returning'
   /** …and which returning home: Version 1 (the live layout, all kinds) or Version 2 (library + status board). */
   const returningVersion = useFlowOption('dash', 'returningHome', '2')
@@ -7941,6 +8218,12 @@ export function DashAI(props: DashAIProps) {
     transparent
   );
 }
+
+/* The Pine Script tip, "Overlay": it sits over the cards, which dim behind it. */
+.cards[data-dimmed] {
+  opacity: var(--l3-opacity-40);
+  transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
 ```
 
 ### `src/flows/dash/screens/HomeCombined.tsx`
@@ -7957,7 +8240,9 @@ import { msChevronRight } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { ChatInput } from '../components/Chat'
+import { useAskModes } from '../components/askModes'
 import { openHistoryOn } from '../components/historyFilter'
+import { usePineTip } from '../components/pineTip'
 import { holdFile } from '../components/pendingFile'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators } from '../data'
@@ -7989,11 +8274,16 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningP
   }
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
   const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
+  // Setting "Ask field": the switch in the field (Rule · Indicator · Strategy) picks where Send goes.
+  const askModes = useAskModes({ onRules, onIndicator, guess: ask })
 
   // Pine Script (prototype setting): the field's + explains itself (a sheet), then picks a file for the indicator chat.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
   const fileInput = useRef<HTMLInputElement>(null)
   const [pineSheet, setPineSheet] = useState(false)
+  // The first-time Pine Script tip on the field's + (as in the indicator chat): over the cards (they dim) or pushed up.
+  const tip = usePineTip()
+  const tipOn = pineOn && tip.show
 
   /** Prototype setting "Home card style": Plain (white, normal stroke) or Green (the DASH green edge of the new-user cards). */
   const glow = useFlowOption('dash', 'homeCardStyle', 'glow') === 'glow'
@@ -8040,7 +8330,7 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningP
             {/* 2 · Rules and Indicators, side by side: an invitation until something's made, then the number leads
                 (how many are working, out of how many made) and the card itself opens the list. Only the empty card has a
                 button (Create rule / Create indicator). */}
-            <Grid columns={2} gap="12" className={home.sections}>
+            <Grid columns={2} gap="12" className={`${home.sections} ${styles.cards}`} data-dimmed={(tipOn && tip.overlay) || undefined}>
               {cards.map((c) => (
                 <Card
                   key={c.kind}
@@ -8071,9 +8361,15 @@ export function HomeCombinedScene({ onManage, onRules, onIndicator }: ReturningP
       </div>
 
       {/* 3 · Ask DASH: start anything in words. */}
-      <div className={home.dock}>
+      <div className={home.dock} data-tip={tipOn && !tip.overlay ? (tip.story ? 'story' : 'card') : undefined}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
+          <ChatInput
+            onSend={askModes?.send ?? ask}
+            modes={askModes?.modes}
+            placeholder={askModes?.placeholder}
+            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined}
+            attachTip={tipOn ? { title: t('pineTip.title'), text: t('pineTip.text'), onDone: tip.close, story: tip.story } : null}
+          />
           <input
             ref={fileInput}
             type="file"
@@ -8117,6 +8413,7 @@ import { AssistantMessage, ChatInput, ReplyChips, Thinking, UserFile, UserMessag
 import { captureOrigin, flyMessage, type FlyOrigin } from '../components/flyMessage'
 import { takeFile } from '../components/pendingFile'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
+import { usePineTip } from '../components/pineTip'
 import { IndicatorCard, type IndicatorCardState } from '../components/IndicatorCard'
 import { QuestionCard } from '../components/QuestionCard'
 import { RulesIntro } from '../components/RulesIntro'
@@ -8210,24 +8507,13 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   // asks nothing, and builds the indicator (the usual card, suggestions after).
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
   // A/B: the first-time tip as a simple card or an animated story; over the suggestions, or with the chat pushed up.
-  const pineStory = useFlowOption('dash', 'pineTip', 'animated') === 'animated'
-  const tipOverlay = useFlowOption('dash', 'pineTipPlace', 'overlay') === 'overlay'
+  const { show: pineTip, story: pineStory, overlay: tipOverlay, close: closePineTip } = usePineTip()
   const fileInput = useRef<HTMLInputElement>(null)
   // A file picked on the DASH home arrives attached, ready to send.
   const [attachment, setAttachment] = useState<{ name: string } | null>(takeFile)
   // The + explains itself first (a sheet: what a Pine Script upload does), then Choose a file opens the picker.
   const [pineSheet, setPineSheet] = useState(false)
-  // First-time guide for the + (Pine Script): once per person (prototype: per browser), on the empty chat.
-  // Testing (setting "Show Pine Script tip: Always"): it shows every time the chat opens, whatever was seen before.
-  const tipAlways = useFlowOption('dash', 'pineTipShow', 'once') === 'always'
-  const [pineTip, setPineTip] = useState(() => tipAlways || !pineTipSeen())
-  useEffect(() => {
-    if (tipAlways) setPineTip(true)
-  }, [tipAlways])
-  const closePineTip = () => {
-    setPineTip(false)
-    markPineTipSeen()
-  }
+  // First-time guide for the + (Pine Script): once per person (components/pineTip), on the empty chat.
   const [pine, setPine] = useState<{ file?: string; pasted?: string } | null>(null)
 
   const send = (typed: string, from: HTMLElement) => {
@@ -8556,15 +8842,6 @@ function describeChange({ settings, changed }: IndicatorChange) {
               : t('indicator.changeOther'),
     )
     .join(' ')
-}
-
-/** The Pine Script guide shows once per person (here: once per browser). */
-const PINE_TIP_KEY = 'dash.pineTipSeen'
-function pineTipSeen() {
-  try { return localStorage.getItem(PINE_TIP_KEY) === '1' } catch { return false }
-}
-function markPineTipSeen() {
-  try { localStorage.setItem(PINE_TIP_KEY, '1') } catch { /* storage off: it may show again next visit */ }
 }
 ```
 
@@ -9230,6 +9507,26 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
     animation: none;
   }
 }
+
+/* The Pine Script tip, "Push up" (Combined home): room above the field for the tip, as in the indicator chat. */
+.dock[data-tip='card'] {
+  padding-top: var(--l3-size-96);
+}
+
+.dock[data-tip='story'] {
+  padding-top: var(--app-dash-story-room);
+}
+
+/* Your strategies, none yet: a plain card — what's missing, and where to start (the field). */
+.strategyEmptyTitle {
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+}
+
+.strategyEmptyText {
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -9252,6 +9549,7 @@ import { openHistoryOn } from '../components/historyFilter'
 import { holdFile } from '../components/pendingFile'
 import { PineUploadSheet } from '../sheets/PineUploadSheet'
 import { ChatInput } from '../components/Chat'
+import { useAskModes } from '../components/askModes'
 import { t } from '../copy'
 import { dashRules, firstName, homeDrafts, homeTriggers, savedIndicators, type HomeDraft, type SavedRule } from '../data'
 import { CreationDetailsSheet } from '../sheets/RuleSheets'
@@ -9270,14 +9568,14 @@ import styles from './ReturningV2.module.css'
  * 4. the field — change something or start something new, in words.
  * Kept to three things so it reads at a glance (designer's call). Status is sample data (the app has no feed yet).
  */
-/** Your strategies on the home: off until strategies exist (designer's call). */
-const SHOW_STRATEGIES = false
+/** Your strategies on the home: shown (none saved yet — an empty card that points to the field). */
+const SHOW_STRATEGIES = true
 
 export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRules, onIndicator }: ReturningProps) {
   /** Where a draft carries on: its chat. */
   const open = (kind: 'rule' | 'indicator') => (kind === 'indicator' ? onOpenIndicator : onOpenRule) ?? (() => {})
   // Prototype setting "Resume chats": Show (the sample drafts) / Hide (none — the centre-stage state).
-  const resumeShown = useFlowOption('dash', 'resumeChats', 'show') === 'show'
+  const resumeShown = useFlowOption('dash', 'resumeChats', 'hide') === 'show'
   const [drafts, setDrafts] = useState<HomeDraft[]>(resumeShown ? homeDrafts : [])
   useEffect(() => setDrafts(resumeShown ? homeDrafts : []), [resumeShown])
   /** Prototype setting "Creations layout": Grouped (a group per kind, its own row) or Mixed (one row, kinds together). */
@@ -9322,6 +9620,8 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
   const sheetId = useId()
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
   const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
+  // Setting "Ask field": the switch in the field (Rule · Indicator · Strategy) picks where Send goes.
+  const askModes = useAskModes({ onRules, onIndicator, guess: ask })
 
   // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
@@ -9417,11 +9717,17 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
                     </div>
                   </Stack>
                 ))}
-                {/* Your strategies: hidden for now (strategies aren't built yet). */}
+                {/* Your strategies: none saved yet, so an empty card (no View all). */}
                 {SHOW_STRATEGIES && (
                   <Stack as="section" gap="12" aria-label={t('home2.group.strategy')}>
                     <SectionHeader title={t('home2.group.strategy')} headingLevel={2} />
-                    <span className={styles.soon}>{t('home2.strategiesSoon')}</span>
+                    {/* None saved yet (strategies aren't built yet): say so, and point to the field below. */}
+                    <Card className={styles.strategyEmpty}>
+                      <Stack gap="04">
+                        <span className={styles.strategyEmptyTitle}>{t('home2.strategiesEmpty')}</span>
+                        <span className={styles.strategyEmptyText}>{t('home2.strategiesEmptyText')}</span>
+                      </Stack>
+                    </Card>
                   </Stack>
                 )}
               </>
@@ -9480,7 +9786,11 @@ export function ReturningV2Scene({ onManage, onOpenRule, onOpenIndicator, onRule
       {/* 4 · Ask DASH: change something or start something new, in words. */}
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          <ChatInput onSend={ask} rotatingPlaceholder={{ prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
+          <ChatInput
+            onSend={askModes?.send ?? ask}
+            modes={askModes?.modes}
+            placeholder={askModes?.placeholder}
+            rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} onAttach={pineOn ? () => setPineSheet(true) : undefined} />
           {picker}
           {pineSheet && (
             <PineUploadSheet
@@ -10159,6 +10469,7 @@ import { Stack } from '@l3/components/Stack'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { RuleSummary } from '../components/RuleSummary'
 import { SuccessBurst } from '../components/SuccessBurst'
+import { PineActions } from '../components/PineActions'
 import { t } from '../copy'
 import type { IndicatorDraft } from '../indicatorData'
 // Same layout as "Your rule is created" (tick burst, title, line, summary, two buttons).
@@ -10198,6 +10509,8 @@ export function IndicatorSavedSheet({ draft, onDone, onView }: { draft: Indicato
           </Stack>
         </Stack>
         <RuleSummary title={draft.name} description={t('indicatorSaved.summary', { place: draft.placement, count: draft.testedOn })} />
+        {/* Its Pine Script: Copy / Download (kept out of the chat; here and in the history details sheet). */}
+        <PineActions name={draft.name} />
       </Stack>
     </Sheet>
   )
@@ -10396,7 +10709,12 @@ export function PineUploadSheet({ onChoose, onClose }: { onChoose: () => void; o
   inset: calc(-1 * var(--l3-spacing-12));
 }
 
-/* Details version 3: the Status row ends in its status and a switch. */
+/* Details version 3: one toggle card — Status in Heading/14, the activity under it, the status word + switch right. */
+.statusHeading {
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+}
+
 .statusToggle {
   display: inline-flex;
   align-items: center;
@@ -10437,6 +10755,7 @@ import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { BacktestStrip } from '../components/RuleCard'
+import { PineActions } from '../components/PineActions'
 import { SuccessBurst } from '../components/SuccessBurst'
 import { RuleSummary } from '../components/RuleSummary'
 import { t } from '../copy'
@@ -10645,7 +10964,7 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
   }
   // Details version 2 (testing): no switch card; the Status tag itself switches it (tap: On ↔ Paused / On chart ↔ Not on chart).
   // Details version 3 (testing): the Status row ends in a switch (with its status beside it) instead of the tag.
-  const detailsVersion = useFlowOption('dash', 'detailsVersion', '1')
+  const detailsVersion = useFlowOption('dash', 'detailsVersion', '3')
   const tagSwitch = detailsVersion === '2'
   const rowSwitch = detailsVersion === '3'
   // Activity follows the switch: an indicator taken off says so (activityOff), instead of still reading "On your … chart".
@@ -10667,24 +10986,39 @@ export function CreationDetailsSheet({ item, kind, on: initialOn, onToggle, onCl
       }
     >
       <Stack gap="16">
-        <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
-          <KeyValueRow
-            label={t('details.status')}
-            value={rowSwitch ? (
-              <label className={styles.statusToggle}>
+        {rowSwitch ? (
+          // Version 3: one toggle card — Status (heading) with its activity under it, the on / off word and the switch
+          // on the right.
+          <ListCell
+            variant="card"
+            as="label"
+            label={<span className={styles.statusHeading}>{t('details.status')}</span>}
+            description={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>}
+            multiline
+            trailing={
+              <span className={styles.statusToggle}>
                 <span>{status}</span>
                 <Switch checked={on} onChange={(e) => toggle(e.target.checked)} aria-label={t('details.switchStatus', { status })} />
-              </label>
-            ) : tagSwitch ? (
-              <button type="button" className={styles.statusSwitch} onClick={() => toggle(!on)} aria-label={t('details.switchStatus', { status })}>
-                <Tag color={on ? 'success' : 'neutral'} variant="primary" size="sm" iconRight={<Icon icon={lmSwitchArrowVertical} />}>{status}</Tag>
-              </button>
-            ) : (
-              <Tag color={on ? 'success' : 'neutral'} variant="secondary" size="sm">{status}</Tag>
-            )}
+              </span>
+            }
           />
-          <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
-        </KeyValueList>
+        ) : (
+          <KeyValueList variant="card" size="sm" aria-label={t('details.facts')}>
+            <KeyValueRow
+              label={t('details.status')}
+              value={tagSwitch ? (
+                <button type="button" className={styles.statusSwitch} onClick={() => toggle(!on)} aria-label={t('details.switchStatus', { status })}>
+                  <Tag color={on ? 'success' : 'neutral'} variant="primary" size="sm" iconRight={<Icon icon={lmSwitchArrowVertical} />}>{status}</Tag>
+                </button>
+              ) : (
+                <Tag color={on ? 'success' : 'neutral'} variant="secondary" size="sm">{status}</Tag>
+              )}
+            />
+            <KeyValueRow label={t('details.activity')} value={<span className={styles.activityValue}>{text}{strong && <strong>{strong}</strong>}{after}</span>} />
+          </KeyValueList>
+        )}
+        {/* Indicators: get the Pine Script behind it — Copy / Download. */}
+        {kind === 'indicator' && <PineActions name={item.title} />}
         {/* Under the details: turn it on / off from here (a card row with a switch): Rule on · Show on chart. */}
         {detailsVersion === '1' && <ListCell
           variant="card"
