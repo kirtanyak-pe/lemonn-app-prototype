@@ -1,6 +1,6 @@
 # Flow: DASH Ai · Trading rules (`dash`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `facf790` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `cdf73c6` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.
 
@@ -210,9 +210,15 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-29 — **V7 · Pills** (id '11'): V3 Dock's edge-to-edge dock without the Rule · Indicator · Strategy pills, and just above it a row of two Create pills (`components/CreatePills`): white with a 1px light border, the black raised disc with a pencil, then “Create strategy” · “Create indicator”. The field is one row (ChatInput `inline`, 16 in on both sides): the text across, then the + (white, light outline) beside Send. While the first message is typed the Create pills make way for the suggestion pills (`firstSuggestions`) — mixed at first, then ones that finish what's typed. A tap types “Build a strategy / an indicator that ” and brings the keyboard up; Send opens the strategy chat for a strategy, the indicator chat for chart words, else rules. “Your creations” shows only creations here (no + Create card).
+- 2026-10-29 — Homes with “Your creations” (V1–V4, V6 in the dropdown): “+ Create <picked kind>” leads the row for every pill (rule, indicator, strategy — not only strategy), the + a black raised disc (L3 Raised strong); a tap types “Build a rule / an indicator / a strategy that ”. V5 · Cards (id 9): › at the bottom right of every card; the strategy invite reads “Create new strategy”.
+- 2026-10-29 — **Dropdown renumbered in order:** V1 Classic · V2 Pills · V3 Dock (id '7', called V7 below) · V4 Focus (id '8', V8) · V5 Cards (id '9', V9) · V6 Creations (id '10', V10). The ids, the code and the entries below keep the original numbers; the hidden older versions show as “Old · …”.
+- 2026-10-29 — V8 / V10 typing the first message: the home sections fold away completely (as on the other versions) and an empty chat's intro hides — no more washed-out content behind the suggestions.
+- 2026-10-29 — First-message suggestions (V7, V8, V10) follow the field: before typing they're for the picked pill and flip with Rule · Indicator · Strategy; once something is typed they finish it (live, with every key, for the picked kind). Version names shortened: V1 Classic · V2 Pills · V7 Dock · V8 Focus · V9 Cards · V10 Creations. V4 and V6 off the dropdown too (code kept).
 - 2026-10-29 — **V9 square cards, made state:** no green line; the title alone, on two lines in Heading/14 like “Create Ai / strategies” — “3 active” / “Rules” (switched on), “2 saved” / “Indicators” (all saved). Ai strategies keep their name. No › on any card: the whole card is the tap target. Not-made “Create Ai …” cards otherwise unchanged and still first.
 - 2026-10-29 — **DASH V10 · First message: your creations.** V8 exactly, but instead of the suggestion pills one glass card over the field (`FirstCreations` in components/FirstAsk): a row per kind (L3 ListCell, no card look per row) — Rules · Strategies · Indicators — with the kind's tile, how many and how many active (“3 of 8 rules active”; all on: “8 rules active”; none: “None yet · …”), and a small, fully round Create button (surface/primary) on the right; the whole row taps too, and both put “Build an Ai … that ” in the field (on the home the pill follows). Once something is typed the card gives way to live suggestion pills (`LiveAsk`, V8's pill style): up to 4 request endings ranked by the typed words, which show in bold — a tap puts the whole request in the field (“Build an Ai rule that caps my daily loss at ₹5,000”); they change with every key (pool: copy `liveAsk.<kind>.1–6`; the kind comes from the opening words, the chat, or the best match on the home).
-- 2026-10-29 — V7 gets V8's first-message suggestions (`firstSuggestions`): while the first message is typed (home or an empty chat) the 4 suggestions stack over the dock and the DASH orb + title step away. V5 and V3 are off the DASH version dropdown (code kept).
+- 2026-10-29 — V7 gets V8's first-message suggestions (`firstSuggestions`): while the first message is typed (home or an empty chat) the 4 suggestions stack over the dock and the DASH orb + title step away. V5, V3, V6 (too close to V2) and V4 (Dropdown field) are off the DASH version dropdown (code kept).
 - 2026-10-29 — **DASH V9 · Greeting + square cards** (`screens/HomeV9.tsx`, one home for new and returning users): DASH orb and a time-of-day greeting (Good morning / afternoon / evening, {name}) + “How can I help you trade today?” at the top left; above a plain field, a sideways row of square white cards — Ai rules · Ai indicators · Ai strategies. Not made: “Create Ai rules ›” — tap puts “Build an Ai rule that ” in the field with the keyboard up. Made: a small green line (2 triggered today / 1 on a chart) over “Ai rules ›” — tap opens history on that tab. Send: the opening words (or chart words) pick the chat. Not-made cards come first, with an edge in DASH's light (teal → green → yellow); made ones move to the back. The glow rises behind the cards (`glowRise: 'cards'`). Field: V7's edge-to-edge dock with the Rule · Indicator · Strategy pills; a Create card also picks its pill. Cards are 80% glass (blur). Typing the first message (home or an empty chat): the header (orb + greeting) fades away and the white wash covers the top while DASH's glow climbs up from the bottom behind the field and the cards (`firstMessageWash: 'rise'`); no field edge or suggestions.
 - 2026-10-29 — **DASH V8 · First message focus.** Only while the FIRST message of a chat is typed (a home, or an empty chat): a white wash over DASH's background and the content (intro / home sections stay, washed out), the field gets an edge in DASH's teal → green → yellow, and DASH's glow climbs up from the bottom behind the field and the suggestions (the wash clears towards the bottom; no halo behind the field), and 4 suggestions stack above it (`components/FirstAsk`, copy `firstAsk.<home|rule|indicator|strategy>.1–4`; a tap puts the text in the field). Later messages type as usual, the conversation in view. V3 Pills above: the pills are now the field's top row with the + beside them. V7 dock: see-through (80% white), pills track and + on surface/primary, glow raised.
 - 2026-10-29 — **DASH versions.** One dropdown setting **DASH version** = the whole home experience (homes + chat input style), list in `components/dashVersion.ts` + `screens/homes.tsx`: V1 Previous field · V2 Pills (default) · V3 Pills above · V4 Dropdown field · V5 a section per kind (was Returning home V3) · V6 one home with Create cards (was DASH home V4) · V7 edge-to-edge dock (Gemini-like: the field runs edge to edge, rounded top, text on top, pills · + · Send under it). Separate settings **User** (New / Returning) and **Made so far** (Rules / Indicators / Both): every version adapts to them (`useDashUser`) — a made kind shows its cards, the others are promoted (V6: no Create rule card once a rule exists). Replaces the settings DASH home, Returning home, Chat input, Made so far (V3) and Home cards. Settings panel: options can be a dropdown (`picker: 'dropdown'`).
@@ -274,7 +280,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V2 · Pills (new user: Landing, big cards; returning: Returning home V2) | V1 Previous field · V4 Dropdown field · V6 one home with Create cards · V7 edge-to-edge dock · V8 first message focus · V9 greeting + square cards · V10 first message: your creations |
+| DASH version | V2 · Pills (new user: Landing, big cards; returning: Returning home V2) | V1 Classic · V3 Dock (id 7) · V4 Focus (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V7 Pills (id 11) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Chat version | V1 | V2 |
@@ -284,7 +290,6 @@ the product team tells you otherwise; the other values are experiments.
 | Details version | V3 | V1, V2 |
 | Pine Script | On | Off |
 | Pine Script tip | Animated, shown Always, Overlay | Simple, Once, Push up |
-| If asked for V6 | Strategy card Off, Create cards Button | Strategy card On, Outline |
 
 The version list is `components/dashVersion.ts` (each version's chat input) + `screens/homes.tsx` (its homes).
 
@@ -327,7 +332,6 @@ The version list is `components/dashVersion.ts` (each version's chat input) + `s
 ### 6. Home (`screens/ReturningV2.*`)
 - [ ] "Your creations": one sideways row, edge to edge (16 in at both ends), snap, small two-line cards; the active status shows in green.
 - [ ] The field's switch **reorders** the row (picked kind first). Strategy picked → "+ Create strategy" leads (not on V6). Cards on show slide down and fade one by one; new ones rise in one by one (~0.35 s).
-- [ ] V6 only: heading "Ai creations", Create cards in one row (2, or 3 with Strategy card on). Button style: title on **two lines** ("Create" / "indicator", top left), icon top right, small primary "Create" button 16 below. With 3 cards that row scrolls (cards 40% wide).
 
 ### 7. History, sheets, Pine Script
 - [ ] History ("Created with DASH", `screens/Creations.tsx`): pill tabs All / Rules / Indicators / Strategies; card V3 = status + name left, switch right; on items bold heading text, off items medium label text.
@@ -2877,7 +2881,8 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   border-width: 1px 0 0; /* 1px: only the top edge — the sides and bottom are the screen's */
   border-radius: var(--l3-radius-24) var(--l3-radius-24) 0 0;
   /* See-through, so DASH's glow shows behind it. No backdrop blur: it smudged the screen's rounded bottom corners. */
-  background: rgb(from var(--l3-surface-primary) r g b / var(--l3-opacity-80));
+  background: rgb(from var(--l3-surface-primary) r g b / var(--dash-glass-alpha, var(--l3-opacity-80))); /* setting "Glass opacity" */
+  backdrop-filter: blur(var(--dash-dock-blur, 0px)); /* setting "Glass blur" (none unless picked: it can smudge the screen's corners) */
   box-shadow: none;
   /* On the see-through dock the pills' grey track would read as a smudge: it's surface/primary instead. */
   --pills-track: var(--l3-surface-primary);
@@ -2920,6 +2925,65 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   border-width: var(--app-dash-ftux-edge);
   box-shadow: none;
 }
+
+
+/* A top row inside the field (DASH V7 · Pills: the Create pills); under it one row — the +, the text filling the rest,
+   Send. Wins over the dock's text-on-top layout. */
+.input[data-top] {
+  flex-wrap: wrap;
+  row-gap: var(--l3-spacing-12);
+}
+
+.topRow {
+  order: -1;
+  flex-basis: 100%;
+  min-width: 0;
+}
+
+.input[data-top] .fieldWrap.fieldWrap {
+  order: 0;
+  flex: 1 1 0;
+  padding-inline: var(--l3-spacing-04);
+}
+
+.input[data-top] .send.send {
+  margin-left: 0;
+}
+
+/* One row (DASH V7 · Pills): the text across, then the + beside Send — over the dock's text-on-top layout. The + is
+   white (surface/primary) with the light outline, like the other 40 controls. */
+.input[data-inline] {
+  flex-wrap: nowrap;
+  padding-inline: var(--l3-spacing-16); /* 16 from the screen edge on both sides */
+}
+
+/* No inner padding: the text, its caret and the animated placeholder all start at the same x. */
+.input[data-inline] .fieldWrap.fieldWrap {
+  order: 0;
+  flex: 1 1 0;
+  padding-inline: 0;
+}
+
+.input[data-inline] .attachWrap {
+  order: 1;
+}
+
+.input[data-inline] .send.send {
+  order: 2;
+  margin-left: 0;
+}
+
+.input[data-inline] .attachWrap:not([data-glow]) .attach.attach {
+  background: var(--l3-surface-primary);
+  box-shadow: inset 0 0 0 1px var(--l3-border-intense); /* 1px: the outline */
+  color: var(--l3-content-primary);
+}
+
+/* DASH V7 · Pills: the dock is solid (surface/primary, not see-through) and lifts off the page with a low shadow. */
+.input[data-inline][data-dock] {
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+}
 ```
 
 ### `src/flows/dash/components/Chat.tsx`
@@ -2947,6 +3011,10 @@ import styles from './Chat.module.css'
  */
 
 type ChatInputProps = {
+  /** A row at the top inside the field; the + · text · Send row sits under it. */
+  top?: ReactNode
+  /** One row: the text across, then the + beside Send (DASH V7 · Pills; overrides the dock's two rows). */
+  inline?: boolean
   /** This is the chat's first message (a home, or an empty chat): DASH V8 makes the field glow while it's typed. */
   firstMessage?: boolean
   /** `from`: where the text was typed — the sent message flies up from there. */
@@ -2986,7 +3054,7 @@ type ChatInputProps = {
  * - Default: border-light edge, placeholder in content/tertiary, Send off (L3 disabled) until there's text.
  * - Typing: the DASH green edge, the text in content/primary, Send on (L3 primary, black).
  */
-export function ChatInput({ firstMessage = false, onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment, rotatingPlaceholder, attachTip, placeholder, modes }: ChatInputProps) {
+export function ChatInput({ top, inline = false, firstMessage = false, onSend, value: controlled, onChange, typing = false, onFocus, autoFocus, inputRef, onAttach, attachment, onRemoveAttachment, rotatingPlaceholder, attachTip, placeholder, modes }: ChatInputProps) {
   const [own, setOwn] = useState('')
   const value = controlled ?? own
   const setValue = (v: string) => (onChange ? onChange(v) : setOwn(v))
@@ -2995,6 +3063,14 @@ export function ChatInput({ firstMessage = false, onSend, value: controlled, onC
   // A phone (touch) types on the prototype's drawn keyboard: its own keyboard stays closed (inputMode none). A laptop
   // types on its keyboard too.
   const touch = useSystemKeyboard()
+  // Typing state = the field has focus, so its green caret is always there, blinking — also when typing was turned on
+  // from elsewhere (a Create pill, a suggestion, a card) or the text changed from outside. The end of the text.
+  useEffect(() => {
+    const el = field.current
+    if (!typing || !el || document.activeElement === el) return
+    el.focus({ preventScroll: true })
+    el.setSelectionRange(el.value.length, el.value.length)
+  }, [typing, value, field])
   // DASH version with a dock field (V7): edge to edge, text on top, controls under it.
   const dashVersion = useDashVersion()
   const dock = dashVersion.dock
@@ -3014,6 +3090,8 @@ export function ChatInput({ firstMessage = false, onSend, value: controlled, onC
       data-attach={onAttach ? '' : undefined}
       data-modes={modes && modes.display !== 'above' ? '' : undefined}
       data-pills-top={modes?.display === 'above' || undefined}
+      data-top={top ? '' : undefined}
+      data-inline={inline || undefined}
       data-dock={dock || undefined}
       data-first-glow={firstGlow || undefined}
       data-surface={dock ? 'primary' : undefined}
@@ -3022,6 +3100,7 @@ export function ChatInput({ firstMessage = false, onSend, value: controlled, onC
         send()
       }}
     >
+      {top && <div className={styles.topRow}>{top}</div>}
       {/* "Pills above" (DASH V3): the switch is the field's top row, full width (equal pills); text and Send under it. */}
       {modes?.display === 'above' && (
         <span className={styles.modesTop}>
@@ -3314,6 +3393,98 @@ export function ReplyChips({ options, asButtons = false, glow = false }: { optio
 }
 ```
 
+### `src/flows/dash/components/CreatePills.module.css`
+
+```css
+/* DASH "Pills" version: the Create pills over the dock — one sideways row; it bleeds to the screen edges (the dock's
+   16 inset handed back), the first pill 16 in. */
+.row {
+  display: flex;
+  gap: var(--l3-spacing-08);
+  margin: 0 calc(-1 * var(--l3-spacing-16)) var(--l3-spacing-12);
+  padding-inline: var(--l3-spacing-16);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+/* A pill: 40 tall, white with a 1px light edge, the disc then the label. */
+.pill {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  height: var(--l3-size-40);
+  padding: 0 var(--l3-spacing-16) 0 var(--l3-spacing-08);
+  border: 0;
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-primary);
+  box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the edge */
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.pill:active {
+  transform: scale(var(--l3-motion-scale-press-default));
+}
+
+/* The black raised disc (like the Primary button) with the pencil. */
+.icon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-24);
+  height: var(--l3-size-24);
+  border-radius: var(--l3-radius-full);
+  background-color: var(--l3-surface-inverted);
+  color: var(--l3-content-inverted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
+
+}
+```
+
+### `src/flows/dash/components/CreatePills.tsx`
+
+```tsx
+import { Icon } from '@l3/components/Icon'
+import { raised } from '@l3/components/Raised'
+import { msEdit } from '@l3/icons/material'
+import { t } from '../copy'
+import type { CreationKind } from './dashVersion'
+import styles from './CreatePills.module.css'
+
+const KINDS: CreationKind[] = ['strategy', 'indicator']
+
+/**
+ * DASH "Pills" version: just above the field, a sideways row of white pills with a light 1px edge — the black raised disc with a pencil, then "Create strategy" / "Create indicator". A tap
+ * starts it in the field (the opening words, the matching pill, keyboard up).
+ */
+export function CreatePills({ onCreate }: { onCreate: (kind: CreationKind) => void }) {
+  return (
+    <div className={styles.row} role="list" aria-label={t('createPills.label')}>
+      {KINDS.map((kind) => (
+        <button key={kind} type="button" role="listitem" className={styles.pill} onClick={() => onCreate(kind)}>
+          <span className={styles.icon} {...raised('strong')}><Icon icon={msEdit} size={16} /></span>
+          {t(`createPills.${kind}`)}
+        </button>
+      ))}
+    </div>
+  )
+}
+```
+
 ### `src/flows/dash/components/DashDock.tsx`
 
 ```tsx
@@ -3536,13 +3707,14 @@ export function DashDock({ children }: { children: ReactNode }) {
 ### `src/flows/dash/components/DashScreen.tsx`
 
 ```tsx
-import { useEffect, useRef, type ComponentProps } from 'react'
+import { useEffect, useRef, type ComponentProps, type CSSProperties } from 'react'
 import { Actionbar, type ActionbarProps } from '@l3/components/Actionbar'
 import { Screen } from '../../../shared/ui/Screen'
 import gradient from '../assets/bg-gradient.png'
 import grids from '../assets/grids.svg'
 import styles from './DashScreen.module.css'
 import { useDashVersion } from './dashVersion'
+import { useFlowOption } from '../../../shared/prototype'
 
 /** brand = lime-green (every page); loss = the same gradient turned red, when the backtest says the rule would cost money. */
 export type DashTone = 'brand' | 'loss'
@@ -3571,6 +3743,15 @@ type DashScreenProps = ComponentProps<typeof Screen> & {
 export function DashScreen({ tone = 'brand', keyboard = false, chatting = false, firstFocus = false, className, ...screen }: DashScreenProps) {
   // Some DASH versions raise the glow: behind the see-through dock (V7), or up behind the cards too (V9).
   const glowRise = useDashVersion().glowRise
+  // Settings "Glass opacity" / "Glass blur": every see-through DASH surface (glass cards, the see-through dock) reads them.
+  const glassOpacity = useFlowOption('dash', 'glassOpacity', '80')
+  const glassBlur = useFlowOption('dash', 'glassBlur', '16')
+  const glass = {
+    '--dash-glass-alpha': `var(--l3-opacity-${glassOpacity})`,
+    '--dash-glass-blur': `${glassBlur}px`,
+    // the dock is only blurred when a blur is picked other than the default (it can smudge the screen's corners)
+    ...(glassBlur !== '16' ? { '--dash-dock-blur': `${glassBlur}px` } : {}),
+  } as CSSProperties
   // The turning colour glow: normal speed for the first 5 s on DASH, then half speed (it slows from where it is — the
   // running animation's playback rate, so nothing jumps). The frame stays mounted across DASH screens, so this is
   // once per visit to DASH.
@@ -3580,7 +3761,7 @@ export function DashScreen({ tone = 'brand', keyboard = false, chatting = false,
     return () => window.clearTimeout(id)
   }, [])
   return (
-    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-chatting={chatting || undefined} data-glow-rise={glowRise} data-first-focus={firstFocus || undefined} data-edge-to-edge="" data-dash="">
+    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-chatting={chatting || undefined} data-glow-rise={glowRise} style={glass} data-first-focus={firstFocus || undefined} data-edge-to-edge="" data-dash="">
       <div className={styles.background} aria-hidden="true">
         <div ref={glow} className={styles.gradientBox}>
           <img src={gradient} alt="" className={styles.gradient} />
@@ -3665,8 +3846,8 @@ const GLOW_SLOW_RATE = 0.5
   border: 1px solid var(--l3-border-light); /* 1px: the card's edge */
   border-radius: var(--l3-radius-20);
   overflow: clip; /* a row's press / hover tint stays inside the rounded corners */
-  background: rgb(from var(--l3-surface-primary) r g b / var(--l3-opacity-80));
-  backdrop-filter: blur(var(--app-dash-glass-blur));
+  background: rgb(from var(--l3-surface-primary) r g b / var(--dash-glass-alpha, var(--l3-opacity-80))); /* setting "Glass opacity" */
+  backdrop-filter: blur(var(--dash-glass-blur, var(--app-dash-glass-blur))); /* setting "Glass blur" */
   animation: first-ask-in var(--app-dash-reveal) var(--l3-motion-easing-decelerate) both;
 }
 
@@ -3730,16 +3911,27 @@ export type FirstAskKind = 'home' | 'rule' | 'indicator' | 'strategy'
 const NUMBERS = ['1', '2', '3', '4'] as const
 
 /**
- * DASH V8 · first message: while someone types the first message of a chat (on a home or in an empty chat), a few
- * suggestions stack up just above the glowing field — tap one and it goes into the field to send or edit. Gone once
+ * DASH V7 / V8 / V10 · first message: while someone types the first message of a chat (on a home or in an empty chat),
+ * suggestions stack up just above the field — for the picked kind (they flip with the field's pills), and once
+ * something is typed, ones that finish it (they change with every key). A tap puts the text in the field. Gone once
  * the chat has started (the next messages type as usual, with the conversation in view).
  */
-export function FirstAsk({ kind, text = '', onPick, onKind }: { kind: FirstAskKind; /** What's in the field (V10: suggestions follow it). */ text?: string; onPick: (text: string) => void; /** V10 Create: the kind picked (the field's pill follows). */ onKind?: (kind: CreationKind) => void }) {
-  // V10: one card — what they have of each kind, and Create; once something is typed, suggestions for it instead.
-  if (useDashVersion().firstCard) {
-    if (text.trim()) return <LiveAsk kind={kind} text={text} onPick={onPick} />
-    return <FirstCreations onCreate={(k) => { onPick(t(`home9.start.${k}`)); onKind?.(k) }} />
-  }
+export function FirstAsk({ kind: place, mode, text = '', onPick, onKind }: {
+  kind: FirstAskKind
+  /** The field's picked pill (a home): the suggestions are for that kind and flip when it changes. */
+  mode?: CreationKind
+  /** What's in the field: once something is typed, the suggestions follow it (live, with every key). */
+  text?: string
+  onPick: (text: string) => void
+  /** V10 Create: the kind picked (the field's pill follows). */
+  onKind?: (kind: CreationKind) => void
+}) {
+  const firstCard = !!useDashVersion().firstCard
+  const kind: FirstAskKind = place === 'home' && mode ? mode : place
+  // Something typed: suggestions that finish it (V7, V8, V10).
+  if (text.trim()) return <LiveAsk kind={kind} text={text} onPick={onPick} />
+  // V10, nothing typed yet: one card — what they have of each kind, and Create.
+  if (firstCard) return <FirstCreations onCreate={(k) => { onPick(t(`home9.start.${k}`)); onKind?.(k) }} />
   const items = NUMBERS.map((n) => t(`firstAsk.${kind}.${n}`))
   return (
     <div className={styles.list} role="group" aria-label={t('firstAsk.label')}>
@@ -3811,9 +4003,12 @@ const words = (s: string) => s.toLowerCase().replace(/[^a-z0-9₹%\s]/g, ' ').sp
  * comes from the opening words (Create typed them), the chat's kind, or — on the home — whichever match best.
  */
 function LiveAsk({ kind, text, onPick }: { kind: FirstAskKind; text: string; onPick: (text: string) => void }) {
-  const started = KINDS.find((k) => text.toLowerCase().startsWith(t(`home9.start.${k}`).trim().toLowerCase()))
+  // The opening words a Create typed ("Build an Ai rule that", or the row's "Build a rule that"): they set the kind.
+  const openings = (k: CreationKind) => [t(`home9.start.${k}`), t(`home3.start.${k}`)].map((o) => o.trim())
+  const opening = KINDS.flatMap((k) => openings(k).map((o) => ({ k, o }))).find(({ o }) => text.toLowerCase().startsWith(o.toLowerCase()))
+  const started = opening?.k
   const kinds = started ? [started] : kind === 'home' ? KINDS : [kind]
-  const typed = words(started ? text.slice(t(`home9.start.${started}`).trim().length) : text).filter((w) => !STOP.has(w))
+  const typed = words(opening ? text.slice(opening.o.length) : text).filter((w) => !STOP.has(w))
   const pool = kinds.flatMap((k) => TAILS.map((n) => ({ kind: k, tail: t(`liveAsk.${k}.${n}`) })))
   const score = (tail: string) => {
     const ws = words(tail)
@@ -3828,7 +4023,7 @@ function LiveAsk({ kind, text, onPick }: { kind: FirstAskKind; text: string; onP
   return (
     <div className={styles.list} role="group" aria-label={t('liveAsk.label')}>
       {shown.map(({ kind: k, tail }, i) => (
-        <button key={`${k}${tail}`} type="button" className={styles.chip} style={{ '--i': i } as CSSProperties} onClick={() => onPick(`${t(`home9.start.${k}`)}${tail}`)}>
+        <button key={`${k}${tail}`} type="button" className={styles.chip} style={{ '--i': i } as CSSProperties} onClick={() => onPick(`${opening && opening.k === k ? `${opening.o} ` : t(`home9.start.${k}`)}${tail}`)}>
           {bold(tail)}
         </button>
       ))}
@@ -7163,7 +7358,7 @@ export type AskField = 'plain' | 'switch' | 'above' | 'menu'
 export type DashVersionInfo = {
   /** Stored value of the setting (keep it once published: people's picks are saved under it). */
   value: string
-  /** In the dropdown: "V7 · what's new in it" — short. */
+  /** In the dropdown: "V7 · Dock" — one short word after the number. */
   label: string
   /** Off the dropdown, code kept (an old pick still shows it). */
   hidden?: boolean
@@ -7174,6 +7369,9 @@ export type DashVersionInfo = {
   /** First message focus: while typing the first message of a chat (home or empty chat) the field glows, what's
    *  behind it washes out under white, and suggestions stack above the field. Later messages type as usual. */
   firstMessageFocus?: boolean
+  /** Create pills ("Create strategy" · "Create indicator") as the top row inside the field (the + · text · Send row
+   *  under them, no kind pills); the "Your creations" row then shows only what's been made (no + Create card). */
+  createPills?: boolean
   /** V10: while the first message is typed, one card over the field — a row per kind (how many, how many active) with
    *  Create — instead of the suggestion pills. */
   firstCard?: boolean
@@ -7188,17 +7386,21 @@ export type DashVersionInfo = {
   glowRise?: 'dock' | 'cards'
 }
 
+// The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
+// and the code and changelog call them by it): V3 Dock = '7', V4 Focus = '8', V5 Cards = '9', V6 Creations = '10', V7 Pills = '11'.
+// Hidden ones ('3', '4', '5', '6', 'combined') are older ideas kept in the code.
 export const dashVersions: DashVersionInfo[] = [
-  { value: '1', label: 'V1 · Previous field', field: 'plain' },
+  { value: '1', label: 'V1 · Classic', field: 'plain' },
   { value: '2', label: 'V2 · Pills', field: 'switch' },
-  { value: '3', label: 'V3 · Pills above', hidden: true, field: 'above' },
-  { value: '4', label: 'V4 · Dropdown field', field: 'menu' },
-  { value: '5', label: 'V5 · A section per kind', hidden: true, field: 'plain' },
-  { value: '6', label: 'V6 · One home, Create cards', field: 'switch' },
-  { value: '7', label: 'V7 · Edge-to-edge dock', field: 'switch', dock: true, glowRise: 'dock', firstSuggestions: true },
-  { value: '8', label: 'V8 · First message focus', field: 'switch', firstMessageFocus: true },
-  { value: '9', label: 'V9 · Greeting + square cards', field: 'switch', dock: true, glowRise: 'cards', firstMessageWash: 'rise' },
-  { value: '10', label: 'V10 · First message: your creations', field: 'switch', firstMessageFocus: true, firstCard: true },
+  { value: '3', label: 'Old · Pills above', hidden: true, field: 'above' },
+  { value: '4', label: 'Old · Dropdown field', hidden: true, field: 'menu' },
+  { value: '5', label: 'Old · A section per kind', hidden: true, field: 'plain' },
+  { value: '6', label: 'Old · One home, Create cards', hidden: true, field: 'switch' },
+  { value: '7', label: 'V3 · Dock', field: 'switch', dock: true, glowRise: 'dock', firstSuggestions: true },
+  { value: '8', label: 'V4 · Focus', field: 'switch', firstMessageFocus: true },
+  { value: '9', label: 'V5 · Cards', field: 'switch', dock: true, glowRise: 'cards', firstMessageWash: 'rise' },
+  { value: '10', label: 'V6 · Creations', field: 'switch', firstMessageFocus: true, firstCard: true },
+  { value: '11', label: 'V7 · Pills', field: 'plain', dock: true, glowRise: 'dock', createPills: true, firstSuggestions: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -8101,7 +8303,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home9.name.strategy": "Ai strategies",
   "home9.create.rule": "Create Ai rules",
   "home9.create.indicator": "Create Ai indicators",
-  "home9.create.strategy": "Create Ai strategies",
+  "home9.create.strategy": "Create new strategy",
   "home9.start.rule": "Build an Ai rule that ",
   "home9.start.indicator": "Build an Ai indicator that ",
   "home9.start.strategy": "Build an Ai strategy that ",
@@ -8145,7 +8347,14 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "liveAsk.strategy.4": "exits at 2% profit or 1% loss",
   "liveAsk.strategy.5": "trades the opening range breakout",
   "liveAsk.strategy.6": "sells when RSI crosses 70",
-  "liveAsk.label": "Suggestions for what you're typing"
+  "liveAsk.label": "Suggestions for what you're typing",
+  "home3.start.rule": "Build a rule that ",
+  "home3.start.indicator": "Build an indicator that ",
+  "home3.start.strategy": "Build a strategy that ",
+  "createPills.label": "Create",
+  "createPills.rule": "Create rules",
+  "createPills.strategy": "Create strategy",
+  "createPills.indicator": "Create indicator"
 }
 ```
 
@@ -8354,6 +8563,9 @@ export const dash: Flow = {
     { id: 'cardIcons', showIf: { cardVersion: ['1', '2'] }, group: 'History', icon: msImage, label: 'Card icons', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'show' },
     { id: 'detailsVersion', group: 'History', icon: msDescription, label: 'Details version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '3' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
+    // Glass: every see-through DASH surface (V5 · Cards' cards, V6 · Creations' card, the see-through docks).
+    { id: 'glassOpacity', group: 'Glass', icon: msLayers, label: 'Glass opacity', picker: 'slider', range: { min: 0, max: 100, step: 5, unit: '%' }, values: [], default: '80' },
+    { id: 'glassBlur', group: 'Glass', icon: msVisibility, label: 'Glass blur', picker: 'slider', range: { min: 0, max: 40, step: 1, unit: 'px' }, values: [], default: '16' },
     { id: 'pineScript', group: 'Pine Script', icon: msCode, label: 'Pine Script', values: [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }], default: 'on' },
     // The Pine Script first-time tip (A/B): a simple card or an animated story of the flow; over the suggestions
     // (they dim) or with the chat pushed up to make room.
@@ -9731,13 +9943,14 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
 }
 
 .header {
-  animation: v9-in var(--app-dash-reveal) var(--l3-motion-easing-decelerate) both;
+  /* backwards, not both: once in, the animation lets go, so the typing fade below can run */
+  animation: v9-in var(--app-dash-reveal) var(--l3-motion-easing-decelerate) backwards;
 }
 
 .header {
   transition:
-    opacity var(--app-dash-scene) var(--app-dash-scene-easing),
-    transform var(--app-dash-scene) var(--app-dash-scene-easing);
+    opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
 }
 
 .header[data-hidden] {
@@ -9789,8 +10002,8 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
   border: 1px solid var(--l3-border-light); /* 1px: the card's edge */
   border-radius: var(--l3-radius-16);
   /* Glass: 80% white with the glow blurred through it. */
-  background: rgb(from var(--l3-surface-primary) r g b / var(--l3-opacity-80));
-  backdrop-filter: blur(var(--app-dash-glass-blur));
+  background: rgb(from var(--l3-surface-primary) r g b / var(--dash-glass-alpha, var(--l3-opacity-80))); /* setting "Glass opacity" */
+  backdrop-filter: blur(var(--dash-glass-blur, var(--app-dash-glass-blur))); /* setting "Glass blur" */
   text-align: start;
   cursor: pointer;
   scroll-snap-align: start;
@@ -9845,11 +10058,33 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
   width: var(--l3-size-40);
   height: var(--l3-size-40);
   border-radius: var(--l3-radius-full);
-  background: var(--app-dash-tile);
+  /* Made cards: a white disc (surface/primary) on a small low shadow, the mark in green. */
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
   color: var(--l3-content-accent-success-default);
 }
 
+/* Create cards (not made yet): a black disc like the Primary button (surface/inverted), raised strong (L3 Raised),
+   the mark in the inverted content colour. */
+.card[data-create] .icon {
+  background-color: var(--l3-surface-inverted);
+  color: var(--l3-content-inverted);
+}
+
 /* The title: "Create Ai rules" (wraps as text) or, made, "3 active" over "Rules" (one line each). */
+.bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--l3-spacing-04);
+}
+
+.caret {
+  display: inline-flex;
+  flex: none;
+  color: var(--l3-content-secondary);
+}
+
 .name {
   color: var(--l3-content-primary);
   font: var(--l3-text-heading-14);
@@ -9884,8 +10119,9 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
 ```tsx
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
+import { raised } from '@l3/components/Raised'
 import { Stack } from '@l3/components/Stack'
-import { msFunction, msMonitoring, msRule } from '@l3/icons/material'
+import { msChevronRight, msFunction, msMonitoring, msRule } from '@l3/icons/material'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { useAskModes } from '../components/askModes'
 import { ChatInput } from '../components/Chat'
@@ -9917,7 +10153,7 @@ const KINDS: { kind: CreationKind; icon: typeof msRule }[] = [
  * - Not made yet: "Create Ai rules ›" — tap: the field opens with "Build an Ai rule that " typed, to carry on.
  * - Made: the title on two lines, the same style as "Create Ai / strategies": "3 active / Rules", "2 saved /
  *   Indicators" — tap: history on that tab.
- * Every card: the icon at the top left, no › (the whole card is the tap target).
+ * Every card: the icon at the top left, a › at the bottom right (the whole card is the tap target).
  */
 export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   const kb = useHomeKeyboard({ typing, onTyping })
@@ -9986,8 +10222,12 @@ export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrat
             {/* Not made yet first (the invite leads); what they've made moves to the back. Stable within each group. */}
             {[...KINDS].sort((a, b) => Number(made[a.kind]) - Number(made[b.kind])).map(({ kind, icon }) => (
               <button key={kind} type="button" role="listitem" className={styles.card} data-create={!made[kind] || undefined} onClick={() => open(kind)}>
-                <span className={styles.icon}><Icon icon={icon} size={20} /></span>
-                <span className={styles.name}>{title(kind)}</span>
+                <span className={styles.icon} {...(made[kind] ? {} : raised('strong'))}><Icon icon={icon} size={20} /></span>
+                {/* Bottom: the title on the left, › at the bottom right. */}
+                <span className={styles.bottom}>
+                  <span className={styles.name}>{title(kind)}</span>
+                  <span className={styles.caret}><Icon icon={msChevronRight} size={16} /></span>
+                </span>
               </button>
             ))}
           </div>
@@ -10371,7 +10611,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
         }}
       >
         {(empty || introLeaving) && (
-          <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined} data-dimmed={(pineOn && empty && pineTip && !attachment && tipOverlay) || undefined} data-washed={firstFocus || undefined} data-hidden={(firstSuggest && !firstFocus) || undefined}>
+          <div className={styles.intro} data-leaving={(chatStarted && introLeaving) || undefined} data-dimmed={(pineOn && empty && pineTip && !attachment && tipOverlay) || undefined} data-hidden={firstSuggest || undefined}>
             <RulesIntro onPick={empty ? send : undefined} title={t('indicator.emptyTitle', { name: firstName })} description={t('indicator.emptyDescription')} examples={indicatorPrompts} top={indicatorPromptsV2.map((p) => p.text)} typing={typingNow} />
           </div>
         )}
@@ -11217,14 +11457,15 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   stroke-dasharray: 6 4;
 }
 
+/* The +: a black disc like the Primary button (surface/inverted), raised strong (L3 Raised: sheen, bevel, drop). */
 .createIcon {
   display: grid;
   place-items: center;
   width: var(--l3-size-32);
   height: var(--l3-size-32);
   border-radius: var(--l3-radius-full);
-  background: var(--app-dash-tile);
-  color: var(--l3-content-accent-success-default);
+  background-color: var(--l3-surface-inverted);
+  color: var(--l3-content-inverted);
 }
 
 /* An example's first line: 💡 Try, in the discover colour. */
@@ -11346,17 +11587,16 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   font: var(--l3-text-label-14);
 }
 
-/* DASH V8 · typing the first message: the page stays but washes out under white (the field glows over it). */
-.sectionsFold[data-washed] {
-  opacity: var(--l3-opacity-30);
-  pointer-events: none;
-}
-
 /* V8 · typing the first message: the header (orb + greeting) fades up and away; back when the keyboard closes. */
 .header {
   transition:
-    opacity var(--app-dash-scene) var(--app-dash-scene-easing),
-    transform var(--app-dash-scene) var(--app-dash-scene-easing);
+    opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* The entrance lets go once done (backwards, not both), so the typing fade can run on the header. */
+.reveal.header {
+  animation-fill-mode: backwards;
 }
 
 .header[data-hidden] {
@@ -11379,6 +11619,7 @@ import { Inset } from '@l3/components/Inset'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
+import { raised } from '@l3/components/Raised'
 import { msAdd, msAssignmentAdd, msFunction, msLightbulb, msChevronRight, msClose, msDelete, msMonitoring } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
@@ -11391,6 +11632,7 @@ import { ChatInput } from '../components/Chat'
 import { useAskModes } from '../components/askModes'
 import { useDashUser, useDashVersion } from '../components/dashVersion'
 import { FirstAsk } from '../components/FirstAsk'
+import { CreatePills } from '../components/CreatePills'
 import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
 import { dashRules, firstName, homeDrafts, homeTriggers, savedIndicators, type HomeDraft, type SavedRule } from '../data'
@@ -11465,7 +11707,6 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   /** Your creations, one row, most active first: rules that stepped in today, then indicators, then the other rules. */
   // What this person has made so far (settings "User" / "Made so far"): only those kinds show. No strategies yet.
   const has = useDashUser(returning).made
-  // DASH V8: typing the first message keeps the page in place under a white wash (no fold), suggestions over the field.
   const dashVersion = useDashVersion()
   const firstFocus = !!dashVersion.firstMessageFocus
   // V7 / V8 · typing the first message: suggestions over the field, and the header (orb + greeting) steps away.
@@ -11482,7 +11723,10 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   const [removing, setRemoving] = useState<HomeDraft | null>(null)
   const sheetId = useId()
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
-  const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.())
+  const ask = (text: string) =>
+    // A strategy started from a Create pill opens the strategy chat; charts → indicators; anything else → rules.
+    text.startsWith(t('home3.start.strategy').trim()) ? (onStrategy ?? onRules)?.()
+      : /indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? onIndicator?.() : onRules?.()
   // Setting "Ask field": the switch in the field (Rule · Indicator · Strategy) picks where Send goes.
   // V3 has no switch in the field (the sections already offer each kind): the plain one-line field there.
   /** V3 · an example tapped: rules and indicators open their chat; a strategy (no chat yet) goes into the field. */
@@ -11602,7 +11846,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
           <div className={styles.row} role="list">
             <button type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={create}>
               <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
-                              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+                              <span className={styles.createIcon} {...raised('strong')}><Icon icon={msAdd} size={20} /></span>
               <span className={styles.itemTitle}>{t(`home3.create.${kind}`)}</span>
             </button>
             {EXAMPLES[kind].map((key) => (
@@ -11641,7 +11885,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                 the header (the field below is there from the start). */}
             {/* Typing (keyboard up): the sections fade and fold away with the keyboard's rise (and come back as it goes),
                 so the greeting glides to its place instead of jumping. */}
-            <div className={styles.sectionsFold} data-folded={(typing && !firstFocus) || undefined} data-washed={(typing && firstFocus) || undefined}>
+            <div className={styles.sectionsFold} data-folded={typing || undefined}>
             <div className={styles.sectionsFoldInner}>
             <Stack gap="32" className={styles.sections}>
             {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
@@ -11732,12 +11976,13 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
               <Stack as="section" gap="12" aria-label={t(version4 ? 'home4.creations' : 'home2.creations')}>
                 <SectionHeader title={t(version4 ? 'home4.creations' : 'home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
                 <div ref={mixedRow} className={styles.row} role="list">
-                  {/* Strategy picked: none made yet, so "+ Create strategy" leads the row (not on V4: its Create cards do that). */}
-                  {shown === 'strategy' && !version4 && (
-                    <button data-key="create-strategy" type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={() => { kb.field.onChange(t('home3.strategyStart')); kb.field.onFocus() }}>
+                  {/* "+ Create <picked kind>" leads the row (flips with the field's pill): the opening words go into the field,
+                      keyboard up (not on the old V6: its Create cards do that). */}
+                  {shown && !version4 && !dashVersion.createPills && (
+                    <button data-key={`create-${shown}`} type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={() => { kb.field.onChange(t(`home3.start.${shown}`)); kb.field.onFocus() }}>
                       <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
-                              <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
-                      <span className={styles.itemTitle}>{t('home3.create.strategy')}</span>
+                              <span className={styles.createIcon} {...raised('strong')}><Icon icon={msAdd} size={20} /></span>
+                      <span className={styles.itemTitle}>{t(`home3.create.${shown}`)}</span>
                     </button>
                   )}
                   {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).map(({ item, kind: k }) => card(item, k, true))}
@@ -11752,7 +11997,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                   {createCards.map((c) => createStyle === 'outline' ? (
                     <button key={c.kind} type="button" role="listitem" className={`${styles.item} ${styles.createCard} ${styles.createCell}`} onClick={c.onClick}>
                       <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
-                      <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+                      <span className={styles.createIcon} {...raised('strong')}><Icon icon={msAdd} size={20} /></span>
                       <span className={styles.itemTitle}>{t(`home3.create.${c.kind}`)}</span>
                     </button>
                   ) : (
@@ -11760,7 +12005,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                       <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
                       <span className={styles.createBlockHead}>
                         <span className={styles.createBlockTitle}>{t(`home4.createTitle.${c.kind}`)}</span>
-                        <span className={styles.createIcon}><Icon icon={c.icon} size={20} /></span>
+                        <span className={styles.createIcon} {...raised('strong')}><Icon icon={c.icon} size={20} /></span>
                       </span>
                       <Button size="sm" fullWidth onClick={c.onClick}>{t('home4.createButton')}</Button>
                     </div>
@@ -11820,9 +12065,16 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
       <DashDock>
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
-          {firstSuggest && typing && <FirstAsk kind="home" text={kb.field.value} onPick={(text) => kb.field.onChange(text)} onKind={(k) => askModes?.modes.onChange(k)} />}
+          {firstSuggest && typing && <FirstAsk kind="home" mode={askModes?.mode} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} onKind={(k) => askModes?.modes.onChange(k)} />}
+          {/* "Pills" version: the Create pills just above the field, under the suggestions when the field opens; once
+              something is typed they go and only the suggestions that finish it stay. */}
+          {dashVersion.createPills && !(typing && kb.field.value.trim()) && (
+            <CreatePills onCreate={(k) => { kb.field.onChange(t(`home3.start.${k}`)); kb.field.onFocus() }} />
+          )}
           <ChatInput
             firstMessage
+            // "Pills" version: one row — the text across, then the + beside Send.
+            inline={!!dashVersion.createPills}
             {...kb.field}
             onSend={kb.sending(askModes?.send ?? ask)}
             modes={askModes?.modes}
@@ -11973,14 +12225,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
 }
 
-/* DASH V8 · typing the chat's first message: the intro washes out under white (the field glows over it). */
-.intro[data-washed] {
-  opacity: var(--l3-opacity-30);
-  pointer-events: none;
-  transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
-}
-
-/* DASH V7 · typing the chat's first message: the intro (orb + title) steps away; the suggestions take its place. */
+/* DASH V7 / V8 / V10 · typing the chat's first message: the intro (orb + title) steps away; the suggestions take its place. */
 .intro[data-hidden] {
   opacity: 0;
   pointer-events: none;
@@ -11989,6 +12234,8 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
 
 /* The phone's keyboard: rises with the typing state (its height opens, 300 ms), so everything above moves with it. */
 .keyboard {
+  position: relative;
+  z-index: 1; /* over the field: a field's shadow tucks under the keyboard */
   display: grid;
   flex: none;
   grid-template-rows: 0fr;
@@ -12340,7 +12587,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
         }}
       >
         {(empty || introLeaving) && (
-          <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined} data-washed={firstFocus || undefined} data-hidden={(firstSuggest && !firstFocus) || undefined}>
+          <div className={styles.intro} data-leaving={(!empty && introLeaving) || undefined} data-hidden={firstSuggest || undefined}>
             <RulesIntro onPick={empty ? send : undefined} typing={typingNow} top={strategy ? strategyTop : topSuggestions} {...(strategy ? { title: t('strategyHome.title', { name: firstName }), description: t('strategyHome.description'), examples: [strategyTop] } : {})} />
           </div>
         )}
@@ -12624,6 +12871,7 @@ export const homeScenes: Record<string, HomeScenes> = {
   '8': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   '9': { newUser: HomeV9Scene, returning: HomeV9Scene },
   '10': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  '11': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
