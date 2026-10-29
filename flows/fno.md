@@ -34,6 +34,13 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-22` | Asset page · illiquid | [6754:61613](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613) | `fno-17`, `fno-05` | Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from. |
 | `fno-23` | Gold Summary · Buy / Sell sheet | — | `fno-08`, `fno-17` | Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary). |
 | `fno-24` | Gold Summary · illiquid sheet | — | `fno-08`, `fno-17` | Product rule (commodities): an illiquid contract carries the ILLIQUID tag on its card (edge case — illiquid contracts shouldn’t be listed, but the state is built) and in the sheet; Buy / Sell are greyed out with “Trading is not allowed as this contract is illiquid”. Only the name › (asset page fno-22) or tapping outside works. |
+| `fno-25` | Order pad · Buy · Market | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — | Commodity option chain order pad (other order pads differ a little). From Buy on the commodity asset page or the Gold Summary Buy / Sell sheet. Delivery / Intraday tabs, Market / Limit / SL pills, Quantity (⇕ lots) in steps of one lot, Set TPSL, Avail. · Req, Buy. Placing shows a sample toast; no order is sent. |
+| `fno-26` | Order pad · Buy · Limit | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — | Limit adds the validity (Day ⇕ → Day / IOC) and a limit price row with a % stepper from the market price. |
+| `fno-27` | Order pad · Buy · SL | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — | SL adds a trigger price row above the limit row. |
+| `fno-28` | Order pad · Buy · Intraday | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — | Intraday: “This position will auto close by 11:30 PM” above the dock. |
+| `fno-29` | Order pad · Sell · Market | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — | Sell adds Margin · Leverage (grey strip) above the quantity; the action is Sell (red). |
+| `fno-30` | Order pad · Sell · SL | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — |  |
+| `fno-31` | Order pad · Sell · Intraday | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — |  |
 
 ## Spec (README.md)
 
@@ -72,6 +79,8 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-22 | Asset page · illiquid commodity | 6754:61613 + product rule |
 | fno-23 | Gold Summary · Buy / Sell sheet | live app screenshot 2026-10-29 |
 | fno-24 | Gold Summary · illiquid Buy / Sell sheet | live app + product rule |
+| fno-25 … 28 | Order pad · Buy (Market, Limit, SL, Intraday) | 8671:18433 |
+| fno-29 … 31 | Order pad · Sell (Market, SL, Intraday) | 8671:18433 |
 
 ### Structure
 
@@ -146,6 +155,18 @@ The other F&O navbar items open a sheet explaining that those destinations are o
 
 `sheets/IlliquidSheet` — one explainer for every illiquid entry point in F&O: the ⓘ in the option-chain tooltip, and a tap on any ILLIQUID tag (asset page, Buy / Sell sheet, Gold Summary card). Same pattern as DASH's Pine Script sheet: small header (“What does illiquidity mean?” + “{contract} is illiquid right now”, or a general line from a tag), a card with three icon + one-line points (very few people trade it · buy and sell prices are far apart, which increases chances of slippage · Lemonn doesn't allow orders, to protect you), Got it.
 
+#### Commodity options order pad (fno-25 … 31)
+
+`order-pad/screens/OrderPad` (Figma 8671:18433) — **commodity option chain only**; other order pads (equity, futures) differ a little and get their own. Opened from Buy / Sell on the commodity asset page and in the Gold Summary Buy / Sell sheet; Back returns there.
+- Actionbar: back · “Gold ⇕ 5 OCT Fut” over price + change (contract switch) · MCX; **Delivery / Intraday** tabs in its bottom slot.
+- **Market / Limit / SL** pills; Limit and SL add the validity pill (**Day ⇕** → Day / IOC).
+- **Sell** only: Margin · Leverage grey strip.
+- **Quantity ⇕** (switches to Lots) · “(100 = 1 Lot)” · compact stepper in steps of one lot (grey −, blue +, as in Figma).
+- **Limit**: a limit price row (price + % stepper from the market price); **SL**: a Trigger Price row above it.
+- **Set TPSL ⊕** (right). **Intraday**: “This position will auto close by 11:30 PM” above the dock.
+- Dock: Avail. ₹ · <u>Req</u> ₹ (Req opens its breakdown), then **Buy** (brand) or **Sell** (L3 sell, red). Placing shows a sample toast; no order is sent.
+- Data: `order-pad/data.ts` (contract, lot size, margin / leverage, funds, auto-close time, validities).
+
 #### Buy / Sell sheet (fno-23, 24)
 
 `commodities/sheets/ContractSheet` (live app, 2026-10-29): any futures or option card on Gold Summary opens it. Name › (asset page) · price; expiry · type · change; Buy (brand) / Sell (secondary) docked. **Illiquid** (commodities, product rule — same from any entry point): ILLIQUID tag in the sheet, Buy / Sell greyed out with “Trading is not allowed as this contract is illiquid”; only the name › (→ the illiquid asset page) or tapping outside work. The card itself also carries the ILLIQUID tag — an edge case kept in development (illiquid contracts aren't meant to be listed in discovery, but can still reach a list). Sample: GOLD 24000 CE.
@@ -213,6 +234,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
+- 2026-10-29 — Commodity options order pad (fno-25 … 31) from Figma 8671:18433; asset page and Gold Summary Buy / Sell open it.
 - 2026-10-29 — Illiquid explainer simplified (small header, three icon points like the Pine Script sheet) and shared: opens from the chain's ⓘ and from every ILLIQUID tag.
 - 2026-10-29 — Buy / Sell sheet from Gold Summary cards (fno-23) with the illiquid state (fno-24: tag on the card and in the sheet, Buy / Sell disabled).
 - 2026-10-29 — Commodity asset page (fno-21) with the illiquid state (fno-22); opened from the option-chain order dock's contract name.
@@ -1371,7 +1393,7 @@ import { assetCandles, type AssetPage as Asset } from '../data'
 import scalppro from '../../assets/scalppro.svg'
 import styles from './AssetPage.module.css'
 
-type Props = { asset: Asset; onBack: () => void; onChain: () => void; /** ScalpPro (Scalper) — disabled for an illiquid contract. */ onScalper: () => void }
+type Props = { asset: Asset; onBack: () => void; onChain: () => void; /** ScalpPro (Scalper) — disabled for an illiquid contract. */ onScalper: () => void; /** Buy / Sell open the commodity order pad. */ onOrder: (side: 'buy' | 'sell') => void }
 
 /**
  * A commodity contract's asset page (Figma 6754:61613): name + contract and price with the commodity art; the chart and
@@ -1379,7 +1401,7 @@ type Props = { asset: Asset; onBack: () => void; onChain: () => void; /** ScalpP
  * Market Depth; Buy / Sell docked. An illiquid contract (commodities only) shows the ILLIQUID tag and greyed-out Buy /
  * Sell, whatever screen it was opened from.
  */
-export function AssetPage({ asset, onBack, onChain, onScalper }: Props) {
+export function AssetPage({ asset, onBack, onChain, onScalper, onOrder }: Props) {
   const [saved, setSaved] = useState(false)
   const [detail, setDetail] = useState<string | null>(null)
   const [explain, setExplain] = useState(false)
@@ -1419,7 +1441,7 @@ export function AssetPage({ asset, onBack, onChain, onScalper }: Props) {
     {asset.illiquid && <button type="button" className={styles.illiquidNote} onClick={() => setExplain(true)}>{t('asset.illiquidNote')}<Icon icon={msInfo} size={16} /></button>}
     {asset.illiquid
       ? <div className={styles.pair}><Button variant="brand" disabled>{t('asset.buy')}</Button><Button variant="secondary" disabled>{t('asset.sell')}</Button></div>
-      : <><Button variant="brand" onClick={() => setDetail(`${t('asset.buy')} ${asset.name}`)}>{t('asset.buy')}</Button><Button variant="secondary" onClick={() => setDetail(`${t('asset.sell')} ${asset.name}`)}>{t('asset.sell')}</Button></>}
+      : <><Button variant="brand" onClick={() => onOrder('buy')}>{t('asset.buy')}</Button><Button variant="secondary" onClick={() => onOrder('sell')}>{t('asset.sell')}</Button></>}
   </ButtonGroup>
 
   return <Screen
@@ -1552,9 +1574,11 @@ type Props = {
   onChain: () => void
   /** The sheet's contract name › opens the asset page (illiquid = the ILLIQUID page). */
   onAsset: (illiquid: boolean) => void
+  /** The Buy / Sell sheet's buttons open the commodity order pad. */
+  onOrder: (side: 'buy' | 'sell') => void
 }
 
-export function LotSummary({ sort: initialSort = 'price', initialSheet, onBack, onChain, onAsset }: Props) {
+export function LotSummary({ sort: initialSort = 'price', initialSheet, onBack, onChain, onAsset, onOrder }: Props) {
   const [lot, setLot] = useState(goldLots[0].id)
   const [month, setMonth] = useState(expiryMonths[0])
   const [category, setCategory] = useState('top')
@@ -1570,7 +1594,7 @@ export function LotSummary({ sort: initialSort = 'price', initialSheet, onBack, 
   const open = (contract: Contract & { illiquid?: boolean }) => setModal({ kind: 'contract', contract })
   const options = lotOptions.filter((o) => filter === t('filter.puts') ? o.side === 'put' : true)
   const lotName = goldLots.find((l) => l.id === lot)!.name
-  const sheet = modal?.kind === 'illiquid' ? <IlliquidSheet contract={modal.contract} onClose={close} /> : modal?.kind === 'contract' ? <ContractSheet contract={modal.contract} onClose={close} onIlliquid={() => setModal({ kind: 'illiquid', contract: modal.contract.name })} onAsset={() => { close(); onAsset(!!modal.contract.illiquid) }} onBuy={() => setModal({ kind: 'detail', title: `${t('asset.buy')} ${modal.contract.name}`, contract: modal.contract })} onSell={() => setModal({ kind: 'detail', title: `${t('asset.sell')} ${modal.contract.name}`, contract: modal.contract })} /> : modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : undefined
+  const sheet = modal?.kind === 'illiquid' ? <IlliquidSheet contract={modal.contract} onClose={close} /> : modal?.kind === 'contract' ? <ContractSheet contract={modal.contract} onClose={close} onIlliquid={() => setModal({ kind: 'illiquid', contract: modal.contract.name })} onAsset={() => { close(); onAsset(!!modal.contract.illiquid) }} onBuy={() => { close(); onOrder('buy') }} onSell={() => { close(); onOrder('sell') }} /> : modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : undefined
   return <Screen sheet={sheet} top={<Actionbar title={t('lot.title', { name: goldLots[0].name })} onBack={onBack} backLabel={t('lot.back')}
     bottom={<Tabs aria-label={t('lot.lots')} value={lot} onChange={setLot} width="hug" items={goldLots.map((l) => ({ value: l.id, label: l.name, iconLeft: <img className={styles.tabArt} src={l.image} alt="" /> }))} />} />}>
     <Stack gap="32" className={styles.lotBody}>
@@ -2642,7 +2666,33 @@ function clock(start: string, add: number) {
   "illiquid.point3": "To protect you, Lemonn doesn’t allow orders in it",
   "illiquid.ok": "Got it",
   "illiquid.open": "What does illiquidity mean?",
-  "chain.illiquidSub": "Can’t be traded"
+  "chain.illiquidSub": "Can’t be traded",
+  "order.back": "Back",
+  "order.switch": "Change contract",
+  "order.product": "Product",
+  "order.delivery": "Delivery",
+  "order.intraday": "Intraday",
+  "order.type": "Order type",
+  "order.market": "Market",
+  "order.limit": "Limit",
+  "order.sl": "SL",
+  "order.validity": "Validity",
+  "order.quantity": "Quantity",
+  "order.lots": "Lots",
+  "order.unitSwitch": "Switch between quantity and lots",
+  "order.lotHint": "({lot} = 1 Lot)",
+  "order.limitPrice": "Limit",
+  "order.trigger": "Trigger Price",
+  "order.offset": "Distance from the market price",
+  "order.tpsl": "Set TPSL",
+  "order.margin": "Margin:",
+  "order.leverage": "Leverage:",
+  "order.autoClose": "This position will auto close by {time}",
+  "order.available": "Avail.",
+  "order.required": "Req",
+  "order.buy": "Buy",
+  "order.sell": "Sell",
+  "order.placed": "{side} order placed · {name} {contract}"
 }
 ```
 
@@ -2759,6 +2809,7 @@ import { LotSummary } from './commodities/screens/LotSummary'
 import { AssetPage } from './commodities/screens/AssetPage'
 import { goldMiniAsset, illiquidAsset } from './commodities/data'
 import { OptionChain } from './option-chain/screens/OptionChain'
+import { OrderPad } from './order-pad/screens/OrderPad'
 import type { Segment } from './strategies/data'
 import { Scalper } from './screens/Scalper'
 
@@ -2789,19 +2840,26 @@ export const fno: Flow = {
     { id: 'fno-09', group: 'home', name: 'Commodities · heatmap & Smart Futures', figma: '6754:63637', tab: true, note: 'The same long screen, scrolled to the Futures Heatmap.', render: (go) => home(go, 'heatmap', { product: 'commodities' }) },
     { id: 'fno-10', group: 'home', name: 'Contract picker · Commodities', figma: '6754:65111', tab: true, note: 'From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'commodities' }) },
     { id: 'fno-11', group: 'home', name: 'Contract picker · Equity', figma: '6754:65054', tab: true, note: 'The same sheet on its Equity tab: the 8 index contracts.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'equity' }) },
-    { id: 'fno-12', group: 'lot', name: 'Gold Summary · by price', figma: '6754:65113', note: 'From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.', render: (go) => <LotSummary onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
-    { id: 'fno-13', group: 'lot', name: 'Gold Summary · by volume', figma: '6754:65288', note: 'Sorted by volume: each option shows its traded volume, no change.', render: (go) => <LotSummary sort="volume" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
-    { id: 'fno-14', group: 'lot', name: 'Gold Summary · margin per lot', figma: '6754:65444', note: 'Sorted by margin per lot: each option shows the margin for one lot, no change.', render: (go) => <LotSummary sort="margin" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
+    { id: 'fno-12', group: 'lot', name: 'Gold Summary · by price', figma: '6754:65113', note: 'From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.', render: (go) => <LotSummary onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
+    { id: 'fno-13', group: 'lot', name: 'Gold Summary · by volume', figma: '6754:65288', note: 'Sorted by volume: each option shows its traded volume, no change.', render: (go) => <LotSummary sort="volume" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
+    { id: 'fno-14', group: 'lot', name: 'Gold Summary · margin per lot', figma: '6754:65444', note: 'Sorted by margin per lot: each option shows the margin for one lot, no change.', render: (go) => <LotSummary sort="margin" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
     { id: 'fno-15', group: 'home', name: 'Strategies · Equity', figma: '6754:64178', tab: true, note: 'The Strategies product tab with Equity selected in the pill group: shortcuts, Zing Trades, Smart Invest, Pre-build Strategies (Nifty 50 ⇕, Bullish / Bearish / Neutral / Volatile), Quick Trade. Card footer buttons stay Small (32) as in Figma.', render: (go) => home(go, undefined, { product: 'strategies', segment: 'equity' }) },
     { id: 'fno-16', group: 'home', name: 'Strategies · Commodities', figma: '6754:64607', tab: true, note: 'The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying.', render: (go) => home(go, undefined, { product: 'strategies', segment: 'commodities' }) },
     { id: 'fno-17', group: 'chain', name: 'Option chain', figma: '11630:16785', note: 'From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear.', render: (go) => <OptionChain onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
     { id: 'fno-18', group: 'chain', name: 'Option chain · Buy selected', figma: '11630:16184', note: 'A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'buy', ltp: 160.54 }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
     { id: 'fno-19', group: 'chain', name: 'Option chain · Sell selected', figma: '11695:26269', note: 'The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'sell', ltp: 160.54 }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
     { id: 'fno-20', group: 'chain', name: 'Option chain · illiquid contract', figma: '', note: 'Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “ILLIQUID contract” / “Can’t be traded” ⓘ; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.', render: (go) => <OptionChain initialIlliquid={{ strike: 25700, side: 'put' }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
-    { id: 'fno-21', group: 'asset', name: 'Asset page · Gold MINI', figma: '6754:61613', note: 'A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later.', render: (go) => <AssetPage asset={goldMiniAsset} onBack={() => backOr(go, 'fno-18')} onChain={() => go('fno-17')} onScalper={() => go('fno-05')} /> },
-    { id: 'fno-22', group: 'asset', name: 'Asset page · illiquid', figma: '6754:61613', note: 'Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from.', render: (go) => <AssetPage asset={illiquidAsset} onBack={() => backOr(go, 'fno-17')} onChain={() => go('fno-17')} onScalper={() => go('fno-05')} /> },
-    { id: 'fno-23', group: 'lot', name: 'Gold Summary · Buy / Sell sheet', figma: '', note: 'Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary).', render: (go) => <LotSummary initialSheet="lo-0" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
-    { id: 'fno-24', group: 'lot', name: 'Gold Summary · illiquid sheet', figma: '', note: 'Product rule (commodities): an illiquid contract carries the ILLIQUID tag on its card (edge case — illiquid contracts shouldn’t be listed, but the state is built) and in the sheet; Buy / Sell are greyed out with “Trading is not allowed as this contract is illiquid”. Only the name › (asset page fno-22) or tapping outside works.', render: (go) => <LotSummary initialSheet="lo-5" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
+    { id: 'fno-21', group: 'asset', name: 'Asset page · Gold MINI', figma: '6754:61613', note: 'A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later.', render: (go) => <AssetPage asset={goldMiniAsset} onBack={() => backOr(go, 'fno-18')} onChain={() => go('fno-17')} onScalper={() => go('fno-05')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
+    { id: 'fno-22', group: 'asset', name: 'Asset page · illiquid', figma: '6754:61613', note: 'Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from.', render: (go) => <AssetPage asset={illiquidAsset} onBack={() => backOr(go, 'fno-17')} onChain={() => go('fno-17')} onScalper={() => go('fno-05')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
+    { id: 'fno-23', group: 'lot', name: 'Gold Summary · Buy / Sell sheet', figma: '', note: 'Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary).', render: (go) => <LotSummary initialSheet="lo-0" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
+    { id: 'fno-24', group: 'lot', name: 'Gold Summary · illiquid sheet', figma: '', note: 'Product rule (commodities): an illiquid contract carries the ILLIQUID tag on its card (edge case — illiquid contracts shouldn’t be listed, but the state is built) and in the sheet; Buy / Sell are greyed out with “Trading is not allowed as this contract is illiquid”. Only the name › (asset page fno-22) or tapping outside works.', render: (go) => <LotSummary initialSheet="lo-5" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} onOrder={(side) => go(side === 'buy' ? 'fno-25' : 'fno-29')} /> },
+    { id: 'fno-25', group: 'order', name: 'Order pad · Buy · Market', figma: '8671:18433', note: 'Commodity option chain order pad (other order pads differ a little). From Buy on the commodity asset page or the Gold Summary Buy / Sell sheet. Delivery / Intraday tabs, Market / Limit / SL pills, Quantity (⇕ lots) in steps of one lot, Set TPSL, Avail. · Req, Buy. Placing shows a sample toast; no order is sent.', render: (go) => <OrderPad side="buy" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-26', group: 'order', name: 'Order pad · Buy · Limit', figma: '8671:18433', note: 'Limit adds the validity (Day ⇕ → Day / IOC) and a limit price row with a % stepper from the market price.', render: (go) => <OrderPad side="buy" type="limit" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-27', group: 'order', name: 'Order pad · Buy · SL', figma: '8671:18433', note: 'SL adds a trigger price row above the limit row.', render: (go) => <OrderPad side="buy" type="sl" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-28', group: 'order', name: 'Order pad · Buy · Intraday', figma: '8671:18433', note: 'Intraday: “This position will auto close by 11:30 PM” above the dock.', render: (go) => <OrderPad side="buy" product="intraday" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-29', group: 'order', name: 'Order pad · Sell · Market', figma: '8671:18433', note: 'Sell adds Margin · Leverage (grey strip) above the quantity; the action is Sell (red).', render: (go) => <OrderPad side="sell" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-30', group: 'order', name: 'Order pad · Sell · SL', figma: '8671:18433', render: (go) => <OrderPad side="sell" type="sl" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-31', group: 'order', name: 'Order pad · Sell · Intraday', figma: '8671:18433', render: (go) => <OrderPad side="sell" product="intraday" onBack={() => backOr(go, 'fno-21')} /> },
   ],
 }
 ```
@@ -3260,6 +3318,172 @@ function IlliquidCell({ open, onToggle, onMore, label, side, children }: { open:
       </Tooltip>
     </span>}
   </div>
+}
+```
+
+### `src/flows/fno/order-pad/data.ts`
+
+```ts
+/**
+ * Commodity options order pad (Figma 8671:18433). Sample contract and account values, not live data. Prices in ₹.
+ */
+export type OrderSide = 'buy' | 'sell'
+export type OrderProduct = 'delivery' | 'intraday'
+export type OrderType = 'market' | 'limit' | 'sl'
+
+export const orderContract = {
+  name: 'Gold',
+  contract: '5 OCT Fut',
+  exchange: 'MCX',
+  ltp: 153580,
+  change: 2.62,
+  /** Units per lot: the quantity steps by one lot. */
+  lotSize: 100,
+}
+/** Selling (writing) shows the margin and leverage the exchange asks for. */
+export const sellMargin = { margin: '7.00%', leverage: '14.3X' }
+export const funds = { available: 1105002, required: 1075060 }
+/** Intraday positions are squared off automatically at this time (MCX evening session). */
+export const intradayCloseTime = '11:30 PM'
+export const validities = ['Day', 'IOC']
+```
+
+### `src/flows/fno/order-pad/screens/OrderPad.module.css`
+
+```css
+/* Commodity options order pad (Figma 8671:18433) on L3 tokens. */
+.contract { display: flex; flex-direction: column; align-items: flex-start; gap: var(--l3-spacing-02); padding: 0; border: 0; background: none; color: var(--l3-content-primary); text-align: left; cursor: pointer; }
+.contractName { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); font: var(--l3-text-heading-14); }
+.expiry { margin-left: var(--l3-spacing-04); font: var(--l3-text-label-12); color: var(--l3-content-tertiary); }
+.contractPrice { display: inline-flex; align-items: center; gap: var(--l3-spacing-08); font: var(--l3-text-label-12); }
+.exchange { font: var(--l3-text-label-12); color: var(--l3-content-primary); }
+
+.body { padding: var(--l3-spacing-16); }
+.validity.validity { min-height: var(--l3-size-32); border: 1px solid var(--l3-border-dark); border-radius: var(--l3-radius-full); padding-inline: var(--l3-spacing-12); }
+
+/* Margin · Leverage (Sell): a grey strip. */
+.margin { display: flex; justify-content: space-between; padding: var(--l3-spacing-12); border-radius: var(--l3-radius-12); background: var(--l3-surface-secondary); font: var(--l3-text-label-12); }
+.margin strong, .funds strong { font: var(--l3-text-heading-12); color: var(--l3-content-primary); }
+.muted { color: var(--l3-content-tertiary); }
+
+/* A field row: label, value / hint, compact stepper at the right — bordered, 12 radius. */
+.field { display: flex; align-items: center; gap: var(--l3-spacing-08); min-height: var(--l3-size-40); padding: var(--l3-spacing-04) var(--l3-spacing-04) var(--l3-spacing-04) var(--l3-spacing-12); border: 1px solid var(--l3-border-light); border-radius: var(--l3-radius-08); }
+.fieldLabel { flex: 1; font: var(--l3-text-label-12); color: var(--l3-content-secondary); }
+.fieldValue { font: var(--l3-text-heading-12); }
+.unit { display: inline-flex; align-items: center; gap: var(--l3-spacing-02); padding: 0; border: 0; background: none; color: var(--l3-content-primary); font: var(--l3-text-label-12); cursor: pointer; }
+.hint { flex: 1; font: var(--l3-text-label-12); color: var(--l3-content-tertiary); }
+/* Figma stepper: grey − and a blue-tinted + on the grey track (L3 sm has black buttons). */
+.stepper.stepper.stepper button { background: var(--l3-surface-primary); color: var(--l3-content-tertiary); }
+.stepper.stepper.stepper button:last-of-type:not(:disabled) { background: var(--l3-surface-accent-discover-light); color: var(--l3-content-accent-discover-default); }
+
+.tpsl { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); min-height: var(--l3-size-32); padding: 0; border: 0; background: none; color: var(--l3-content-primary); font: var(--l3-text-label-12); cursor: pointer; }
+
+/* Dock: optional auto-close note (intraday), then Avail. · Req and the action. */
+.dock { background: var(--l3-surface-primary); }
+.autoClose { margin: 0; padding: var(--l3-spacing-12) var(--l3-spacing-16); font: var(--l3-text-label-12); color: var(--l3-content-tertiary); text-align: center; }
+.dockBody { display: flex; flex-direction: column; gap: var(--l3-spacing-12); padding: var(--l3-spacing-12) var(--l3-spacing-16) var(--l3-spacing-16); border-top: 1px solid var(--l3-border-light); }
+.funds { display: flex; justify-content: space-between; font: var(--l3-text-label-12); }
+.req { padding: 0; border: 0; background: none; color: var(--l3-content-accent-discover-default); font: var(--l3-text-label-12); text-decoration: underline; cursor: pointer; }
+```
+
+### `src/flows/fno/order-pad/screens/OrderPad.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Actionbar } from '@l3/components/Actionbar'
+import { Aerobar } from '@l3/components/Aerobar'
+import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { PriceChange } from '@l3/components/PriceChange'
+import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
+import { Stepper } from '@l3/components/Stepper'
+import { Tabs } from '@l3/components/Tabs'
+import { lmSwitchArrowVertical } from '@l3/icons/lemonnade'
+import { msAddCircleFill } from '@l3/icons/material'
+import { inr } from '../../../../shared/data/format'
+import { Screen } from '../../../../shared/ui/Screen'
+import { ChoiceSheet, DetailSheet } from '../../sheets/HomeSheets'
+import { t } from '../../copy'
+import { funds, intradayCloseTime, orderContract, sellMargin, validities, type OrderProduct, type OrderSide, type OrderType } from '../data'
+import styles from './OrderPad.module.css'
+
+type Props = {
+  side: OrderSide
+  product?: OrderProduct
+  type?: OrderType
+  onBack: () => void
+}
+
+type Modal = { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void } | { kind: 'detail'; title: string }
+
+/**
+ * Commodity options order pad (Figma 8671:18433) — commodity option chain only; other order pads differ a little.
+ * Actionbar: back · contract ⇕ (name, expiry, price + change) · exchange, Delivery / Intraday tabs in its bottom slot.
+ * Body: Market / Limit / SL pills (+ validity “Day ⇕” for Limit / SL); Sell shows Margin · Leverage; Quantity (⇕ lots,
+ * lot hint, stepper of one lot); Limit adds a limit price row, SL a trigger price row and a limit row (each with a %
+ * stepper from the market price); Set TPSL. Intraday: the auto-close note above the dock. Dock: Avail. · Req, then
+ * Buy (brand) or Sell (sell).
+ */
+export function OrderPad({ side, product: initialProduct = 'delivery', type: initialType = 'market', onBack }: Props) {
+  const c = orderContract
+  const [product, setProduct] = useState<OrderProduct>(initialProduct)
+  const [type, setType] = useState<OrderType>(initialType)
+  const [validity, setValidity] = useState(validities[0])
+  const [lots, setLots] = useState(false)
+  const [quantity, setQuantity] = useState(c.lotSize)
+  const [limitPct, setLimitPct] = useState(20.3)
+  const [triggerPct, setTriggerPct] = useState(20.3)
+  const [modal, setModal] = useState<Modal | null>(null)
+  const [placed, setPlaced] = useState(false)
+  const buy = side === 'buy'
+  const priceAt = (pct: number) => inr(Math.round(c.ltp * (buy ? 1 - pct / 1000 : 1 + pct / 1000)), 0)
+  const priceRow = (label: string, pct: number, setPct: (n: number) => void) => <div className={styles.field}>
+    <span className={styles.fieldLabel}>{label}</span>
+    <span className={styles.fieldValue}>{priceAt(pct)}</span>
+    <Stepper size="sm" className={styles.stepper} label={t('order.offset')} value={pct} onChange={setPct} min={0} step={0.1} format={(n) => `${n.toFixed(1)}%`} />
+  </div>
+
+  const sheet = modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={() => setModal(null)} /> : modal?.kind === 'detail' ? <DetailSheet title={modal.title} onClose={() => setModal(null)} /> : undefined
+  const top = <Actionbar onBack={onBack} backLabel={t('order.back')}
+    title={<button type="button" className={styles.contract} aria-label={t('order.switch')} onClick={() => setModal({ kind: 'detail', title: t('order.switch') })}>
+      <span className={styles.contractName}>{c.name}<Icon icon={lmSwitchArrowVertical} size={16} /><span className={styles.expiry}>{c.contract}</span></span>
+      <span className={styles.contractPrice}>{inr(c.ltp, 2)}<PriceChange value={c.change} unit="percent" size="sm" arrow /></span>
+    </button>}
+    actions={<span className={styles.exchange}>{c.exchange}</span>}
+    bottom={<Tabs aria-label={t('order.product')} value={product} onChange={setProduct} items={[{ value: 'delivery', label: t('order.delivery') }, { value: 'intraday', label: t('order.intraday') }]} />} />
+
+  const dock = <div className={styles.dock} data-surface="primary">
+    {product === 'intraday' && <p className={styles.autoClose}>{t('order.autoClose', { time: intradayCloseTime })}</p>}
+    <div className={styles.dockBody}>
+      <div className={styles.funds}>
+        <span><span className={styles.muted}>{t('order.available')}</span> <strong>{inr(funds.available, 0)}</strong></span>
+        <span><button type="button" className={styles.req} onClick={() => setModal({ kind: 'detail', title: t('order.required') })}>{t('order.required')}</button> <strong>{inr(funds.required, 0)}</strong></span>
+      </div>
+      <Button variant={buy ? 'brand' : 'sell'} size="lg" fullWidth onClick={() => setPlaced(true)}>{t(buy ? 'order.buy' : 'order.sell')}</Button>
+    </div>
+  </div>
+
+  return <Screen top={top} bottom={dock} sheet={sheet}
+    toast={placed ? <Aerobar floating type="success" heading={t('order.placed', { side: t(buy ? 'order.buy' : 'order.sell'), name: c.name, contract: c.contract })} onDismiss={() => setPlaced(false)} /> : undefined}>
+    <Stack gap="16" className={styles.body}>
+      <Stack direction="horizontal" align="center" justify="between">
+        <Tabs aria-label={t('order.type')} appearance="pill" size="sm" value={type} onChange={setType} items={(['market', 'limit', 'sl'] as const).map((value) => ({ value, label: t(`order.${value}`) }))} />
+        {type !== 'market' && <Select size="sm" aria-label={t('order.validity')} className={styles.validity} onClick={() => setModal({ kind: 'choice', title: t('order.validity'), values: validities, value: validity, onPick: setValidity })}>{validity}</Select>}
+      </Stack>
+      {!buy && <div className={styles.margin}><span><span className={styles.muted}>{t('order.margin')}</span> <strong>{sellMargin.margin}</strong></span><span><span className={styles.muted}>{t('order.leverage')}</span> <strong>{sellMargin.leverage}</strong></span></div>}
+      <div className={styles.field}>
+        <button type="button" className={styles.unit} aria-label={t('order.unitSwitch')} onClick={() => setLots(!lots)}>{t(lots ? 'order.lots' : 'order.quantity')}<Icon icon={lmSwitchArrowVertical} size={12} /></button>
+        <span className={styles.hint}>{t('order.lotHint', { lot: c.lotSize })}</span>
+        <Stepper size="sm" className={styles.stepper} label={t(lots ? 'order.lots' : 'order.quantity')} value={lots ? quantity / c.lotSize : quantity} onChange={(n) => setQuantity(lots ? n * c.lotSize : n)} min={lots ? 1 : c.lotSize} step={lots ? 1 : c.lotSize} />
+      </div>
+      {type === 'sl' && priceRow(t('order.trigger'), triggerPct, setTriggerPct)}
+      {type !== 'market' && priceRow(t('order.limitPrice'), limitPct, setLimitPct)}
+      <Stack direction="horizontal" justify="end">
+        <button type="button" className={styles.tpsl} onClick={() => setModal({ kind: 'detail', title: t('order.tpsl') })}>{t('order.tpsl')}<Icon icon={msAddCircleFill} size={16} /></button>
+      </Stack>
+    </Stack>
+  </Screen>
 }
 ```
 

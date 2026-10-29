@@ -245,6 +245,62 @@
         "fno-17"
       ],
       "figmaUrl": ""
+    },
+    {
+      "id": "fno-25",
+      "name": "Order pad · Buy · Market",
+      "figma": "8671:18433",
+      "note": "Commodity option chain order pad (other order pads differ a little). From Buy on the commodity asset page or the Gold Summary Buy / Sell sheet. Delivery / Intraday tabs, Market / Limit / SL pills, Quantity (⇕ lots) in steps of one lot, Set TPSL, Avail. · Req, Buy. Placing shows a sample toast; no order is sent.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-26",
+      "name": "Order pad · Buy · Limit",
+      "figma": "8671:18433",
+      "note": "Limit adds the validity (Day ⇕ → Day / IOC) and a limit price row with a % stepper from the market price.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-27",
+      "name": "Order pad · Buy · SL",
+      "figma": "8671:18433",
+      "note": "SL adds a trigger price row above the limit row.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-28",
+      "name": "Order pad · Buy · Intraday",
+      "figma": "8671:18433",
+      "note": "Intraday: “This position will auto close by 11:30 PM” above the dock.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-29",
+      "name": "Order pad · Sell · Market",
+      "figma": "8671:18433",
+      "note": "Sell adds Margin · Leverage (grey strip) above the quantity; the action is Sell (red).",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-30",
+      "name": "Order pad · Sell · SL",
+      "figma": "8671:18433",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-31",
+      "name": "Order pad · Sell · Intraday",
+      "figma": "8671:18433",
+      "note": "",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
     }
   ],
   "files": [
@@ -301,6 +357,9 @@
     "src/flows/fno/option-chain/data.ts",
     "src/flows/fno/option-chain/screens/OptionChain.module.css",
     "src/flows/fno/option-chain/screens/OptionChain.tsx",
+    "src/flows/fno/order-pad/data.ts",
+    "src/flows/fno/order-pad/screens/OrderPad.module.css",
+    "src/flows/fno/order-pad/screens/OrderPad.tsx",
     "src/flows/fno/screens/Home.tsx",
     "src/flows/fno/screens/Scalper.module.css",
     "src/flows/fno/screens/Scalper.tsx",
