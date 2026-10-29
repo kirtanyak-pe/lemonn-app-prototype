@@ -42,6 +42,9 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 
 > The spec for this flow. A developer should be able to build it on any platform (Flutter, iOS, web) from this file,
 > the Figma links and the screens in this folder — without reading the rest of the repo.
+>
+> **Building it? Go through [CHECKLIST.md](CHECKLIST.md) line by line** — the small details (background, motion,
+> shapes, which prototype version to build) that are easy to miss.
 
 - **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · one screen: `#/dash-03`
 - **Figma:** [DASH AI - main flow](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11491-7726) (F&O dev
@@ -207,6 +210,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-29 — **CHECKLIST.md** added: every easy-to-miss design detail (background layers and motion, orb, scene motion, input and bubbles, cards, home, history, copy) and which prototype version to build. It's bundled into `flows/dash.md` right after the spec.
 - 2026-10-29 — **DASH home V4** (setting DASH home → V4): one home for new and returning users — the Returning V2 home with the heading “Ai creations” (no “+ Create strategy” in that row), and under it small dashed Create cards in one row: Indicator, Rule, and Strategy with the setting **Strategy card** On (opens the chat in strategy mode). Setting **Create cards**: Button (title “Create / indicator” on two lines top left, icon top right, a small primary “Create” button; three cards scroll sideways at 40%) or Outline (the + Create card, the whole card taps). Combined is off the DASH home setting (code kept).
 - 2026-10-27 — Indicator chart: price and time axes, last price, timeframe; typed changes (timeframe, EMA, Supertrend) redraw it after DASH thinks, with the build playing again; change suggestions (faint gradient edge) under a ready indicator; the card folds while typing. The chat always uses the drawn keyboard (a phone's own stays closed). Prototype setting **Indicator tags** (Show / Hide).
 - 2026-10-27 — Settings split: **Chat version** (was “DASH version”) for the chats, **History version** for the history page (1 = Trading rules list, 2 = Created with DASH), each set on its own. Version 1 chats now get the same end-to-end steps as Version 2: Save indicator opens the saved sheet, after Modify the pinned card shows the updated version, and the indicator examples work as in Version 2 (builds straight away / asks the chart / asks the timeframe). Nothing made with DASH can be edited: the details sheet's dock is Add to chart on top, Delete under it (a rule: Delete only).
@@ -248,6 +252,84 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 - 2026-10-22 — First build: 17 screens from "DASH AI - main flow", DASH chat style as flow components, verified
   against every Figma frame at 392 wide.
+
+
+## Build checklist (CHECKLIST.md) — tick every line
+
+
+DASH has many small design decisions that are easy to miss if you only skim the screenshots. Every line below is
+deliberate. Exact values live in the file named on each line (all of it is also in this flow's `flows/dash.md`). Values
+that aren't L3 tokens are local tokens `--app-dash-*` in `src/local-tokens.css`: carry them over as named theme values,
+never as magic numbers.
+
+### 0. Which version to build
+The prototype shows several versions behind settings (`index.tsx` → `options`). **Build each setting's default** unless
+the product team tells you otherwise; the other values are experiments.
+
+| Setting | Build (default) | Other values (don't build unless asked) |
+|---|---|---|
+| Chat version | V1 | V2 |
+| DASH home | Returning user | New user, V4 |
+| Returning home | V2 | V3 |
+| Resume chats | Hide | Show |
+| Chat input | Pills | Previous, Pills above, Dropdown |
+| History version | V2 | V1 |
+| Card version (history) | V3 | V1, V2 |
+| Details version | V3 | V1, V2 |
+| Pine Script | On | Off |
+| Pine Script tip | Animated, shown Always, Overlay | Simple, Once, Push up |
+| If asked for DASH home V4 | Strategy card Off, Create cards Button | Strategy card On, Outline |
+
+### 1. Background (`components/DashScreen.tsx` + `DashScreen.module.css`)
+- [ ] One background for the whole DASH screen. It stays put while scenes change on top of it; it is never redrawn per screen.
+- [ ] Layers, bottom to top: white surface → **rotating gradient** (image `assets/`, a square 125% of the box tall, centred, drawn turned 180° and mirrored, 120% of its box) → **white blurred disc** (10% from the top to 3% from the bottom, blur `--app-dash-glow-blur`) → **fine grid lines** across the top.
+- [ ] Gradient motion: −164° → 196°, ease-in, over the first 75% of a 3.08 s loop, then still until the loop restarts.
+- [ ] Geometry is in fractions of the background box, so it scales with the screen and **shrinks when the keyboard is up** (the box's bottom = keyboard height, 300 ms `--app-dash-scene-easing`).
+- [ ] While chatting (Chat V2): the round disc crossfades (300 ms) to a straight **white veil**, so the glow at the bottom is a level band rising from the input's bottom edge (band `--app-dash-veil-band`).
+- [ ] Loss tone: the same gradient hue-rotated to reds.
+- [ ] Edge to edge: the background runs under the status bar and the OS nav bar; the content is inset by them.
+- [ ] Top bar = L3 Actionbar, **transparent, no hairline**.
+- [ ] Reduced motion: no gradient turn, no transitions.
+
+### 2. Orb (`src/shared/ui/dash/DashOrb.*`)
+- [ ] Artwork drawn at 100 and scaled. Ring = angular gradient (`--app-dash-glow-1/2/3`), its highlight turns clockwise, 1 s per turn, linear; the leaves don't move.
+- [ ] Halo copy offset 8 right / 10 down, blur `--app-dash-orb-halo-blur`. On homes V2 / V3 / V4 the orb is nudged 8 right (`orbNudge`).
+
+### 3. Scenes and motion (`components/SceneSwap.*`, `screens/DashAI.tsx`, README → Motion)
+- [ ] Landing, rules chat and indicator chat are **one screen whose scenes change in place**. Nothing is pushed between chat steps.
+- [ ] Scene change: push, back or fade, 300 ms. A send from a home **cross-fades**; it doesn't push. The typed text flies up and becomes the first user message (`components/flyMessage.ts`, `pendingMessage.ts`, 450 ms).
+- [ ] New message: fades up 8, 250 ms decelerate. Thinking: three pulsing dots. Question card: rises 24 from the input's place.
+- [ ] Rule created / indicator saved: green disc pops in with overshoot (`--app-dash-pop-*`), the tick draws itself, then confetti (1.6 s).
+- [ ] Every timing in README → Motion table. All motion off with reduced motion.
+
+### 4. Chat input and messages (`components/Chat.*`, `SlidingPills.*`)
+- [ ] One fixed input for every scene. Send = 40 circle. A green typing caret.
+- [ ] Animated placeholder: the word slides up into place.
+- [ ] **Pills** kind switch (Rule · Indicator · Strategy): grey track, pills without fill, a **black raised thumb that glides** under the picked one (250 ms). Switching kind in an empty chat flips the chat.
+- [ ] **+** (Pine Script) shows only for Indicator, next to Send, and pops in. A picked file = small grey pill before the text (file icon, name, ✕).
+- [ ] **User message bubble**: min height 48, radius 24, padding 12 / 16, `surface-secondary`, Label/14, hugs its text.
+- [ ] Typing state: the drawn keyboard is up and the home's sections fold away (`sectionsFold`); the greeting glides. It reverses on close.
+
+### 5. Cards
+- [ ] Indicator card (`IndicatorCard.*`): border-light, **radius 16**, 12 inside; builds live (wave → candles → lines), part tags pop in one by one, 3 build steps (spinner / tick / ring). Ready = DASH-green edge. A change sweeps a band of light across it once (1.2 s) and shows "Indicator updated" for 2.8 s. An earlier version folds to a dimmed mini card.
+- [ ] Chat V1 pins the card on top and shrinks it to a mini card (80 × 40 chart) on scroll.
+- [ ] No shadows on DASH or home cards. Hover / press tint on landing cards = orb green at 10%.
+- [ ] Dashed "Create" cards: 1px `border-intense`, **6 on / 4 off dashes** (drawn as an SVG rect inside the card, not a CSS dashed border), radius 12, + on a light DASH-green disc.
+
+### 6. Home (`screens/ReturningV2.*`)
+- [ ] "Your creations": one sideways row, edge to edge (16 in at both ends), snap, small two-line cards; the active status shows in green.
+- [ ] The field's switch **reorders** the row (picked kind first). Strategy picked → "+ Create strategy" leads (not on V4). Cards on show slide down and fade one by one; new ones rise in one by one (~0.35 s).
+- [ ] V4 only: heading "Ai creations", Create cards in one row (2, or 3 with Strategy card on). Button style: title on **two lines** ("Create" / "indicator", top left), icon top right, small primary "Create" button 16 below. With 3 cards that row scrolls (cards 40% wide).
+
+### 7. History, sheets, Pine Script
+- [ ] History ("Created with DASH", `screens/Creations.tsx`): pill tabs All / Rules / Indicators / Strategies; card V3 = status + name left, switch right; on items bold heading text, off items medium label text.
+- [ ] Confirm and simple-action sheets use the **large header with an icon** (e.g. delete = bin in a red circle, 64).
+- [ ] Pine Script: upload sheet with 3 steps; the first-time tip loops a 3-step story in the chat; Copy / Share / Download live only in the saved and details sheets, never on the chat card.
+
+### 8. Copy
+- [ ] Every string comes from `copy.json`, word for word ("Ai" is spelled Ai on purpose; line breaks in copy, e.g. `Create\nindicator`, are intended).
+
+When a line here and the code disagree, the code is newer: follow the code and tell the designer.
 
 
 ## Source — this flow

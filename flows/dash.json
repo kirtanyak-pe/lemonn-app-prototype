@@ -367,6 +367,7 @@
     }
   ],
   "files": [
+    "src/flows/dash/CHECKLIST.md",
     "src/flows/dash/README.md",
     "src/flows/dash/assets/bg-gradient.png",
     "src/flows/dash/assets/grids.svg",

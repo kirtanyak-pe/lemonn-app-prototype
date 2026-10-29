@@ -8,7 +8,10 @@ using that codebase's own architecture, state management and API layer.
 ## 1. Read, in this order
 1. `flows/<id>.md` — one file with everything for the flow: spec, screen list, navigation, all source code, and the
    shared parts it uses. (Machine-readable screen list and navigation: `flows/<id>.json`.)
-2. The **spec** section first (what each screen shows, data, rules, edge cases), then the source.
+2. The **spec** section first (what each screen shows, data, rules, edge cases), then the **Build checklist** if the
+   flow has one (`src/flows/<id>/CHECKLIST.md`: the small design details that are easy to miss — background, motion,
+   exact shapes, which prototype version to build), then the source. Go through the checklist line by line before you
+   start and again before you call the flow done; every line is required.
 3. For every L3 component used, look it up in the design system:
    https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt (component pages, props, tokens, rules). The component
    name in code = the component name in Figma (`Button` = "L3: Button").
