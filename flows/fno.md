@@ -144,7 +144,7 @@ The other F&O navbar items open a sheet explaining that those destinations are o
 
 #### “What does illiquidity mean?” sheet (shared)
 
-`sheets/IlliquidSheet` — one explainer for every illiquid entry point in F&O: the ⓘ in the option-chain tooltip, and a tap on any ILLIQUID tag (asset page, Buy / Sell sheet, Gold Summary card). Same pattern as DASH's Pine Script sheet: small header (“What does illiquidity mean?” + “{contract} is illiquid right now”, or a general line from a tag), a card with three icon + one-line points (very few people trade it · buy and sell prices are far apart · Lemonn doesn't allow orders, to protect you), Got it.
+`sheets/IlliquidSheet` — one explainer for every illiquid entry point in F&O: the ⓘ in the option-chain tooltip, and a tap on any ILLIQUID tag (asset page, Buy / Sell sheet, Gold Summary card). Same pattern as DASH's Pine Script sheet: small header (“What does illiquidity mean?” + “{contract} is illiquid right now”, or a general line from a tag), a card with three icon + one-line points (very few people trade it · buy and sell prices are far apart, which increases chances of slippage · Lemonn doesn't allow orders, to protect you), Got it.
 
 #### Buy / Sell sheet (fno-23, 24)
 
@@ -154,7 +154,7 @@ The other F&O navbar items open a sheet explaining that those destinations are o
 
 `commodities/screens/AssetPage` (Figma 6754:61613), data `AssetPage` in `commodities/data.ts`:
 - Actionbar: back · ☆ (watchlist, toggles). Head: name + contract (“Gold MINI 5 OCT Fut”), price + change, commodity art.
-- Chart (the Scalper's trading pane: candles, price axis with last-price tag, high / low, zoom, time axis, 5m) and the tool row Range · 5m Interval · Indicators · Drawings · Settings; Option chain (→ fno-17) and ScalpPro (→ Scalper fno-05) side by side (Figma 6754:62688: two Secondary, 40 tall, light outline). ScalpPro is disabled for an illiquid contract.
+- Chart (the Scalper's trading pane: candles, price axis with last-price tag, high / low, zoom, time axis, 5m) and the tool row Range · 5m Interval · Indicators · Drawings · Settings; Option chain (→ fno-17) and ScalpPro (→ Scalper fno-05) side by side (Figma 6754:62688: two Secondary, 40 tall, light outline). ScalpPro is disabled for an illiquid contract; tapping it shows the illiquid tooltip (as in the option chain: tap only, 5 s, ⓘ → the illiquidity sheet).
 - Contract Info (key–value rows with dashed separators: days to expiry, margin, leverage, price unit; the tender-margin notice with ⓘ); {NAME} Futures rail; Performance (24H low / high bar with the last traded price, Prev. Close / Open / circuits / tick size / price unit); Trading details; Market Depth (bids | asks, totals). Buy (brand) / Sell (secondary) docked.
 - **Illiquid (commodities only, product rule):** ILLIQUID tag (error, secondary) next to the name, Buy / Sell disabled, and “Trading is not allowed as this contract is illiquid” above them — whatever the entry point.
 - Entry so far: the contract name in the option-chain order dock (“25,400 Put ›”). More entry points (Gold Summary cards, search, watchlists) to come. Equity contracts get their own, similar page.
@@ -169,7 +169,7 @@ How option chains behave (Sensibull, Dhan, Zerodha, the live Lemonn app) and how
 - **Selecting:** tap a call or put price → selected to **Buy** (green B badge on the strike side, green wash from the outer edge) and the order dock rises. Tap it again → **Sell** (red S badge, red wash, Sell button). A third tap clears it. Tapping another price moves the selection there (as Buy).
 - **Order dock:** B / S + “25,400 Put ›” (contract details) · “Set Limit • TP/SL ›”; Balance and Req (buy = premium × quantity, sell = margin per lot); quantity in lots (L3 Stepper, steps of one lot, “1 lot”); Buy (brand lime) or Sell (secondary). Placing shows a success toast and clears the selection — no order is sent.
 - **Top:** back (→ F&O home) · ribbon “Option chain” · Add more strategies (+); BankNifty ▾ (underlying sheet) | Expiry: 09 Oct ▾ (expiry sheet), Zing signals tile with count; Σ (Greeks: shows Δ instead of the day change) · basket · PCR • Max Pain • ATM IV; column heads: “Call LTP” / “Put LTP” (metric sheet: LTP, OI, OI Chg, IV), “All” (strike range: all, ±5, ±10 around the spot). Changing underlying or expiry clears the selection.
-- **Illiquid contracts** (`quote.illiquid`; here deep in-the-money calls 24,700–24,900 and far out-of-the-money puts 25,700–25,900): a block icon (Material `block`, content/tertiary) beside the price on the strike side, as in Groww. Unlike Groww, a tap never selects them: an L3 Tooltip opens above the price — “Illiquid contract · can’t be traded ⓘ” — on a tap only (never hover or focus). It closes by itself after 5 s, when another contract is tapped, on tap-away or Esc. ⓘ opens the shared `sheets/IlliquidSheet` (see “What does illiquid mean?” below).
+- **Illiquid contracts** (`quote.illiquid`; here deep in-the-money calls 24,700–24,900 and far out-of-the-money puts 25,700–25,900): a block icon (Material `block`, content/tertiary) beside the price on the strike side, as in Groww. Unlike Groww, a tap never selects them: an L3 Tooltip grows out of the block icon (fade + scale from its arrow), above or below to fit — two lines: “Illiquid contract” (label) over “Can’t be traded” (secondary), then ⓘ — on a tap only (never hover or focus). It closes by itself after 5 s, when another contract is tapped, on tap-away or Esc. ⓘ opens the shared `sheets/IlliquidSheet` (see “What does illiquid mean?” below).
 - **Entry:** Option chain on the F&O home chart (all product tabs), the Option Chain bottom-nav tab, and View option chain on Gold Summary.
 
 Differences: lot size 35 (BankNifty) so the stepper starts at 35 / 1 lot (Figma's “10000 · 91 lots” is placeholder); quotes are computed sample values (Figma repeats 292.15 / 25100); the stepper is L3 Stepper Large (Figma draws a bordered box with round ± buttons); Max Pain 25,400 so its tag sits where Figma draws it. L3 gaps: an option-chain row / table (strike column 107, row 54, dock header 44 → local tokens `--app-size-chain-*`), B / S order badges, OI bars.
@@ -1286,6 +1286,19 @@ export const assetCandles = assetCloses.map((close, i) => {
 /* Option chain · ScalpPro (Figma 6754:62688): two equal Secondary buttons, 40 tall, light outline. ScalpPro is disabled for an illiquid contract. */
 .chartActions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--l3-spacing-12); padding-inline: var(--l3-spacing-16); }
 .chartAction.chartAction:not(:disabled) { --btn-border: var(--l3-border-light); }
+/* Disabled ScalpPro (illiquid): an invisible tap layer over it opens the illiquid tooltip (same as the option chain's). */
+.scalpWrap { position: relative; display: grid; }
+.scalpTip.scalpTip { position: absolute; inset: 0; display: block; }
+.scalpTap { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.tip { display: inline-flex; align-items: center; gap: var(--l3-spacing-12); white-space: nowrap; }
+.tipText { display: flex; flex-direction: column; gap: var(--l3-spacing-02); text-align: left; }
+.tipTitle { font: var(--l3-text-label-12); color: var(--l3-content-inverted); }
+.tipSub { font: var(--l3-text-description-12); color: var(--l3-content-inverted-secondary); }
+.tipInfo { position: relative; margin-right: calc(-1 * var(--l3-spacing-04)); display: inline-grid; place-items: center; width: var(--l3-size-16); height: var(--l3-size-16); padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.tipInfo::before { content: ''; position: absolute; inset: calc(-1 * var(--l3-spacing-08)); }
+.scalpTip [role='tooltip'][data-ready] { animation: asset-tip-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both; transform-origin: var(--tt-arrow) 100%; }
+@keyframes asset-tip-in { from { opacity: 0; scale: 0.9; translate: 0 var(--l3-spacing-04); } }
+@media (prefers-reduced-motion: reduce) { .scalpTip [role='tooltip'][data-ready] { animation: none; } }
 .scalpIcon { display: inline-flex; width: var(--l3-size-20); height: var(--l3-size-20); }
 
 .section { display: flex; flex-direction: column; gap: var(--l3-spacing-16); padding-inline: var(--l3-spacing-16); }
@@ -1334,6 +1347,7 @@ export const assetCandles = assetCloses.map((close, i) => {
 
 ```tsx
 import { useEffect, useRef, useState } from 'react'
+import { Tooltip } from '@l3/components/Tooltip'
 import { Actionbar } from '@l3/components/Actionbar'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
@@ -1369,6 +1383,14 @@ export function AssetPage({ asset, onBack, onChain, onScalper }: Props) {
   const [saved, setSaved] = useState(false)
   const [detail, setDetail] = useState<string | null>(null)
   const [explain, setExplain] = useState(false)
+  // Illiquid: ScalpPro is disabled; a tap on it shows the illiquid tooltip (tap only — no hover / focus), gone after 5 s.
+  const [scalpTip, setScalpTip] = useState(false)
+  const scalpWasOpen = useRef(false)
+  useEffect(() => {
+    if (!scalpTip) return
+    const timer = window.setTimeout(() => setScalpTip(false), 5000)
+    return () => window.clearTimeout(timer)
+  }, [scalpTip])
   // The Actionbar's bottom line shows only once the page has scrolled under it.
   const pageRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
@@ -1419,7 +1441,14 @@ export function AssetPage({ asset, onBack, onChain, onScalper }: Props) {
         </button>)}</div>
         <div className={styles.chartActions}>
           <Button variant="secondary" size="md" fullWidth className={styles.chartAction} iconLeft={<Icon icon={msLink} size={20} />} onClick={onChain}>{t('asset.chain')}</Button>
-          <Button variant="secondary" size="md" fullWidth className={styles.chartAction} disabled={asset.illiquid} iconLeft={<span className={styles.scalpIcon}><MaskIcon src={scalppro} /></span>} onClick={onScalper}>{t('chart.scalper')}</Button>
+          <div className={styles.scalpWrap}>
+            <Button variant="secondary" size="md" fullWidth className={styles.chartAction} disabled={asset.illiquid} iconLeft={<span className={styles.scalpIcon}><MaskIcon src={scalppro} /></span>} onClick={onScalper}>{t('chart.scalper')}</Button>
+            {asset.illiquid && <Tooltip className={styles.scalpTip} placement="top" open={scalpTip} onOpenChange={(open) => { if (!open) setScalpTip(false) }}
+              content={<span className={styles.tip}><span className={styles.tipText}><span className={styles.tipTitle}>{t('chain.illiquid')}</span><span className={styles.tipSub}>{t('chain.illiquidSub')}</span></span><button type="button" className={styles.tipInfo} aria-label={t('chain.illiquidMore')} onClick={() => { setScalpTip(false); setExplain(true) }}><Icon icon={msInfo} size={16} /></button></span>}>
+              <button type="button" className={styles.scalpTap} aria-label={`${t('chart.scalper')}: ${t('chain.illiquid')}, ${t('chain.illiquidSub')}`} aria-expanded={scalpTip}
+                onPointerDown={() => { scalpWasOpen.current = scalpTip }} onClick={() => setScalpTip(!scalpWasOpen.current)} />
+            </Tooltip>}
+          </div>
         </div>
       </Stack>
 
@@ -2554,7 +2583,7 @@ function clock(start: string, add: number) {
   "chain.sell": "Sell",
   "chain.placed": "{action} order placed · {contract}",
   "chain.oiLegend": "Call OI {call} · Put OI {put}",
-  "chain.illiquid": "Illiquid contract · can’t be traded",
+  "chain.illiquid": "Illiquid contract",
   "chain.illiquidIcon": "Illiquid",
   "chain.illiquidMore": "Why can’t I trade this?",
   "chain.illiquidLabel": "{strike} {side}, illiquid: can’t be traded",
@@ -2609,10 +2638,11 @@ function clock(start: string, add: number) {
   "illiquid.forContract": "{contract} is illiquid right now",
   "illiquid.general": "Some contracts barely trade",
   "illiquid.point1": "Very few people are buying or selling it",
-  "illiquid.point2": "Buy and sell prices are far apart, so trading costs you more",
+  "illiquid.point2": "Buy and sell prices are far apart, which increases chances of slippage",
   "illiquid.point3": "To protect you, Lemonn doesn’t allow orders in it",
   "illiquid.ok": "Got it",
-  "illiquid.open": "What does illiquidity mean?"
+  "illiquid.open": "What does illiquidity mean?",
+  "chain.illiquidSub": "Can’t be traded"
 }
 ```
 
@@ -3008,10 +3038,21 @@ export const sellMarginPerLot = 1250
 .tipDot { display: block; width: 100%; height: 100%; }
 .blocked { display: inline-flex; vertical-align: -2px; margin-inline: var(--l3-spacing-04); color: var(--l3-content-tertiary); }
 .cell[data-illiquid] .ltp { color: var(--l3-content-secondary); }
-.tip { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); white-space: nowrap; }
+.tip { display: inline-flex; align-items: center; gap: var(--l3-spacing-12); white-space: nowrap; }
+/* Two lines: the label, then a secondary line under it. */
+.tipText { display: flex; flex-direction: column; gap: var(--l3-spacing-02); }
+.tipTitle { font: var(--l3-text-label-12); color: var(--l3-content-inverted); }
+.tipSub { font: var(--l3-text-description-12); color: var(--l3-content-inverted-secondary); }
 .tipInfo { position: relative; margin-right: calc(-1 * var(--l3-spacing-04)); display: inline-grid; place-items: center; width: var(--l3-size-16); height: var(--l3-size-16); padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
 /* The icon sits 8 from the bubble edge (like L3 Tooltip ✕: it steps out of the text's 4 inline padding); its touch area stays larger than the 16 icon. */
 .tipInfo::before { content: ''; position: absolute; inset: calc(-1 * var(--l3-spacing-08)); }
+
+/* The illiquid tooltip grows out of its arrow (at the icon): fade + scale + a 4 px slide away from the icon, once placed. */
+.tipTarget [role='tooltip'][data-ready] { animation: chain-tip-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both; }
+.tipTarget [role='tooltip'][data-side='top'] { transform-origin: var(--tt-arrow) 100%; --tip-from: var(--l3-spacing-04); }
+.tipTarget [role='tooltip'][data-side='bottom'] { transform-origin: var(--tt-arrow) 0; --tip-from: calc(-1 * var(--l3-spacing-04)); }
+@keyframes chain-tip-in { from { opacity: 0; scale: 0.9; translate: 0 var(--tip-from); } }
+@media (prefers-reduced-motion: reduce) { .tipTarget [role='tooltip'][data-ready] { animation: none; } }
 ```
 
 ### `src/flows/fno/option-chain/screens/OptionChain.tsx`
@@ -3211,7 +3252,7 @@ function IlliquidCell({ open, onToggle, onMore, label, side, children }: { open:
       onPointerDown={() => { wasOpen.current = open }} onClick={() => onToggle(!wasOpen.current)}>{children}</button>
     {open && target && <span className={styles.tipTarget} style={target}>
       <Tooltip placement="top" open onOpenChange={(next) => { if (!next) onToggle(false) }}
-        content={<span className={styles.tip}>{t('chain.illiquid')}<button type="button" className={styles.tipInfo} aria-label={t('chain.illiquidMore')} onClick={onMore}><Icon icon={msInfo} size={16} /></button></span>}>
+        content={<span className={styles.tip}><span className={styles.tipText}><span className={styles.tipTitle}>{t('chain.illiquid')}</span><span className={styles.tipSub}>{t('chain.illiquidSub')}</span></span><button type="button" className={styles.tipInfo} aria-label={t('chain.illiquidMore')} onClick={onMore}><Icon icon={msInfo} size={16} /></button></span>}>
         <span className={styles.tipDot} />
       </Tooltip>
     </span>}
