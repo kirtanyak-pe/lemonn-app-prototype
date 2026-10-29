@@ -1,6 +1,6 @@
 # Flow: DASH Ai · Trading rules (`dash`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `571a418` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `facf790` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.
 
@@ -4860,14 +4860,14 @@ function useChartGestures(
 .pill.pill {
   height: var(--l3-size-40);
   padding-inline: var(--l3-spacing-16); /* a little more room either side than the md pill's 12 */
-  /* The black chip (the pill group's selected look: surface/inverted, inverted text), flat — no shadow or sheen. */
+  /* The black chip (the pill group's selected look: surface/inverted, inverted text), raised strong (L3 Raised). */
   --tab-surface: var(--l3-surface-inverted);
   --tab-content: var(--l3-content-inverted);
   --tab-border: transparent;
   --tab-layer-default: var(--l3-state-layer-light-default);
   --tab-layer-hover: var(--l3-state-layer-light-hover);
   --tab-layer-pressed: var(--l3-state-layer-light-pressed);
-  box-shadow: none;
+  --raise-layer: var(--tab-layer);
 }
 
 /* While the panel is open it sits over the chip (it grew out of it): the chip itself steps back. */
@@ -4909,31 +4909,6 @@ function useChartGestures(
 
 .option.option :is(span) {
   font: var(--l3-text-label-16);
-}
-
-/*
- * Raised, like the filled (primary) buttons (src/shared/ui/Raised.module.css, on while <html data-buttons="raised">):
- * a sheen lighter at the top and darker at the bottom under the state layer, the lit-from-above bevel and a small
- * drop shadow; pressed, it goes in. Flat when the experiment is off.
- */
-:root[data-buttons='raised'] .pill.pill {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-  background-image:
-    linear-gradient(var(--tab-layer), var(--tab-layer)),
-    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
-  box-shadow:
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop),
-    var(--l3-shadow-elevation-low);
-}
-
-:root[data-buttons='raised'] .pill.pill:active {
-  box-shadow: inset 0 1px 2px var(--raise-shade);
 }
 ```
 
@@ -5016,7 +4991,7 @@ export function ModeMenu({ value, items, onChange, label }: { value: string; ite
 
   return (
     <span ref={trigger} className={styles.wrap} data-open={place ? '' : undefined}>
-      <Tab type="button" action appearance="pill" emphasis="tertiary" size="md" iconRight={<Icon icon={lmSwitchArrowVertical} />} aria-haspopup="menu" aria-expanded={!!place} aria-controls={listId} aria-label={`${label}: ${current.label}`} onClick={() => (place ? close() : open())} className={styles.pill}>
+      <Tab type="button" action appearance="pill" emphasis="tertiary" size="md" iconRight={<Icon icon={lmSwitchArrowVertical} />} aria-haspopup="menu" aria-expanded={!!place} aria-controls={listId} aria-label={`${label}: ${current.label}`} onClick={() => (place ? close() : open())} className={styles.pill} raised="strong">
         {current.label}
       </Tab>
       {place && createPortal(
@@ -6437,7 +6412,7 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
   background: var(--l3-surface-secondary);
 }
 
-/* The black thumb under the picked pill; it glides to the next one (left / width, 250 ms). */
+/* The black thumb under the picked pill, raised strong (L3 Raised); it glides to the next one (left / width, 250 ms). */
 .thumb {
   position: absolute;
   top: var(--l3-spacing-04);
@@ -6473,25 +6448,6 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
   .tabs [role='tab'] {
     transition: none;
   }
-}
-
-/*
- * Raised, like the filled (primary) buttons (src/shared/ui/Raised.module.css, on while <html data-buttons="raised">):
- * a sheen lighter at the top and darker at the bottom, the lit-from-above bevel and a small drop shadow. Flat when the
- * experiment is off.
- */
-:root[data-buttons='raised'] .thumb {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-  background-image: linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
-  box-shadow:
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop),
-    var(--l3-shadow-elevation-low);
 }
 
 /* Full width (Chat input "Pills above"): the track and the L3 group stretch; the pills share it equally. */
@@ -6546,7 +6502,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
   const withBadges = items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : item))
   return (
     <span ref={track} className={styles.track} data-fill={fill || undefined}>
-      <span ref={thumb} className={styles.thumb} aria-hidden="true" />
+      <span ref={thumb} className={styles.thumb} data-raised="strong" aria-hidden="true" />
       <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width={fill ? 'fill' : 'hug'} items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
     </span>
   )
@@ -12490,81 +12446,6 @@ export function useSystemKeyboard() {
 }
 ```
 
-### `src/shared/ui/Raised.module.css`
-
-```css
-/*
- * EXPERIMENT — every screen and sheet of the app, not in L3 yet: "raised" buttons, a soft 3D look like YouTube's
- * recent buttons. On when <html data-buttons="raised"> (the default; the prototype controls switch it to "flat" to
- * compare with plain L3). On top of the L3 Button (nothing in the design system changes):
- * - a faint vertical sheen: a touch lighter at the top, a touch darker at the bottom, under L3's hover/press layer;
- * - a 1px inner highlight on the top edge and a 1px inner shade on the bottom edge (the "lit from above" bevel);
- * - a small soft drop shadow, so the button sits slightly above the page.
- * Pressed: the drop shadow goes and the bevel turns inward (pushed in). Disabled / loading / ghost stay flat.
- * If it's approved for L3, these become Button tokens (e.g. button/raise-sheen, -highlight, -shade) per variant.
- */
-
-:root[data-buttons='raised'] .raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-60));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
-  background-image:
-    linear-gradient(var(--btn-layer), var(--btn-layer)),
-    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop),
-    var(--l3-shadow-elevation-low);
-}
-
-/* Filled (primary, brand, buy, sell): a stronger sheen and bevel on the solid colour. */
-/* (:not(ghost) only matches the base rule's specificity, so these values win.) */
-:root[data-buttons='raised'] .raised :is(button, a):is([data-variant='primary'], [data-variant='brand'], [data-variant='buy'], [data-variant='sell'])[data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-}
-
-/*
- * Secondary and tertiary: only a hint of the effect — no darker bottom (it read as grey), just a faint white light on
- * top, a soft top highlight and a small drop shadow (no elevation-low). The full effect stays on the filled buttons.
- */
-:root[data-buttons='raised'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-0));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-50));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop);
-}
-
-/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
-:root[data-buttons='raised'][data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-5));
-  --raise-sheen-bottom: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-0));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-5));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-}
-
-/* Pushed in while pressed: no drop shadow, the bevel turns inward. */
-:root[data-buttons='raised'] .raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']):active {
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 2px var(--raise-shade);
-}
-```
-
 ### `src/shared/ui/Screen.module.css`
 
 ```css
@@ -12633,7 +12514,6 @@ export function useSystemKeyboard() {
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
 import { usePreview } from '../prototype'
-import raised from './Raised.module.css'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
 
@@ -12658,14 +12538,13 @@ type ScreenProps = {
  * OS, edge-to-edge insets), so nothing sits under the gesture handle. The screen is the sheet's container, so sheets
  * and their scrim stay in the app; its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash
  * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
- * its colour (the button dock and the bottom navbar are recognised already). Buttons on every screen and its sheets
- * get the raised-button experiment (Raised.module.css) while <html data-buttons="raised">.
+ * its colour (the button dock and the bottom navbar are recognised already).
  */
 export function Screen({ top, bottom, toast, sheet, children, className }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
-    <div ref={setEl} className={[styles.screen, raised.raised, className].filter(Boolean).join(' ')}>
+    <div ref={setEl} className={[styles.screen, className].filter(Boolean).join(' ')}>
       <SheetHost container={el}>
         <div className={styles.page} data-part="page">
           {top}

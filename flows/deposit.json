@@ -4,7 +4,7 @@
   "description": "Add money over UPI after account setup: amount, UPI app, confirmation, receipt or failure.",
   "designSystem": {
     "name": "Lemonnade V3 (L3)",
-    "commit": "571a418",
+    "commit": "facf790",
     "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
   },
   "prototype": {
@@ -81,7 +81,6 @@
     "src/shared/ui/External.tsx",
     "src/shared/ui/Intro.module.css",
     "src/shared/ui/Intro.tsx",
-    "src/shared/ui/Raised.module.css",
     "src/shared/ui/Screen.module.css",
     "src/shared/ui/Screen.tsx",
     "src/shared/ui/Sheet.module.css",

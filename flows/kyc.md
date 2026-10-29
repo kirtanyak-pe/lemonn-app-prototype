@@ -1,6 +1,6 @@
 # Flow: Account setup (`kyc`)
 
-> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `571a418` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
+> One self-contained file for converting this flow to another platform. Read https://kirtanyak-pe.github.io/lemonn-app-prototype/CONVERT.md first. Design system: Lemonnade V3 @ `facf790` (components, tokens and rules: https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt).
 
 KYC after login: PAN, details and declarations, nominee, bank account and F&O activation.
 
@@ -106,7 +106,7 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 | Where | L3 component (Figma name) | Props / variant |
 |---|---|---|
 | Top bar | Actionbar | title + `onBack`. kyc-01 has none — nothing to put in it, so the content starts 24 below the status bar |
-| Stage progress under the bar | ProgressBar (`components/StageBar`) | "Step 1 of 3 · Verify your identity", value by stage |
+| Stage progress under the bar | L3 StageBar (via `components/StageBar`) | "Step 1 of 3 · Verify your identity", one segment per stage |
 | Headlines | `Intro` (src/shared/ui) | Heading/24 title + Description/14 secondary; `align="center"` on result screens |
 | Stage list, fetch list, progress | L3 `Steps` | done ✓ / current / loading / to do, with a connector line |
 | Illustration | **Illustration slot** (`Spot`, src/shared/ui) | md 64 in sheet headers and kyc-17, lg 96 + halo on result screens |
@@ -165,7 +165,7 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 ### L3 gaps
 
 - **Illustrations:** L3 has none for onboarding / results; `Spot` slots stand in (marked `data-illustration-slot`).
-- **Stage progress:** made from ProgressBar + a label (`components/StageBar`); an L3 "stepper header" would replace it.
+- **Stage progress:** L3 StageBar; `components/StageBar` only passes this flow's stage names and copy.
 
 ### Changelog
 
@@ -177,38 +177,22 @@ From `src/shared/data/user.ts` (fictional sample user — never real customer da
 
 ## Source — this flow
 
-### `src/flows/kyc/components/StageBar.module.css`
-
-```css
-/*
- * In the Actionbar's content-bottom slot on the setup forms (it stays put while the page scrolls, so it belongs to the
- * bar): "Step 1 of 3 · Verify your identity" over a thin progress bar. The slot has no padding of its own; like pill
- * tabs there, the bar (a Section) brings 12 top and bottom, 16 at the sides.
- */
-
-.label {
-  font: var(--l3-text-label-12);
-  color: var(--l3-content-secondary);
-}
-```
-
 ### `src/flows/kyc/components/StageBar.tsx`
 
 ```tsx
-import { ProgressBar } from '@l3/components/ProgressBar'
-import { Section } from '@l3/components/Section'
+import { StageBar as L3StageBar } from '@l3/components/StageBar'
 import { t } from '../copy'
 import { stages } from '../data'
-import styles from './StageBar.module.css'
 
-/** Where the user is in account setup (stage 1–3). */
+/** Where the user is in account setup (stage 1–3): L3 Stage bar with this flow's stage names. */
 export function StageBar({ stage }: { stage: 1 | 2 | 3 }) {
-  const name = t(`stage.${stages[stage - 1]}.label`)
   return (
-    <Section paddingBlock="12" paddingInline="16" gap="08">
-      <span className={styles.label}>{t('stageBar.step', { stage, count: stages.length, name })}</span>
-      <ProgressBar size="sm" value={(stage / stages.length) * 100 - 15} label={t('stageBar.label', { stage, count: stages.length })} />
-    </Section>
+    <L3StageBar
+      stages={stages.length as 3}
+      current={stage}
+      stepText={t('stageBar.step', { stage, count: stages.length })}
+      stage={t(`stage.${stages[stage - 1]}.label`)}
+    />
   )
 }
 ```
@@ -223,8 +207,7 @@ export function StageBar({ stage }: { stage: 1 | 2 | 3 }) {
   "stage.bank.description": "To add money and withdraw · about 1 min",
   "stage.fno.label": "Activate F&O (optional)",
   "stage.fno.description": "Needs a bank statement · about 2 min",
-  "stageBar.step": "Step {stage} of {count} · {name}",
-  "stageBar.label": "Account setup: step {stage} of {count}",
+  "stageBar.step": "Step {stage} of {count}",
   "start.emailVerified": "Email verified",
   "start.actionsLabel": "Start",
   "start.cta": "Start",
@@ -1629,81 +1612,6 @@ export function Intro({ title, description, art, align = 'start', children }: {
 }
 ```
 
-### `src/shared/ui/Raised.module.css`
-
-```css
-/*
- * EXPERIMENT — every screen and sheet of the app, not in L3 yet: "raised" buttons, a soft 3D look like YouTube's
- * recent buttons. On when <html data-buttons="raised"> (the default; the prototype controls switch it to "flat" to
- * compare with plain L3). On top of the L3 Button (nothing in the design system changes):
- * - a faint vertical sheen: a touch lighter at the top, a touch darker at the bottom, under L3's hover/press layer;
- * - a 1px inner highlight on the top edge and a 1px inner shade on the bottom edge (the "lit from above" bevel);
- * - a small soft drop shadow, so the button sits slightly above the page.
- * Pressed: the drop shadow goes and the bevel turns inward (pushed in). Disabled / loading / ghost stay flat.
- * If it's approved for L3, these become Button tokens (e.g. button/raise-sheen, -highlight, -shade) per variant.
- */
-
-:root[data-buttons='raised'] .raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-60));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-10));
-  background-image:
-    linear-gradient(var(--btn-layer), var(--btn-layer)),
-    linear-gradient(to bottom, var(--raise-sheen-top), var(--raise-sheen-bottom));
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop),
-    var(--l3-shadow-elevation-low);
-}
-
-/* Filled (primary, brand, buy, sell): a stronger sheen and bevel on the solid colour. */
-/* (:not(ghost) only matches the base rule's specificity, so these values win.) */
-:root[data-buttons='raised'] .raised :is(button, a):is([data-variant='primary'], [data-variant='brand'], [data-variant='buy'], [data-variant='sell'])[data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-20));
-  --raise-sheen-bottom: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-15));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-25));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-30));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-}
-
-/*
- * Secondary and tertiary: only a hint of the effect — no darker bottom (it read as grey), just a faint white light on
- * top, a soft top highlight and a small drop shadow (no elevation-low). The full effect stays on the filled buttons.
- */
-:root[data-buttons='raised'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-10));
-  --raise-sheen-bottom: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-0));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-50));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-5));
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 0 var(--raise-highlight),
-    inset 0 -1px 0 var(--raise-shade),
-    0 1px 2px var(--raise-drop);
-}
-
-/* Dark themes: the light glint on dark outlined buttons is kept faint (a bright line would look like a border). */
-:root[data-buttons='raised'][data-mode='dark'] .raised :is(button, a):is([data-variant='secondary'], [data-variant='tertiary'])[data-state='default']:not([data-variant='ghost']) {
-  --raise-sheen-top: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-5));
-  --raise-sheen-bottom: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-0));
-  --raise-highlight: rgb(from var(--l3-static-white) r g b / var(--l3-opacity-5));
-  --raise-shade: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-  --raise-drop: rgb(from var(--l3-static-black) r g b / var(--l3-opacity-20));
-}
-
-/* Pushed in while pressed: no drop shadow, the bevel turns inward. */
-:root[data-buttons='raised'] .raised :is(button, a)[data-variant][data-state='default']:not([data-variant='ghost']):active {
-  box-shadow:
-    inset 0 0 0 var(--btn-border-width) var(--btn-border),
-    inset 0 1px 2px var(--raise-shade);
-}
-```
-
 ### `src/shared/ui/Screen.module.css`
 
 ```css
@@ -1772,7 +1680,6 @@ export function Intro({ title, description, art, align = 'start', children }: {
 ```tsx
 import { Fragment, useState, type ReactNode } from 'react'
 import { usePreview } from '../prototype'
-import raised from './Raised.module.css'
 import { SheetHost } from './Sheet'
 import styles from './Screen.module.css'
 
@@ -1797,14 +1704,13 @@ type ScreenProps = {
  * OS, edge-to-edge insets), so nothing sits under the gesture handle. The screen is the sheet's container, so sheets
  * and their scrim stay in the app; its SheetHost keeps one sheet open while the screen's sheet changes (no scrim flash
  * between two sheets). Mark a bottom part with data-surface="primary" | "secondary" if the navigation bar should take
- * its colour (the button dock and the bottom navbar are recognised already). Buttons on every screen and its sheets
- * get the raised-button experiment (Raised.module.css) while <html data-buttons="raised">.
+ * its colour (the button dock and the bottom navbar are recognised already).
  */
 export function Screen({ top, bottom, toast, sheet, children, className }: ScreenProps) {
   const [el, setEl] = useState<HTMLDivElement | null>(null)
   const { screenId } = usePreview()
   return (
-    <div ref={setEl} className={[styles.screen, raised.raised, className].filter(Boolean).join(' ')}>
+    <div ref={setEl} className={[styles.screen, className].filter(Boolean).join(' ')}>
       <SheetHost container={el}>
         <div className={styles.page} data-part="page">
           {top}
