@@ -41,9 +41,13 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-29` | Order pad · Sell · Market | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — | Sell adds Margin · Leverage (grey strip) above the quantity; the action is Sell (red). |
 | `fno-30` | Order pad · Sell · SL | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — |  |
 | `fno-31` | Order pad · Sell · Intraday | [8671:18433](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433) | — |  |
+| `fno-32` | Order pad · Buy · ILLIQUID (edge case) | [8671:18433 + product rule](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433 + product rule) | — | Should never be reached — every entry point blocks illiquid contracts — but if one slips through: ILLIQUID tag in the header (tap → “What does illiquidity mean?”), the blocked note in the dock (tap → same sheet) and Buy disabled. Inputs stay usable. |
+| `fno-33` | Order pad · Sell · ILLIQUID (edge case) | [8671:18433 + product rule](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433 + product rule) | — | The same edge case on the Sell side: Sell disabled. |
 
 ## Spec (README.md)
 
+
+> **ILLIQUID contracts** span this flow and others — read [`docs/ILLIQUID.md`](https://kirtanyak-pe.github.io/lemonn-app-prototype/ILLIQUID.md) (rule, data flag, UI patterns, every place) before building any of it.
 
 The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → Equity](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) and the [F&O Home section](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63073) (Commodities, asset selection, lot selection, Strategies — drawn in the old D2 system, rebuilt in L3 with the same look).
 
@@ -81,6 +85,7 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-24 | Gold Summary · illiquid Buy / Sell sheet | live app + product rule |
 | fno-25 … 28 | Order pad · Buy (Market, Limit, SL, Intraday) | 8671:18433 |
 | fno-29 … 31 | Order pad · Sell (Market, SL, Intraday) | 8671:18433 |
+| fno-32, 33 | Order pad · ILLIQUID edge case (Buy, Sell) | 8671:18433 + product rule |
 
 ### Structure
 
@@ -165,6 +170,8 @@ The other F&O navbar items open a sheet explaining that those destinations are o
 - **Limit**: a limit price row (price + % stepper from the market price); **SL**: a Trigger Price row above it.
 - **Set TPSL ⊕** (right). **Intraday**: “This position will auto close by 11:30 PM” above the dock.
 - Dock: Avail. ₹ · <u>Req</u> ₹ (Req opens its breakdown), then **Buy** (brand) or **Sell** (L3 sell, red). Placing shows a sample toast; no order is sent.
+- Steppers are the L3 Stepper Small as the design system draws it (dark + / − on the grey track), not Figma's grey / blue.
+- **ILLIQUID edge case** (`fno-32` Buy, `fno-33` Sell): should never be reached, but if an illiquid contract slips through — ILLIQUID tag in the header, the blocked note in the dock, Buy / Sell disabled (see docs/ILLIQUID.md).
 - Data: `order-pad/data.ts` (contract, lot size, margin / leverage, funds, auto-close time, validities).
 
 #### Buy / Sell sheet (fno-23, 24)
@@ -2860,6 +2867,8 @@ export const fno: Flow = {
     { id: 'fno-29', group: 'order', name: 'Order pad · Sell · Market', figma: '8671:18433', note: 'Sell adds Margin · Leverage (grey strip) above the quantity; the action is Sell (red).', render: (go) => <OrderPad side="sell" onBack={() => backOr(go, 'fno-21')} /> },
     { id: 'fno-30', group: 'order', name: 'Order pad · Sell · SL', figma: '8671:18433', render: (go) => <OrderPad side="sell" type="sl" onBack={() => backOr(go, 'fno-21')} /> },
     { id: 'fno-31', group: 'order', name: 'Order pad · Sell · Intraday', figma: '8671:18433', render: (go) => <OrderPad side="sell" product="intraday" onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-32', group: 'order', name: 'Order pad · Buy · ILLIQUID (edge case)', figma: '8671:18433 + product rule', note: 'Should never be reached — every entry point blocks illiquid contracts — but if one slips through: ILLIQUID tag in the header (tap → “What does illiquidity mean?”), the blocked note in the dock (tap → same sheet) and Buy disabled. Inputs stay usable.', render: (go) => <OrderPad side="buy" illiquid onBack={() => backOr(go, 'fno-21')} /> },
+    { id: 'fno-33', group: 'order', name: 'Order pad · Sell · ILLIQUID (edge case)', figma: '8671:18433 + product rule', note: 'The same edge case on the Sell side: Sell disabled.', render: (go) => <OrderPad side="sell" illiquid onBack={() => backOr(go, 'fno-21')} /> },
   ],
 }
 ```
@@ -3372,9 +3381,7 @@ export const validities = ['Day', 'IOC']
 .fieldValue { font: var(--l3-text-heading-12); }
 .unit { display: inline-flex; align-items: center; gap: var(--l3-spacing-02); padding: 0; border: 0; background: none; color: var(--l3-content-primary); font: var(--l3-text-label-12); cursor: pointer; }
 .hint { flex: 1; font: var(--l3-text-label-12); color: var(--l3-content-tertiary); }
-/* Figma stepper: grey − and a blue-tinted + on the grey track (L3 sm has black buttons). */
-.stepper.stepper.stepper button { background: var(--l3-surface-primary); color: var(--l3-content-tertiary); }
-.stepper.stepper.stepper button:last-of-type:not(:disabled) { background: var(--l3-surface-accent-discover-light); color: var(--l3-content-accent-discover-default); }
+/* Steppers are the L3 Stepper Small as it is (dark + / −) — the design system's style wins over Figma's grey / blue. */
 
 .tpsl { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); min-height: var(--l3-size-32); padding: 0; border: 0; background: none; color: var(--l3-content-primary); font: var(--l3-text-label-12); cursor: pointer; }
 
@@ -3384,6 +3391,12 @@ export const validities = ['Day', 'IOC']
 .dockBody { display: flex; flex-direction: column; gap: var(--l3-spacing-12); padding: var(--l3-spacing-12) var(--l3-spacing-16) var(--l3-spacing-16); border-top: 1px solid var(--l3-border-light); }
 .funds { display: flex; justify-content: space-between; font: var(--l3-text-label-12); }
 .req { padding: 0; border: 0; background: none; color: var(--l3-content-accent-discover-default); font: var(--l3-text-label-12); text-decoration: underline; cursor: pointer; }
+
+/* ILLIQUID edge case: tag in the header (tap → explainer), the blocked note above the disabled action. */
+.headEnd { display: inline-flex; align-items: center; gap: var(--l3-spacing-08); }
+.tagButton { position: relative; display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; }
+.tagButton::before { content: ''; position: absolute; inset: calc(-1 * var(--l3-spacing-16)) calc(-1 * var(--l3-spacing-04)); }
+.illiquidNote { display: flex; align-items: center; justify-content: center; gap: var(--l3-spacing-04); width: 100%; min-height: var(--l3-size-40); padding: var(--l3-spacing-08) var(--l3-spacing-12); border: 0; border-radius: var(--l3-radius-08); background: var(--l3-surface-accent-error-light); font: var(--l3-text-label-12); color: var(--l3-content-accent-error-default); cursor: pointer; }
 ```
 
 ### `src/flows/fno/order-pad/screens/OrderPad.tsx`
@@ -3399,11 +3412,13 @@ import { Select } from '@l3/components/Select'
 import { Stack } from '@l3/components/Stack'
 import { Stepper } from '@l3/components/Stepper'
 import { Tabs } from '@l3/components/Tabs'
+import { Tag } from '@l3/components/Tag'
 import { lmSwitchArrowVertical } from '@l3/icons/lemonnade'
-import { msAddCircleFill } from '@l3/icons/material'
+import { msAddCircleFill, msBlock, msInfo } from '@l3/icons/material'
 import { inr } from '../../../../shared/data/format'
 import { Screen } from '../../../../shared/ui/Screen'
 import { ChoiceSheet, DetailSheet } from '../../sheets/HomeSheets'
+import { IlliquidSheet } from '../../sheets/IlliquidSheet'
 import { t } from '../../copy'
 import { funds, intradayCloseTime, orderContract, sellMargin, validities, type OrderProduct, type OrderSide, type OrderType } from '../data'
 import styles from './OrderPad.module.css'
@@ -3412,10 +3427,15 @@ type Props = {
   side: OrderSide
   product?: OrderProduct
   type?: OrderType
+  /**
+   * Edge case: an ILLIQUID contract should never reach the order pad (every entry point blocks it), but if one does,
+   * the pad shows the ILLIQUID tag, the blocked note in the dock and a disabled Buy / Sell.
+   */
+  illiquid?: boolean
   onBack: () => void
 }
 
-type Modal = { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void } | { kind: 'detail'; title: string }
+type Modal = { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void } | { kind: 'detail'; title: string } | { kind: 'illiquid' }
 
 /**
  * Commodity options order pad (Figma 8671:18433) — commodity option chain only; other order pads differ a little.
@@ -3425,7 +3445,7 @@ type Modal = { kind: 'choice'; title: string; values: string[]; value: string; o
  * stepper from the market price); Set TPSL. Intraday: the auto-close note above the dock. Dock: Avail. · Req, then
  * Buy (brand) or Sell (sell).
  */
-export function OrderPad({ side, product: initialProduct = 'delivery', type: initialType = 'market', onBack }: Props) {
+export function OrderPad({ side, product: initialProduct = 'delivery', type: initialType = 'market', illiquid = false, onBack }: Props) {
   const c = orderContract
   const [product, setProduct] = useState<OrderProduct>(initialProduct)
   const [type, setType] = useState<OrderType>(initialType)
@@ -3444,13 +3464,13 @@ export function OrderPad({ side, product: initialProduct = 'delivery', type: ini
     <Stepper size="sm" className={styles.stepper} label={t('order.offset')} value={pct} onChange={setPct} min={0} step={0.1} format={(n) => `${n.toFixed(1)}%`} />
   </div>
 
-  const sheet = modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={() => setModal(null)} /> : modal?.kind === 'detail' ? <DetailSheet title={modal.title} onClose={() => setModal(null)} /> : undefined
+  const sheet = modal?.kind === 'illiquid' ? <IlliquidSheet contract={`${c.name} ${c.contract}`} onClose={() => setModal(null)} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={() => setModal(null)} /> : modal?.kind === 'detail' ? <DetailSheet title={modal.title} onClose={() => setModal(null)} /> : undefined
   const top = <Actionbar onBack={onBack} backLabel={t('order.back')}
     title={<button type="button" className={styles.contract} aria-label={t('order.switch')} onClick={() => setModal({ kind: 'detail', title: t('order.switch') })}>
       <span className={styles.contractName}>{c.name}<Icon icon={lmSwitchArrowVertical} size={16} /><span className={styles.expiry}>{c.contract}</span></span>
       <span className={styles.contractPrice}>{inr(c.ltp, 2)}<PriceChange value={c.change} unit="percent" size="sm" arrow /></span>
     </button>}
-    actions={<span className={styles.exchange}>{c.exchange}</span>}
+    actions={<span className={styles.headEnd}>{illiquid && <button type="button" className={styles.tagButton} aria-label={t('illiquid.open')} onClick={() => setModal({ kind: 'illiquid' })}><Tag color="error" variant="secondary" size="sm" iconLeft={<Icon icon={msBlock} size={12} />}>{t('asset.illiquid')}</Tag></button>}<span className={styles.exchange}>{c.exchange}</span></span>}
     bottom={<Tabs aria-label={t('order.product')} value={product} onChange={setProduct} items={[{ value: 'delivery', label: t('order.delivery') }, { value: 'intraday', label: t('order.intraday') }]} />} />
 
   const dock = <div className={styles.dock} data-surface="primary">
@@ -3460,7 +3480,8 @@ export function OrderPad({ side, product: initialProduct = 'delivery', type: ini
         <span><span className={styles.muted}>{t('order.available')}</span> <strong>{inr(funds.available, 0)}</strong></span>
         <span><button type="button" className={styles.req} onClick={() => setModal({ kind: 'detail', title: t('order.required') })}>{t('order.required')}</button> <strong>{inr(funds.required, 0)}</strong></span>
       </div>
-      <Button variant={buy ? 'brand' : 'sell'} size="lg" fullWidth onClick={() => setPlaced(true)}>{t(buy ? 'order.buy' : 'order.sell')}</Button>
+      {illiquid && <button type="button" className={styles.illiquidNote} onClick={() => setModal({ kind: 'illiquid' })}>{t('asset.illiquidNote')}<Icon icon={msInfo} size={16} /></button>}
+      <Button variant={buy ? 'brand' : 'sell'} size="lg" fullWidth disabled={illiquid} onClick={() => setPlaced(true)}>{t(buy ? 'order.buy' : 'order.sell')}</Button>
     </div>
   </div>
 

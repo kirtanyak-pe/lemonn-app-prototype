@@ -301,6 +301,22 @@
       "note": "",
       "goesTo": [],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433"
+    },
+    {
+      "id": "fno-32",
+      "name": "Order pad · Buy · ILLIQUID (edge case)",
+      "figma": "8671:18433 + product rule",
+      "note": "Should never be reached — every entry point blocks illiquid contracts — but if one slips through: ILLIQUID tag in the header (tap → “What does illiquidity mean?”), the blocked note in the dock (tap → same sheet) and Buy disabled. Inputs stay usable.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433 + product rule"
+    },
+    {
+      "id": "fno-33",
+      "name": "Order pad · Sell · ILLIQUID (edge case)",
+      "figma": "8671:18433 + product rule",
+      "note": "The same edge case on the Sell side: Sell disabled.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=8671-18433 + product rule"
     }
   ],
   "files": [

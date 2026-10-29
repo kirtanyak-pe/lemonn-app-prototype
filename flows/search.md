@@ -42,6 +42,8 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/search · machi
 ## Spec (README.md)
 
 
+> **ILLIQUID contracts** span this flow and others — read [`docs/ILLIQUID.md`](https://kirtanyak-pe.github.io/lemonn-app-prototype/ILLIQUID.md) (rule, data flag, UI patterns, every place) before building any of it.
+
 F&O home entry points (2026-10-26): `search-25` opens F&O search, `search-26` opens the existing combined Smart Options & Futures index list, and `search-27` opens its stock list. Back returns to `fno-01` for these entry points.
 
 > The spec for this flow. A developer should be able to build it on any platform (Flutter, iOS, web) from this file,
