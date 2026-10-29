@@ -17,7 +17,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/search · machi
 | `search-04` | Stocks · no matching watchlist | [4912:13587](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13587) | `stocks-01`, `search-18` | Same results without the watchlist group. |
 | `search-05` | Stocks · nothing found | [4912:13703](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13703) | `stocks-01` | L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field. |
 | `search-25` | F&O · search from home | [4912:13728](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728) | `fno-01`, `search-26` | From F&O home; Back returns there. |
-| `search-28` | F&O · “Gold” results (illiquid) | — | `fno-01`, `search-26` | Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”. |
+| `search-28` | F&O · “Gold” results (illiquid) | — | `fno-01`, `search-26` | Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”. Tapping a row opens the contract’s asset page (fno-21); an illiquid one opens the ILLIQUID asset page (fno-22). |
 | `search-26` | F&O home · all Smart Options | [4912:13925](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13925) | `fno-01` |  |
 | `search-27` | F&O home · all Smart Futures | [4912:14019](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-14019) | `fno-01` | Uses the existing combined Smart Options & Futures stock list. |
 | `search-06` | F&O · before typing | [4912:13728](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728) | `stocks-01`, `search-09` | Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows). |
@@ -179,6 +179,7 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 
 - **search-28** — typing “Gold” on the F&O tab (live app reference): MCX gold options, each with the gold artwork (32, kept at its size in the small row via `data-avatar`). Commodity results that are illiquid (`SearchResult.illiquid`; GOLD 135000 Put, GOLD 150000 Call) carry the **ILLIQUID** tag after the name (L3 Tag error · secondary · sm, block icon) — ListCell `labelSuffix`.
 - Tapping the tag (its own tap target inside the row) opens **“What does illiquidity mean?”** — the shared `src/shared/ui/IlliquidSheet` with this flow's words (`illiquid.*` in copy.json): small header, three icon points, Got it. Same sheet as the F&O flow.
+- Tapping a commodity result row (any Search screen) opens its asset page in F&O (`fno-21`); an illiquid one opens the ILLIQUID asset page (`fno-22`: tag, Buy / Sell and ScalpPro greyed out). Other results have no page yet.
 - Product rule: illiquid applies to commodity contracts only; equity / index contracts never carry the tag.
 
 ### Changelog
@@ -1034,9 +1035,9 @@ export const fewWatchlists = allWatchlists.slice(0, 4)
 import { Aerobar } from '@l3/components/Aerobar'
 import { Icon } from '@l3/components/Icon'
 import { msCheck } from '@l3/icons/material'
-import type { Flow } from '../types'
+import type { Flow, Go } from '../types'
 import { t } from './copy'
-import { allWatchlists, bank, bankNoWatchlist, energy, fewWatchlists, nothing, penny } from './data'
+import { allWatchlists, bank, bankNoWatchlist, energy, fewWatchlists, nothing, penny, type SearchResult } from './data'
 import { Search } from './screens/Search'
 import { Signals } from './screens/Signals'
 import { AddToWatchlistSheet, CreateWatchlistSheet } from './sheets/WatchlistSheets'
@@ -1049,6 +1050,12 @@ const savedAfter = ['BANKBARODA', 'HDFCBANK']
  * and adding a result to a watchlist. Figma: "Search → 🌙 Dark" (4912:12950) in the dev handoff file — final D2
  * layouts, rebuilt with L3 components and tokens without changing the layout.
  */
+/**
+ * Tapping a result: commodity contracts (they carry artwork) open their asset page in F&O — fno-21, or the ILLIQUID
+ * asset page fno-22. Other results have no page in this prototype yet.
+ */
+const openResult = (go: Go) => (item: SearchResult) => { if (item.image) go(item.illiquid ? 'fno-22' : 'fno-21') }
+
 export const search: Flow = {
   id: 'search',
   title: 'Search',
@@ -1063,38 +1070,38 @@ export const search: Flow = {
   ],
   screens: [
     // ---- Stocks
-    { id: 'search-01', section: 'stocks', name: 'Stocks · before typing', figma: '4912:13308', note: 'From the search field on Stocks home. Recent (last 5) and popular searches as chips, max 200 wide. Type to search; the tabs switch in place.', render: (go) => <Search tab="stocks" onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
-    { id: 'search-24', section: 'stocks', name: 'Stocks · before typing (from Market)', figma: '4912:13308', note: 'Opened from the Search action on the Market tab: the same screen as search-01, but back returns to Market.', render: (go) => <Search tab="stocks" onBack={() => go('market-01')} onBookmark={() => go('search-18')} /> },
-    { id: 'search-02', section: 'stocks', name: 'Stocks · results', figma: '4912:13483', note: '"Bank": 2 matching watchlists, then 8 stocks. A bookmark opens Add to watchlist; ✕ clears.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
-    { id: 'search-03', section: 'stocks', name: 'Stocks · only a watchlist matches', figma: '4912:13671', note: '"Penny": the watchlist, and "Stocks (0)" with nothing under it.', render: (go) => <Search results={penny} onBack={() => go('stocks-01')} /> },
-    { id: 'search-04', section: 'stocks', name: 'Stocks · no matching watchlist', figma: '4912:13587', note: 'Same results without the watchlist group.', render: (go) => <Search results={bankNoWatchlist} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
-    { id: 'search-05', section: 'stocks', name: 'Stocks · nothing found', figma: '4912:13703', note: 'L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field.', render: (go) => <Search results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },
+    { id: 'search-01', section: 'stocks', name: 'Stocks · before typing', figma: '4912:13308', note: 'From the search field on Stocks home. Recent (last 5) and popular searches as chips, max 200 wide. Type to search; the tabs switch in place.', render: (go) => <Search onOpen={openResult(go)} tab="stocks" onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
+    { id: 'search-24', section: 'stocks', name: 'Stocks · before typing (from Market)', figma: '4912:13308', note: 'Opened from the Search action on the Market tab: the same screen as search-01, but back returns to Market.', render: (go) => <Search onOpen={openResult(go)} tab="stocks" onBack={() => go('market-01')} onBookmark={() => go('search-18')} /> },
+    { id: 'search-02', section: 'stocks', name: 'Stocks · results', figma: '4912:13483', note: '"Bank": 2 matching watchlists, then 8 stocks. A bookmark opens Add to watchlist; ✕ clears.', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
+    { id: 'search-03', section: 'stocks', name: 'Stocks · only a watchlist matches', figma: '4912:13671', note: '"Penny": the watchlist, and "Stocks (0)" with nothing under it.', render: (go) => <Search onOpen={openResult(go)} results={penny} onBack={() => go('stocks-01')} /> },
+    { id: 'search-04', section: 'stocks', name: 'Stocks · no matching watchlist', figma: '4912:13587', note: 'Same results without the watchlist group.', render: (go) => <Search onOpen={openResult(go)} results={bankNoWatchlist} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} /> },
+    { id: 'search-05', section: 'stocks', name: 'Stocks · nothing found', figma: '4912:13703', note: 'L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field.', render: (go) => <Search onOpen={openResult(go)} results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },
     // ---- F&O
-    { id: 'search-25', section: 'fno', name: 'F&O · search from home', figma: '4912:13728', note: 'From F&O home; Back returns there.', render: (go) => <Search tab="fno" onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
-    { id: 'search-28', section: 'fno', name: 'F&O · “Gold” results (illiquid)', figma: '', note: 'Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”.', render: (go) => <Search tab="fno" query="Gold" keyboard={false} onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
+    { id: 'search-25', section: 'fno', name: 'F&O · search from home', figma: '4912:13728', note: 'From F&O home; Back returns there.', render: (go) => <Search onOpen={openResult(go)} tab="fno" onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
+    { id: 'search-28', section: 'fno', name: 'F&O · “Gold” results (illiquid)', figma: '', note: 'Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”. Tapping a row opens the contract’s asset page (fno-21); an illiquid one opens the ILLIQUID asset page (fno-22).', render: (go) => <Search onOpen={openResult(go)} tab="fno" query="Gold" keyboard={false} onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
     { id: 'search-26', section: 'fno', name: 'F&O home · all Smart Options', figma: '4912:13925', render: (go) => <Signals scope="indices" onBack={() => go('fno-01')} /> },
     { id: 'search-27', section: 'fno', name: 'F&O home · all Smart Futures', figma: '4912:14019', note: 'Uses the existing combined Smart Options & Futures stock list.', render: (go) => <Signals scope="stocks" onBack={() => go('fno-01')} /> },
-    { id: 'search-06', section: 'fno', name: 'F&O · before typing', figma: '4912:13728', note: 'Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows).', render: (go) => <Search tab="fno" onBack={() => go('stocks-01')} onSignals={() => go('search-09')} /> },
-    { id: 'search-07', section: 'fno', name: 'F&O · results', figma: '4912:14199', note: '"Bank": watchlists (no count on this tab), then the contracts.', render: (go) => <Search tab="fno" results={bank} onBack={() => go('stocks-01')} /> },
-    { id: 'search-08', section: 'fno', name: 'F&O · nothing found', figma: '4912:13902', render: (go) => <Search tab="fno" results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },
+    { id: 'search-06', section: 'fno', name: 'F&O · before typing', figma: '4912:13728', note: 'Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows).', render: (go) => <Search onOpen={openResult(go)} tab="fno" onBack={() => go('stocks-01')} onSignals={() => go('search-09')} /> },
+    { id: 'search-07', section: 'fno', name: 'F&O · results', figma: '4912:14199', note: '"Bank": watchlists (no count on this tab), then the contracts.', render: (go) => <Search onOpen={openResult(go)} tab="fno" results={bank} onBack={() => go('stocks-01')} /> },
+    { id: 'search-08', section: 'fno', name: 'F&O · nothing found', figma: '4912:13902', render: (go) => <Search onOpen={openResult(go)} tab="fno" results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },
     { id: 'search-09', section: 'fno', name: 'Smart Options & Futures · indices', figma: '4912:13925', note: 'The ↕ pill switches Indices / Stocks; pills pick the list; Price ↕ switches the sort to Volume.', render: (go) => <Signals scope="indices" onBack={() => go('search-06')} /> },
     { id: 'search-10', section: 'fno', name: 'Smart Options & Futures · stocks', figma: '4912:14019', render: (go) => <Signals scope="stocks" onBack={() => go('search-06')} /> },
     { id: 'search-11', section: 'fno', name: 'Smart Options & Futures · by volume', figma: '4912:14113', note: 'Sorted by volume: each row shows its volume instead of price + change.', render: (go) => <Signals scope="stocks" sort="volume" onBack={() => go('search-06')} /> },
     // ---- Mutual funds
-    { id: 'search-12', section: 'mf', name: 'MF · before typing', figma: '4912:13035', note: 'Recent and popular funds, then collections as tiles.', render: (go) => <Search tab="mf" onBack={() => go('stocks-01')} /> },
-    { id: 'search-13', section: 'mf', name: 'MF · results', figma: '4912:12952', note: '"Bank": watchlists, then funds with 3Y returns; the 3Y Returns ↕ switcher changes the period.', render: (go) => <Search tab="mf" results={bank} onBack={() => go('stocks-01')} /> },
-    { id: 'search-14', section: 'mf', name: 'MF · no fund matches', figma: '4912:13010', note: 'Other tabs have results ("Energy"), this one has none: the empty state on this tab only.', render: (go) => <Search tab="mf" results={energy} onBack={() => go('stocks-01')} /> },
+    { id: 'search-12', section: 'mf', name: 'MF · before typing', figma: '4912:13035', note: 'Recent and popular funds, then collections as tiles.', render: (go) => <Search onOpen={openResult(go)} tab="mf" onBack={() => go('stocks-01')} /> },
+    { id: 'search-13', section: 'mf', name: 'MF · results', figma: '4912:12952', note: '"Bank": watchlists, then funds with 3Y returns; the 3Y Returns ↕ switcher changes the period.', render: (go) => <Search onOpen={openResult(go)} tab="mf" results={bank} onBack={() => go('stocks-01')} /> },
+    { id: 'search-14', section: 'mf', name: 'MF · no fund matches', figma: '4912:13010', note: 'Other tabs have results ("Energy"), this one has none: the empty state on this tab only.', render: (go) => <Search onOpen={openResult(go)} tab="mf" results={energy} onBack={() => go('stocks-01')} /> },
     // ---- IPO
-    { id: 'search-15', section: 'ipo', name: 'IPO · before typing', figma: '4912:13116', note: 'Recent and popular IPOs, then Most Subscribed and Upcoming IPOs (View All each).', render: (go) => <Search tab="ipo" onBack={() => go('stocks-01')} /> },
-    { id: 'search-16', section: 'ipo', name: 'IPO · results', figma: '4912:13240', note: '"Energy": 2 IPOs with their price bands.', render: (go) => <Search tab="ipo" results={energy} onBack={() => go('stocks-01')} /> },
-    { id: 'search-17', section: 'ipo', name: 'IPO · nothing found', figma: '4912:13274', render: (go) => <Search tab="ipo" results={nothing('Adsf')} onBack={() => go('stocks-01')} /> },
+    { id: 'search-15', section: 'ipo', name: 'IPO · before typing', figma: '4912:13116', note: 'Recent and popular IPOs, then Most Subscribed and Upcoming IPOs (View All each).', render: (go) => <Search onOpen={openResult(go)} tab="ipo" onBack={() => go('stocks-01')} /> },
+    { id: 'search-16', section: 'ipo', name: 'IPO · results', figma: '4912:13240', note: '"Energy": 2 IPOs with their price bands.', render: (go) => <Search onOpen={openResult(go)} tab="ipo" results={energy} onBack={() => go('stocks-01')} /> },
+    { id: 'search-17', section: 'ipo', name: 'IPO · nothing found', figma: '4912:13274', render: (go) => <Search onOpen={openResult(go)} tab="ipo" results={nothing('Adsf')} onBack={() => go('stocks-01')} /> },
     // ---- Add to watchlist (from a result's bookmark on search-02)
-    { id: 'search-18', section: 'watchlist', name: 'Add to watchlist', figma: '4912:14274', note: 'From HDFC Bank’s bookmark. Nothing ticked yet: Save is off. The keyboard goes down while the sheet is open.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={allWatchlists} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
-    { id: 'search-19', section: 'watchlist', name: 'Add to watchlist · 2 ticked', figma: '4912:14811', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={allWatchlists} checked={['Momentum Plays', 'Banking Giants']} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
-    { id: 'search-20', section: 'watchlist', name: 'Added · toast', figma: '4912:15015', note: 'Floating L3 toast with OK; it leaves on its own (L3 timing: 6 s with an action — Figma says 2 s).', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} toast={<Aerobar floating emphasis="primary" icon={<Icon icon={msCheck} />} heading={t('toast.added')} action={{ label: t('toast.ok'), onClick: () => go('search-21') }} onDismiss={() => go('search-21')} />} /> },
-    { id: 'search-21', section: 'watchlist', name: 'Added · bookmark filled', figma: '4912:15123', note: 'HDFC Bank’s bookmark is now filled with a tick.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} /> },
-    { id: 'search-22', section: 'watchlist', name: 'Create watchlist', figma: '4912:14650', note: 'From "+ Create" (or the first time, when there’s no watchlist yet). The keyboard sits under the dock.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<CreateWatchlistSheet name="Banking" onCreate={() => go('search-20')} onClose={() => go('search-18')} />} /> },
-    { id: 'search-23', section: 'watchlist', name: 'Add to watchlist · few lists', figma: '4912:14477', note: 'Someone with 4 watchlists: the sheet is only as tall as its rows.', render: (go) => <Search results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={fewWatchlists} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
+    { id: 'search-18', section: 'watchlist', name: 'Add to watchlist', figma: '4912:14274', note: 'From HDFC Bank’s bookmark. Nothing ticked yet: Save is off. The keyboard goes down while the sheet is open.', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={allWatchlists} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
+    { id: 'search-19', section: 'watchlist', name: 'Add to watchlist · 2 ticked', figma: '4912:14811', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={allWatchlists} checked={['Momentum Plays', 'Banking Giants']} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
+    { id: 'search-20', section: 'watchlist', name: 'Added · toast', figma: '4912:15015', note: 'Floating L3 toast with OK; it leaves on its own (L3 timing: 6 s with an action — Figma says 2 s).', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} toast={<Aerobar floating emphasis="primary" icon={<Icon icon={msCheck} />} heading={t('toast.added')} action={{ label: t('toast.ok'), onClick: () => go('search-21') }} onDismiss={() => go('search-21')} />} /> },
+    { id: 'search-21', section: 'watchlist', name: 'Added · bookmark filled', figma: '4912:15123', note: 'HDFC Bank’s bookmark is now filled with a tick.', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} saved={savedAfter} /> },
+    { id: 'search-22', section: 'watchlist', name: 'Create watchlist', figma: '4912:14650', note: 'From "+ Create" (or the first time, when there’s no watchlist yet). The keyboard sits under the dock.', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<CreateWatchlistSheet name="Banking" onCreate={() => go('search-20')} onClose={() => go('search-18')} />} /> },
+    { id: 'search-23', section: 'watchlist', name: 'Add to watchlist · few lists', figma: '4912:14477', note: 'Someone with 4 watchlists: the sheet is only as tall as its rows.', render: (go) => <Search onOpen={openResult(go)} results={bank} onBack={() => go('stocks-01')} onBookmark={() => go('search-18')} keyboard={false} sheet={<AddToWatchlistSheet lists={fewWatchlists} onSave={() => go('search-20')} onCreate={() => go('search-22')} onClose={() => go('search-02')} />} /> },
   ],
 }
 ```
@@ -1168,6 +1175,8 @@ type SearchProps = {
   onBookmark?: (item: SearchResult) => void
   /** F&O: a Smart Options & Futures tile (or View All) opens its signals list. */
   onSignals?: (category: string) => void
+  /** A result row opens its page (commodity contracts → the asset page; illiquid → the ILLIQUID asset page). */
+  onOpen?: (item: SearchResult) => void
 }
 
 /**
@@ -1177,7 +1186,7 @@ type SearchProps = {
  * lists. After typing: the matching watchlists, then the results (with a bookmark each). No match on a tab: the L3
  * empty state with "Clear Search". The phone keyboard stays up while searching.
  */
-export function Search({ tab: initialTab = 'stocks', query: initialQuery, results, saved, keyboard = true, sheet, toast, onBack, onBookmark, onSignals }: SearchProps) {
+export function Search({ tab: initialTab = 'stocks', query: initialQuery, results, saved, keyboard = true, sheet, toast, onBack, onBookmark, onSignals, onOpen }: SearchProps) {
   const { interactive } = usePreview()
   const startQuery = initialQuery ?? results?.query ?? ''
   const [tab, setTab] = useState<SearchTab>(initialTab)
@@ -1207,7 +1216,7 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
       {!shown ? (
         <BeforeTyping tab={tab} onSignals={onSignals} />
       ) : shown.tabs[tab] ? (
-        <Results tab={tab} results={shown} saved={saved} onBookmark={onBookmark} onIlliquid={setIlliquid} />
+        <Results tab={tab} results={shown} saved={saved} onBookmark={onBookmark} onIlliquid={setIlliquid} onOpen={onOpen} />
       ) : (
         <Stack direction="horizontal" className={styles.fill}>
           <EmptyState
@@ -1251,7 +1260,7 @@ function BeforeTyping({ tab, onSignals }: { tab: SearchTab; onSignals?: (categor
 }
 
 /** Something typed and this tab has matches (watchlists, items, or both). */
-function Results({ tab, results, saved, onBookmark, onIlliquid }: { tab: SearchTab; results: SearchResults; saved?: string[]; onBookmark?: (item: SearchResult) => void; onIlliquid?: (item: SearchResult) => void }) {
+function Results({ tab, results, saved, onBookmark, onIlliquid, onOpen }: { tab: SearchTab; results: SearchResults; saved?: string[]; onBookmark?: (item: SearchResult) => void; onIlliquid?: (item: SearchResult) => void; onOpen?: (item: SearchResult) => void }) {
   const { watchlists, listTitle, items } = results.tabs[tab]!
   return (
     <Section paddingBlock="16" gap="24">
@@ -1261,7 +1270,7 @@ function Results({ tab, results, saved, onBookmark, onIlliquid }: { tab: SearchT
           title={t('results.title', { list: listTitle, count: items.length })}
           action={tab === 'mf' && items.length > 0 ? <Select size="sm" icon="swap" aria-label={t('results.returnsPeriod')} onClick={() => {}}>{t('results.returns3y')}</Select> : undefined}
         />
-        <ResultList items={items} label={listTitle} saved={saved} onBookmark={onBookmark} onIlliquid={onIlliquid} />
+        <ResultList items={items} label={listTitle} saved={saved} onBookmark={onBookmark} onIlliquid={onIlliquid} onOpen={onOpen} />
       </Stack>
     </Section>
   )

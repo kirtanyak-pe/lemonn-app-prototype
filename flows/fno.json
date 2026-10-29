@@ -208,7 +208,6 @@
       "figma": "6754:61613",
       "note": "A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later.",
       "goesTo": [
-        "fno-18",
         "fno-17",
         "fno-05"
       ],
