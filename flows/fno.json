@@ -116,7 +116,7 @@
       "note": "From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.",
       "goesTo": [
         "fno-08",
-        "search-26"
+        "fno-17"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65113"
     },
@@ -127,7 +127,7 @@
       "note": "Sorted by volume: each option shows its traded volume, no change.",
       "goesTo": [
         "fno-08",
-        "search-26"
+        "fno-17"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65288"
     },
@@ -138,7 +138,7 @@
       "note": "Sorted by margin per lot: each option shows the margin for one lot, no change.",
       "goesTo": [
         "fno-08",
-        "search-26"
+        "fno-17"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65444"
     },
@@ -157,6 +157,46 @@
       "note": "The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying.",
       "goesTo": [],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64607"
+    },
+    {
+      "id": "fno-17",
+      "name": "Option chain",
+      "figma": "11630:16785",
+      "note": "From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16785"
+    },
+    {
+      "id": "fno-18",
+      "name": "Option chain · Buy selected",
+      "figma": "11630:16184",
+      "note": "A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16184"
+    },
+    {
+      "id": "fno-19",
+      "name": "Option chain · Sell selected",
+      "figma": "11695:26269",
+      "note": "The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11695-26269"
+    },
+    {
+      "id": "fno-20",
+      "name": "Option chain · illiquid contract",
+      "figma": "",
+      "note": "Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": ""
     }
   ],
   "files": [
@@ -204,6 +244,13 @@
     "src/flows/fno/copy.ts",
     "src/flows/fno/data.ts",
     "src/flows/fno/index.tsx",
+    "src/flows/fno/option-chain/components/OrderDock.module.css",
+    "src/flows/fno/option-chain/components/OrderDock.tsx",
+    "src/flows/fno/option-chain/data.ts",
+    "src/flows/fno/option-chain/screens/OptionChain.module.css",
+    "src/flows/fno/option-chain/screens/OptionChain.tsx",
+    "src/flows/fno/option-chain/sheets/IlliquidSheet.module.css",
+    "src/flows/fno/option-chain/sheets/IlliquidSheet.tsx",
     "src/flows/fno/screens/Home.tsx",
     "src/flows/fno/screens/Scalper.module.css",
     "src/flows/fno/screens/Scalper.tsx",
