@@ -210,6 +210,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-29 — **V9 square cards, made state:** the count is the title and the green line says what happened — Ai rules: “2 rules triggered” over “3 rules active” (none triggered: “None triggered today”); Ai indicators: “1 on a chart” over “2 indicators saved”; Ai strategies keep their name. Every card: icon top left, › top right (no longer after the title). Not-made “Create Ai …” cards unchanged and still first.
 - 2026-10-29 — **DASH V9 · Greeting + square cards** (`screens/HomeV9.tsx`, one home for new and returning users): DASH orb and a time-of-day greeting (Good morning / afternoon / evening, {name}) + “How can I help you trade today?” at the top left; above a plain field, a sideways row of square white cards — Ai rules · Ai indicators · Ai strategies. Not made: “Create Ai rules ›” — tap puts “Build an Ai rule that ” in the field with the keyboard up. Made: a small green line (2 triggered today / 1 on a chart) over “Ai rules ›” — tap opens history on that tab. Send: the opening words (or chart words) pick the chat. Not-made cards come first, with an edge in DASH's light (teal → green → yellow); made ones move to the back. The glow rises behind the cards (`glowRise: 'cards'`). Field: V7's edge-to-edge dock with the Rule · Indicator · Strategy pills; a Create card also picks its pill. Cards are 80% glass (blur). Typing the first message (home or an empty chat): the header (orb + greeting) fades away and the white wash covers the top while DASH's glow climbs up from the bottom behind the field and the cards (`firstMessageWash: 'rise'`); no field edge or suggestions.
 - 2026-10-29 — **DASH V8 · First message focus.** Only while the FIRST message of a chat is typed (a home, or an empty chat): a white wash over DASH's background and the content (intro / home sections stay, washed out), the field gets an edge in DASH's teal → green → yellow, and DASH's glow climbs up from the bottom behind the field and the suggestions (the wash clears towards the bottom; no halo behind the field), and 4 suggestions stack above it (`components/FirstAsk`, copy `firstAsk.<home|rule|indicator|strategy>.1–4`; a tap puts the text in the field). Later messages type as usual, the conversation in view. V3 Pills above: the pills are now the field's top row with the + beside them. V7 dock: see-through (80% white), pills track and + on surface/primary, glow raised.
 - 2026-10-29 — **DASH versions.** One dropdown setting **DASH version** = the whole home experience (homes + chat input style), list in `components/dashVersion.ts` + `screens/homes.tsx`: V1 Previous field · V2 Pills (default) · V3 Pills above · V4 Dropdown field · V5 a section per kind (was Returning home V3) · V6 one home with Create cards (was DASH home V4) · V7 edge-to-edge dock (Gemini-like: the field runs edge to edge, rounded top, text on top, pills · + · Send under it). Separate settings **User** (New / Returning) and **Made so far** (Rules / Indicators / Both): every version adapts to them (`useDashUser`) — a made kind shows its cards, the others are promoted (V6: no Create rule card once a rule exists). Replaces the settings DASH home, Returning home, Chat input, Made so far (V3) and Home cards. Settings panel: options can be a dropdown (`picker: 'dropdown'`).
@@ -7893,8 +7894,13 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home9.start.rule": "Build an Ai rule that ",
   "home9.start.indicator": "Build an Ai indicator that ",
   "home9.start.strategy": "Build an Ai strategy that ",
-  "home9.stat.triggered": "{count} triggered today",
-  "home9.stat.active": "{count} active",
+  "home9.stat.rulesTriggered.one": "1 rule triggered",
+  "home9.stat.rulesTriggered.other": "{count} rules triggered",
+  "home9.stat.noneTriggered": "None triggered today",
+  "home9.made.rule.one": "1 rule active",
+  "home9.made.rule.other": "{count} rules active",
+  "home9.made.indicator.one": "1 indicator saved",
+  "home9.made.indicator.other": "{count} indicators saved",
   "home9.stat.onChart": "{count} on a chart",
   "home9.placeholder": "Ask DASH anything"
 }
@@ -9612,16 +9618,16 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
   font: var(--l3-text-label-12);
 }
 
-/* The name wraps as text; the › follows its last word. */
+/* The title: "Create Ai rules" or the count ("3 rules active"); it wraps as text. */
 .name {
   color: var(--l3-content-primary);
   font: var(--l3-text-heading-14);
 }
 
-.name > :last-child {
+/* The › sits opposite the icon, top right. */
+.chevron {
   display: inline-flex;
-  margin-left: var(--l3-spacing-02);
-  vertical-align: middle;
+  color: var(--l3-content-secondary);
 }
 
 @keyframes v9-in {
@@ -9679,7 +9685,9 @@ const KINDS: { kind: CreationKind; icon: typeof msRule }[] = [
  * DASH V9 home (new and returning users alike; Synora-like): the DASH orb and the greeting at the top left, a row of
  * square white cards just above a plain chat field — one per kind (Ai rules · Ai indicators · Ai strategies).
  * - Not made yet: "Create Ai rules ›" — tap: the field opens with "Build an Ai rule that " typed, to carry on.
- * - Made: a small green line (2 triggered today / 1 on a chart) over "Ai rules ›" — tap: history on that tab.
+ * - Made: a small green line (2 rules triggered / 1 on a chart) over the count as the title (3 rules active /
+ *   2 indicators saved) — tap: history on that tab.
+ * Every card: the icon at the top left, the › at the top right (the whole card is the tap target).
  */
 export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   const kb = useHomeKeyboard({ typing, onTyping })
@@ -9688,9 +9696,24 @@ export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrat
   const stat = (kind: CreationKind) => {
     if (kind === 'rule') {
       const triggered = dashRules.filter((r) => homeTriggers[r.id]).length
-      return triggered ? t('home9.stat.triggered', { count: triggered }) : t('home9.stat.active', { count: dashRules.filter((r) => r.on).length })
+      if (!triggered) return t('home9.stat.noneTriggered')
+      return t(triggered === 1 ? 'home9.stat.rulesTriggered.one' : 'home9.stat.rulesTriggered.other', { count: triggered })
     }
     return t('home9.stat.onChart', { count: savedIndicators.filter((x) => x.on).length })
+  }
+
+  // Made: the count is the title (3 rules active · 2 indicators saved); strategies keep their name.
+  const title = (kind: CreationKind) => {
+    if (!made[kind]) return t(`home9.create.${kind}`)
+    if (kind === 'rule') {
+      const active = dashRules.filter((r) => r.on).length
+      return t(active === 1 ? 'home9.made.rule.one' : 'home9.made.rule.other', { count: active })
+    }
+    if (kind === 'indicator') {
+      const saved = savedIndicators.length
+      return t(saved === 1 ? 'home9.made.indicator.one' : 'home9.made.indicator.other', { count: saved })
+    }
+    return t('home9.name.strategy')
   }
 
   const open = (kind: CreationKind) => {
@@ -9738,13 +9761,13 @@ export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrat
             {/* Not made yet first (the invite leads); what they've made moves to the back. Stable within each group. */}
             {[...KINDS].sort((a, b) => Number(made[a.kind]) - Number(made[b.kind])).map(({ kind, icon }) => (
               <button key={kind} type="button" role="listitem" className={styles.card} data-create={!made[kind] || undefined} onClick={() => open(kind)}>
-                <span className={styles.icon}><Icon icon={icon} size={20} /></span>
+                <Stack direction="horizontal" align="center" justify="between">
+                  <span className={styles.icon}><Icon icon={icon} size={20} /></span>
+                  <span className={styles.chevron}><Icon icon={msChevronRight} size={20} /></span>
+                </Stack>
                 <span className={styles.foot}>
                   {made[kind] && <span className={styles.stat}>{stat(kind)}</span>}
-                  <span className={styles.name}>
-                    {t(made[kind] ? `home9.name.${kind}` : `home9.create.${kind}`)}
-                    <Icon icon={msChevronRight} size={16} />
-                  </span>
+                  <span className={styles.name}>{title(kind)}</span>
                 </span>
               </button>
             ))}
