@@ -76,6 +76,87 @@
         "dash-20"
       ],
       "figmaUrl": ""
+    },
+    {
+      "id": "fno-08",
+      "name": "Commodities home",
+      "figma": "6754:63637",
+      "note": "The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. Shortcut buttons are L3 Tertiary Large (48) round buttons; Figma draws 52.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637"
+    },
+    {
+      "id": "fno-09",
+      "name": "Commodities · heatmap & Smart Futures",
+      "figma": "6754:63637",
+      "note": "The same long screen, scrolled to the Futures Heatmap.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637"
+    },
+    {
+      "id": "fno-10",
+      "name": "Contract picker · Commodities",
+      "figma": "6754:65111",
+      "note": "From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65111"
+    },
+    {
+      "id": "fno-11",
+      "name": "Contract picker · Equity",
+      "figma": "6754:65054",
+      "note": "The same sheet on its Equity tab: the 8 index contracts.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65054"
+    },
+    {
+      "id": "fno-12",
+      "name": "Gold Summary · by price",
+      "figma": "6754:65113",
+      "note": "From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.",
+      "goesTo": [
+        "fno-08",
+        "search-26"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65113"
+    },
+    {
+      "id": "fno-13",
+      "name": "Gold Summary · by volume",
+      "figma": "6754:65288",
+      "note": "Sorted by volume: each option shows its traded volume, no change.",
+      "goesTo": [
+        "fno-08",
+        "search-26"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65288"
+    },
+    {
+      "id": "fno-14",
+      "name": "Gold Summary · margin per lot",
+      "figma": "6754:65444",
+      "note": "Sorted by margin per lot: each option shows the margin for one lot, no change.",
+      "goesTo": [
+        "fno-08",
+        "search-26"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65444"
+    },
+    {
+      "id": "fno-15",
+      "name": "Strategies · Equity",
+      "figma": "6754:64178",
+      "note": "The Strategies product tab with Equity selected in the pill group: shortcuts, Zing Trades, Smart Invest, Pre-build Strategies (Nifty 50 ⇕, Bullish / Bearish / Neutral / Volatile), Quick Trade. Card footer buttons stay Small (32) as in Figma.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64178"
+    },
+    {
+      "id": "fno-16",
+      "name": "Strategies · Commodities",
+      "figma": "6754:64607",
+      "note": "The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying.",
+      "goesTo": [],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64607"
     }
   ],
   "files": [
@@ -91,6 +172,23 @@
     "src/flows/fno/assets/trade-calls.svg",
     "src/flows/fno/assets/watchlist.svg",
     "src/flows/fno/assets/zing.svg",
+    "src/flows/fno/commodities/assets/crude-oil.png",
+    "src/flows/fno/commodities/assets/gold-default.png",
+    "src/flows/fno/commodities/assets/gold-guinea.png",
+    "src/flows/fno/commodities/assets/gold-mini.png",
+    "src/flows/fno/commodities/assets/gold-petal.png",
+    "src/flows/fno/commodities/assets/gold-ten.png",
+    "src/flows/fno/commodities/assets/gold.png",
+    "src/flows/fno/commodities/assets/natural-gas.png",
+    "src/flows/fno/commodities/assets/silver.png",
+    "src/flows/fno/commodities/components/Commodities.module.css",
+    "src/flows/fno/commodities/components/CommoditiesFeed.tsx",
+    "src/flows/fno/commodities/components/CommodityHeatmap.tsx",
+    "src/flows/fno/commodities/components/CommodityShortcuts.tsx",
+    "src/flows/fno/commodities/components/PopularCommodities.tsx",
+    "src/flows/fno/commodities/data.ts",
+    "src/flows/fno/commodities/screens/LotSummary.tsx",
+    "src/flows/fno/commodities/sheets/ContractPickerSheet.tsx",
     "src/flows/fno/components/ContractSection.tsx",
     "src/flows/fno/components/Discovery.tsx",
     "src/flows/fno/components/FnoNav.tsx",
@@ -112,7 +210,10 @@
     "src/flows/fno/sheets/ChartToolsSheet.module.css",
     "src/flows/fno/sheets/ChartToolsSheet.tsx",
     "src/flows/fno/sheets/HomeSheets.tsx",
-    "src/flows/fno/sheets/IndicatorDetailsSheet.tsx"
+    "src/flows/fno/sheets/IndicatorDetailsSheet.tsx",
+    "src/flows/fno/strategies/components/Strategies.module.css",
+    "src/flows/fno/strategies/components/StrategiesFeed.tsx",
+    "src/flows/fno/strategies/data.ts"
   ],
   "shared": [
     "src/shared/copy.ts",

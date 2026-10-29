@@ -17,11 +17,20 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-05` | Scalper | — | `fno-01`, `dash-20` | From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators. |
 | `fno-06` | Scalper · DASH indicator | — | `fno-01`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list. |
 | `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles. |
+| `fno-08` | Commodities home | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. Shortcut buttons are L3 Tertiary Large (48) round buttons; Figma draws 52. |
+| `fno-09` | Commodities · heatmap & Smart Futures | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The same long screen, scrolled to the Futures Heatmap. |
+| `fno-10` | Contract picker · Commodities | [6754:65111](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65111) | — | From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet. |
+| `fno-11` | Contract picker · Equity | [6754:65054](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65054) | — | The same sheet on its Equity tab: the 8 index contracts. |
+| `fno-12` | Gold Summary · by price | [6754:65113](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65113) | `fno-08`, `search-26` | From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot. |
+| `fno-13` | Gold Summary · by volume | [6754:65288](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65288) | `fno-08`, `search-26` | Sorted by volume: each option shows its traded volume, no change. |
+| `fno-14` | Gold Summary · margin per lot | [6754:65444](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65444) | `fno-08`, `search-26` | Sorted by margin per lot: each option shows the margin for one lot, no change. |
+| `fno-15` | Strategies · Equity | [6754:64178](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64178) | — | The Strategies product tab with Equity selected in the pill group: shortcuts, Zing Trades, Smart Invest, Pre-build Strategies (Nifty 50 ⇕, Bullish / Bearish / Neutral / Volatile), Quick Trade. Card footer buttons stay Small (32) as in Figma. |
+| `fno-16` | Strategies · Commodities | [6754:64607](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64607) | — | The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying. |
 
 ## Spec (README.md)
 
 
-The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → Equity](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100).
+The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → Equity](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) and the [F&O Home section](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63073) (Commodities, asset selection, lot selection, Strategies — drawn in the old D2 system, rebuilt in L3 with the same look).
 
 - **Local prototype:** `http://127.0.0.1:5202/#/fno-01`; board: `#/fno`
 - **Status:** implemented · 2026-10-26
@@ -38,6 +47,15 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-05 | Scalper | Screenshot supplied 2026-10-26 |
 | fno-06 | Scalper, with DASH indicator sheet open | — |
 | fno-07 | Scalper, with the saved indicator applied | — |
+| fno-08 | Commodities home | 6754:63637 |
+| fno-09 | Commodities home, at Futures Heatmap | 6754:63637 |
+| fno-10 | Contract picker sheet, Commodities tab | 6754:65111 |
+| fno-11 | Contract picker sheet, Equity tab | 6754:65054 |
+| fno-12 | Gold Summary (lot selection), by price | 6754:65113 |
+| fno-13 | Gold Summary, by volume | 6754:65288 |
+| fno-14 | Gold Summary, margin per lot | 6754:65444 |
+| fno-15 | Strategies · Equity | 6754:64178 |
+| fno-16 | Strategies · Commodities | 6754:64607 |
 
 ### Structure
 
@@ -46,13 +64,16 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 - `sheets/HomeSheets.tsx`: single-choice sheet, create watchlist, contract details and unavailable-destination sheet.
 - `data.ts`: typed snapshot contracts, indices, watchlists, chart series and heatmap cells.
 - `copy.json` / `copy.ts`: translatable UI copy. Market names and values live in data.
+- `commodities/` — the Commodities product tab and its pages: `components/CommoditiesFeed` (the tab's sections in order), `CommodityShortcuts`, `PopularCommodities`, `CommodityHeatmap`; `sheets/ContractPickerSheet` (“Choose options contract”); `screens/LotSummary` (Gold Summary); `data.ts` (commodities, contracts, heatmap groups, picker groups, gold lots — the API contract for this tab); `assets/` (commodity artwork exported from Figma, resized to 2× / 3×).
+- `strategies/` — the Strategies product tab: `components/StrategiesFeed` (pill group, Zing Trades, Smart Invest, Pre-build Strategies, Quick Trade cards); `data.ts`.
+- `screens/Home.tsx` renders the shared header, P&L, indices and product tabs once, and the selected tab's feed under them (`product` prop). Equity, Commodities and Strategies reuse the same sections where Figma does (watchlists, chart, contract cards, sheets).
 - `assets`: exported Figma artwork for Zing, product tabs, shortcuts and chart actions. Monochrome paths use L3 MaskIcon; detailed shortcut artwork keeps its original SVG with inversion in dark mode.
 
 ### Navigation and behaviour
 
 Main F&O → fno-01. Home → stocks-01. Search → search-25 (F&O selected, Back → fno-01). ScalpPro and the Scalper tab → fno-05; Back → fno-01.
 Profile → profile-01; Wallet → deposit-01; DASH → dash-02. These shared flows retain their existing return behaviour.
-The other F&O navbar items and Commodities / Strategies open a sheet explaining that those destinations are outside this prototype; they do not switch the selected Equity tab.
+The other F&O navbar items open a sheet explaining that those destinations are outside this prototype; they do not switch the selected Equity tab.
 
 - Total / Day P&L switches the displayed example.
 - Index selector uses a sheet of Radio rows. Chart metric tabs update the example series.
@@ -83,6 +104,27 @@ The other F&O navbar items and Commodities / Strategies open a sheet explaining 
   indicator listed. Picking one closes the sheet and applies it (fno-07): its name under the spot quote and two
   illustrative moving-average lines (EMA 9 / 21 of the sample candles) on the spot chart.
 
+#### Commodities (fno-08 … 14)
+
+- Product tabs: Equity → fno-01, Commodities → fno-08, Strategies → fno-15 (each tab is its own screen; switching opens the tab at its top).
+- **Shortcuts** Gold · Silver · Crude Oil · Natural Gas (artwork, name, day change in up / down colour) → Gold Summary (fno-12).
+- **Chart**: same as Equity, the instrument selector reads “Gold ⇕” and opens the contract picker (fno-10). Picking a contract renames the chart and closes the sheet.
+- **Contract picker** (`ContractPickerSheet`): header “Choose options contract”, underline tabs Equity (8) / Commodities (7) in its bottom slot; on Commodities, pill chips All / Gold / Silver / Crude Oil / Natural Gas / Copper / Aluminium / Zinc filter the groups. Rows: ListCell Small with artwork, name, price + change, a “Lowest Margin” discover Tag where it applies, Radio. The selected row is highlighted (ListCell `selected`).
+- **Watchlist** — same as Equity.
+- **Popular commodities**: Options ⇕ Futures switch (secondary pill), divider, pills Top traded / Top gainers / Top Losers / Advanced declined, Filter (sheet) and By Price ⇕ By Volume. Option card: name + type | expiry left, price + change right. Future card: price and change on one line, “Margin / lot : …” under it. Options shows the frame's own rows (three calls and one future).
+- **Futures Heatmap**: Bullion / Energy / Metals pills, 3-column tiles in profit / loss surfaces; a tile opens its details.
+- **Smart Futures**: the Equity section with commodity contracts.
+- **Gold Summary** (`LotSummary`): Actionbar back (→ fno-08) + “Gold Summary”; lot tabs with artwork (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the bottom slot, scrolling sideways. Futures (View all) — two future cards. Options (View option chain → the F&O options list) — expiry month pill (October ⌄ → month sheet), divider, Top traded / Most active / OI gainers / Top gainers, Filter, sort. Sort opens a sheet: **By Price** (price + change), **By Volume** (traded volume only), **Margin per lot** (₹ per lot only) — fno-12 / 13 / 14 open on each. Filter Puts shows the empty state (the sample has calls only).
+
+#### Strategies (fno-15, 16)
+
+- Shortcuts (as Equity), then a full-width **pill group Equity / Commodities** (fno-15 / fno-16).
+- **Zing Trades** (Explore): rail of cards — trader avatar, strategy name, “Built with DASH Ai”, today's return; divider; Last week (M T W T F dots: green = profit, grey = no trade, red = loss), Avg. trades, Win rate (trending icon); grey footer: ☆ save · Learn in 30 Secs (play ▶ ›) · Apply (primary).
+- **Smart Invest** (View all): rail of cards — logo, basket name, By lemonn, min. deposit; 7 Days P&L ⇕ 30 Days (switcher) with an eye to hide it, AUM, Slots left (🔥 80/100); grey footer: Monthly charges ₹0 ~~₹300~~, Invest now (primary). The card itself isn't tappable (it holds buttons).
+- **Pre-build Strategies** (Explore): underlying pill (Nifty 50 / GOLD ⇕ → sheet), divider, Bullish / Bearish / Neutral / Volatile; rail of cards — Probability of profit, strategy name, Funds Req, Max Profit (Unlimited or ₹) / Max Loss, payoff sketch (loss area left, profit area right).
+- **Quick Trade**: ⚡ Quick Trade · Beginner friendly; “Which way will GOLD ⌄ move?” (underlying → sheet); Up • Bullish (green outline) and Down • Bearish (red outline).
+- Destinations outside this prototype (Explore, Apply, Invest now, Learn, Up / Down) open the explanatory sheet.
+
 ### L3 components
 
 Scalper: Screen, Button (ghost, tertiary, brand, secondary), Tabs (ribbon, pill group), Stepper, BottomSheet,
@@ -103,7 +145,26 @@ live #1d1d1d).
 
 The source uses old D2 controls alongside L3; their code equivalents are L3 components rather than hand-built lookalikes, including L3 shortcut buttons. The header matches Stocks home, including its search pill, DASH entry and wallet. The profile uses the app's fictional Rohan Mehta instead of AG. The misspelled watchlist name “Specail 25” is corrected to “Special 25”. Chart candles are representative data rendered by L3 Chart; chart metrics and data are illustrative, with no market/API or order execution integration. Repeated Figma quotes, historical expiry text and the red/green JSWSTEEL pattern are preserved, including the source's inconsistent negative percentages in green cells. The source ribbon's custom green edge is replaced by the existing L3 Ribbon styling.
 
+#### Commodities & Strategies vs Figma (6754:63073)
+
+- D2 parts → L3: section titles → SectionHeader (View all / Explore), D2 pills → Tabs pill / Tab action, the asset list cards → ListCell Small inside a bordered group, D2 tabs → Tabs underline (sheet header bottom slot, Actionbar bottom slot), card buttons → Button, D2 tags → Tag, card shells → Card (footer / footerFilled for the grey strips).
+- Commodity shortcut buttons are L3 Tertiary Large (48, art 24) — Figma draws 52 circles with 32 art; same treatment as the Equity shortcuts.
+- Card footer buttons (Zing Trades, Smart Invest) and Quick Trade stay Small / Medium as in Figma, not the app's Large default — the user asked for the same UI as the frames.
+- Price changes show their sign (“+0.10%”, L3 PriceChange); Figma shows “0.10%”.
+- Figma's “Gold Gunia” tab → Gold Guinea; “1,65,4500.23” margin → 1,65,450.23; western “₹186,456” → ₹1,86,456; “ViewAll” → View all.
+- The Zing trader photo is replaced by initials (fictional trader); the Smart Invest logo by the basket's initials.
+- Equity (8) in the picker lists 8 indices (Figma draws 6). Copper, Aluminium and Zinc have no artwork yet, so their chips and rows show the name only.
+
+#### L3 gaps (Commodities & Strategies)
+
+- Commodity artwork (L3/Image/Commodities/… in Figma) isn't in the code package — exported PNGs live in `commodities/assets`; Copper / Aluminium / Zinc missing.
+- Outlined Buy / Sell buttons (Quick Trade): L3 Button has filled Buy / Sell only; the flow tints Secondary with the up / down tokens.
+- Payoff sketch on strategy cards: no L3 mini payoff chart; drawn as a small SVG on L3 tokens.
+- Weekday result dots (Zing Trades): no L3 component; 16 circles on the up / down light surfaces.
+
 ### Changelog
+
+- 2026-10-29 — Commodities tab (shortcuts, Gold chart, Popular commodities, Bullion / Energy / Metals heatmap, Smart Futures), contract picker sheet (Equity / Commodities), Gold Summary lot page (by price / by volume / margin per lot) and the Strategies tab (Equity / Commodities: Zing Trades, Smart Invest, Pre-build Strategies, Quick Trade) from Figma 6754:63073; product tabs now switch between the three.
 
 - 2026-10-27 — Chart-tools sheet states from the live app: nothing on the chart (“Indicators” · search); some on the chart (“Indicators (N)” · bin · fx with the count · search, each one a blue row with ✕, several at once — tapping toggles, the sheet stays open); search (field in the title's place, results wrap, full height). Focus guide from DASH: dimmed sheet, Your indicators lit, one-line tooltip with ✕. Scalper top as the live light screenshot: grey header band, Zing ring on Add, tools spread with Active cut at the edge, one tools button per chart, “N ▾” at the chart's top-left, reset on the option chart; light mode greys (surface/secondary) the header, the band between the charts and the order dock (dark keeps black).
 - 2026-10-27 — Chart-tools sheet uses L3 SideNav 1.0.0 (design system moved to 571a418); the flow's own copy is removed.
@@ -321,6 +382,874 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 </svg>
 ```
 
+### `src/flows/fno/commodities/assets/crude-oil.png`
+
+```tsx
+�PNG
+
+   IHDR   �   �   �>a�  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       ��       �    kF&M  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  #IDATx�{�U�y����)7E>����Ԃ�btƙ�j�N�δ��?�d2�m��M�h����N�2�v��mJ��6MM���V��zC��E.��o�����9|h�9�нf���˻�^�}�����^�|YV���*T�,PY��@e���*T�,PY��@e���*T�,PY��@e���*T�,PY�l�@�,�@��Y�*P�;`���C��W�x@�
+t:�2�����o�~�&*S�����G!�۷�1�~��Nb���z������9rd�u��V��[rt,n���sw���w{��������G�f8��9眓�)D�T�$�(�="�V�a�گ>|��={��ܸq�f�b��Y:� <��M[�n}�����b6z���������7r�D!FB�FWD8�e�M� b=#B�h���k���b?gC�c	p�=�\y饗.]�l�P������ٱc�z"y�uD��'��	�J� ��"�~�UX�{�lق�x7)�:� �}�;��'7�x�Z�m۶%`-���FRDO���2P��A�������� ���{�}����Z�����<�X�z��ǎ����ۇ_y���kvfr�	�f$�; <�QR��L{	��	x�D� ������;v�ӫ����Tv'��ӧ��z�P'M����.��W����l���fb6y����u���g�)yʊ����ߟ�{���x�L���y�l߾}	|�Z�1@-��C�5j��#G~Nd��y�7Fu���;��ę�%��iӾt�%�L>|xv�Wd�#Ȗ,Y�]xᅙ�� �n�> t3B�	.����k��D�L3;��O3@$�!�3$�	�%�ڃ\�=ɬ�.��7F�1U�m��x��ا�u$fΜ9\;�Gƌsk����^x!{��׳�'f��iV�7v��&�/����A�]��ӧg�ND�H<D� �q]�6�\C�G}ذaƏ?U��uy��u�;w����Mv$�/˸���2#k<   �0aB�<��3�"@<�E�IC$A��a����MX���ͩ?�9PO�O�!���@��2����L���5�i�~���V�P��t$��ꪇ4ۧk�՘���Ǖ�,l޼9-���ݝ@c��F�D0	 Ǹq�2+��x@�;O�� 0��y�@ �@�1�45�UVW]"�U��5拴���]O&K:� S�N.���f�0fl��X 	�z�x@�z����_NB�9c3g�LH³����+�d+W��6lؐ��T��Z��˵�+�O<�<��|]��kߨ�+"�.���J�G ��g�l0<���C �kg�� o� 厁vx@Tf.��x\=�:��|��7S9@(�Х���|	��
+y]�6�D�4�&��7�p�d���5kִ��R�@���d�뙭�-lmxV{f�,x{�q��yڰ�8�;�|��3���3�O�1L:���cy�4,*���di�x&k�x�dm�~e���j�Q�Z:D��Q���X �؄|�% I�Pt �%��>Fܻ%'����]����� )�k@�?�a`�b�G4�;�D�a� h|���3g��[n�e�E�Z�����7��f͚5[ �P��]  ����	l|�H�᪙���e��pʔ)iɬծ=���ˌPH�k�e�1�I<�D�H�A�A��%I�ܲ~O���������( ࿠s�3#��v�2������cF3�!d`�� !��� �@D���e���������6���;��?�|�I��$t��rۏj��d�����" ��� ��<i"`p���C,�  �EO���d��|O}F���׍cq9��]u=}�G�����eGC�_�8A��_�`�1����[���*?��e�)�
+��&�@9�GЩ��� �&$�XH�2�Q/{2��uq�x�|tc����k"���s}�fR���7p�p��u���L��!��?'�����I��I|�cG��rID��`C^4�~�[:� �e��hQ!�u�1h�@�I����Y�D���Ҳ�C��c�}QF��n��2X��y�� �B�K��LN�هD�9ܲ����~�;�	�;@��=z&yB�_��l�q9�#ݺ�W�-��C�ZJO�Gy�Þ�:]<���΁4�FL��� @6Дx�#��G� �!��h G���7!���c1�J��L�&���������f����Ó�?�LX$�'�w��ɣ�<��G4Ȕɻ�io�L���� ��9�i)�.��آt�6�
+�c����e�ie8u����gx-m��b �X\1`:D`�\��r�3���H @7��51У/���HB�����i�5�j�/u�Vɓ�l�?�utO�����>�Y��~i�2(ր $� ���M$e.70�:��[����<"���͛���'�� ��|饗��z�@V� b���t#�݇	ἥ�D�4:˙�:06��}�y���Z)KO ��M�>`�N��q�~*���v����6(�ˑ>HG�]giP��4���c���tԉit����3/��V�KO ��ۺ��yyR{����n�MD x	P��.� ����}E���q�F$h~,W�:^M������A�-�Sj��o?������5�!/^�8݋C {o�|ۅ� ����I��@�s�e3�O�[|Tk"�>=_x�t�>κR@��2�U ��}0�p��tt�ð��H�r��c������y�[�z_�t 1��u)���U�V��V�R@�q��@Iv����BHz]���{.���0�D )�-�lH`"AE���M1M��B#��6�<��o)�{G�]�#֗� ��s�j��S4�P��4O?�t�bŊ�Tc����s�K���'�F�	�;]��͛�1��$	����GE�V�K�:xƌ���z
+80�q����|��p��ܞ�x��c��L�$�|ˢ�&�<��i�^F���|ڃ]L��e��s(�ո�z8�����5{Gg�j�d�]3� �!��9�����s��!ҁ�����# D ��7薀�(�o�����k����iC�>��ۗD��Q����i��{�����f�f-@�6	0(��] �x[ǻ{�@���@��$�L!KHC ��7!m�-M����f��u=c��
+�p�]�.YJtww���}=��:��� �hcy�1�P}BY@�uxy0��4ހ��@*H�%"�>d�\����������\_�ky��������)�)����$G� �� �i\��÷}9��R�.z�K@�Y���7`C{{�S�����e�9��+Yۨcf_Q�a��.YJh��M�)� \&�|f*�  Lt��=�M@dI�@��^{-��v\�)XNh�g�;�G�`��|m��eH�#�q),�x�hw(#���M��Y
+���-==S�3� ��L�9���1۬#XD�����k <d�- � ������]��5�����Ĵ����Y�'�[�5m���~�v�/i]���-`�``�w���	.s�:�t@�2��]�� <Dpf>K�=  �C{��=�91̞�}pm��@�����2�o>U^��jk(݉ ͺ�a8`ؐ��R�4�& ��
+��Ǽ�('M[f0�>�ź��jX P�e� 0�Y&�l�,�]/C��Vy��"��H�� �+d�Obl�A�`	X$�`L� ���e�39�#җw�xf5" ��C�\��/��bD�@��#�O	5�؏����_��%���k7�"�����f��M �O��<``d�L���G�=��?�c�'�'����'P��w�}8:oi=���>��m����~������TЌ�V�����amH�#PF$D��9ݨ�2���\��@�gY�5�=6�	ɵ����2�_���v�"�f�l��]6(Ĉ��:��q]��h�So\��(sI;\	����]����������4ue	e" ���)��s�q)'x�K������L�[�κ&����G'_�2������В�{�q�|ip�]w�կ� c"#��r�P^1m�]^�s����}��(wp��EI=Q��p�R�ow�Ĵj�(�Ν{�~�e� �c�-��5H��ַ��P�t����>���Td1�.��Dn˩�8�F�{���{�\�h>X�$�'3Pi��"x��.w�8�r�w�Q���k;��Xc��ԉ ���Z�}?_�Ld�=�v��8���/n�z~������yC�$Ak�v_֍�Fe�Q,��d<1�:�iO���K?9��ue�m' ��Κ�QK?����4�z׹̒��h���wy3i}$с�6
+9�;���?.��c,,S����٭z�������6��51�Dg����cۨ�}M�V�ct�%���V��Y��M�� �-�'���g�<����N��@4Y
+#�Ŵ��-֑w<h��6��h�?��)-�������N �/x?�;{�İ^�D�3�u�Ժ��u�9m�f��X#��|^��?��_�ݿ?W�	p�}�q�w:y?ϋd�=2�)��<�" �ܠAw����؏�]���$�e���j�/�pK[O�6���N �����X��oȤ��%ͫZ~��7u���1Xř�rK�8�Sc�,�m�(㌏�y��Z�N����%J�� zp�bf=�c�Qg<����"�H0�����D�t��9���dҽtD���k�w�z���N dV>[2~���K�.�6��d��J��9��&�@A�(3p1]�mc��Y��T�E28�r,�1������o]�0:�����}] ���LǱ8��q-�s�6�!R���f��r��k��H�z�A����`�$����ߗG[w&���i+��܇d�>���s �g�p,I������A
+<Dh|L�]����z{�p��NG )�G��^kYެ��?�n+��y��w<� �4g� ��	8��Q-�Aܤ"�"� hb�r�"��|����6	�v�{���_����<]l_�|[	�[����~��p@f�s���Ưur\�C"�dA@�ip���L�׋`;urp�@c��lm��eM�� �g�- �!��[�4�1�I��H��sK@�f/� "�Y$� 	$����gY��;���
+�[���L�G��)�>i��B��?U�S7����i�����|G���ɨ����� xȀpt�<I���x��>� [z�G>FHa@�!�iʬO�ƱI�����B�����j�n�a)���,gsș~<wx�<4b�觉<C���%� ���X�t]�� ��u]�oc}��m!������#�O��������l\Kt �� $0!�+� 	� �<;���(A�׈d�g��a\���e��k����̷�Jq��co&O~�f?�r��ϵ���#�p�\c�^�F.^��Xbt�d��2� p�ľ�>��,����6|}���	�[J�Av��c@:㐬+�	��6�_-�����@/~�k�� ���V	���00�G��G ��X� ��/�w{�	��`oi���K���k ��E )s̯�n�t��4�OJ����� ��3�j��?�{~�)�tpJ9�& `��,�H=uDH�m$u����:�hÃ&$^��
+t�S��@0_�6�H�}N�]�b�+t�|��@F�E;�>2�n�0,FƠH���O�#��:n�x �׼���x�ܤ �>����!|=��uȼ������e�uRh)d�n�z��]c<B�1]�#orDR��,u�g��xH � I9:D{_/���2>_��0j�DK�wh�i�����(�;l����L �d�YI�c�s���=�ɳ�'�E�(w?��m�%U\g��]����G�CK	�Y�����8�5�-���@�h.'O= 8��� Y�6��"��\ǵ�C�C1�>��~^�>f�����4��� zX�f�m�jܛ�x6ٰ���w>�f@b��܏����2@�ֱ���6�QW������u�&[J ���i~��XF������ #�t�7�:� @� J�E��O���X�i�?	ԋ�Z>+��G�	6h<����ؤ�X�y�9o�8���5�1!����٧��E��x���Ȗ@�<���Mr���Q����W �N���(��1�a�����)�!^3��B���U��t�	���f�f�^qK _c=fg�S<�sh`�S�����g�)�(��o�e�-]f�.!�Nz�q��<�OSE��i��H�D����v��x4�3|��'����=�~N��D�7�Q����uq�5j���`G���P�6`�|볺�*#��ӻ~Z�"?��l�AҠ�t>�kt�lTN����w>���}@.�:��*>��1I����� �J�O_�K���&_8?��6�o� �<dK 1(��֋�:�f�d��znG_@��5��F�Y?�P�v`$���(�׌!"L�]BD�9KK�@��-c�t�'m}���ty��K4�Q�ӥ  ��nz���'���E�d�q��x���|&Y� Gi�h4"���U�P(ݏ>��[�4�@�Re��w�Z�0'�����v ��@�h��ҠSn�-i�Y%�1�>��O_O� �F�NL�� ��io�r�ڵ��Z�b�����8�IPi�3H��`Б&�_$ˏơd1_�����3��t�J �����B_����
+-#�X�1��8����	H#	���	��E:&�������g?8&�GE�7�~'��N �������Ϭ���E�(.����)ph#�0�pb��P��r�E��g~� ��O5�G�.�W��gj�>1]Ք�L��G�e�mZ"�h��	�9t�B�6j#Y�]E�J�\@�˃.Jf;�<ms]~��^]�_Kn�3^� ~:y��$ܨ'�w�����/(��: ��<aj&��7�v�QZ��)}Tu_���wr�� @�Q�k�FK��� ΐ��8R.0`>D�K��E�@�ɯ�_W�R��O��f�F��y���,^"\�8I��%c��+2�V �Q�'���(}@�;7)�\�Y�}�b��7v~6��v��!Z&�	�A"�9�c��;vP�n����'����z��*T�,PY��@e���*T�,PY��@e���*T�,PY��@e���*T�,PY��@e���*T�,PY��@9,���sS��    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/gold-default.png`
+
+```tsx
+�PNG
+
+   IHDR   `   `   �w8  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       `�       `    ��}t  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  .ZIDATx���W���u�A��eٖ,K�	d��6ql������k����̞e���{v��x&l�#㄃�le�rK��V�V�^��W��q�e�Asu��{oݺu���n����������Q+_���S7?�䌟���SۂW��D�M�hMd�_�jK�_Y���k�ϯ���*)�+��?2R��m�OV>������ٞ�ڟ���_����=;��-*���&5���Q���|���"�[p���[h���}��4�ػs�}��=�� =QAϵ�Dv@��?m8cqޗ��+[��6l����e|�@�N�,/J��"�)�g۴��l��t�����};��ܣ���`�O��	�{n�K��nwϛg7���m�FF�|���NH�*�#(�룬��f�|��O�m�c������E��5���[#�1]'�P��u6w�i��N�;j�����lxX�� �O����3&� ��<)𪮸$���lu��`������g�n���ٟu?r��v�D��	ါϴ�kϷ�.�gwΛmo��3��΀�y�@��6ў	�L>����A��-O�u3l��δTI�uwtno۳��[�5<p��홖oݧ���uo��?��N���fڥ,%=����XE�sa(i�.'d YW ?��3Bu��b��V���2�:w�U�<�F�m�v�b��߾�+�+%��l�2뭡��[|�T�R]�}���
+�:3KK~,72�#�#̈́�K6О���u�Hk��*Ծ2u�\�����z�P{���[�7?��<��ہ����7�w}�j��gf��gk�l&?4���X�"�Y���X�Iӊ�(�Q��j���!�a��<G��)�l�Iˬ�z�u�6ٻ�g{6m���/�ڐ#S��A����I�q�4�����a�j 0<��X�  #�c	��_�Dvl��w�����1�x�v�;�`y׬(�4dy�����Gz�7=�R��|�w��W�v�7�d�O�p��>�ƾTSm*)�B6YN7 ��x�*Ϛ�;�B��Y@��q � :B9�)�M[ؾ�$:Bw�U����ج�n���?ˆ�k��u������R�D�����E���7��I�R[a��*��WUڌ�-7C��G�,���9嘨c���->ewb�(����ܬ#`B��3��"�C�fFIy���Yh���5[��;�v�l�u?����D4������2��3�Q����
+;gT�>@��'x��	��\@���
+,N��Y��"��}�'!�R3���!�ԓ�b��u.ʜ��mʜ�V5���j�Ӵ���5������?��:��5]����O��i5vWy�}���
+��M>��`� �Fʱ#"�)i�� H@�>c���z�NR.w��B����#��Q6A����SefgŴV3�l�/�������}�����5�E�WKa��m�{���6���>WQi���Yj�"O�� �OY2>@B9�����I2��[r(�F?��^��d>2:�����@���T�1\��L-������Xa�B��>Ա��W:=}k�]�=�1SN7���w���
+n9�n�/�/��R�="�h�.£\=��R)� ��q	 wN�gа���� S�:b���K�� �z�����낯v��G=�*�Y�f�Vq��ֶeu��G��?y�^s��19iX����);��ܾZ�g7��z����2h�TUf�I��Tu!�*'�5�Œ3@�Q��@�;@	�:%:C�K�	�ȃ��1����b��/	�]w"��)R72<fM����jg�.k������>�M��n���^���j�ϵ;ug�=k��F
+�x<�q��䠌ђ�5_e�s�hyZz��|6$y���^�1� = �2u�� ��?���Dw�yQY=�*]	�iv��1�b��g�ڸ�֭�^ܤǐ���Jk�Mw�̞����^��n�w�;�������2��|��n ���*��8_2��N!�%��j�}Ʌ.�8��4Q�}��aOR���y_N�׿�C|-�^'f�Cu8�C=z���oX'���f�[��kY���$�7d=��\��b�h?�1���S��s/?���SS����p_�!��b2�1�/�q3�Q�x24��H.�����A��-ҁ(�<)�~U0'!7M��-�x�GT��~_7�Q‐��=�֦����-C�>E�n,�՚]yY�-<��~���ʍ����: L����런��Uw���\EQ�+�jy#>N��0}��  �0��g��L_'�i !�$�80�%yt�lB,��]?:Ћb�t^�S����2>��Sg�56
+��f��`Zr��-\d��u�Uή�uM�u�h����=�ƴ;�2�\�p���U����|�����l�՞t�͜6j�y��s��K� L�0��0��<��
+rPUp��4fO�q�DrL"��8u!��*}�^䘉^vA�� ^�������6m4ۺ��^����Į���6u��6޳������>��CM��Ƿ��W�cr�;O��F����]���笲��Ԝk����=�<�>e��X�Xv`��D;�y���^�&e?v�G;@|s���D2�gy|H&�����!�q�OFBў"6�N�xؾWѾFKN�~-9r���f׿w��w�VXQb�-����o�Cz�]Pd}����G7L�nR���3��Wd벚�<;�w�voj���g�����.��Yٌy�V[�m�^EI�AgΔ�A%�~� �����#�%KIs)��}� �	E{"di{�`&d�!K�У<�d6k�]�AN8�@Q�Ņ��[�����-o챎m�Y�����l��#����m����[��Z���H�����r�ɖ���˯�c��'ٖU;m��l��_�Ⳟ�yg]l����o?Ϧ��[�ص�Z���#�GmT����`�ِ�x>`��#�`�h����ϑE��}.��N�B7���S�|�@
+[2���]:�p�٩��u��+�5��v��^�\=���_eM���d91X^�@:(�&��ی��\M�U4l����![t�B[���{�l��۷s������˛��J�\h3O��i��V�?`c�Ze���#Yxx �7s ���q�a��������'�rp���'Ō$��	�Y�%--f/���/���Sv�-�l������z��k7ZCÈ���ņ�����>̀_�5͛W�I���V72n�Ѵ*m��=�{m���*ͳ�-�9����׶o�#��V>�U��:WYqݙz�[k5��f�Ng��Ȇ�� H*� x����"�m��U��l��BΏ����Iwȡ��r��|����i�Y��?��vN��{n���o|���Xd��u�Jk�?�#��i/�sA���?���<��8���6�����zV�� ҫ�����z�ﳩS����셳����vo���V��f����+�=�j�J���ˆ��lH�ǈ]�(7�D$�̄��-49�dT��4���,�%9<'�1�J�R֦�z��~Q/�.</e��z�͹�:�ɳ�����ͻl��ak�{l��NE��%���5C�5���z�-�+Ӥ3��.���A�]S�$�o,}:	t��69b�[p�e6mv��{ض�;`]��[�5ZI�K՞oe3�T9��d��{-��́D�lt`�q�r"��ƁV2D/�0:|�P=*z;����(�!�-��z�p@N ꯾��.��22t�쬷�]O؎u���qܺ�䠃w#
+$�g�!�Kd8A�Xψ}�h��x��6M��RX�� G��s�gm���ΖC6ܺ[�hgقη�)����m~q���U��L8��]e�s��Q�VY.K��l|T����;���YH�L���^ǌ�W��Б��}Be���M��ɥ���6�^T��l����<�������JmJmxߣv`s�կ��Z�y�Ag,�\��;n�~)�P23 _���]w3��Xmg��.�Jy�Q�k��$��Ay�p눵�6t�Q�4�c�^|����hl�]Z/��ڨ�Zuq��My���:ͦ�.���.Ռ �����J���(�����.,����!�y��#�-V8���YcS�^X=n-�im���(�������i���֥�o�Ю�V����RI��Y��D{v��V�J���u�}�n<�=��w��RND��m���u��1J��H;��gc]m�i:1]p�U������v`G��[����V˫^��<+�>ݦL�W8���?���Q�2`�}�*!��J�/��0T
+%|��_YS�%"�6m��ZNz��ͮ�i�-��
+�/�����ֺ}�5l���bcf�b͇ԝ��ر�)�C��U���������[���wwh�0���Ė�1�� iDF�uY{�Ku��ŋl���弔��~�Z�l��)9�GN8��kϳ���6´
+���[ޘ��0}�C_�������K��(P"@h_R�o��2RG[�֯����R�+�Qb��x�U�r��{Y���M��f�Tiy`.��@˦8j��G ��P����`�}l�q,A|�f@�}J�JY��:t@�3`@�T�s�R ����~�mi���>�;�T��L�6>4�{s[j���<oee�W{�q�q�UVXj��Ɔ�}s���:�@��[(���90J��N-�TQ��[�m��a;�'�O�F��v��-�r�����r˳�c˰�Z��i0@]�p c�}��.ߌY�-��v�p\���V����+�38]1��ր/0E����Ŭ��k*Z��>���d��N�}�9��Ku�鷦�����z+�h��r���,���Ӭ�jH����/M�^]}�җ��a���L�+us���@�V=�mk��<�/�(ߖ��v�^r�Nd������.ܸ{�:��@�A�Ǻ� ]/����~� �^��h��3��<Q?��J{T�W�I�WʠR��)#ayT�'Pvc�Y7�.�ɂ}��虝�h��{��K}�^d'�7b{׭���v��-�������uq��V,����ڌ���޸�:w�w����E��2;�������Ҫ�ֲ눭]�k:�ټY�^r���P˳vd�;�o�:�M8_�Y� }(e\��X�B��d��4!�v)9�P�����Z��Bx���<��G�:"���#*���:�I7N|�s�HV���;�y�:㬷�f.����#�c�AkkXce�M�>����J+�z�UΨ�ѵO�C��ɛ 3�>���M�=E V��u�l��?^^tn�]s�96���dL��l���^��v�J��? ���-e �z�����<���+�x}`�A�E;-�Cze�'�N�W:�:��K����>%��F�� �a�;@� �%)�k '2[0��<�s�`j��+���u晩�'�Y_{�5m8d��h��Y�{g��r��.��ZECq��{���ᆪV߁��Qg����Um��aLw�f�\[gg^�^+�}���b������G��E6�\���eG@�'���!�ӏx LE ��7_���u�fှ������4�K�&S���z�u	ؤ_��'�X~h���4�1�r����_L���d3�,�3nx��<d{W��͏���F�s�YV>o����XY��g�֒��F�;4�SVT:E@ۦmÆ!��ca�T-�n�U�~��9��!;�Po͍f��zn��[�1kÒ�+�W6S��.ڱ3#|	]���q��ĝ�&�
+�D����un��U���Cx� Q�%� 1��ž��j�
+���A��lƂ=6���l���	j�5���^x�y�6k����s�\�ñ9��#V<�]�����m��!���אּe�_��?[�]�4��Z��׉ڟ�H��/��{4'vb?v{`)e|0d�\�u�GeFU���x �>:T����n����>0@�#��6/h\��,Ao�p���7�_�ط���ZWX� �������[m�=�]�Q�x�杶�\�^+�s�:��ԽFϤ�ٺ���nZ�.�e�՞~��Ȟ'���M�Ԙ��Ti��HP���v�؍�����T��DvR�u�ڑ�Y����4���g��fB�t�=��}#���b�b,@sÄ�ܙ� �\^�(c<z�-z�ƁP
+�C�-�lh��-[ݼ:���";ﶳ�{�=��jMO~O�a�����ִf�m����"{��o�3�l�{�l}��7���O�b9�u] �|���;ӵ��m�Gf:��f.ʪ`L��Ty��<�t�*P�j���&u�o�脙 �n�@r U�e'"����B�3�ў:��z_ { ���Y���d2��uz�f�El��WY���l��k|�!۸~�mn�E�g����97Xz�
+���S۷kПnv�q��ʬ��ɛ+@�YǸT��ǩ���I�'����AK� "�{��SCz21���;Z�N�Y'>�0�t�1B��`��4�W?�� %ﺐ�<��a4�uJɣ����q`g����6�w��̹�N���=Td��KNz�+�jw]gk�����E�H��G��s�)�*a\؈��1>r"l@;X��6�Sf<��d�^�ҙ��Ҥ3��VHI�\?��7QK� �Ð!e�`k���e�~DU�(w��}CV}a�;�6bqG=~d̆�=b3��N?�̗}G�T/T�ZV)�m;���~=��׬��Щ4Nd4v�lȈ{���ڏ��{d�����3�|�B�,ˏN#���\	 I����%FtN�aPD�b8��K&����ĝF!�<� ׫���8�n~�҇��s.�g��wْ����u��m�^%�d���3��;tTv	T��{�����i��w��'��|��'���9�~及�d�-=Ñ�~�IT��H9:'��G��Y׽Y��0w��ʚ
+�	Z�<�hH\�AR>�<:h��%O���q�^VHNǙ�~���s��u ��g���r�v1���)��� �GJ}�x�#ߍ��G}Y�ջ�<����ߧI0� ]���P��=c@��"*T�˔��HRnV ��Rճ��i7��L��,w������z_��{�;>>�[ ��Q����ހ���G�v �=���,}8����Ot�$�{?j�"}�Nx�(�������]�OD�:�?3��%�#=Jq@�y��ME# :�B�h���l��s��e!х�e`��2�v��)k�xZ/q�<�cs�e
+��S�>_��qVR9�)�+=��I(fr؂M���(�Yx��n��4e_�&u�XJ�LˎdD�tD�2C!ep�!�I�f~�:�0r}�3�Ȼ�dGGBl�>`1L�7̀q! �D[���%���qRe����L|5��������z�S�
+�Qv���ّV_'�I0< �����; J#���<�� � �����Ȼi�a� |�H��E����1�$D���X`�M�7R� l�:gHr ���ם 6��A�����̒ e��Rv���}E*)�>=:v�H���p �$N`��0����KU�- p�4m�M>2|�B�qm�L.���q>� �.�,���F�*�1�!_~���U�mrd�:$G^�\����(4�������4�h�Ay�+��� ���d;h���$� ���|��N䜒Ax�nL�&ᓠ�"u�s�ľ�G�/���u�g�B}R����s~�QF�Kc��<���q6���&u�~Z�'�2?C���nl�)5��]�<�SE��Yƃ���` ��q�	h�	�#r��6��e��
+=��L�'d�u�r��mK�e(��)�.�SN"�ӝ����9]�/w���ؤ��)OF�y�摪4�S�P��x����p�q�����v*#�h���M?{7Lu���]$�A �}����a�f��}ҍ݀����BY�)�9��N��'�̰Y�" X�r�����f���(4�z�I(��O=�	�x>���+Ũ č�u�61�.H��<%������=��
+�hڏi�u�|P�"WD�.>���1�R��?չ�3]�3C�+i�~�(�:)�\��&�I�w�B/�
+����+&���D&������AR� 2b C=�^�Dꐡ^Y'xN�	S��g�J�|�ê�$E7`�,��&���<3�I~�L#���:�#G?�i���#�;�7b5R�1hT�,�^0")b��=�V,��)8&��''~� ��U��9_o����D��X6X� 
+�7�Ͷ�)��6��|!�6%)P��j�R���s�r�tЖ�H7}�F4|�޹R�F���ߤVفN��D�6>8�Ĥ=K�� ���6f���<.E耫��XٍWe8-t�l�$e���}��Y������>�۩�Ε\8�t�����j�k���|J��jӜ���:�L�#��/�,�#|v��m 9��pܜ�5�\ȹ#�� @� *���.� D)�py.WC]"�(e�iw̔]P	���Z-���&u -R2���Pt��I�߀	���8r0��/PQ���.�|�N�	y<��c�����$~�ţ��=��<t��T F�6�feT��Q|�-�P��\!��fB:&hZ�b���3x��#R���%��[�h��L���C�a���G<1�AUJ�o�TǠ=�5�#3*��l i@SB�8�" �Ԟ: $��')y.�q�D�<�QG�؃2D�mZ�,��&u��o`��Q���j��:�p HA�W[�7L<f��%���~��Ֆ~�q���h�dO���d�F�1��ER�S�0:\���r�QށV�IWY��l��I�hCcuyD��A�&�I�?C�q�910�`:���a6�S��iHel��Hۤ�����sՖ'��TP���n�SGY��߹�;qEI�؆Nʾ<�U�Tc[6�U�	�!�	�(�l���'3�yt��)7�M1����&u��a���֙P �w'H?��r1��X<�T�Ȋ�� ��>+Tt�>h˦�N[e�   �2�Io��/��!瀠Oe�!xX�EY����D.���"�կ�ԇ>��)~��SG �0�J�ܣ��t ��1���գFF��Qe��4F�Pv�����:N�x)���S��J]��� |����1<o/!�g#�+ԇ�ΧO.�Od�!T��/�	]2�:��ݑOR%�B�;u�AF�ğ�:��R�����D���'���I|u`!����(�G��XJ��ʫ>�P��L�Ѵ����$�M�%�~��#����E��r*f�������a�/�G����m�)�T�/��:�� k�S^�=��R�X��tFbHR'`gЬ��H �D����� ���`%�Lf	�W����T�<�c�\�MV'���C=W�9��Sv�e�����L<�1�W�/�f��(d�����~S�Wm��ͷ0�θ�y�,r�r�;"dD`�2�uG�A �^���:w@�31�!�!꣍7���$��8q�(a����QP��!2����Ix�!�S�%G��#O�oz�1|��s�J���`����v��c锁�D^L��B���f��-D;(fE�s���'�p'P��$E���-�/��ڤ��Gm�I{��+fBn��ٙ�P�D��Ccv�ov؃��1~����Z���]s��>�Ǥ|q��J�wP�}���yʺL�|�	hq��"e�>�w�%��)M��3�� �� JbN��vI�(�m�';U���#��U��oUu�Q�ﭰ�lx�?���@翪�ճ
+쏴�ޡ�4lf6` ���ԀH��2@��hp�L	 G9dHy� u�Nry꤇ �܈�$O{N)�O��"�w{�� �}���R�t�'�=�@�`\���M����N�G��S�CR{��������~�޾�{�+�/�ӾV�i��?� b9�G @	�rR�`�#���A>X��v�ِ&�Y��З��mNuH�^�.�8/q4ˍO%��+���?6��9?�=���!�v�.{"1�5%���N?z���S�]`���ٗ�{�z����4Tv渖� �9>�@�r�	aXB;���Ʃ��! �I��y���ʶ~�1���Km�ч�%���G��3�<}�B3g�u�3;���F}���ڵ��E{�z�n�/F}|�^�ڨ?��ץx{� TlʤD3�10��,8�Hw���2��E|����6�Y�#@'�?�@���V;_r��:�����D��;_m����̮}j�}�%i:x���8��Y�~�����+w�i:������ �h�ʹ`�s ^�2� >p�!Q�Q��R��.3���^��8�p'��9�*SG��~�c�3Ovs����<���m��y�踖�W2���_����η�����ܦ_�-��zia�|�n����8 �˼	�8����E=:2��T��CF�@���C� �.�� �F�(cy**�I�r��-�"ڼ���6^nԃ���{��Gt�pk�[۲_��狾�bЀ� ��=�|լ:/ї���� ��Ǭ��|�.R�A�w��6�i7���j��l���o����9 ��}+��]�vU[����k��d�8B#�h&�%�ye2w��P�(���I��\0��Q�y҃|��4i�u���w,=�f�W6��m�l���[��cy�C��Jo�0�G���{����_�R7p�U���W�)�[]  "� ?����s ����Prk9 +ɂ�p��E
+��h���خ_����*x?����]e{Xe_���PW44g�%�d"��`� &�m�SY._8Ͻ�>�q�8*f���(Hړ��gA2c4C�Cv�_���_���~S�Mu@����۪�S�&��'��Z��jY���FH� "�Sf N�L��S�Kf9�ޝ$ �[w���K
+�".�p���c�UMw���+�U�5�G����^h���-�~�l����w��ݖ�т��Q8�#���;f��C`�>>sN���`�ؓO����Ԣ��+�zL!'�( v�M���,���}��5�"��lzKf@� �e����U���;�A�hK���W/} J� ��'�3Q���z�ssځ�{DD�t����H]���Ń���h-��-�x�c��*۸d�}p`�n�s�V�?�[�<��w��
+X_����
+<��S�o�R�;�*�<����Z�{�Ck�k��!Z�}��	� r����K��*U���h��n�?qU=���RE:���a�B?���&��/��f�Qf����)Yھ�W�7�t�='ѷ�^�;��cD�>ez�a��K�a���;�9ӭdV��g6i�٬�c�7%E�4	t ��fc���qkַ����idjO�Ϸl>��k�>�q��l�t{N?�4K/�N�2��_��(3�9}�Z�Gl���#�J=�=�s3�o��R�"�o~h�=y,���2'��-��i��aO�ڻl�~/b�/9Z@��l��qkԣ����}��Bq�F����U؟?�r�o(Dof�L�7����냗�l=}�K-E�W�Z?��� ���Њ�Z�v����������m�o��G/��uC�Y����<C� ���˱��p*G|�����xvN���u@��3l�P��dS�����婆��?^������? �z"���5�=e$|    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/gold-guinea.png`
+
+```tsx
+�PNG
+
+   IHDR   `   `   �w8  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       `�       `    ��}t  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  >IDATx�	�\Wy�WKWW��"��ݲe[�7���a38$l�mrrI<	�����fH9$3���xÖ%˖���ޒZ������k�7���.�s&��Ar�k�~�޻��[�w�{2{5���������{E��7:p�^������ϩx���/"z����o����4g2�V��͡P���2Z]V�W�?_�t8�O���r9?���T>���s�x<9��&'#e���luϹ���/|��ةS��E��ϝ ��ws�=�qy*Z��԰��2wU�[��+��\}$���ɰ��n�)�|�|��|��9~�|��%���[м`0�k�9�~:������N�M�I?7�><��p�Gv���	�s!�������m�K����n��xׄ�?3VQ����,��\*	�A@���|�3�Y>��<��ȣ�t�S�<��X0�@8l\j�PU�E'���S�Һ�FF����:O��#Gf~���`��߿����U����:��Ħ�B�����2s 	7=�������u>n~�@=�AВ _��.7����(�2pEj-R���@�T�˟L�r���~��?y�̧����(�,8����4T�W[�S���z=���" 'uug��f���_��� 7v�AQ�v��� @s"�~s���𬐏s� "���;G��
+�,PZc^y���V=9��o<��C{?�5#�+�^Q<��G�^���#eၷF��~��A�[�=+� ��:G�ΰy��],��@�g�v�����,6��d�8��%�g%h�hY��˲VX0\	���Fd��M��48���W��o5��4�<��*j�u��Py���9��'o;�O�\�LzEp����i[�����ԯ���.�L�t#��4���8=�^_��L�XD�$mt�lv��y���@[-�%�[g��Ĭ�ܬ�Ҭ����K�VU��-op��3����tb�湷 	R��\<t����*�K*�� �-����<v� �e%�C_�;r�׽��r��BٮM��Y�2	�� ���h
+�ÃAA�0���̓j"��驠M��l~��yi���r �PMaAH �8p��CjF�-�p�>����U[���"�M�D-9;h��~�$�Q[�6��TP��Sݒ���Z+m\�}�ة����=��zt��k�rT����V6���DI��݁��K�	�U`4��B�3ٜ��'P'�6=���a����T���k9W��Up�C �P"�/�pr4 �t��.<�I��&u�k�`%HJ8Ze���6S&`s���9'M�V@� gڢڰW�Ԑ���}?��|v٭�W�ˑ.F�|��h�O�n��.X��c����x?P�.Λ������Ȩ%�΍�±u��Z�y�g!N�
+�!T�0����+aǱ��`9p���Y4������j	��$�@d�y�VʄQs�6?9`���������@��Ԫ��8�E[~o�M{wq��N���Jc�뾊����Ϭ�C~ PE�# SB�9�� ηD2��1�Ɂq���[�R��ڀ�ʐX4�F�\�d#�)/HF6������T,���$�Ҽ����@D�"�Ԓ��Ը$"q8�!���~��"�,���?��)dU���*��y9�W�U4T|r~��t�'&��#�y�����/�O4���5�� �V
+'7X�Y���E���A��Ycּ#W[��W��r7��	$�p��C/�Yo�d%5Wx��T�Xi��?m��n��(H��An&�b� ��T�b��ui(E��T~���Z:~�rsݎ�e�EX�)w�]Z3߼���N?���;?�G����OL�D������UĘJi�s��u�J�F8?_g�=)�?1jMuy[�1dM��-mb`J�`u(� {��0�峒�qr�%V��M�\��ϑ}Q�b�����}�z9uоS?@�p�T�Ȫg"�;2ݧI����Tet���2�E�zL�4Q���TeD��%�D�Қ?h~r诼O��/?!�/?M���7G#�_Ύ=����ډfAyh���6�h���O�T���^�ۆ��o+J{�d���g`�\n
+��� fRsv�=�M�e=�Z}��<���w��W���[XES�M���h�UW����^*�l@U5п^��/ԏh\E)r��1�eQ���T"h���p�����u�������L6l�̍޵5�����/I�f/��D������|&3��9hQ߂�I����X,f��j{nwa�Y�tm�6nm����� �y�aV\��D���"�,Z��Yi5`�,=?f�	���ɰm[8q��$�y����@$G²��p�6߸ު��l($B��:K��Ȍ�Z%���bX�$Dpj)8j���լڈ��g��h�� �T�T��M��k"�g��l�^�s|��C����\���7E+�+77��U�y�+�|)H'�A�c'��\K6ډCH�ږ�"�i{��C��:��8��&�HZ�ɖZE�N+oق* ��G/��a����іm{����}�~b��pmK/@�)dSbVV�d�l�����<� mi+��m�����I�S��C���&�^s�h4n3]��Bv��v�Gy���Y�@��Ǻg�EKK>��PK�%���Q�%�������Ͼ=3q��9 5_܋hS�B�P��?�g��q�>�ک �<�.�8N*��p�+���i�K6㕀�T�~b���Ԩys,��`��{-�-m�'NY��.�m����OY6>l�٤��r=y���a�H����#�n���"�8N7�����*��4��!�Mb�շ]Ž硺<<�|/��9r(��uE�=��B�K&@����a�?f�OT�٬���kAgggP%� ���t���m�� �6j�-�Y�q���c'�w�����3g�vt�Y�O��y��A�C��U^���<g�n�T:`���ȣ��!���Ow�����`�Q�s?OlIse���/y�irϩ�W�����f���U��x��OZ�����M���*�$����z�c3�Tr�C��"�^���Rݲe��ّə�"�����C�n�	h�!@��=�V��Q`hY��nT�)\E8�<d+8K�ځ�vYc�1,Kyu^R��C��?85�-3u�]jg������:�?7j}=�6��ڎ��Jyb!�^��d�B̸��w�����,���-������"D
+���bō6SR�:%2��jB���?5�P�$�J|�'��.� _�H����َr�V��n��)�������I{�۪!�4B�2xQ��zp����XP��;۬�����&o�ۃp�Ԥ�źȓ��kKD)�r�t���Д-[�F6��o��%���V��<�:�J�B�@4��D������p�V��PG��9]rL�1�YD6�5���<KL�Y%�Qf���;,��:��H����:�w����o��Z4]ʯZ�*�ssV���(����r��2�0d5�ki�u�w��Z�>&Q��{M�IL[�(e��_���"胚rˌ
+�;˨�+����	���`��A20ֵHH=K9#�ֺj������]��[������J�ͼg�ƙuO ��*e��r��ֲ
+�ya�`�L	���5&%<U�!t��5Tf�*��`�L�'��i���\"tUiep+O*�t�D �*��e��Ĵ�g��&�C ����P�֭c���Tz/��'�H��X���ouV�x�[`��!x��v�I�c`C&nk7�
+��\��t����O�x�������Zz67�n���66<��c`�p��*[��̥/lee
+y ��0r���Y˜!k�gF������0��mp��=�zK����VS+LD�P>��cS��r3�/>�ie2�7�2i�:i�G�� -�r��-�v[��_ѡ�<#�y	��YW�c�&����@��M����4�>�'�{
+@ �p��Ӈ�
+��}���J�Vofr����,>6jݱ���Dp�-Y[F~"RėN��+�ɑ�
+u��x6��Oؙ�f7l�X���F.���C�5�S�[�	��`��D�߼l�����S�k��
+����k�-�K�7z�$���v-ј8�Ϊ�����Y�R�B�в쀘���Yo�sv��j���b��6
+�N����#�W.��Fk!.]F�a����ÜM�����yGUE0�Ӏ\�Yf8k���VְD<��,���j<��[��3G�%i���-��)}����� kb�#"P�"�� �[��"�nZ\ sI�dG�ln��bۇ��k&�hZ� �� �2���	ĂP�Au��0���K�A�~��3��f�-���D�oOgƭ��,�����۷��,�(��Qp�2�K����6Ȭ���Vc;�klvb��%x��� �,3O\ t#��&�O�IYy#q�;#�>�Q�YӜ�ő�I�"P��dN�8[�V��َ���F�PC:���,)��8KM���ɆY@"�~@[�t<�&�hE�d�n%B΁���V�,�9��+�Jp�:��y������f㱐��ޝ���L`���B!�S/H����aTf��.�ֶr���a1j��Ԩ��o�K�Z�������"���d��Yޜ���)���x.v=��N?��\R��r,����_���#��a@]�}uO�"�#ZOHϧB@E����x�K#�t�,�:-a�>��p=��c\�)|�@����U�bA����/r�zIhy��S���qXVnA�,��>���5
+1Bw�9y̞~|��\��^s�2+����!x_�+jy�nYi鉓VZ�$���Ntڊ+oD�m$P�hx-u1���1�>}���uW�p���8r�tƭ�� �uD�Y�5�;���6P���g:������ �ԶxZ� ��cST�PB �4 ���(J'�V͒��`�r���q�:�A��چI&ڰl5`+�p��{얀�:N�'w���7�����t��#GqA����(,�������
+�^�f='�XU�jkjی��1a&��
+!7y5J�<X��T2�kGNƭ�H��7�OƢ��q�R bI�+��Q����T#y]f�	}�K곾������%$��x�ߩ8��"ZG-4&p�x8�1���!S��C��Q\Bސ�4�5h��lZ��3�6�w��V��2C}���?$��f�w�����I��w[�|2�aT��̫a��yf�4���[Z-5w��<i}.�Q5/RN�z+�^c���-T�� a�w��k���ԭ$"(� ����5%61�F�e��f\�rAE����Ͱ� ςy��.�wQ*�-����ɵVg���
+dՏ�V�����M�B(����^7^�:)n�N�aa�  g8"pr����SOřD�m��QL%-?
+5��(��;��1��WB����<��.�a^�c�p[�D[�,�~�C�HIڪ��/�|$���PT��u���tS��[i����&$���`<�*���6����ٷ�0�K"��P��ڳ�^�,���3X��Z�au�u������Z�%D����6<����:�߬�.��B|g����fsqf��G��3�n���%�"����!|1�n�h7�y�I�ɝ�s�;<'��2v��"k+ֆ�[<��J�c?��p��)bFq�h������f�υ�9+�C�jj}�_�̎�b�i����
+�?��cH�z���UK����{	�A�-�% ��O��;�-m�V�k��RO��"���ܲ%m����Ul��q�;1UWTF��F밫Ws ���q���72Ў{�G��b��8���(�Lq�%�7l����ٴ��n;�N>>"Ä*�\�7��h/��Z���V�����!�9�;�a�:��yS���x4���P�i��50�{�v�~-�Q;� 	��X׶|f-B��,�0^#LHGaW��	�oi5`�Xc}��'&]/\��T��	�5���A;r(h�o����I���렳��޺լo���T�Z��jX\�|�ŔSq��M 9���;�_�:h�L`Г��.�^(��9j5�� &�0G��g�X�:8��������G\���Ņ�a�
+"�+�n���6�޷�����Q^y4G����)Z��z�췁�b?K����E�ԛn���Y{g:�W��%l���e�t	$Á���iqE��tS�o��I�� ���Œ	8�0 �Q��h����W"��H��A�]j�ӑ�\b�u�z�,O�>aӳ�]蘱�i��-k0�s�}�-��=�0[XXv,�3�����͌�Yo�R��efK �&��Vy:N��L��h�j��l�M����*���y�vlO`� ��(�ꤘ�C�pJ˺klj��Ο���X�`a�5<z�Γ����.���>̈���gmɪV��Zf��2�4�B��q1Z�ԇ0��Y�={ޞz(i���V�ٱ�x
+L����<v��9輥,@�A�	�XY��� ��!�d6�&v.[jk
+���<���Z�x>Lx���fg \a��E�8^׍��He����"����f�Jk�r�=����?x��#���C:E$�'%Asƪ��l~6k�X���a�PE��/�W]�h���gy���4��p�u��@���iZ���_R�(�!]�����;�̀�k�YA��T�������
+�#���� '�g��-�K��@�؍��Hy�F�֯2��/��$�m��jg��
+";OJ�����}��s�l��<&q��>8�nw��rNE�gpU@e�CYC���V��t�x>k}�� ��e`���=i��biQ	 T�a�Y�&�Y|�=?>e��m�M퇻�L�`:���7�*q���oī�u�N�c�+m��!̬M��dO�x�M�[eTV�&.����c�>�� y&�2�����R۶8]��U*Gz�EO�k�V�mT[��kX���v��y;w�m�ʤ�zw���u]�+"��������U؋)7���b��3�"��d�(� ���a_�L�� �{Q/�~���?n��,N����#� Հɮɗ:��:<��n;���ն^a뮹ٚ��9c��Ag;4�VDR�SY���eԚ�*^/0���*I�.NWL��TN.�S3B�$���c"�U�˛�[�o�gػ�q�[�l�^wu ������D�MO��4D�>SU缾AV��<3kL����A�,n���iQ,�dK��F\AI3��s3�����Xl`7�T�l�#h1�(aa���I"�e�֌����h�J[��Zk�p-�=� 6��ȋpD���Q�: "P�R$�{"�~;�E5���p�p���њf��/a�`��m߮.�=��-o���v�� d�r�=��O]�s�[޺�JkP����G�ĳ��5\q�$Pa3�R7M������]�es�Ni��u�Ӊ#'1hq�q�/�����O����W�Z�$(��$Թ��Nkn���x��?�a�Su�&�l٪��z�� n�0.$k�lKV*%�
+aX�WvGu�[��%�Ū�H5!�j�T���4X�]�u��bQ�%�{l�r��h��z���R5b%O�$@X�ba����{��Z;�B���SJR�'tQ[Zik��[�/�%@eUmlR)V� ���tJ2���e{��wv��s�-3�(�x�8o6
+0��ICQ"���ؾ8=i�ۅt��*+Ŋ��VZcC�#xG��
+g3����^�+��s䈤��
+���b�kb�f:s63z��\�V^�bf�o��d{d
+���/�:(���-��	�Wb�j�C��ι]��V[��ǚ�c9��h��@m�ӈ�v�(j�ýU��SC�YzN^��L:U����T̞��7�;�hm�������-�bhY͢wr/E�U\��i���*ty4eA&�����~#�܅}/��9 E��J�����!�%�RuB@��j��c!�׼�Ŧ��"휀��xWDK�m2�Dep⼅�T����!I����9ܘ��f�HU�s�$�9w��e֪�z�G&�(c�}D���������� �����?�O�vG���cp3-8cFc2F/��h{Ǚ����h�m��NG�Zrt7v��m~X%�xKi�2�������l�e���� �b=S�ٵ�v�hbŖ����D�i�NeY3��ŧ��n��Y��}:WZ���jZ�vw�W���?z��cO��\퀗��8DHBI[�k����w.�wQ���v&�+V��Ա�ϋpnQ>��Ľ
+`�!�z"��aK����#ΰ��{-�OXtl7K���硇癴L�N��R\n��r�� o�N����IHa�L5K]�Cc�Z/�0!&#����}���R1�ϝJ����0NAiYR�N*���d���$/����\�ZEK苈��k��Ɋ�k%���KH�`���r���֍��ف�i�T�g�	�Ӊj!��$N��I����#6=x�Vo�͚W���<C��[���3�����^P��Z`K���,���N[Nm�1���).`�t[DT?��yC��g��� 0��vìW�/Z��n�(\���4:>����u��Τm^G~XZm��
+|Ͱ%by���	�����A�~,��}�㢉�O��(�Η6Mdm��2;�L�V.�3�A묞)��F���3�����
+D���[mݖ׳>�����'X�t�u�8�1ϫ�Ȳ��R4�rIgjKg�ж�V��Vq��s�MIP����
+|�R�yk�E��Ey^I�9;�GU��'����L!u%I�tcT;�g���,
+;X~_�6bkV�w��TYI��X<-J �^�#c���V���2�li3�f� �f�E=^�:�8B����s��|�ښ����NW���b'�)��ΛǦ�d�	��#��AS�c�S��,+:ϋ �$�/��H 7��R,�ЎvC�e�R��g�/�K��TL���d�M��R�1�O���#f欭���0�&|�"��T�Ԭ��{�2�ϩ3�lʶ���&�-LlIVhѴ(o'aЬ������}�����%;<��B��8O�Q�q�Q�ah�I��%u�&O�f��kk6[Ų60�����mۭoBxe���x��+�vT	����$n��f9��B/��M�F�(�N�]\v��egꜽ ��6M�'��=���(�˫m꿒�F�ͅ24y7x�����{rG͕����3;�A`��è&͘M��7u\�
+߾�]����K���7@f�V�].N� �!ݨ��T���R�"�J����!^x�{H�Ӡ�Z�΋wm��cSV ��L����B��
+��VaJ�gp���*��!�>g�h�	u0�Zp� '���N�h���K����"����Aߋ*O&Kc�*<Ү(k�vޜ���>(Ċ-RBm��E	�а��&�؄�{_�ݶ��bF`�6q�B�"��:/�F��Y^xq�-�l!��J�A�aܼ�v�8������3sy���fw��[ǹi�˖/!B��C Gݒ@��ڥ��c��A��&Y,=k��(;�@�,&Q(\�U)J��{���yQ���x��)�E��s	�] ���!�.u?/�gQ b�����G�;wmz{��ݟ�[X=juX�I���x.wU�r�����~	<���l��R�����r&�6CH��	�RA�~����s�,��\�j)qs��_�h�"!)X�Km:u�}1�>��{:�0jO^��<J2ʚ�>�4������o{���9vKP���
+�ɥ���x�OcӦ��Ε���0�"u��>�޵�<���q��a�x�W`tI�vHՀ����_g���d�:I��s5�t����H�Ȭ8���P$�JjDaqx�}A��;ޯ��"���������@�ѡq�����MY�8�í��W�Xg���E���8�K�8���/��fCj?"c#�t�T�~�vź�}���H$jO(��B�b���H�Ѡ����蹤�M�<���}��ʑϕ���p����pq��:�l�Dɀ�cp��W]/N�x��E�S|F.��(q~{c�m������/U[��Y;~� 1�Q)�$��KHT�j{\��47���
+�p=��3��9n��wڪ���,.݉3�:őmq��T�(?]�Y��D�"��(<V.�E	�/V��qn
+$G� i�!"(9)�L�p��x���bHU�Y��ڢ�����l�����o��7�zl��c�y������*2^P=;7V�s�$Oe�6���2�p�=�7���:�(�=oW�g�w�����������7o7\kv��$�,`�z\��.]k'�@`.#��YjK�����ѵ�.�-.VNDW��3��(����t�Vy)'����L���9T��;J���j	~�՗�m�Z,��+gW�{�`�*�0���*,�%�@�7����N�����N���É4�9��$C�v����g?p����ig;̮���*�F� ��8��v,�w�
+���/ptU��\������s�O�[� f%��#V�&�$ٍ���#w���ꓷ��l?�ϱ�у�x�oGЎ<=d�'��䈯��s�.Ơus��c�@l�(��K~��K�K�hD΀	"� ��4��>��[|{���fw�3i���������/rn`V�Rb3��&1��:��4�jC�	@�/���#�(����O�:tA��K"�\N�8a_�/ɪ����:�� v�5b:KZ���e��wTYeS��ƄM������ȄN-S����5�6��>\h���E	p��vu{�v�q���5�G�a4�
+8Շ $`=�����a�m�������w�������!��=o��fWn�__�@WP�P]R5Q��[�wэ�����T�KU��8PH��By�C7�.eeT�L2�G;�rs����f}�1�a{�	���ڌ���(�R��#5�zܙ{n!D�L^���>�eƱ}����o�q+o�4�b�q<:/�s@��4}qR3��u��2��	;\mw���v��Cv��E���}ON��#��*��A�xФI��4HZ��"��*�hE@D<�A$5*���	$q�ڐGė�lQܪ��y�dg�ݺ�o.L����{A*͆�k�"��9���A���~��b��z���G�v�k�#�K��&��xb>b29t0Ş�R{���EQ%j�u����� ᖀ҅&=,P�ii�Ɠ���x�����{��7����N;���;r�z�^8�|�ח�����@9�B�9�+�K��}���z�y��>�#��	:c�������n��Pm��jF�a��-�c`�cBA�����c�r�R�@���QW;�G��8y&��5lv�=�7�o���.�% �#�O�|ַ�Rܶ���?s+VꜸKp+P�'�ŁJR�e���0�WyQ��[V��cj���7��&��Ww��w�e��-v�oG���cl�8կI�X�C	�ym̩!�"�9")�� �ĝ
+K�<�~�2pRBD�vS��y��/oD"� >����L�x�]:�T��-��	�!�p�9��.d�rQlUע��z2���s���kn-e�4�0۸@8��Q����(uV�������4���&����r;�^bO�8i��
+{�}�m���q���ؠM��S�Ib�q��pf��6XJp��M�k�r��6�^��TXk����g�n�N�J���I��!�:PU���p�k�I;}Wy�9w� g�?I���z�d��P�����x��O���w��Q����� p/W�\�R��T.7�� 0�<'�^d4]X�3���H2�k�p� �G�q�p���R����G�����.���-xQӸ���jB��z۽�������f9��$�I�.�A>�[k�F*N�R*���}(
+�g��q�ΪVg�#��n2�s0��n���D�O1v�#�Z���(�Բx�0�@�+�"u �>u�F=h��kߎ��ێ����kf(�����T}qP�ED�KV�\I}iÖ�(%�����X���|Ӂ��������"=*b�a��\��>RhK*�%β����F&
+FW�Ϻ�m�M��&���̋!��t- �y�ټ�w�$����u��{��.ȻR�"�.�����B�
+�E �wz�]�VΏ��~[�C��H��)��`
+������f�X�A���{��5��T��rX@K���5ծi�V�5h�1' ŹM*GFZ �P̆�]G|1�#*�ݼ���A�"w���Z�uq~�>��o=WRM�T��ϝ5���ǘ?�(�E<��)�)r ��,�%�~hsxAh ��dyZ�;�w�>�[�vͶr���´]�F�� tAR97�b0/r+���'.�Ҟpω=�D$]��V9E)ݼ�k1���\�b�h���SցL}�_t��T������Y �P���$_�^�\O�l��c����j���/���/IM[7��&��hU�B�8��t��� ������w�u��\�����zxQ���F|k�u�H~�X �8P�9b�[��@E�wP��X�V�K���@dv�T�B;΀�R�R0������	,C�	Β0��%a�Ю!^*���Pg�`ؐ'�+�P"2'�Kj������c�UY4�ܢ��ʺ���I��������lM���� K��}���<�:^�
+zx)�
+(�[$� q�	w�Iݓ*A��p��A����O@P��ӱ�~�@�EG �T����Վ�^�	�Ҥ����������Y<J � ����#�x?"}��Q��&�/�Z�������DQ�}�@��pd?Pe���~n���KyY!`��Ō�΋=�~���B���u�MU����-���͆��H z]K:��c��QV��U�j[D��DN�s�ؔ��#�r{P7';�C�9}�sfo|#�@;�������^��h�o�=W�m�T�x��6��;���pc�� -�h�J/#�w`з����lox�V{�Gg���3�,l��?�,�a�#��*R�/��"PX�x�Vg��!ݫ<V���ө1~�N��M^���va� r�E=M*UI��'�	]Ro�+o3{�{P?�������+��ԅ��f��&�����%%1�%��7�8��Z��>*��F\(���4����q��˯��w_o���N�[�7�\3g^�w9ׅ��efzE }RR�)}��z?lӪ�_/ה��|@�G�h���$�*����z��
+��$F�A�-p|��{��!� 1�\NxZ}V��H��;�@}q�|}(~�L�>u��ᥥK&���~�u3�;K-^����	|uL�}�����H�����)�W��/�7���l���XNپ��$:�^UQ;�nWo*�2�J�[�l��m�*�-��: #��R����h�&IB�3'&�}&�.&��O����j���m���3����<ҠY��^�<@v�<@�s��� �c�a>�{�u�R]��������f��9_��VԂπ<�!��� �['%�~�y �����d�>��{����m���N�X��Z�_~�xL�Ń*J��7��Ӧ'_m���'��l��kQ@�I?OBT�(9 Ri	:�.s��� T=u�J����טw�M��`����1�)���Q��U$Vm�M�D�G��ҷ��ԍ��\�_N���;��	+|n�o���jܽl�MO���[$�z�q8������Zਰ���h�U� d��y�;y�ώ�Y__���������$K�d�B��D�{Z�['�g8��� ��<I�!|�@2Z�۲ެ�������;	�:|b��$����a���7��(u�CTiO?}�pR�,D���;˚쏾���oER�_��%Œ������m!�e��������]h�f��@�߳�6��8h7�����|������#�?��_��O�U{=݃֍�d�##l�#�F��3�B!@_�W��ԋ��w\�}6`��|�3��Ĩ��LĲ�X}��A��+���ꔼ��0������;�Ҏ��˒����[S�빊:�=��+��r�?>�M�������8�(���Q��ɣ@G�'�Y�bq��Q��$D�5��L�Ǟ~��}��u�xm����m�*l��!h>K#�yd_�_���Փ|
+�7Q|�!Ŧp9��4�>��,��ҫ��}�1���$�!�rT@o��[׿Q#թy�Ʊ@L�G\/WV̤3�k�@�h�	���|�Z<�L�Z���6�;��o��o�\P>�{✢�&DT�}?II�5�rߤjd��)�4��̹v���΃��y��w̼_y��������ͪ������ٺ$�c��/�[Rc�>�͚!� nŵԧ$4O�-��T���3�>��'�o�w�y>y$�)~~�>a��<�DPl�/v���n��]�d�|A���W/Мa�w��;��Z��z�@�r����}�� �6���	�5djV_�����b<��ZR��z�<�ݖ�y�hw��F�7���3޴�I��tѠ����"$g�s�sI��{��T���?���?�K"�O���ǒ���}��ƼU�_�B�I�l��w��Z��8�� p�svtF�QJ�Ie	<'I �h�������%[�P�,����>�����&��o�Nj�.m��n�@R�}M�\���s���k��|��._��g��A>.����}�F4z��T�FLr���'i(A�m��H�C�N�D�Wh�+��ʗ�\���vX�[�#.�qx�6��J���J�4Z�)��l��?���ϻεۧ��1C�.O��˗>��P�|�-�C�ˇ��of�V�ɐf���,!D���BQz�"�q���� ��q���ǋ���X(�$y� Az1�ʫ!���We�n���UV�D<Tb/o�<�7j_����4���J�b�>�={����Я��w�bf�<�əS Hg;}+ �-���#/@�v@Ke9`��k�t�Ʃp�Iy!t��@-���K�))�K%T��2�2�؟f�����ǽrJ�˟^��{�X��G�}�=���v�0��V�g�f�N��]/�!�+q�vpv��N�sűE %n1Dy�."��3�\Ya�C�%q"�#4g1��򞝋���
+�?�͏�陣+�W&�b(v�K�M��{�=y���O5��[�w��l`ɱL�ʸ*�-"U��"���8�.r��:��5Ԣ�˿P@e�Ay&Е���q��^�it�3|{�������]z4�5�S�y�	P��?�p������_��,o�m�M�:�Q���'6�p@<������@bLǝ��3�\�h"���@I� �="�V~=q���j#�ئY��<��䃐O=L��=�����c���%���Ч��	�k��qp�n��l=��%`_�:
+��#���"�R�y3WD��b|��ˏ�	�-��h��r�o{�#�p�Yl;{����w�8	U��Ks�¤͛��Fv'��
+��Mx1k0��؆�����7.����嵩2&jA�N��G�h�c9q���	��Q�v?R����7⤿8�� �,�! U��柍�Ώr�`;(��5�:�(S��R8[�.o<����]|g��ޫ�^E�U^E�����p�	#��    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/gold-mini.png`
+
+```tsx
+�PNG
+
+   IHDR   `   `   �w8  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       `�       `    ��}t  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  *TIDATx�}	��U��w�yLU�*�Te�HH!2dR�Dl^�.��v�_7��v���'*OE�D#�y2��J*����R�<������?7�2��|uμ����g���o̆Yf�E`�Yf�E��G|KB��D��K.�M�9e��{�䕭��{�Ўm@��*�ߌ
+7d�B?����?�ǧͅ?.0��ѻ��Pï��ߡ���F��M
+�+ټr�o�Ζ�s{��>	)ј�x1�	9����VSu��'��|�q4�_�W�P�GN�kﹷ�@�`��6:�I� *&iV 6%���5���;�j�}_�e�">�
+��hssY�]�%�C�c���_�j�	�	�*$5{12Vb`0��\��|UQ�on�/�F���X���򮊚;Z���|���������P��Q^ʈR�Y�v|�2r�<o��c'[��v7�W�j۟�[���wS	H�8�����QQ��������	t�-������$�%��WY\J���`05��M���>��Q�n(���P(��)8������k�6�� yhI	*7Kg�f��#��EW�61�aeh�D��At����������P��J
+����](|'�Q@(�)�����5�k�5���M�@M��^�K6��u@y����S�fPTt,gO
+|щ$/�T(����y��������wBd���*NK�=4x{����o���ȵ �O�;��,��X���r�~��W�R��a�d�J��Bhl����:9.!uަ�;�?��Ӱ��|��4Zd��B5�f�&��Sw]_� -��
+0>nq50)����@�N3A���*������=!�~�O��KdE4&��1>��-����	�h����l�tyCS�C�{�.�F��݆|��Ղ* ���m&|�,�-ϴ˻2Sۅ�c}�%�Ow�������/��W�Ĺe~8��4X���*?���@�]��ƇGO 	�Y��Z�
+|��%��3W�<;�0��;E(=V����8è����,C���q�'!c~4d�����S�83$��.�T^|^SEݯ�ʗ`b�P�В[�f{z�R���4kw KA�f;�Q�f���XkI��C *�u�|z��碫� �|	ǝ�1�A�Tj;�yQ~��/�y�����
+]�g|������}��L�O޷l���U@��Y� ��rh���&\��f��Itn�||�Q�bY��� ��}	k�;�k� 
+��bx��-��0�/��Y�6S�}������G}a�]��ՙ>ߔ�+P�g�j̪	�Y2�-�)7��ج���"Ey������A��0z+�q�����S��ơݕ�&Vg�����3�萍�>�x��9x�7��no�lI���B����;�6�����)��Ŗ����F`�r�Spd�.&�̏��"Ͼ���lBzP���vQq�#���C���86��6̝)�(�{B�+�%��V�������@,w:V �������t�c {
+��+��ژ������vL�8ϲ@l
+��?�ޚ�(z�U�:g��(ϫ�&5󘠁�ǚ�Qah+�$�4V?���{����M	��u�V���0���!��z%�Y��*(-$�GV��~����6�Lm-�����̀���W���yX�y&G;Q���S���	��%0fFLB>��(���7��謴Pm�Κ=%74w�⼫��%��F��<�f��P;l����nIRI!�tN1���S\.�E�>�>�)'��ۃC�6c�V>A�y Ɣg��>�%M��n�|;2g��D��s�����Sw�P� b�������-EhG�2\k�>L�wB�W��[+�)�+W[4�N��h�;�牝Xz�zL��|OB�km\?�R�f����&&�4'�gB"������5ֵ�[�_�(�`�7;0l�e.B@
+�j'w`�0�f�����)M@�����f��<Z-Yi�Rt��@��8����5�i�1hP#��r�&���}]:>ΪG]�ۍ5���N_�R��hɫ��|�r� ����'���E�ڰL�Y��ࣴ=^���MTb�����]��l!V���`'�
+[m|�A��b�i�g���K��kW��	����YuLAc�+a�|�����-e��N��F��@�Mp�n�"��j�/e9p�t���qu�c��X
+�N����Ϣ�v;�_8����p'�Z�k�h���ueZ��z�M	J���e_����9��1�á��0X~慭�-T�/���m3ͧ������  L`��jf� W����ޞuR��	G����/���r�p�F����T�vu��DOJ���j�-���*W0z�G�G��\�q^����KR�l�/ZqI���;�[3CϽ,1+�&Xd񥀲Z+��f�̛_W��P`��K�nGվ�t��\�ުm��֝*��R�vk�x�s`�BDC��'�MFa�S9��c��~G�V����?�+�L��������* �xm)e��@`{m
+a��v�=�L���b�"�}�_��gK���S19Ј��&[p��42����*�2c��8j;I���ɼCm�%�c
+h��ת��ok<��w����f�M���q�,%��MrF�g_�9���̑e���H]�|��k�W��;�u���47��|�����[?Ʋzs=�4����_/ͤ��ë��;�qo�������xm�[n��c��o��m�����u������rD�Y5�,f�� T���Sx��~l�vM�[;��)D@���}UO�������t�Mh9�l�ù:����g �S�� �5p��v�rVr���O;{q�'o�+�c~��޽�^���v5�k[u�?���[ �a��V/����6��)�Y+w/��R���w�G��.��������Y�X���=��7���q���BKz��\ёU�Nc[P��y�_>'yI���n�wo����Ì)�y낄���慨���IId��I@	f��<3�h2v�!n���v)L@+�fԂ���sg�@}��^p���c��X͗)S��|����1H2r���|�[��sÄ/�#KzO����y�?�6�ٌD3�����Ӈ�}w��R�ٶ�^�'x�
+j@y�:�#p͒����R���(�g^���b�V��0
+�eZmq��۹�>�E�=[Ƌ�oGkES����/#�����оޔ ka;թ��6����%Ƣt�<�&�ɪ�ӱPlٷ"s|8pgy^�%�����]>A��δ܍��L1tIr4�V�)Ƌ��ܕ��L�Ci�!����}5�	��EX��x�y�m��N�N}̅QZ��k\bo���7f�����_�t����)_�#ǂ�_�K1�~:�qAg��]%��?��:b�;K�fݷ:R��vo.��|��¦ɘe��RO�K�6;��
+�gy�oC�E��l����m� ��ܝs}�q5�D^�3k�f�N�>����I|���$��#�m+���U���w��՝9�Dbrd	���@�#�e�ف�r�%�k+��Na��-x����g0P�,�^.Ɗ�6��������RIƔ&��S�����d���;_� Z�����o�E��;�Ƿ��7�����rg�����p�)�L@R�ׇ,�^�Hh,7� ��kF�9�ewAj��4E������2�}����z�+�:>��wV4���"��^�����:�:�5#�x3]׈�9x��@�t�7Pn1�����4�ʓ�5Uw?P��q��Ș]�Ф$p��ɯ��������������Hi6����	�2t�>�}/V`�y�yMٍ�ʎp;����lL�ɿ+-���W,��1�2�S��W����F3������?�����@V�|�-=nS}y�C��ׯ�ݬ�A��13�$UݿgeJ+8˧P�1�Ug�Ό�._��e�m�B�r;x�P�[�
+�9g��}h-�0��.��V,'������S��c�y(m ����Ѽ���X��~ܱ.=�_X!f2x���$�����P�m���!rl�����Ւ�m	I�E��Y��䣴��v�l��,V�|�Y�GW4m�8�r�����<���*��z�\�Q�ڙ#g��2��L�����yf�[<¥V����bD$T�q�"����@��g"H�7���_�X9t՞��1Q����Z��x�)-W"Pe���$��d�&ۨ�)���,>�j�܎�4~���<ᾊ|~����5����@kx�$a/�d���JOrWc����O!p���D�nZ<y�S���=->���$����m%<�c =��^��ڒ�_V�mɎ��o��<S)i�)���͍x�T&a����j��iC�iS���(�pb�0P��������i�h,h���� �4��r�1�����rQsҀg����D�N�`wElc.��σ�y�L���i��ؔ$|;wI�)+s&������v�������ǯh�j�uM~y�,߹u��KP������"[D)�Y��KQ�3v��K�@�o�C�$��,�2��_ž��p��Ѿ���5E����z�%W����}Df��ΎD�S=A��[�G^S9�	��֥� �s�>�tK���muǵ���ei�.;{q��~jm�ۻ��
+(y4������W�������H�e�����):�����,rئ ��/ �0����m,�K��	�{���]X���T�*_�� m`t�m�sL� ��,_�@��L��O�~�Hغ3�@�CK�N?��[*�6�,Qw�n�҇c�8SҐ������qѺ��O�,y|�[�h�u�k��f��S���7c�SB�A�����b,T.����,�>5dY�ʝ����s_��D�,�ϯ߇܁�� >n�/7�ݍ��f��V�)I��+b:�ng���?p�>�ʘK��|�|`y�,��l0�ɿEr�ۥΐԹшO����8!���_�<'��W�LmǾJNF��7�^W�|_NI��vr��N8��8��po�	,`cJ���wJΥ�Y)I@�R����:�5{�Δ :qI�6`�C;��x6oV�p`[{���Y��u����3��gZ�"R�N����NA�"�~A_��
+�7��vu-��!�w�$�Ob��9���e����ܹ���.:~��)'�.}�<Q�q`����Ƶs��G[I�!�O���8_�?�X	\
+i;2'�۵�y������:�(���%�����+���Xu�̙3�����|��襈^��)M �2�˒{�yM���x̠�xd;��s�ߴ�f��_��V�H����r�6�uk�^.�1���)wVDߗ�;����HL�_v޲�C�)���@��|�9�xi"�1k��,?�?թC���t-i�5�1�9`n���Rȏ�u�<-m d��3�e�2��|��c�u?v>�lX��,?�<]�1.w3F��H6�8�\��$��Z����h�eT#����������XFW���/b�~�n��)���*6c�k|?作�PjP�$-���2�ƪN�ښ� �&�x��}$ʇs$d�JGjg2��U���K����3�~�'вw�$���e�!%��U��P��dQdZe�@�<��bZJ���&���d��/`��y�=���ټ�Ƕ-M�CMZV��2��J��������,6���E�|� ��^���_� ��8����ذ�~���.�O�4gHZ7�7^�r�Ҹ�t�q��q	��fA�L�9�c����(C�����1����ʕW��������HG�8	[�����֝z ��~��$t�BG�Ə���}�U�-��l�.a��(/�U����Y��k0�V�]����"�+O6�G�aw« ��x� ̈́�Aڒ]�L��@eإ,��=@��������Y"�(�8���v�EǼ
+���޵���l	D���\����CL
+&}�ģU��Œ��Wu=5p?k�Q�׆��Grw	J���`�w����n,۴��kAOɋ�M����r1�^��`�	#`e�n�a�S����*U�8�{<�p�]�xᾧ�I�ȉ���j0�)���Lh�"](�'���Yy7�b��M	;ya��XJ�/�_�!��(-%�Q�z��f��$��ȿ�W���n-��~���s��I��K� 7*��
+�hm"e^>z��z��w���ߤH=��=F����ϙEM=�ѶKV�/D���Q��{�J$��5`�0�;�;{j�D�	����j::��Dޖ�1m�����yc������Ղ^#j�r�a��j�N�2 쫢[�X��O-�]�!���CwUA(�����A;9��2/:��r=���m�~IIM�8����3��P
+�:*�ۼ=mAħ-��f����ny�;�	,]�ud��=F�u~d��#�88�����B�2����hn�@WM�ʑ��4$���B���o�H�_���QJ�)NA�c}����X%�^�ɱ�y�$/\���R��+�R`�����_��g�4d��۱�3��b�����<��4���a���5aaZ�}����C�Ĵ�Ph�5���o��V/������������Vx~k:�C�-h.y-U5�F�Z����2�D]y/ǜ� g#E^�I��7�}�}��tN	�	&K�h�B(a�`��;��0�Y��� �p_��b�/I�Q��Yܖ�I�uF�_���@���?܍��E��4	/m)ǥ���Y�v@���"�b,�w��')C?��Ee��5��+TZ���YO�V��vz�Q�K}��N�B�ebjr�O�7qe�n�w�Y���$� ���U?ZJw���x�S��Z����^�¡��>d{O�H�S�����ѻ��p��8�/_$����ˊ̢��i�x��k��wR�-FҪ�r���W�{H܀��%!_�����������c2؃�'�EL�"�L��G��P�$P63��X�F�O���S�X�R����,�����$�A��_��k�x�����A���R�_�B��]��'������4��O^�I�z�JPVX���8d-Y�v�8�����I�����m !Oݹ��?��!�<x,Q u�	�b��c^�������7<��k����b�/8}�^@�c̗��"�f�螴��(~�nDs/��n^�U��h�\�[pő�+!H��d��U�2�˯k�4�?�Dq]g�f����F|�W=Z�ہ{�
+�����)N��C�٧����F�v�&Ƃ>ы�8�I=���ݵh�n�P0�Wapp eTD����ݔ��?nL�/^C�)�psϩ��p�h�s��P_Y�܁$<+XowCI���MtK��X�t/�l\���?ß��`��%��0Ez�E���ŪS���^FO���4�Ϭ-��N^6"���@��x�4��j��?�KA�f��ۉ]Vͱtb�}���hk�E�/�M�ӯg���߈��F*���O`���m�~O 1s!}�$J�բ�}�x�N����A�+�q�l�֮Ŭ=*�{$�r����E��ղ,� k������PY�K8��80�с��}H�Z���H�ŎG�@Y���l���Ye��+�N��vtkR�� ]A��k ��q������b���_����t(��qT���Oyͬں1Zv;V򄖔����2�d��@���.��u�Z<��d��o��o��Ф�<ǟ��e�;*� yT'�y�<q~�T��n������r�i���kL[+f�g�MiMg�8��FyY^� ph� ���N��/�j�n	�r�6�W���"�I3o�y��ī�,�b.���_0�8���Ѭ�tXe; 1*��~�qU����zFՆ���w��21w������(-����_���.�(D#/���'㔕�Hpk&I��Ż�OZ�_����p���"n��X��Y1�,N�d�oV����[D��4/W�wO#.�E�3��Ŷ�pо@H`G	�EUqF�|�Uf�_5y�ޗ��^���R��ė�U;���������P��S�o��U�Y���Tl	�|S�_�A_����Ќ)�a��)sZ^2�:��ܽeq�X��#`|{M�хq��e�c���6xVoh>֖�3�Ti^ �Q�9s��$7Lc��I�Eq���t ���� F�C��������y7�/fXJ� ��{i+:�P���Rd@��vPz�gy�8��x{Bw}%�Ɠ�[Vv����}��hg�N�g.�1eN�\c4��s�.���<�����Ί4���0�0v'R��Odl��A����.�V���l��HD{cѲ-�� c�i�@�jLtX4'	�����
+O>�w�����j�&�:{�}"��6�0�z�@G��M�u���o�s;6$���o�ȋf��2�~�U{�K}�h��_W i�$�;�X]�U�s�2���p"&�����f���A��Ot�'}��
+����qjc
+ -sAУQ0�#)2'���7�u������΀O��%~J�Q��X�ţD�D��x�<|�6�b���៥R)v�c}���{�����=>�IM���ql���hY��X
+���U��`?>?D��yDH�m 	䥕7���Hf��*��/2�x<�d�-g	��Û����Q�0���q�^&���[�߁�¥���Z�b��+�}H�e�vuhS,�]�o�����G��X��nR&h�����8�A���ڱ@m\,C���N��>���@ю��;����M�����$AӀ� #�h�|��*��P������|l���*���j'�L��1�����w/�w�[���Jt���\�Le�4��:D���Y�x�XZ��\�&�o����D�q�Gb=`'�+S���B4���|�]�h��p`�뇛�G�W~�Zqy� v���8@��nX�:'�$� P<<0��d_�3M+��L���@�	3%?����D����|�V�I�&�0�q��a���D��#P*��(�V�<�G}-HV�2��b��v�c2�[�1cY{?
+��'�)�pА5���x:�.n����#��~iU�E 'C�ge�)A�zF�!$&Lٷ7�w;!�y$'�8�J�
+���6'w��pӕ�?� nq���'�V��	��<�sh_-���3-tIhu��(E��JL��'+�N���K^a!��^��$�<���������o� 5��������5M���q1,�zl�s Y�sAJR;I4F'5e�'<�,��FA�܎G֨�Ѳ��ؒ,��?���e����~>�ul�}� +�C~��7)_Ai��
+]"���'Y�T뀷Y��b��(N|ɥqT�7���|��~�=kzP�7�� ��!>�Շ���Y����4�FEL�c�	7��⑞�I��:��0����My���Y���$�z���H����Q������ɫ��!Ȧ*Y MW���Ǒ"`{�e �BA��#%::��B7��ҩkmǿ�7��<y�E�Ȱ�[�?�����#��k#�(1k㑓0fd�YB����u]eݔ\�Y��R�N�Z ���⤄��_���P���{M��v��O����ε,�&k�Z�+g�f��{��QQ�ŵc���7l@�b�����5�d�x��܉�W��kwl�cE���~��o/��{���?��:<?77��}� S*u���8���(ZȄ���g���,Ќ��Fή�.�6*�gG��g��O|���CA��O�� ���xlR }�!��v$��Y�����z��v�W���.���[x+|�}����7
+�vl��}���G3���w'p��(N���Ӣb�e1���og�w��}m�ͫ)����%��/B�����vl\�~�5�w�";�I>M	���we�O>=�zh�Іc����`�� �u�10��N���7��E�^؈�p�7���{�"������v|�'�g����J81�Ð>)q[c����ԪzYOz
+&��]��x��9��~�����R�v�?a)ק�Y�m�H���m��X3[���-�N��۞����+�훍�yL��h�K��9���{����T�\��bڏ�h.q|k�c�F���,*�g��~Z�#|oۑ2O'?c��t�����1��,=AnH���#N�p*J��?�*�����M��UeZ�Zڱ���~� ���!d�t]�i^gT��勺�Ů5���<w�Y˅/J��=`jz<����F(�
+���c�%��/��j�MK��cЗ��SC���9���h�\N;;e�|	�OO�!���R�։����n~n�Z��ï��ۛeg���v]��a�(������$ƒ&QU9���¾�.W4��C���n�--�����N�E5���/qÉ����ͷz!��E7����n�4���r��"�Rϯ[f�Oͼw<�x.r���x3zwq�-@+�Oh�����Ex�g��~3��/dn]�g������~���R�bo������Y��}��wE�����f^G_��P&��R�B�Gͮ����\�/Óp9?Q?��m4ק��xd[�m��k�fǟE`�Yf�E`�Yf�E`�Yf�E`�Yf�E`�cA��f$8&��6    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/gold-petal.png`
+
+```tsx
+�PNG
+
+   IHDR   `   `   �w8  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       `�       `    ��}t  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  'UIDATx�	�eYu�׹ÛǪ�j���kl�ih�q��"�`�@�l� 14�&�J9Nl'���8rp"�1 �b�-'6M a���������U�y���|�z��(R��^(�U�{ϰ���Z�_k��ϭ���&7���Mn"p���D�&7������G�C/��ܳmǡ�����E�Ѩ-]��r���?������'b��o?p���ū���zEs�m/ر�Ec�c�je�������G.^8��_=�����%>�ַ���,�|��c�����:o���zx�{��K�U��KS�Y\�Zώ��r[�x�����&f�O,�o��#1y�
+�B ���qwW3������ۢܵ��zW�O��v'ZK3�E�n�[�����?�P{����/~�s ~�o���(�ƍب�M:}Sg�u��Z<�Ռ�%ʑ��K�@ �c�":e�M_���V{�h��N�z���������7��KU�7Ҿ~#5�m�Wo��K��Ok�x��]ͮh߲-���F�a�P����ۢѳ5�ň�ًqe�g�D�?ێ�ɨ]�������{z��{����}�z�3n��7���;cO����o�G�k��0���#6���cϊ�ێ淢�>�'bia1�q����Б�TF����M������pC��~�q{_'~m�p�ĎQkԢ�ځEl۳/z6�ѿ;P}�>KS����), b���̹�+av���x�]�b`d����'O��?����n$u����������������6����W����k��{8�!���¹h-�	�A� |q,�jg���>/Dq��Ų{xc__o��C�c��_�r��?��xAm)~m�H�覱(�\��D�o���;�7݅��B,o���`6:�P�K�wN�����8w1����������+���Qn|�=�B�K�::/���g� w�زsst�~�V�Aep[KW"&QyA��^r��I��\�l�xf�Vv�;#۷����!��\w|��q��B�RO����OF1o"��֏ý�7|?@�lg��ekY�ۄ���`���1^�n��&���̥�TqGlm�薁x�^7�ﻮ��{cWk!~q�7^:�95�63�F(~��z�n��j~��ľ��]p�;�6V O����~���n�0jl�S8��)�;ch��������}A<uc��	&����a ^�g��0�D��߲���n���@�z|�t�s碽8K��	A�v�#,gǍ��S�S_c��qhWY+�r��S��zL�}q|�����-��57�8�a0~���O�DAYl��s;�o�������_�_��q&�7�����
+�hIE����5HM0T<��B�}��7<Z6�k=��x�w]_藟~�-�#Gbd��������E"�'� |���]��r ���"z�A���kK� �Ӛ���9����j���EF��c��&7�h�h_��{7"�V������F��>������W��|���K����߶�`�	�G`���[#���ÛvFc��|.������|�Ks�8� :P�2肬���-���Dz�[�
+�y��8��c����Z٨T񺃛�Ǹ��%���� j#�Z+ޱes��%�_H8�ش9bd|$zV4��IԐ���)���)���	����'�pJ*2���K+�K��ňo�����(Ʒt�X�H����#��!_3|�g⮥�x/�����E��cQ;�c+���dc#z�wA;�~Ӑ�XR�lv�3�Eb}4�tp� ��fw�|@^B �����C�~��<�p}��G:]���׻{	hg��$T��!��+���k"�O���Z����=x[�!4,��2@#�����O�M�oJ94��ȧ� p��b+gB�T�WS��.2T㘠@
+�Aet���� ;��QL�'����*�u�w^��W] 9=����f��w8����x��QL�e?,3����$e�"4)y���-,�=agg�bF>����2�ÄX����#�ru="G�&h|� ;Ƶ%m��ԕ���}���y��T������xyO�ܺ��ٶ�7�>�)Α�o ���n�p�oӲ����-ׄ[��� �IR�g�x@��1>�R Ҍ���HA��h�!4�U�K��o�Οc��\yl_љ��ۆ���{׵OS\U��?��]����;��z�@9=U�SG�!��~����A�Y��X�j@V��δ�r��N�>x.����g&]����ea�e����ԣ?P@ާ��/��&�)&g�l��Ƕ�{����]�r��o	9��V4������Fq����E�� }�F ݽ�htD<5���_.ٴ <m�5t���������ɷ?Z�N���}7��Y�H]������<^��$M��[~�9���j�P�_)W�AL~���oٰ������S3q�$=0�߀�Uݽ�Q']�0��6l�%j�%���(̀�S�P ؙ/U	���������{�@�b�-7i�q������ }��}�:��_A�*~�*���.���h��݇;eY/�?Δ!xJj��������U�t��Z�����/-�g$�N��Q�NF9�*��~ ���/��(��������h�B�ɟŨ]��3^��4�/|�mq�U����] ��T�����E[w�:c��j�?Σ�h���[/�7��k�:<��L�����^ _"�6�.հB�i�W����5�
+E�~K^�p��
+ �O!�v8nڂ�� L��<�4�|��-��g�/�r���� ⡸yS_ѷ���rfr�8q�c����.��9 �� ��\�,��u�fH9\fc ���t�}��|:�k�����s������MO-��~�����s�	!���u��9��QiUֵ�����8�;��.G{jg���y��n�" )H�ov����C�DQ�+���f�o�2�?�7N� Mt�j��V�cS���c/����ˀ<qe��Q��u�0�'��c�����@O����Ƌ��j�u��F���{��������/N��,xvz������]��R����D����%��:��8�I��V��� 	�[����r�ZC�R�5�>�-��i��s���4t��ڶ��+�/�k�&��b��}��xϧ�[����u�������;w+{�ǋs'&R���W�u�F-��ĥ�e����$�_r������ �R�����d[j��wS�j���ǹ��UI�#��R�Q�#h�Q{w3� ��e�������x�����׿>0��/�&��z<o�+^52�,��?�W��2���y�`�
+��FZ4S�:[S͋���Z������)�E�/t�'5���UܞcYl���V��W��S��_���S��7���5b�N�@[���_@P�9P���/Y���^퇎D�g��-[l�����±SqQ�s:�6�̢@1;��h�x2�D%�.�(�$�d%\)��I1|O��K/�������|f�8�"�LMtq��9�ƨ�Ğ�m�q�@�n����]�3!��,�;?�L^6f�Ф���^�������fsî�Ȋ�3'�S���R�#RSR�2|��\&sf�@�����}�R�EZP��\��4�
+��{R�
+�+0?+�LI�\c;�Q�j��3h�μo�;v7��!��%�-N����e7T�sS�8�*�u+k��#Q(�Gi�C㽝F��b��ɸ���4�����  
+�V�Ǒf.�XC�(��?�f����f�tW���*xϫ�B� �k=�qm��_A8�f��{�گ/�6�M.jp�-��֮��v&�����(���'LF7���|`}vk���֏����e?�r1.?��͚�>����g�]�_�o �n�[��TTBA�������f��@	�*mw�hG-�*,
+F���LQx��dY��{�>Ƚ�f6c�C����|Ԉ�������8�%�8X@<qO�w�|�J�kޭ�"���u8���E����܅ch?�M�S�0w����W4��@e��o:W���|똆�`	�RR{�U$���� 
+��I7j==R`��*.�
+�����ǹ�g舉�	wYmQ���{;�����{�(��gs �K�^�����<��$���C�?ԬŶ�Mc��Y�]9�d�`�:[�V!�O�c6�NΧ4w R��:.AY:(Q�R�Q���+�I��j�/���`dd�����G��½�T8
+K���(.�Bj{�"Tt��FchO�o�Ca3T$E=Œ$r���g��5�5	��O�Ρ�x���<�Y�<��/���si�t^*2����覃�z������\Y��J������ET�-y^0}N���B�2*-Wֶ����R �K���(.�[`��in����r�������f�<c�=�	r�k/4a��T���z�P��ށ�̅�b�;U���a�2b߀�:�i4o p�
+��	Z��� x�h3�?Z����Y�-K��W0
+��j�B���]��ֱG��
+���ר��x���V� ����C[wľ}�+�� �8�0�����La�Z ��4�Ytx�g��,j���Ź4gt�������\j~�k�zȎvCGZoa�Vj� s$�-�"u�jvZ
+;�T ҎT��k�hG������ �<�|�_���z�F���Ē��'��t�����3��I*���(�-,2x!5��جU���B�Øc�k����*'/������v\ln�&��ن`�	'�+��d`M6h��84X�N�^`��3?;��y��"���J(���e �s
+�I��$���\K"��o�L�獣�F��س���&���8)c�q��?6RÚʪ0Ј:�[m�b����l1�$%P� �Q��ha���R����D��O� $-t�X�s�u�vܯ�vj���Gh5_�M�X��Y�T�t��=.����ZF�<�RhwPv�}�i��t{�4�E���ؾ�7����Z�Ϟ�)�w�qG>dh��
+/K�~n�9��,fY]�D���A3�F@
+��k�ݬrn�����^9��CA���g-´� Ѩ�j���$�H'�9lZ����9_Y���g��ZWE=��~O+X�W��f��Csg9Ax5�3�7o�];"ƙJ��K�:�ul��<��U��}�p���!��+˯
+) �w3������ ��\�bh=��@0ר�Z�ʌ�13q� �i+�s����t�ȹ����!h�/����W�*_U	�gg����=�9�2�Y���^����`R���&��H�O�(� 8Bv�|����j� ���P�&��k�	=�i�*J����Pp�c�Y?�{��bA�%�Ky�(eyc�k��S��"\�Ui���+$zЅ�V>��s����9�a�Lrp��b3�N�@�`��|V�f�W�����t��ٴ�&3m��c���Z�`�V@;��.����Nr}��X�}�H��!�Z�:�
+j%�M�y�y�=���v�d�����+Ѝ������!
+2D}s���Q�Be(�$,��jn����q�D�H@ǋ��d��ՕU�|L�Mo�\Ab��ς������&�R��~;9��$<=�2�����
+ +�^�/�˴���)3���9)��
+���V�,��=��>�3?�l�֤ �-�Y�0��<�<N�mt���`���^��9���j0�^2k� �6�8 h���.�ٞ*���_T^E1P��kE/4� ����j���}�Q�Ҕ�g��Gi�϶#�{�x�~�{��g��Z���+ �S��YDH9����v�+�Fz�A��q
+�a"�����Z he��+d��RM�W��ў�3䪝���S�F ���L�E :i^�(x��X��#�\���������,R���*�3sP<N��� $����nڐV��QORuim�����#��ptl Cz*&.���
+�8X/��X��`!.�6� ���L�$v��*��eN��V��s����4!�d��;����N�Yqӑ��u�rb�d�'DI�$�Qi��$�k}
+��r2��Q����P�F�H�*�u�L:f�0�y-ܚ@i�x��X�_��FW���\�*�����2M���Ɉ[�S�fs�0)�@���7�j�#Oj����X@71޵��3�&r �<}���&\۩U����uoTQNFC\�4�����ye�_M�0�tՆJ��he����|1��Q�����{��;���׉�fb6���e�Lf	����:�шHK���~�9�&�]*?茽�LdA8Rk������x^+3�0�n-A-Oǫ xvFET��j���'�+�H�dk��y�%��.SD�Ap���<���8��CA0�Z�u��/���w���BsVWX5>K[��#L���t�ѤM��b,m
+F��$q5�M�I���=Fo���b�6�9.(yGL�8���:����n�ɢK��@��A?Z�	,'�����S����c��<�׸xK�g0�(yIķ����S
+^��&;���j��N�^���β��A-�a�4b��F�hT�!�(QUN9���S"K��B$�����w2+�
+�C�(%@
+�cr��\v2���f ��H@���ɢ�f�,cu3� :��
+��3�ZqV��3Z��GI�].S,�a����iL����H��\uY� X:��?���o���~:l"��E���[�U��&�z/���%�\^�J�_5*�PJ6ԫ���6��+;����4]��-��u�
+���	�����f�O�\T�Tx��$Ug䨚��2����i��}����!e�d<yt*�<�s8�����v�,c�EVU�<�+�EW�ex����Np�E R� �,�̄Knh[��̜3mυXv���i�+$��SJT[ޯ��9j�i�x]���.�͕D�R����A��	�c0�w+ y�з���:"�u�*F0 ���>�>��z�Xy���DZ���̪˪�Y��=:y�Ϊ��qN����h��X���gϠ�l,;�$�c,��Z���.T��l.��1����0�@��D|ٯ@�ڢT�3S�l��}�~	s�� }E ��ᦎ&���\郖�Qf�,]��1{�x�sq�A�
+`�[�����@��)HD����s���Նj�K�{	���z���Ǹ�dt����o��r�4�!�2.�|#�&v9�`sJ!HC�H��������ZCS�&iP_j0�*���x4�w���P�&��*��bQ�SA\a���(��"�zo�_DX�G�#Y	W���I ���1�ŗД���a��7�j���좣TR;i��b:��'q���0G~%3�"�t�5\�^8��l�^a�	v��L�ARr3���}����Q�^ �@�~�Q�̾��Z�`���uu��%�w&�cª`�[y�J��M����c����ʚ�Y-��x ���v=���b� ��H%�=�bh�h�X��[���U��Z�gh�;�c�/���
+B���*u��9)CAX��P��jw�Eu�6G���ܙ����D?3����9�S�9���Q���س�~P���T�&���q��ʚ0s!����}]��nl�S�_�G!�(��@ �~b���C�O2 :���m�o�L-��	�um�_тZot�P��}\}��>��<})�_Vvr1]mx��=����)��	�2.�e@?z<��0�5�����	��*v��7�||�?��f�������x-���iX�a}���U��j�����K%o���+%��U@j�Q�S��Ҫ�F���TR���Z���s��x�VaK��/:��!�ͅ9�s<���%V�Yz�U�3q�T�߉��c M ��Y�A�K���SB'/1K�4�X}��Q���t��5 ������,?�z gܰ:e�B�tn ��G��+��i g�t�jpF}�g�5
++�dP@����d�T X�B�F|�NCb5�X�ď�0�N��:W��gyY�G�x�Q��7��7��q.�\*�%��8��sW�����]����Z˺��_����">�x%��@��I�%j��@��sBE�
+���,L^�0�X�G�7����<�I=����HK�d��J6KJRxrw��h1�b�C_r-?�֟>�,0��mi�d��19��S���,Q�s���|�l�g��o;pY{Y،������0T�o ��� �>��gv΢�4<�HЃ ��.��U�)0@��!#��TN�%���@�FK�KM|�V����wW�9`���F�d}Z��Ti|KF%���8Ϋ�Z��3���3Ca�O�Q�S�{2:/�O1@9��� Щ~�p�}�́���� T�ݛ���k�#�����L�{_�֤����p���	�[�,%I�b��.t�Z+Ӻ���y�r�X	'��lJ�®/�{s��w�p�ηB}�`��xL?go�F��A�6�� ʳ�Y�����
+��I��)���9Q��)$7>�
+��*��%).��H9����7��~�+
+�g��C��&�|p�"��t���|��q?�[����U_"�z�-1�ڿ�/�˝w������(�v����k���)��.�ؕP�G��~��Y`aI%��K9UԔ�# �k}*��ku��}X��c	��������Nd�n��u����M��zA<���{>&�@d �B��=-�<�l.c� ��������b��,P:�J�l�ٺs�͍ґ��ޢv�*�JZC
+
+D�S���b�OB�>�q�7׌��/����j ������!"Z���d?���@"� `.�U.�M���
+C�V�A��9�J�\Y� ;�(�j��Ko�ҧm崥AϬ*Z� *��~7^�.Y#�ѱ"�)����/�}ԛ��?<��o<��<;��ˎ������~:���T������#NW)V��� @4�.�� K5��+����{�>���}#!���Μ�c�Ǣ��	DJX���̪��}����+���3�����H,����:��㟻��()��!&��	��瀌��v�Nr^�b��{�UAXYВ�����y{�`�GG�����q��j���}-������g?���s��j�
+�VKG�8|v_<�H�0<�5;0h��V��XU���w����r��^���-�&+'����=�y׎�e�	��5��I3VA�Yr��,�ar=�+������]����@�~����>���#�en�&�[H��i�7՜��F-U{M�uSx�� �}�����>�W�K;՚O��I#7<p����u��#���F��g�O���]T�kZ����Y�7�ށO8�3%*	�
+��\�S��GAU{ͬ�O �NU
+1�L�X��l��h�9�����}��W����`����~�_{��O3�z�@���ct�x���NF��~l��L���؍@
+s9����R�W,ᙚ.�'���p� �r�����,��
+ǳ �O�Ƿ��g�����`��3���u@տ�-�_y$���P_p��|�o��l�X�Ά2C'o�e� ����{�M�$�KW|^�}_E�� m[����/,���翽>�M��.�U Ukğ~;��L_	o��~6B�sِ�H
+B��0���6��~�����ב����,�	OcI���g�:���Α#�Ë�-�zOn�����~'�/d��n@>@7A��_����.���W0�Y�x�s�\�`O ��w��<��8�|�s��s���~��_��.�-8�=h�^��=຅σPH��E��Y��,b�61C�.bE������c����O��n�rC���:��h|�t�p�S�DB5ި�>�ۮ�i�u�K��e$������&7���Mn"p���D������b1q��6�    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/gold-ten.png`
+
+```tsx
+�PNG
+
+   IHDR   `   `   �w8  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       `�       `    ��}t  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  . IDATx�	���U��}�ݷξhV�b�$k-�4�%Y���`!c��*RHU*5!aI%�JƆ;l�H ؈�Jٖ0�v;��fy�{3o���ν�4I����g���u�>��?�O/_ߋ��.!p	�K\B�����%.!�#Py�K|�+?Mq�u�ë���-l�5q��ol���dk�d�hu�����h�L�[�Z��斈��j��F8�������Rmj�T��jS[��T�u��*s�B���R���5U��45��W�ZZ�+�����n��^͙M��
+��G�aμ%�mm���e���M�Q	��J��V�l�M�Wk��Zm��Q�&�kSM-��ZsԢ�F�+���
+y�*���@6M�VЪT�W���+͕�昚��SƓ�MM�M������Zuˡm�~�?|i��/9&g���{"���T̛7/>����Z|�[Ee,b�8��F��1E8A~���}�`"��\k4AZ3Bg�2L9p������q�'!��~g:����9sc����mO��ԋ����$��kZ������V����l����l��E{����1��q@�{]3 ��Ĕ!@�� IG�T����5�&�+��k)Hd� �5��-ȍPz�HL�z�t_�v�n�6O�56q������'(Ӌ�^Wl�M��b��T<Tm�FUF�z��R�����O� ����](��_���y��\ׁ���^����C�W�g5�J�I� k���S��,���Gcւy�i��ᗦN_qo<���Y��*�#���t�ae���E�������z�G�G{5�/�K���XV0ӈf|�^�S�p	��`���z�$�Ԛ4Y��f�i�rO�i�R��Xq�[���w�%�g�3�l���~���\�$�86�ÒԚ���E(]��e��Ɯ���
+`��Gerp 6�U��^ �����I��"�/�8��NqE�JO�P>�)��J���<2����8���Ю�����ػ�m|I�3�^7����1�_��bz����I��� Y]���"�^6?f���2&�GOͶ���k�2N( �Ҕ0԰�SS#�h����b�A��nWq@��Wfá:�5Q0�k������14x:��>���]C�~�7��Rgʩ6���Gbz�s�Qm��>-�i�}t�s�x����1<��I��hi���[ź���=wН���`Ήa�`L��c��b�|l�B[�1���8�#��/���xBz��O�gb|����O�[&��5�-�΋��X���=��on��L���:7�MwЖ3���J�-(�~���+c��?�_x4,]
+p���]1:2c�L���@��WLM6��s?�dG��@ɑ`cL41��a��/e�X>�ET�_qS'��O���ޓQ��������_l����mf
+3�.�	���ceg{|e����oG�4PP�����O�@�!:�N��_B�>3���:����(s�MB絖+� �ȧ�OߠSX�/��)0�;�.D�X-�����ι�p����e΄��=`���Is�VC�[5�4�6�|ƙ�+��j������5+�{�K��Z�b��N/P��4&|�5J���5%�9���qc�s�Kz^�2�Q�(Bt��*��U���uv!l�?�%�����F���{7�s훫<�@��v���/���/ō4�+���1~V��jf}Wưw��G����M���-��c�̶�'���m*�;H1�jϐ�^mh]Zہ�5!�	��
+Fi����^���e]H�5�*����"����Ǟp�;W�5�����,d���q=Dۛ�g��+�\ �-u�ǖ3�ekWc���T��l�0X��ŷ7G�����͵AH'�IQ"�&�� �YH彦��Ɣq U�/���b���LO�4��`���;~�,�/�ص?b�#N2Yؽ�g��^���~��݌��.� �>/�F�>�Uk[G��Q9�ѸΎJ����qx�Shy-��9'�hpws�䇪�����T̈�X�q����	u:n�y,_�~��R.�<	�v�)�"�z_u�i���o���_��;?�kg=����̻������@��bWr���ƺ	�R��\y�z"���!LJS��xꥈ�n����0[BlC4j�ZLU�WW��Mo�w��k�t���>��e��^F
+�и�߸6Z��u���Y�̡W16��1�f��E�S/�Ѽc��Oſ���<�T���ܸρ����������MO�<_C'��a6D��r���Z���z�$8j�����9��fE�R˹W(�ܣn�l=�j�.f� � �~VzT
+�L�-d&�O/�b��ط��rzh�G6��[�Ir!n������h?ˀ�)���D�]�Aсq�7ĩ!V��ǘ���Sc����w�;+Nc��hf�`
+PM_�/t����Q(Ӡ7��r���@��Q�=T��hi�ڿs/+w�S#��o����T��弃���x�6�t�[��&PDj�
+vͮ�eW��>�͍��3��beS��Nu9em W@2@C5���X"�+�� �g(�x.J^C�Wd���x�p���^p���,�O��Bq����������Q|��c��S�V�u\i��b�l��k6��2A�������xaG���}'��]G����}���������v"�Lf:$n��@/]IK��t�4�H3F��GeP���8���W�o�>���ͤ *�:�۫�SS��{�[T^g�;�"��'v?<�8|(v�EÖw��ŧ�b���p{B�0��l�>`��P��N"n���β3K�Gz/�é�.t��,K�f0��i�n�N�~���Z�H��͘ ��b=���O{o��j����˯�3�����<=G3��Ŧ�w�����dD� a�O5j��j��HM$T�u�������.�K9$�^�e@w"1�U23W�Ǐ��О�7�~�{��s.��Q�s��2��{��-��Rѥ��ڟ�V�1�͖�e7��]_�V����M�ʪ���1#��W��4a .R��'��7������0�H\:�{����-v����|3�>�W�8���x�c'HG��M}�G��~�6�a~���]��rC�m�PI������8}�������Ў���s����T?^�[���yV�<2��Y�V0tb%���x¼�����}�Г�{Iy��)���(c�I��HK�gF\�c(mc�3;{�S�cG'��S����Wm���c.�}��ԧ5~��0D5Ak�A�d����h~t.�*Fz�2BWc�DO�׮�:'r�Y�L�i� �_Sz� dZ���zA�x��t�K�y�t�t�\Z͌N��5���I�Ky^�~pJꌨ�5K3���P;���<6�~�]:����`���r�e �j�i����+׿;�l��G��}10��l�w�uV�̵�f���a� �� ͆[�`D�=���|�)�b�r"�P�崉J��OA�G>)pB�tC��p�����74wAT�=�~��D�Muʳ�� ��/�l*�q4uTS��F�m����K�uq�o?����ƶ���:7���@N%X)0xL��'(�M�m3N/ �&
+Z��rSzu�
+x
+�������%B�e�m!��"�\E#���^�t[�{�������!��Y� �	?B%��Т��( ^[q���{y�����pQ۹%���[�7u� �~��FXs]́�H�ѥɀ��
+(�S�$�ǰ�˫�3o�B"ײ䡗��f&��#���&C/��v`��I�c�0��������?���7��u�����s�Ů����-�v�
+����Qم+VES���v����8�3�wF�x�N��#x&k#ɓ�lc � fψ/��'XЧ3�8�<4#�?E�Kz���Ac^]T֍t�<�	K3  �Z&Fk��ţ��-�}Ȭ��,~�[  �c����v�C�B�������{�{�s��y<f�'Y�w����7����ᬩ�s�-���d��^�P�'�`k?
+8���җkm����J�+&��"��y�oZ���m�mt��2���L��֡8���g��u�:�sw���X���89��X��4Ƚi�\���jj�)��;���S���n�uN�������myi�=�nn#xӀ��a�$�ea�<H�|��P��P�A��s�9������=ua�V��Y[
+���X�4:ye	���Iʠ݃C���҉+���^�������UxH�S~�� ���QI���\2�lA���>�b{۱)w����n�f*�I���l?�Ϙ���ܙI�<y��m�#��_�,���|��}h���H���IG�+���r�|u]q|dYfb���t�(��f���v�Ӯ�3N�vW�^?�������]q����_58g�����T�G���Y��><��veڕ ^~��qz��ɾ�N�Ʒ��#N��<j�����(��4T`IJ�
+�l��N��=H!�g�hI�{�D������k,Ҍ�%�� ��>Y�t��j����3L�8
+x�|#�m�S�Y�g��>�b���a����W��^�`�����M��?���_�	�Y��0�T�dX�����f��ؠ�K#Z��p[�������=z$��9mq�J��O����4!�BԾbβ�SX'3�=�y�" u���:�nQ{Jb�U�9&����c�D�O�g��-�Zn{����t�מ���	�e�FW�.��L���q�r��fF�sKo��8��g���ՙ�5~�I +��}�s�u"��z%2�":�x�572���<䓮��Z<�-�ow�5��lZOm"�]j)�q��q����"��8���zh~\��A�<��<���GO;,Y�׮�7^�K �c-����C�u�PfQ������^����������[����(���� ��YT�c<K�t��Άj���=�-.��-qb��<x�Gc�~4lMW,�Y�`��_���6��9k�x���Y�y��t)O:�Rxb� �S6��E�8�I�'�h�<�s�]�b�[/�vzg3��#�7���@K(���[Zᗕl�e]U.n���z� 8M���sE{��WN�����𽺳ܳr�^L�; �i����h� l蚛��'O3`�G��c��؋�sW�Ѓ��t9�ڥu6B��Ayt-�&a��:�	8��:��抓e+�\��{/�_v-�3���fa
+�㱯�-���pܐ���!�]���$%��"�1�4Y
+�����|�,J�"X��%��0�C��޼la���Uپ����bn��~(;P�<\e�`����s����NV�_��t?�������c^�i�11=�P����~�k&l�����h�8�b�Ra�~���D�Q.Q9�
+��/���������=�����L�ꇼRp��8 O����T(��x�Pt
+A!+�,�P�1!�m���!T�_�پi�ulx�_a���+�������tɷX^�z�T�o��Ͱ_u���ľm��9�rf^�yOSܱa	��i'�*.���S��9���	�ǟ�`��w�r�sc�P,Zm-��u0w����)�'���l�cG�GT��H�м ��2� ji�aٻ=)!��Df۽'_6����κ<�w�H]�G�����ɛߴa�>��J��^���O�b�f~�6���zw��	^VF-Z� 欸)�w�-�$�:p4��f1�jA,���pN��m�6F`���'5��p|��8݆���5��8��+���-�=ӽ�9�����5�����@���a�����E�U"���g��KM�nɝҼ�6sa�y��3��sY�.��͙���Ow�4��UX|gH1��8��.���b�J�����{���7�-z����[�D��h�{3!m�y�l�1��7��@��P������>:���s��!.��	�T��w���e%�Ga����/�V�M�.��@�'ao�Ij�,4i,��yLw�inW�.]�uL�����zEG�Ww�n^�"�v�4�baj��߆:[X�v)��=����1�Ö�wb6���f������[`深gx�$��e�*�r��뾵yj�{��\c�f��\�`^F�89�������G�]�W��ո3�
+!�u1�&禎�h��k�ӕ��K���:�`��.kWq|==�xW�S��~�ʮ!�WN|�}���$6�gXh�a���������ݿ��*�ls����8��`�Of*�;�������v\kCS��/�Ɯ]��N��Z�hN�铘�^^L�6/�k] �ᚆfR�-.N�eK'��0������H2ȴ���6V9-�ĂEm1�֮ZÃ�R������ (���y��,�VDl��ȾA0H�����D�«�Į?�`U5���fh6�:;:�����]7��^���iC����c8�?'�M`�A"�}�����Ɂ�
+��S��i�0�:�t��|ց�D�i
+���@+O�4�αD��<u$*DiHN!yo�pL����Ǧ���
+�9l�T�#f{%g�Wu����>��>	 ܾ���wp>f%�z�Ӽշ���lT9�<pxo�����_�[���!+�7���@$�4,���a#�bg�^����ը��4�zן'@�Ndr@E��S�K I��M�z�4�sm�I2.�6��｡��ېi�n��a�w��',�I��|��U�+���G����o��g_�����Y-~}�[�8��
+4-�A��8�ң�9w�z���,|�jgQ�����~*h7u /�{ﵡ��	8uL�hT�fzN�{� Zf`
+���7�F�4�.m4хV��K�a<	�9���*�fU;�u!:�H�O
+�!��G"���.Llg�ŴE��K���%�^��zE��cbh<�~�/&���%:�g��
+��%���佮����Ϲt/�͵W���6Q���oC��6L�O�xoÊ�2ܦ���PS�r���t6�+�ءS�]hɄ�41�W���r�����!T ��͘t�o�[��*���@Iw�pǽ;�+r����8P�z�_��]�x�%�t��>$<��W�_q������s��=�/;���� h�TJ��Ѹ�VވF�R�l8�"eZ�{�q�i��M!IC�s�X�N��;:�Sϕ�ʐc�2���4����|L4��NT�B�t�W�f��L3����cb�.�0m,J��L��X�Z��v�~,ј/ eǷ�6�6?�3⯾�9�?�w���Ѩb�Ls�w��Tn���n'�4�vؘRadD�A6F��Τ���ƛM�^�4#n�	�/��� ��X'@iʈO!�����'Y(�u��x���褐�^�Tz���4���6��M�������̻~)��\���"�;W�Kh�&l5TVO�����#ݼ�^c����t(++w*W�'�/�K"7�#3Ҳ�3���+`'M�~�<��K�s]�t���aR�Ng(/����Q`���BsDXS�F����=����������o��;��鬆���״���;+|�뱟�vM�0�M+5�u�a�^6�Ʈ�hj���������V^_4�ym��
+�!��k�3�AW��J��Gf�3��8y���,�`�\�e;�[/�#�x���f>ߤ����� _]��*��ey	0�
+���,�eg9����龭��k���#>��_8��n�� ,���a�Cp�5�O=_o�/bО�|P�ZH��L'���'�����-(�t#�<�4�'�v����fY�.�|�ՂN�[�<�� 6��U!i&5�;v#$̖6�U(�e�g	��i^��S@���ٱD
+ۿ��H�&���V��򷺇�O_�~�+{�Y�͇���U���I��%�>��d�sRM��:�J��E͂4V6g<��r0�Z�żܟ�+L��n?��^���m����e9`����X��,e'�b����:�a���g]yF�~��:/"�F��-.����Hh��_����d��<����z|���na���FVOgq�G��6(�%�S?����g�L*$`�ׅP4:Z�b��E��Z�L�ْX��2��֙��3�Di�1��S�j$�}����e�Lɺ�]�15l��R0
+�i��<���)��G7�s#N�Y�)=�6��9���x�E˗�3t�?���ݯ�9k�'O�6��@�vZ9.�o��F����C|��8#����J���65S������*�q-m�tk����jw˳`Cg=��@�erd28��C�X�(�!�{�r{�J4ψ{�k��E����3���e�I�gd= e��H����qD�5����gg���� ���ϳz8mS��;ix��Y�" +��3V�����۠��ԓ�k��݈S(j��Ӷ;��xr�U 
+D�,�-ǀ9������nb2OU�Y�������9�����Mϲ�G~��� �B �P�m��
+���G��y��÷y���m�Ξ���شuC�9�Q+��T.A�r��7�܅�bz�U��zO�Oz"��S������L�?4�L��:�˱�Ϻ�@`���W�5;���5�P��uМ���4Vب��늽�{��-L�y��,H�0�Ne�yM=�6]���)֭s߮��[|����s�~y�� 6Ү���s�� �,M�����e/�u��>�x����e`�_v]}6�
+�F�-3���@��=teO�K�׭D���C#��6���I��(��s��#J�����.ǉa�7y��VҪ�M���zʴ.�%ZƎ3����T��+�7�ˆs���ѥ%�_���u��1k��ۊ���ᠡV;���c'0�'ǅ4�Jo���r]4�{���Y��𖬀���Չ�,L0j�N~:�F���5%t�UV��옣�|�����
+��ǎ���Կ���a�G9��+��������T������i.��F���lTN�w�q� {�v(��զ�#;�]od��	J9MY�0C� ꬤ;�=L1���{�su�k��z�
+!�SC+P�n*����
+�k}
+�PZA���k|N μ�8�xl�ڛ��������'�OƟ�)����`1����T�Q+�3�6`�Q @�x��=�����yR��u ������35����N�:�ʭn˶\Cp��#�8� ��)[�Ag&�fY��gZ ֍=��g�儴m�.z��8�Y�O�����q?�- z�i
+�=e�85q/6_��<�=��F/Z\_�����ks��OPҌ�Pg���� 3�x��X��{�u��ײi��0�W���$?��v�<������'k�Ǫ�R�۝� ,���>������X�0�����K��;�U���(�^F�r� k�hi�L��W����r�^�,�t]�묐8���3�!^^��5��zX7�����&&�GX9/�1fd��ূQ���	���1Jk~��+���>@/pf��4΋��)��G	i�,u 
+D��ih�s/Xe�P�<��n����P�O�)˔��!I�O򕟌�#M:�ס�/=�e��Yݣ���o�� wA���x{��Ʂ'��	��
+���u��2ϐ
+��)y�"�4��m���u��Q��@��&���O�/�3��x�V\
+��xX����Ǽ�QZ�����}8*<�>=�s��o�wA���'�< �ؠ�us,�~���Gu��^x?#7�/��g�u� kDZ����4���ڒFD�m�!	M��t���[L��ϸ�E=�W�����!j��~����l�p�����x�cW�P[-6P�u�F�@8�|�^g3ug4�g�s#�EZ�T����f���+".��&��I�\xQ�1�|�3�_LS!/1�ij��+��R�-�E�w$N��O>���U�ra��,�ѧs���L8�,��uĩ'���O�#<?����~4����H�@g���0���g|0i�.�W�&��*Aݗ2�:�9"�ԋ�k������{y�կ�7
+�)ff�6���<K��]i�2�lΗ��P�slܔ�6�S47��D�O�h����� J����/�fZ��4����%�
+��,���1߀������D �c����L���.�͘ ��q���ah�Rsl�B�fе�>5�q]��잊��f`�I!q�^-�smDd	uڤ'���#o�������4�+>剗�
+�b˺�B �~�-l?=������)G3�ئ�_aGi���me�����̜�#Ҧ:&�O$�	�U�3�$�Х�* ���'��O��,C7�Թ��[�^�.e�Q^~��5,�Em3ʓ��9��O���3�(z�ܟ={����hQ��k�х�Y���8l)(w(����~��$�0�.�G�����y�B1��"��*��?�>��zűH�� ���KV����y�l�?�����~롛QȐ���	=�d5�.���� õAuQ�^ΒE�☖�/��� �+���Q��A����t��O1cF��F�tɗ��b��r�It������zO`g��w(>���<� �s�aF�W��CX�?`��o!$j���[�8���Q5̯�Ea��{�O�ht�h�'�7{��:�i�Ȩ']�5�����ƭ�q�a�f���)63faz�{?_�?���,�5~h�̻���^4�n�]U�B�-�+h���Ƨ\>`��]�	yv�*�	!l��%��� ̚dq���>�_��ωy��8�^e�3��M�oXW�R����8E�䃭�yL����ObO)g&Ct`�ݓ���]Wį���~�XCS+n��Ղ|��ʠ�jE�4�i�<�"@��v��n#���YD)\M�@��٣���t1���]�E��"��U0}*��`[�S�;�F!\(��KO��SsQ�M�h��+�CL��V[��B�o^˲�J4��R�)�	�1L�'�r
+m�g�5�v�h���=�8ptgN�f50���ע��9���|�	_�V��C\�}v�#y*Tǀ<ŁPx����x�����Y�f��Ƕ]Tw�Aǎ���_l�'nX�	���`��K�i�Z>@��g��05��5���W�f�j�y���!`�Z���5�ߝeԜ�f^��t������7$��S��U��I�'y�Y�b��1��'��_��	��⸋. ����kt8>����0�\͇S�����Qy#��E�끥�!楻��9\wq�n����ځ9��3>���������͌��E�F���$f%��L9p�yR�^�B����Q��qҏ�R�^��t�/�fc����b�� J�1I���_���#�vzA�d���Q��k��lI%��!�K�`#���c��I4m�=�ޢs������hF���/`�k|�`�6��L���������M�I�fRp�����{���:���U ���u�H�!�2ߚ��p���5+��j�j�6?AlMG�v���"NA��\-V�	�ni���E�G�َT���v�W��~kg�||S`���p�� J��{],�;�z����]�-�1�S̞\����/� ��;� ���G��]\���Jetcںy'���5���C_~�pi����3�
+?�!�bF>��?�O�p��OM������f��g�ǰH���c ����΋���2-�z��� JC�},92]��S1'F���D�K�/�����%.!p	�K�3C��Ɲ�Ud`�h    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/gold.png`
+
+```tsx
+�PNG
+
+   IHDR   @   @   �iq�   	pHYs  %  %IR$�  iiCCPDisplay P3  x�u��K�P�O�R�:�2�C��
+vqh+E0T�S�~	m|$)RqW)�X�Yp��TpqpDݜ:)�hxޗT�"����8�s�\�P+�(閑LĤ�Ժ�{���S�f���,
+��������O�YM�v�O\��.�v�S�]՟ɚ���A�����m�	�%1h)���ǂ�.�;��d���X�
+j��I,�;�|��e����ޟ�W���Q�a&�PQ���ӎ?�-rW`P.�,�DI���Сa2qAꐸs�~���mm��mp�/��B8������x n�L5TG���r��	0���(�a��!w{�{��c�v��#�����+�)j�1)O>   tEXtSoftware Figma���c  �IDATx�[i�\�u���{Ϣ�5�l�f������*��؎	q0$�D�!@��@UJN*.�m�)#H������Ih!!��ьF3�;/={O�������kYBh$��[��_��~��|���\�ƥ�2�uP7n��/q(��	�cǼ)��9\�hgc�[�������� �}���x��z����+N��\ӕ�?1���qt��7�G&���p�x�J�m�o�UIL(�B�Н�J���<S�e��f��}��M6/_�8.��� 8�q�4=���YYu��AQ5�x6!�^UB�I@�\t�SMo�"����~d,�x���w����+ \{MY����w�w�P2^!�5�n�ϙ�n�M��I1�-��xAkg���[:��\�=�������}m���iN(n/��Dhџw��:�.���w��bT_�94lNT�oZho���_�*����ɟ-��:�9Td>��� �@�}v�1�Y��b���J��9� &����1_���9щW�Y�c|) �27Xw���5�;�5��y����>I��<��{~��04/T��Q��C��^�ܓ�U8�� вs�U�~616�q���n+�9�����24�>Tn4݄}��0�н32�P�eJ�Z�:�\y�r;�:����>\���_Z+~f������[�.�L4�I��3��߱j��Ϙ��>�|>y�5;�F�♨ٳ�0��\\��/�G����0T�����^�TKE�ό𸢋̮�$�)�Z����6��{]��F3������(��mGk���&Ɛ3�7`��������s��+�cBq������MƩ������p.�Kء{�ӗ�di>��"28;��0�p��$+�E/��;��08�jW��r]�+Na�Ld�x��v�+⚪�3�@�C�ꝅ�c��lGNi6�?iF$b)cӴ�7hb�M��H��:������[X�#��$���2֙�̃Y�0���,T�4Ĵ��ܺ�9h:�J1O�δ���� C��3p�d�|� w�X�P��~w}�22J�%NzٙT�D�w����A�,���]
+�+KxJ)*>܊��h>܈X$��'�b�bH��p��T|o2��T�@�eU۫_h�-v��eVRYIN�����H��@c�詥�k�ھ��f�ġF�	4&�L������e|���L��ǲ�� ���w.s�`*��ľ�7ͽ��(,yI:�cZ�>!l��T�y��o>%�T�bƂ\�Ե1z�pa1o�9)I�2��rz�� #M��s��1���Y�<������p:%,夀�����e��e���BGh ]�_�L�3�7�F��|tV���Z�r�rd4�ߴ��40��ARΌ����\m8o �e�U�Q�N©L�1A�붞�1�J#%d�Sm�ˤ���(�������dI�+ꐈY�+(�����b>�a����_���jǤC������~�����C��.��r	��6��g�����Pt�8R��so!bj!jw���+栯����?U���٠X9 ��#N�,{�OƞI� ְ�j����my�G<DG���v�;�vcC��f%�-g��xW����E���q����r�o��g�%���H~,�<���A�w-�'|8���93`�*hWd��eUy˿M�E�,�x�-)�@��.�=7�%4��)��o�i���.G���(��M�o�F�$��v�t�Qx�p��0��hMO��ea����)���]]����ֵF$b�;��I�K\�I��OA)u��c��jwlF��訬���T-����cB,Ɓo���F�s|. O<��9�^<�q�.Rw��b�uI�Dq���k��2�O�:F{_!z)�ʷ N�k�9�\��A�1�g��c��E31�g݄��	����V)f���I�)�7�-vXrb��eb����!���,m_�e
+.��@}3��\'�O�)3�;���� ͇�X��3�%W�b׮ɇ�gpp#�"��7ګ�E�Sd�F�ƫv<ꢣ+�.i�nyT�9R
+`�����md�t�׷�RǦ���s�#^A{�鵶(����	��J��N50������$��@��%�ݵ�o�����](���pgR6ׄgeB�2X��mAY�+��<j�w�pA6z�6������.T�9/���Y�<�&P�L�#k
+��O�@j�y=0���5��Ɵ`��sc�i��FN��mխWi:�����Y���JP8�E#�)�[R��q�l_H3\���m�6�=U�G-�2��Y��������*�,c3i�$+Ƞל�I�q�)>/��-�[U���(�:�m/���)x���]�pΖ�}u��	��,�]���e0d�:+����i'<�]?%<��8�އ��$���3�$gگ2��`���t��KƦ������ ��}^�,zN*1bz�ZBg'NW��;��m?�����S��R����^3c�e<�I�Ұj���#Iʺ�r�!��ɝ[E�;F{��q�}�^�?��q�{��7L��C C��5�����i��R`v��N�w��6~
+�)9Nx�X�Y�ʝ25=#�Ίw�)�|-�Ѧ]H� ��n�c�W^5;48�dL�Gf���>�M�S��I-,���!��Wj!�rmނ��٨�ۍ?�ބ�i��X��U�P��<��v`�����tL�H����E,�tN��t��\��H������W�p���3�?}}��''�� �U?m:ڜ�9m
+2���"���&G4H�W�	�CdwE��>��U�J#��\����FάlT���Ȉ�`��=L�z`�6KiI=�?y5�0K##7� ��\;Xy%0��<L����`�r�����v�d8e*��f�cyUCT�.�>������%�ۏ���~2l���O�18�\���ą��߀x$��c��R1�QA7Y�����X��N��Δ\��7���oa�l�ӎ�11JI�#�'B�u�k2�H�n���0�Н��j	��m�i/�L)�	�w�L�U�"�4+��6���jtv��`|�1}d�u'�E��G�Mg�0uwE0�����Ĵ+��P�1L�ZHOFl�	�~�2eJM����IM����/#�$�(�C�5a!a�������H�^ކ�6jgR�s)���8��Fd��`�Zk8�gB�,(l�A��xɤ���M�P[%��3��R
+�Giu �8�t|�azoZ�)F%h�^���,Z:��K1�z�ܥ���9j-ZX���p�N��u;*��0}A��ct$��.aݗ�JC��X"��}�۬����䨉:�M�i��K�8�V~��ں��e!���t��:��m#H͟���.Zc4s���ӊQF��;-�}3J��MH&e>iv����N�s��s�'f��k�"��QSW�����q�m{SJ�p���b>jeua$���A+ޣ���� ��-�JY=D���P:{\Iu�Jj�U���8c]$��	g�Z�z�POM�`4�����=M����ǬE�ZZ�}�{gb@.1�ڠ+2�\�ɶ4E���
+
+f�b�eK)1�hs"W�/7�t���g�9k.�wWc�;'�l�*ml"q��+�2
+7tY�5&@�eu� {���}� �f�(����(�fd���J́N��H4����&e"A��DU'"a�?OZC��� f�LU`���}����u�Ĵ��^���� ��L�i��]MԬVv�����G-i�[B�ꆨ��+F��?�@e����+���W��̀{����MQ��J�"��IS�s�#�k�ij��@�5:����2�����}�g������4 �{����y�"j1��rjsCz�%<��.(�J�sJ��su$SG������$�E��|$n��2�l���{�������`a Ο�`�j�����a�/L��5��a�'Ը�+RL�IuI�R�>��-����O��@4����w\T������ ��,���ڪ���Q*i���4�sԴ���,<�dȮыϏ6ZϿC^�G��
+��c
+�Ɇ�&�g���)���!���z�ɍf�3��b�K9߄�^��K;QL�ǁ��X0��TF��V�M���b��*a�d�%*��'���w4.�Y�y�K��Q2I�SM� E���#x$���o�e�_IZƱ�3 ��Z�s(�K���Qc�7lƩ���Ά=C��G��gc���$ �ZZBx���*Q��]�0Nݓc�ˀ��G��w�NC�%�D��f^�����kף��!��9��[n%uM0��4E��� �'?g1��s�:"a���&�����R&`2	=�m`�i �ބ�_�
+?�	�4�F�v8jy��ǰu��D1fX��]��2 �S'wm���&CBi8ۏ���D��\�}�'���#�����,,�N���2W<��VL�h��2E҅��[xB���wڡJW�-׬�Ɩ.\=�����.7$��g��F\���	�����f�&�;=8����O��a�i@SP�Mt��d�E�Re�V��CT��0X��/a�$;J&b"�@�� 9ۀ�<����&C�nBԔ�h܎k�|�4mf�HF���g-l�^/�E���ڧ�����U���oq��/�
+��^�C�N.���(��/���p�4>a$��c&�=��{q���.�g����4>
+w��P�Gct#�KZ�ζ]zh
+-șc��e�����8-����Kߞ*�]x,Ň��=�=Fцc�'���0�r�
+Y�u��*�c��{���׷�)y����eZ&Q7깵؜���i�s+eyEa�A'��Ԝ�m��<�*۹�u�k�T�=����	>��z4�x��_$c�.�ĺX��O��Ix�0:Ħ�a�����|&����}O�y�M��.��|2�E?._c!��54&GN�~�1҇�;�8?[��F+�~�ț�a��A^5��"��4L�6���Vوe?�?�M�žs��ի���)lhn�$����8�|(�9�\����!��G���_�����������#!l"��L6�	]�G�gfL�s�N���G;�R_��_܋c�v�@�G^B'm�Uӌ�٩&F�*)���`5XM��a��1�n���D�S7)�%x�׬b�:K���-�"�xqv'7=�6\�x�[�����T*j�!?�m�/�?9����X5�D}����a��x�	��X;ighҡv� �q�J�O�c.y�ئ����n��Z�г��S�oӦ3w|/�K�Ҹ4.�K�Ҹ4�6� '�n,äq�    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/natural-gas.png`
+
+```tsx
+�PNG
+
+   IHDR   �   �   �>a�  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       ��       �    kF&M  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  'YIDATx�	�%u}�u��ݷ���i�YE�Md:G�3����=F=br|'�F9F�$*�	$�G�FD�������]�ֽU��֣93#B��^Wu׻[�{���������,�"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q`�P�Y$����[��~�۾�w_s�)���}�o���^��G� ���$�G'~p\o�mo8{���X����ş���?{�sRk��yR�y�XD�5[席�k՚Ŗ�����B����������֭�E�S_�O9� ��,�9N&�Θ��\��
+=el�/����=��r�	�Q% �j�8�Z�L����c��U��s,=:���7n�q�O�}��<��:���o�?��0�ٴ�ܜ��ͤ�V��~�C_��ڛ� �x��~�Q% N�sJƗ�ͼ�9�X,fN`O����c����W�ޟ� �-�����S�*&c�	i���ϬR1wb¼f�:m��V�ⱸ��,79����.]�}ޟp�@ҳu�vg8A�[�7��� +�n�֬լQ�ZCn�-�������~����?���yoH��d2�0��Z<�l.k�B�
+���x-��[*��A'�_b���|�u����<��F `��b~���,��Ms̿���b�})1?�$.�[:���N���{��9)��_<*�ƫ�Z�qۯoכ�d�q������;���7�jioY��6�����M���>��s8���`u��Ɏ�dK׬1'�s��2߂����� ��~��#;�6���/��b�� ����L�����-Yn��댎��.�k�N`�-�װ�D6��|�z��_��C�R���^ r��og;5�V�=�,��	k�N�f�'�3t��� ��o@\`��'m �6��~r�u+0����� �<2���*�H�ڶ�U6p���oŠ�p�@��k����w�4?p"��O����Ϯ�����.jpj���ؙA�ik^�9~EЯkn�n�����c #��Q,
+��b�r~�8�����ƍ϶h��?���l��8��_�t���>Ƽ��[m\��P�����?-|~f���%��}C�LA�Ả[��(�k㢊� �Z�������=���,8�ߪ;wZh+��~^�x��p	-����G��b!�D| �J[�zA��+voܸt�؀E) ���gߐlC�Q���8�
+˖Zs�v�LN�W���0ܓ��8�𾘭L@��q<����D��0?KA�^��Ϸ,�:�� ���߾.�y�r&g��>���Zc�������`f�v�������W(�*�?���.��Gp&w��/[������-:���ǜS�ي�y����c�Y��6�?�}�O���O�^�\F�C���i��1GH@bOml��/}u��g�Yb1��#��_��{����=6eǝ~��s9ko�b��1��{hy@@��d	H���x<�u0��� �K6��
+J�}Dn �@<��\���ع�b���#߽Po���g�9'��_*s���m��ך�أVݷ�Z�|B�bT��02�H��m���V?��B:<�X:������du��8B�}�H r���Ean��WVe�o'덞����� |j0��aҽ&~^��|�/3��0S�������T���,B�*> XlsL� ��@��ة���ȏPZZ�2��%�G�ܘ/4�o�-86E���o��䔵�m��G�'<�a��6ͮH_ ���"�
+A<V��&��PXa�'ˀ tp��#��ĩ���w������:�mFFFb����9�E�\�N��B��sָ�^��̂���2T
+��h�|�~<V�/&c�% 2m�c��ѣ���� e�)��,٬N{��g��	���ON�,�?Z �.?]r�+�����կ�����?��yd ��	ڈ��\�q�;��i`��e|��R�,��!xr�C=���7� � 4��xρM��0kNi�ʎ���~r݆�[`�'^�����.C�j��P����|v�6w�.�&g�E�֖O�H����O�&����U�~x,�W�ߖ�ct<a>BZ��GӴ�Kp�A�hj�0K��󩷽��s�ֽ��ZH$]�1�m�\sr����5�Y�{�%o1���֎�V=|��|j��U���U�V��%>�)A�-Ɗ�	��"H`-TN��4]�Ֆ{ ��@�*/(�����%��m2\R�'���o��ϮyՑC��������l'�fα������/�����ۭyh����߯������t.��I�xNy~��`�|m�b�P@^	_SA��8B��2�u�$X��<*���ŢU+u�۹sx��G��q%\p1@Ο�b.�Xߦ��n��V2w㝔j�[#�GZs���a��B�RA1r��K�w���1@ ���=����;���@Y���C\ xB��k������e�0Y45M�I�y�m���ȯ�w�������/~7���ׄ�+�-�%g�m�;M����z�V��y?�P����[�V�7t��]nA�]�Ǫ�p�m�+>��u�ך�~�0G�Q��Y��M�a��l�L��#��Ɏ���.�d_��.��`�f|k�U�&����\x��>�§���66���̇��.S/?A���K�e�C\����Sb M��s���,�d� Y	�|�:�P��X����e�9+9ܽ�
+��L�;pp聿���a�����D�|?ߩ]��������O��͟�Ԛ��	�Oe��Ч���*���S?U����s��P�U@  �r�� ��f�e���Fj
+��	����}M��l���9�A*s�
+&B(�G@�m~�=~��]?Y� ശ�v�m���,ߒ��w�)�޼�&����U�dÓD���G������6�,��!����Y�y&�����i���:X��@"����4B������l���lf���'�����1�o�gw��.�t� ��Ypڭ?S��_}�yf�c�>��D���Y�&�2�-7��]S)�`~�7Tk��6c�ԅ;L�m*^��j�P. ��`<*�PZ�Mc�cCA �azhnӣ6��`�\�T�WC����>���o���{�>�����v�;W�u��n&{�w�c.��Z��< 7?R�SE�%\��,K��>S���~<��9����!�Dp�v?�b��u��7�+���V�e�Pه��rX�~��:M<T���;�|��+��� �_uUO��~���h[�*�����>>0�2c��3�:�B�|��|^�]�[��U1��APASg�u�r��D2��z�H`KHp`���4!�*5]�`��Sk���MRs�s�#t�2)��AHbvm}�rZ�G�έ�-@���Eyw���g��Do�:?d��I�$����k�F�hi}X�	5x^k�r���.����KFPGBA̰���23~�|& �0	� �܊�b�D�D�@h�Q�RC��g�ST�����`�ľ����/���n�F�Z@�H������K_s:�}����oN3�%�܂a��1��	���{�l��4�]�������a�'���o�}n�vLOٚ�+��Qqi��B	R(LpXnA. �-��$�1������i���a��N("r���L�&{�l���.]v�k����ih��i�ЪU�EKm�.si�����N����F����0@`�����%4x�����f��]�����l2��Y�Y�w��UA.����t��
+�P iq  �	@��-������������H(y�����}���,��A��^�Z�14q��f�Z�w���Q�n��h\��
+�T��%h���0F�k\r�&��a�
+?�tg^��d&����N�i�U����
+y��Ttr���H�R�O�o��?Έ�4^k	��>G�����AQ��7�G�,�q1����o���_��l�v���H�[��y�7y�/z׬�;L7�8�^Ŧ��mbb
+���C�>���0Z���a �_�q��k h�4q�Ϭ����f<���N�R��=s�9�%KpI�J��@!��Oŉ�
+�E�;�"*h鳸������YC��ғ8�o��/W�/�J���X��O��V�P�up��>܁�|C��	�W��|>�f��14���i��T�9F�O�*�	��3���G�~�� O��V�b��H:��i,��1^�E��S��h��w(c5��da1�r@�YnS�@�vx���>�.u�֕��[g$'ݢ�WdI74�c�_8��$Z���*�6&	�dn�ʭ 0��9V�`��0����鳁���a��]9N{���?Z2d_Gk���e�,q+�����dS�p(�|����J�#�H	e�D�Ydļ:9u��m��t���'��_�A��nAK�a�+��[�U�45pj��m(�Gݑ��TL�ҷY@�*��O��F�6��$?�����{A߭����E��c�����O�h���0Yw}�v5���$%X �/ܰ�Ct��V�>���V�ZW�v% �z���8ZT$��z��jZ��Ì�=f�}i�l��a�|��v��)-s203<��S,[3�����L��Ѱ�4��R�qy��	��̇1�4�ϑ+��i:(,7�8$ɕ��}I���G�b��ih�Վܽw9�{�l�kN���Ko�{~{X��aa� �M�����q[htX�Cи0gG�C�q���aa�~�TO��,G�`~��ÍKz���d����n'�sYN���g�s��.�s_��L~�����
+t����1Le�
+J�X�>1�u�`�Y�33d�J"�#��(�^":�V�$G����+]t%��T�h�<R6���C�`.��5U�J}�f�ُ�y�J�ي�9��RNfe��+T��"��ʸJ�0�)Ɔ��^����d�6�q�s�> k��K0�n�����W�O��XZ듟+��xv+�J_f@�P�h?�7vXL�`��GL��w���9�7�5�^}�Ov=�������8���M(�w�ne������w��B������h�Xi��=9�OA)� {!���?�n?��:��u�(~2��)/n	 ��U+�$�mM'>`"��O�h�<�̧Ր���F��σ$wlE����޿��{���g��gy��Q��S(��vW���K�@��s�*��4�JI,�vs��v���ZuT��  B)	4bt��uY̽����\���n��a.���t�v5٥����������i֦���}�Ep�rA����˝z�g�_��s���X�Ih�\��
+߄M�WP�s�^��r.�
+z���'[�/�	 z ���F))6�g�
+�	p�T*A�Pwm]' ��\�Jgsy4Qk���H�ɝY�v�ԪV��U�}Y��1���v��4�@6eŁ���ll���u���ݳRh�&�ˤ����zj0��y�I���A ��#\\K$�W���	�g �7HQ��1�k5�D:k=KW|�x��:-���\� f,�80>ia�6i:'�i�v"��b��!p���ǮXa�Tj�C�߾+<����;���E"D/�HƘ*����R�j��ܖ6-^�Ú�a[V*[/�D�n�$���'�f�I
+3�"�~u)���R�|���c�>�)���u� 䲛 �9 r-2 �_�\��r�`f
+s����-4���"O�0�{ʸ+�;5z�s���~tM2�OF�;�;�j"U�wd��S��;����\��vSd*��[?A.H:�LB
+�q,A�����- ��c��^�R�r���s?���u.��k�) ���ک����&�@����; 1{�@�|�_�9v W�1��V���0�3�??�eݢ�zkWjo��na����mt�N��ÉԆ�>x�GN8�5w��O��haa
+|n�o�V�0����ф������$�j\��0��'���g��ҕ��Ģ���7j�>	b���!F��y����{7Eo��D�x���7p��U�����>)K�\1�
+Y���#�����vֽs~����ɞ���'z˽��=��+���%��TO��G�������ku���,]����;�W����s/���[����&U�~=��"r��zTS��/�[����w�|���G�/���ʕ�<�m�o�~�C�_��/>��O<����FF.j���D
+aT�(E7Q/��î��I�Z	<ҹ��(>Q>���2���u�3���p�#�q��;��S���:e�"V`~��=�V���@���u�����X<�f;��G>�n_���);�����U*M�D��t���4�z ��U�T��(���돖���q*��m�s>���ꫧ��;^�׺��\y�������w��yD]�-��L��1�&���y�/�H�R��N$���3Z�R�۬Vs��z3���׹?�;д�K��2E�4P�(��W/�0�%��%n'���K=�����V �r��d���~���Je�e�RL㯓�6"�V�,1��G ԕ�	⁙=����������A	�O��B��s��kT�i�P�5��	V��V�Xn��ƒC�?8�k_���b�K�ܮ ��z��;�έi{� �(��  �@+��l	�.���ͯQ�p��n4� �/�F��ۖ���=��`���ƚ�
+ �r���$mc�A(;���r�_��zK��N�7�� �����Oy��Dg��qi�iXy`�z!tILn,�%��AS�F=�zp�oA��Z�S%�	����ľ�|a&�����%;(���b!��W!+Y5���GF����]- b���|�v2�	0�Q�DWP�NP(d(	�?O!H���������U/��|B�}�P�� (�N6ff(Ecu�8
+�����"S����+��$3w�/���r���z�o_����X�4���?� /�-,� h�Rr-g��|�)�U�5w��J��]~��|�ޞ!>�s�? #A����_$��q�|��X�^��j����7x��GFhb��mA�H؜���Y��ޚ56
+<,̿����t�r��4���w'��׿ް�����c}�T����Sl�%�j4���D�h� � =+��UK��`_�Ugf2���ܑ�w��o~�޹`�u��7�<���|w?��=��1����O�-PFH�3�/��Sc�{��%��}��甒��q+'�u��0��Y�����|p�p��H,�C0��&w5�����}���r�o���r������7�vڭ,�{���3Y#�V  ��Y���sԳ7�k�t������M�~���6��?����!�S/y�=~ӷmǮ��H�²�����ҨV�=�xr���=���]/��"o#jZ���~����蟞�Ζ_}�1�`>�F�����M�"����:v�}K�t�?b�S,_�=7��4�$	���塷'k���w�ٜk�շ9ӳ�%�5�}���;7�����d�G�T���_k�!��S��ᖩ�g:�
+U� �t_����O������J~b|����ي%��:@c3v�ѱ���\�Ug�i���1�B��A�v��(τ��F��at�_�H�Ⱃ�{�՞x���_m���,�	��i`0(=�d^�溓��/��ɋ����|���p�m���gf�����d�$��~8�e�	��OO�6?�@j��Gm�6���K�"eZ�FYSh�(˷�_{�Mb�5X�Ei�HM&*ڔA����;�U�o�����j~mW�w�`���ԓ��\b+W�0�����Id�)��v�s�- ���Z�����+ǟ�	���]) 7n��LM]J@��N��Zwnn9cZ���H�Ԭ��bB4�f��}�m���w�zP��V,�A����x�(���n](j�+��C�
+��r3O��e�`��\t�ܶ�vl�b{y��iw����z����^ni�C�+F�O�E�	3���z����<����Y��;]tQ��d��}w�	��n�q����^1��P�o� K��·�8�^^@'/?x��l�i���g������0Ku����:��w�ΤQ_X��|&�!z�
+O>��my��q;��ʿ5>k��PY��NY���h4MS����6����h,P!� ����Iz	�d�>��O���rpfz����^8]��B#�J�������~*qm��e�f�E�+��Z�����R��%���N����4:�q��>�i�Jz���K���	�&j��*$g�=Ύ%��UG��������G�Yȡݬ��ș3H���rY4��a�8��p!)�a	0+� �t��9�Dֺj	ٮ��e�ʵ��m׽�qǭ����\�����չ���*�Dt�
+h�b���%�Ba���kH��j�\���ʖ��׊����b<��e�͋��,���@ѩ��
+A��v�S��9���^��z/��Z9,���`y
+�e,Eyh��L+�k.W�}63�J>�u�������X:l�	�3�kw8�Q(��(-F����-��rpLѠ��].A�֥a3B
+��C�$eZ1-<�"Hڨu���1P�F�&�P�z��@�In��|���i ���@�ejM7Y���gR'P�=:��V����}�H���u.�����e��iY�f.��<�����ϢQy�l����+����&�lC�+�V\�Q�(�-w�Ҳ0�¡���ɦ��a<!8Ws��ǚ�D���*}�3���o�%�X�Ci_+^�f��\��!�M��Z�$\9��Rk��K���{r I1J��`��#t��u@��©�{`���D�@��_�h]�	ؓ���nh���ˡ�А���
+.$<n��{ܒ��kh�X�%M�ε�,e�߰�1B���x���&�8$&l��_De��k��J��a
+Z�"Me0&�D��d>��~��G�j�:H
+s>�?
+�4��h]��*㿵s��\�1����Ö1.
+4��L[ͧ�+\A̅�n��R��*�bTJn�n�����5]6{�E��X?�o���>8bA��ԙ��H�
+���-��Q��&����d�jqIb�	@l�����ὙtfU�ʴJ4�7?��5����0�>
+�<:�<�����O�5=������v}�Ƽ�Z*mk�P�%|�
+��1M_�vejH��"�����wCJ����S�+!�=�N��N'��u�&:t�vқ߼��/��;���N�w�ǂ�i����y��*�t���ys�}�h�48kf84�h'lC�y	��fJ���`�ފ�s�ܟ2Y�������+�ޯ�q�� �eꓚM��T���ʁF6��=Ss{��O���z��^{�N}U7m׮�~|��=���k�Ι�f��D�?>�I��eS��]��t�7.<-0M�0�y�� joָV ~_���WP'�����^i�F���P(|T( (Z<�l��iF@���$������`�O��V\+��N{ަ[�x��=���Awn]- �D2����}��Ԛ\o��Y�aU*�2��$���g���^��*rM��}�l l�g��XO'Nw/��tX�f���r���]�|�i�%�x"H��U��(�k �ē�I"�1�s���`��C���-cOM~{���/�w?�����y�[ߚ:�<�ϧ{��T�A?c�<�<v���}�\��=����NR�?�5�ڀM�X���dw��h����G��=�I���BtTD��"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q �@D��"
+D�(Q�7O���0�8�3W�    IEND�B`�
+```
+
+### `src/flows/fno/commodities/assets/silver.png`
+
+```tsx
+�PNG
+
+   IHDR   �   �   �>a�   sRGB ���   xeXIfMM *           >       F(       �i       N      ,     ,    �       �       ��       �    �@k   	pHYs  .#  .#x�?v  &�IDATx�{�eW}��~��=�޹����93�k cb��&�Md7�!J@��Dn%D�J�J��J�?�)Q��:�RPU���Tr�R��`��̐�<���y��w?��Zk�s���{�t��{��o��[��o��c�}ƹ�544444444444444444444444444444444444444444444444444444444444444444444444��H^t�#C~�ޡ����X�ʍi���?��W������_*����nN�gUz������]U����)���-�$���$I��GKW>�����;���ci�����.����A}p�:V8w2M�۫�z�s�K]�n�^j�2��,+/�@Q!�4qW����EQM(p�r�,�}��+�G�~b8i�����e���t\���ܝDl����z4��AG8��Vj���A�(�LP܋L�"�Q���L/�RdP�_N+7���.�p&���{��c#O���G��w/��)7��x��C�_<='2�ŨC�.Nқo/}���F�f��գ�(/d�6�&� �
+/��K"2d�҂�d�*7�U��@�Rn	Გ�Ȧygq��x���ҡG67.���w��gb}�����7����O�ݾ��ﻩ��O�Uv{�L_
+�/�S0L�Nt� |o�N4}�Ilݣ競�(���:l���g@��ۓ����!�4k�����΂kw�U�ꈧ�,v\1Xw���z�\y���������^|�~�����c��c�����~y4�:n-�)����x�?���Ԭ��d��� �Na?�{����0=O�]D��!BҬ�Vϵ:}���v%��C7����%7X��v6W�pK��?U5u��pzn0�_�ޏ����c�)���s���_�̻ߕ���I���t�.��K��*K7���b��2l��p����ЕŘ��T���}����4��sq���z�dL��l/�܄�G�]3�e9vz���7@�C	{{�ɘ���2�:�	&�H���*wc�U��q�/�R����C�������?�t��rLh��.%�����;��\J�K�.��R��qT�b�,�t2 p&�R
+$(�kB7�L$`sQ14fh��M�^؋���˲�:�hӍ�.#����V�h{����Gcz��9������M?x�|=R�V�I�`~�K�{>�����w.�)s��7�\��l�!���Xtg9����`n�K(Ċ�L)]���K�e��/F3�@`�R�
+��sAS����K�.ʅo���ѝ�M%��n��h'�l/l	��=���L�^�QǢ�RE,B���kF}��D4=ܧۋF�i��,� �%��cz2�A�n�IV�[J�j#�����ޒk/� D��dw��-ϔBCE:�G�+�~���(=wLO�Yu;���\6s��b�2�G4&=��л%tuk�\
+úyu�Xk|L����dR���}U q���O������r�i��R83����Ȇ�2� ?�g9W�e�0	����8tx�X���#�P�zwɘ����WM�c�=t0��6�6�O�����'�|t~-xIߛ� r�y�5�OܤH.�����蟝�/!�(,@9��b'����B���?Kkgs5|M���e!R��¥O�$�`�&��B`%:޼����n���n����d�[=�%7�ѫ���9GЬ0��Kd�Da[&X/M����v����T8�MPJ�m͢趒��d�s��׾8�k���������#����jz��aś	�j��L	0c��A�6c�+#_
+�f9��v�n~��^��Z�;�ȟ����	[����mb���{���>nB�UюO��ĭ0|��طz��,K%�ҦQ�>�y���~���b�s��G����Nƣ�[Yu=�>�y ��!jq��zJW����O7��0>k�`Z0v�b��X%0�x�G=~�@1�*�hZ0�Ug�R ��9E1�����G,�������Ѡ�����X:3��Ye{�WЎ[��j��d�5��+A�_I�
+a�K-��fY��LO��|�&na��&�,��5?���3�^رn_�TB�p��4�PBVn�Q΄�3����u�~�/��{�������nX_�[YR�
+���Bv���-,lK3��d�?+ka�hH�,ݯ�ex�˰��%����CM�A����\�t���x�����!�"!=z��h��J��~��ꄯ}o��� eZ}  R8B���--��]���d�}�¦H$p+kD��5��@s	�O3�^?�r�G\��	�,T?q/8�׹aJb�>?Љ"��Ǡ�>��J�*~��p�� ��w�z{R�o���k3 ��XB1 �@L�Ľh$X�X϶�L�*g�*KPuqirgJPHxʠ%�H}��`"VB�)Ɋi%��R��4T�,mt�6��}�y�b��
+�=�q��zF���}S�*�7�JN�HD=S������4s>n4!nDʙ�|ᐥ<�SS �� � r�֞��O�Z�λ��|6e�(�[�[j $�T������?:����|�c?~`Z��5	��T@@���L�>L�^B�)��фMP��A�*K\�/�Úx�� Va(��]�R~�j�S�X@~̥�+��%��pT��Ȭ��D�����W�{��E���ϴ�ꄖ~^�&:��ѕ���*�l��@g�j~HSU
+���̴h�n6�(��sʫ���bINux�����O�F1Մ�+&?ę��7��_{����/tx���_�����_�\9@�rތ+) �^M<�F���`�l(LB��:��ꁞ%��a�@� �����o,��X(
+���y�>��L����(L���w�+(d�ς�=��G�=W���^�T�M&S�bN�Hxa �K��]^n>�p���1,�@l���Pb7`�ǈ�j�5��c�HS��g�'� �R�1��**g4��8i�g��N�ɴz�o���xq�7n�����%��8	C`D����~�dX�	��E,��6�6��H�^�����=
+ZM���*�� V�����BHWR]�"r�������dB�I^��b�������NqtA利�������o��j����ci������h�>X���7<�.�Cզ:|�P5���!�+ �8oT��-1ܔjN�G=��.2�&l#��粚�7W�\ŠG���h��)�*OJ��e�o������_]����=U����w����!8��&\B/o(�X)!��2��B7ˠޫ�B8]`Fa(ж1�ʒI	K5��y�Ҷ��������TotR�(�]��<K��Tˌ=�.�F7"�k���Ί��+\�U�\�J��q������t�C�Td���T��Γ���G�7��LҊ�\�I,{H�F��敯ِ�����X�ҼBH�ߔF=��"@/�,���Y)�����Ȓ|Y�����9�D(�'3~���p)����
+��]'�V5,�Ѹ�nO�L׫��Wɟ�;�g�r��^�O.���w/�j͞�'?~��������8<����l�a�v�RƐ:̂Y��������ڔ@ʣ?�����?|mg�y9v�6lN�������	G���K�.O�J�e��D*��e���˧.�Q+-\7E��9Y4�.����&�R�.������?��W~��o�uL>M�G���=�@�����X�:��i1x[2-~&�L�-6C��Kf9k%�I_Q�&G�������BH���i��~�0�K��l ��u���xW�2�|��/p��G�Gߗ��M5L�Q�N?c i�m��k-N
+���monu�r7;n�Xv�֊������V�n�z�4i��v��n�g�<{���/���CB���9������_��_�<����th)�_W�Ս��<�$�8A�f�>�W;��BU�9'�� �mn���7ٸ���Z��$+˥[Z�\g��{Um7�`-�#�B�����B���>�S�kx9r�	28H}���C�� M�k7؋��x��t�Y��9K��N'��.� �����=3r���s��3�Yt]�5�:��~�-�R��>s�n�c�y��owZI���C��T���2Iw8�|�}����X6?:]|�o��G����kV��z ����.c��h�}j2��k���Xf��'ڮa��6�Y����"\���c7L��p���G��ޙ�;����''7��Ύ;~�t7���c�"�Aյ��@���)�X"l}�iJ ˡ<��C7�ȑ��)��G��	��({�,�+L�2H��ؤ�q�U�\�Q����[�0t�>;r_?S��W*���r�ܺ�[Dq;n�#h�(�9��1����8��Ł�$mqL��>0��i^�H�� ����*Nݘ�Oq��n��P1���M����Yp���� ��{I���O�v�>�°"n�_o�y��X�=f����������,a �=}�_rzw��������k:v�ϻ����S��p���PG�o�n�G8����^ϕ 9a�5Ūh�Q�&���Љb���d���y�+nk}�zv0 e����+׌��Z&�m�u�_�+�ncu�67+�3�J�����^�u�����M�0�+��r3�q����aLx��ZeH�����|~1�S^L-t�eJ_�",�V[k���s���O���j���=)���ox�B?�/)g���]O��t鴮���l?����v���H�W7�R9�t��EB�Ý��\q��n����]~�{�K��O݀ё��S�����m�=�s����,�Q�.���Sǁ#S����"=��)��o��M\�з���Ό��x�n�Ҷ�ra�\����a��U0E�a�2y'q+�u�����-���[osG�ǎ�]��&�|�D7��� P�R���-ԓ�0��R�<�L�(���<֕.'��A�w���/^��i����M`Pу�Zbder�/���	VZ\�ym���E�7u�V��-]w�-_�ykX$���[���̐2B�EKff߃�	���yΪK�]�m�a�-�;�|�'�@�
+��x���36����k���-w�/v��#�ve⶷�X"��9���{$�H�Ő�f�����d��Ԇ�c�۾d�#蛄�Ջ�q	T�Q.�6 ���1	Xq����qe�&�
+���p��^r~�Z�x�
+�鏼�6��1$����"��fb,3���[�A��QI� ��𶮷r#�MV:G�%EI�0F���3����-��n�f"�̌?g"ɘ|�뺇1��N����ķ��S�nsu�6��n{k�.�W��(X8A�:Qb��dE���&��*yr�N�ͳP�]�x���	_�O=]��, �U�K��(hUI\���Ek�32)�������W������k�)�kV W��n�nq��������- ag�%y�"��^�sz���i�c��X���~���I\�ϼ�|��ż�Y��b���"���	�s��ɟ�'�gHHJx�^�P��[�=���/~�x�0	�st��ՕK�ɸ�_Ѓ�9�3,I�$��GS 1 e���E�N�XXzs��2�/�B��bޤ��,=B��,���8�-HoZ*�������]�|�7�3�8��:Ј)��/AG-����C�.�-n�0X�0���'c��z'�@��O�?��{�Lr�:1�Ƀ�s3�����qޤd�j�����
+����;L�/3�0o#�ؗSLq�.˳�}��@U�l��z>B�"O�pE���z	_���n�YU>�'�<=w�.�'RF����F��j�5)@�����������C����AA�S$Y|�Hf�7�!U���ղC�_�ޔO��D��z��`׭FS�R�g�S�&�$Hq�'G<�B���&b��&�,E/`�`�Zh䢧�_��N�)��H�0���J���ټ�V;� 	wv	 o��au�F���ȃ�V��C�	Q������v�K����?�bW�M���,1_r�&@�H7q��P���,B�&�=59����N�q�>��~��I"�����aƞ�&[��u��;� $.��Jd���sL`��RU��h���ui�y[��z����_~P��%�U'�W;,,�����.rv�|����b����Z�T���z1a/��S+t7k�UлO���c���	�̿��\Y��$��f���>�R���͒�KÀL�� ))�̱G��g�\a""?��-�.m��b�/v������wH�;s�����6-;��VX.M��H%xP���(�^bً,�+����r~�G{L�T��\�V��-5ެ�"A�uQ��v�&K�{>q����rWm����`3)6@DB4�r{�'~�I�q5���Pe�4�<)��h�\�v�E���W:��3�Yf�U�u;�5
+�JMb%���"�z(�������?)�����u�pǝ9�\`���\���l3��k��(����ˇH9���a�O��c�E �@Ũc`NV!X���Q�F}�,��X�y���l<��#$�qH~^�U)��ӧ18��]��z��d�y��0+F���o�pAq�) Z���7�s%��	
+��AX��1YK�:P"���\@��^=�z��i���@� ��<#��^�R6)���W��X:����m��g���6���;/�/0%`/�+�a ���<0fXɛ��X��eC�£1!�ʇ*<���	�v�uGa�	�Jh��ww��~b�!f��M,Y�����	Ba��-4A~L���JS��ŕ'+`y%
+�2�$��%�0��K�؜�~������ �t��s�E��Z��+g��a�����؀�sVy���?�D>�T�%sR�#k ����E�^P��z�l�@}�j
+jBW%^�5>�bpY�����kI���Rt4$%V�~��z�u���*P�/0w&�ؕ��[s?�)r-3to�D�����X�A�b��Q%]��7a�N=B`f]�.��z�����,uբ�zk���گ~�s��SH)�2kD�)LBm[�GQ�Ņ�[������ �����6��t�B��VpN\�S%��ȒY,�(qџיJ�	ݣ�YL��EG���
+)U���al�ۡ�w��sz��$���������_x�%.���X͞1��~���y+��X���AR -�L��v7�� z�&����UФPq���d��Ö�2��̌^��`���a��9&\if��/��cl���@�|@���𹺺�(�,����Ӑ%�= ��  ij_t
+�uUH��(��y�N��u! �'�N�>y�����Y��m67ݏ��m�kqe�RQ �������\@A��;h-N	�Etb��� ���[q��oK�A�6㇢��J��%[�i$s�L��Y}�!%p�n���"��3	�;�6<X�Q�~����7��W��$b�h�����uQ���H��:q(�V�0��¿q�X(pjqQD�x�[��v��X9Ȁ��I�ڝ�{�N?o�q{����n#�g�Q��]�<ߘ]�{b_��u��|L���l @��y�&h� zè�fbmn W2�!�vE�Sδ05,輀�����^�h��g����uG[��A�Mi�d���PW@�m�@KC���,�ߵT۴	$�B����C��3�A���W��l��\�(&/7�_��>G�y)�����Ƽ�D���6m|�&'k l�/p��I�e�J�2F�����}\J@ ?���I��U�d��?/x{�Ns���|.�L)�?�)���τ�Ձ/e0�@�
+x��n�E/tT�?t���2��q࣭�	e�&�~��󑯞M�6��c��sW��IT��3"a L�T_�\t�`�mg�'���?�N(<�{^
+P�F���
+���W3��L*���Ê�d�{ᲀ3RO�4_F�Vf� ����@K?�+s���-��=��_�L�W:ż�e�@��>�}cNp
+�2������}ߕ� ��R�)�P�3Y�¤���$(QN>�<q*i�oC��z�{�kW.�P��S�l�M���!�
+p��󲚾S��Tn�?�KO��~�+��f6ʲ�2c0�-Ku�y�/�ӵD�)!9�~3�HQo%`S���R&���7��.���Q	��B� ���\�r�aρ�g~��-,p��d�[�7�CG�r����2����5�!E�;��Y�N����"�0�����4�w��y~c��
+���� �������2�� �.%�L��6�{��bxΏ���E(�EZ	��g\5��Hp/(!�L�*XB��<�1����!��U�@Ҕ��69o;��O[�߹EN!u0��_`�_�����̺~�**��=sϕ���ߢ`�Mг����&̥����[�r���,A��>��[}�3�i�s�b�Όo��T�8	& Y�"ó4�+�s��Xө�5�&D#�,@����CpH�謾PE���j�o��#xYP�{Rߋ�B#���-'r���/й�KL�P ��m���Ca~�XO��m�D�}�eD��<-�jTT`B���,���	���J����U>q��7������2�v��;�ࡺH�I���!"�@�5�[X�GH�փ��>M���2z��K�?i�Ϥ�C�3Dgϧ�a.b� 
+,�S��6��j���:W`ix�'�-�d��&��C�}�X����Nʉ2iρ��@�?q�$� ��!F��RS����U���WR�F@޳D������]0�̎���n��������Vx�ӂ3K@ܷ ��VI)�f�ĺ|���$�ǱZ�څK��������=������_Tg�'z�;��qQ���a��=��N�l(���b�6���k���2�M��9��ae֧�i������sv֯�q:p[W.���9 ܘ6�,��س���ĊH�%"�-���s��L጖|��Q�Ln%�1�x�۳*�ʑ���J���V�<�Ѵռ�\L�>�V��(}ɹ�u�6.s�\�p��в����*�Z:�2c\aTE�Q]�?)��z���#8�9�]N���%wy��z+�W�9J�Z5,u��2?`��xV�7Ϡ�b�v8�N�a���\(���Q��a{k4��(���Y�u�Y \����7�
+v���e��� �=J��:HXG2���vƓ��hZfV�r*kok-��^wYQ벤P�nzB���HӋ�� >:$�h!��	���]K�$��*��@��M�&w�!��.2	\c�EE�v�>���5�tX����v;[�[�fʓ.��e���o���Z:����R���aa�أ��!ƙB��*+ٚB���4ܸS�@�T
+sl��-�""	d ί��n������'�O�gt�s:�#E>�_���d{4M:�2�f��=�?I[�2�'�4�'���:�� �Ov�|���g9����y�2i%-���|@#�/�,�>?�/����s&��׶����gh�}g�[)���4k4��x������S,�,��F̈́Y�7K�I� ��A
+�)_+���+M;`�oV�t�+�x��<Pw��������G'-���2u�٤�*�����ȍF<��P�)�؜ȗ�:��?�ȇ/��L��3���i9��mx�h�*�Jq&�U���Pʍ���M��vVM�Y��N�������OzP��j"�� �HS�5o:�    IEND�B`�
+```
+
+### `src/flows/fno/commodities/components/Commodities.module.css`
+
+```css
+/* Commodities tab, contract picker and Lot summary — flow-only pieces on L3 tokens. */
+.shortcutArt { display: block; width: var(--l3-size-32); height: var(--l3-size-32); object-fit: contain; }
+.change { font: var(--l3-text-label-10); }
+.meta { font: var(--l3-text-label-12); color: var(--l3-content-tertiary); white-space: nowrap; }
+.pillDivider { flex: none; align-self: stretch; width: 1px; background: var(--l3-border-light); }
+
+/* Contract picker */
+.chipArt { display: block; width: var(--l3-size-16); height: var(--l3-size-16); object-fit: contain; }
+.rowArt { display: block; width: var(--l3-size-20); height: var(--l3-size-20); object-fit: contain; }
+.groupLabel { font: var(--l3-text-heading-12); }
+.group { overflow: hidden; border: 1px solid var(--l3-border-light); border-radius: var(--l3-radius-12); }
+.chips { padding: var(--l3-spacing-16); }
+/* The chips row already brings 16 above the list. */
+.pickerBody { padding: 0 var(--l3-spacing-16) var(--l3-spacing-16); }
+.pickerBody.equity { padding-top: var(--l3-spacing-16); }
+
+/* Lot summary */
+.tabArt { display: block; width: var(--l3-size-16); height: var(--l3-size-16); object-fit: contain; }
+.lotBody { padding-block: var(--l3-spacing-24) var(--l3-spacing-32); }
+```
+
+### `src/flows/fno/commodities/components/CommoditiesFeed.tsx`
+
+```tsx
+import { Stack } from '@l3/components/Stack'
+import { ContractSection, type Choose } from '../../components/ContractSection'
+import { Watchlists } from '../../components/Discovery'
+import { TradingChart } from '../../components/TradingChart'
+import type { Contract, Watchlist } from '../../data'
+import { t } from '../../copy'
+import { smartFutures, type Commodity } from '../data'
+import { CommodityHeatmap } from './CommodityHeatmap'
+import { CommodityShortcuts } from './CommodityShortcuts'
+import { PopularCommodities } from './PopularCommodities'
+import parts from '../../components/HomeParts.module.css'
+
+type Props = {
+  /** The contract the chart shows ("Gold"); its selector opens the contract picker. */
+  instrument: string
+  lists: Watchlist[]
+  onCommodity: (commodity: Commodity) => void
+  onPicker: () => void
+  onChoose: Choose
+  onContract: (contract: Contract) => void
+  onDestination: (name: string) => void
+  onAddWatchlist: () => void
+  onScalper: () => void
+}
+
+/** The Commodities tab of F&O home (Figma 6754:63637), under the shared header, P&L, indices and product tabs. */
+export function CommoditiesFeed({ instrument, lists, onCommodity, onPicker, onChoose, onContract, onDestination, onAddWatchlist, onScalper }: Props) {
+  return <Stack gap="32" className={parts.feed}>
+    <CommodityShortcuts onOpen={onCommodity} />
+    <TradingChart instrument={instrument} onInstrument={onPicker} onChoose={onChoose} onDestination={onDestination} onScalper={onScalper} />
+    <div className={parts.divider} />
+    <div data-fno="watchlists"><Watchlists lists={lists} onAdd={onAddWatchlist} onOpen={onDestination} /></div>
+    <div data-fno="options"><PopularCommodities onChoose={onChoose} onContract={onContract} onViewAll={() => onDestination(t('commodities.popular'))} /></div>
+    <div data-fno="heatmap"><CommodityHeatmap onOpen={onDestination} onViewAll={() => onDestination(t('heatmap.title'))} /></div>
+    <div data-fno="futures"><ContractSection kind="futures" contracts={smartFutures} onChoose={onChoose} onContract={onContract} onViewAll={() => onDestination(t('futures.title'))} /></div>
+  </Stack>
+}
+```
+
+### `src/flows/fno/commodities/components/CommodityHeatmap.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Card } from '@l3/components/Card'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Tabs } from '@l3/components/Tabs'
+import { t } from '../../copy'
+import { heatmapGroups } from '../data'
+import parts from '../../components/HomeParts.module.css'
+
+type Group = keyof typeof heatmapGroups
+
+/** Futures Heatmap on the Commodities tab: Bullion / Energy / Metals pills (no Stock ⇕ Index switch) over the 3-column tiles. */
+export function CommodityHeatmap({ onOpen, onViewAll }: { onOpen: (name: string) => void; onViewAll: () => void }) {
+  const [group, setGroup] = useState<Group>('bullion')
+  return <section className={parts.heatmapSection} aria-label={t('heatmap.title')}>
+    <div className={parts.inset}><SectionHeader title={t('heatmap.title')} action={{ type: 'view-all', label: t('viewAll'), onClick: onViewAll }} /></div>
+    <div className={parts.heatmapRow}><Tabs appearance="pill" size="sm" aria-label={t('heatmap.title')} value={group} onChange={setGroup} items={(['bullion', 'energy', 'metals'] as const).map((value) => ({ value, label: t(`heatmap.${value}`) }))} /></div>
+    <div className={parts.heatmap}>{heatmapGroups[group].map((cell) => <Card variant="flat" key={cell.id} className={[parts.heatCell, cell.tone === 'up' ? parts.heatUp : parts.heatDown].join(' ')} onClick={() => onOpen(cell.name)}>
+      <span className={parts.heatName}>{cell.name}</span><span><strong>{cell.change.toFixed(2)}%</strong><span className={parts.heatPrice}>{cell.price}</span></span>
+    </Card>)}</div>
+  </section>
+}
+```
+
+### `src/flows/fno/commodities/components/CommodityShortcuts.tsx`
+
+```tsx
+import { Button } from '@l3/components/Button'
+import { Stack } from '@l3/components/Stack'
+import { t } from '../../copy'
+import { commodities, type Commodity } from '../data'
+import parts from '../../components/HomeParts.module.css'
+import styles from './Commodities.module.css'
+
+/** Gold · Silver · Crude Oil · Natural Gas: artwork in a round Tertiary button, the name and the day's change under it. */
+export function CommodityShortcuts({ onOpen }: { onOpen: (commodity: Commodity) => void }) {
+  return <div className={parts.shortcuts} role="list" aria-label={t('commodities.shortcuts')}>{commodities.map((commodity) => <Stack key={commodity.id} gap="08" align="center" role="listitem">
+    <Button variant="tertiary" size="lg" aria-label={commodity.name} iconLeft={<img className={styles.shortcutArt} src={commodity.image} alt="" />} onClick={() => onOpen(commodity)} />
+    <Stack gap="04" align="center">
+      <span className={parts.secondaryLabel}>{commodity.name}</span>
+      <span className={[styles.change, commodity.change < 0 ? parts.down : parts.up].join(' ')}>{commodity.change > 0 ? '+' : ''}{commodity.change.toFixed(2)}%</span>
+    </Stack>
+  </Stack>)}</div>
+}
+```
+
+### `src/flows/fno/commodities/components/PopularCommodities.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { PriceChange } from '@l3/components/PriceChange'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
+import { Tab, Tabs } from '@l3/components/Tabs'
+import { lmSwitchArrowVertical } from '@l3/icons/lemonnade'
+import { msFilterList } from '@l3/icons/material'
+import { inr } from '../../../../shared/data/format'
+import type { Choose } from '../../components/ContractSection'
+import { t } from '../../copy'
+import { popularFutures, popularOptions, type CommodityContract } from '../data'
+import parts from '../../components/HomeParts.module.css'
+import styles from './Commodities.module.css'
+
+/**
+ * Popular commodities: Options ⇕ Futures switch, category pills, Filter + sort, contract cards. A future's card shows
+ * price and change on one line with its margin per lot under it.
+ */
+export function PopularCommodities({ onChoose, onContract, onViewAll }: { onChoose: Choose; onContract: (contract: CommodityContract) => void; onViewAll: () => void }) {
+  const [futures, setFutures] = useState(false)
+  const [category, setCategory] = useState('top')
+  const [volume, setVolume] = useState(false)
+  const [filter, setFilter] = useState(t('filter.all'))
+  const categories = (['top', 'gainers', 'losers', 'advanced'] as const).map((value) => ({ value, label: t(`commodities.${value}`) }))
+  const source = futures ? popularFutures : popularOptions
+  const filterChoices = [t('filter.all'), t('filter.gainers'), t('filter.losers')]
+  const matching = source.filter((c) => filter === t('filter.gainers') ? c.change > 0 : filter === t('filter.losers') ? c.change < 0 : true)
+  const offset = categories.findIndex((c) => c.value === category)
+  const ordered = category === 'top' ? matching : [...matching.slice(offset), ...matching.slice(0, offset)]
+  const rows = volume ? [...ordered].sort((a, b) => b.volume - a.volume) : ordered
+  return <section className={parts.contractSection} aria-label={t('commodities.popular')}>
+    <SectionHeader title={t('commodities.popular')} action={{ type: 'view-all', label: t('viewAll'), onClick: onViewAll }} />
+    <Stack direction="horizontal" gap="08" align="center" className={parts.filterRow}>
+      <Tab appearance="pill" size="sm" emphasis="secondary" action iconRight={<Icon icon={lmSwitchArrowVertical} size={12} />} onClick={() => setFutures(!futures)} aria-label={t('commodities.segment')}>{t(futures ? 'commodities.futures' : 'commodities.options')}</Tab>
+      <span className={styles.pillDivider} aria-hidden />
+      <Tabs aria-label={t('commodities.popular')} appearance="pill" size="sm" items={categories} value={category} onChange={setCategory} />
+    </Stack>
+    <Stack direction="horizontal" align="center" justify="between">
+      <Button variant="ghost" size="sm" iconLeft={<Icon icon={msFilterList} size={12} />} onClick={() => onChoose(t('filter'), filterChoices, filter, setFilter)}>{filter === t('filter.all') ? t('filter') : filter}</Button>
+      <Select size="sm" aria-label={t('sort.label')} onClick={() => setVolume(!volume)}>{t(volume ? 'sort.volume' : 'sort.price')}</Select>
+    </Stack>
+    <Stack gap="12">{rows.map((contract) => <Card key={contract.id} onClick={() => onContract(contract)}>
+      <Stack direction="horizontal" gap="08" justify="between" align="center">
+        <Stack gap="04" className={parts.grow}><p className={parts.heading}>{contract.name}</p><p className={parts.description}>{contract.description}</p></Stack>
+        {contract.margin
+          ? <Stack gap="04" align="end"><Stack direction="horizontal" gap="04" align="center"><p className={parts.heading}>{volume ? contract.volume.toLocaleString('en-IN') : inr(contract.price, 2)}</p><PriceChange value={contract.change} unit="percent" size="md" arrow /></Stack><p className={styles.meta}>{t('commodities.margin', { margin: contract.margin })}</p></Stack>
+          : <Stack gap="04" align="end"><p className={parts.heading}>{volume ? contract.volume.toLocaleString('en-IN') : inr(contract.price, 2)}</p><PriceChange value={contract.change} unit="percent" size="sm" arrow /></Stack>}
+      </Stack>
+    </Card>)}</Stack>
+  </section>
+}
+```
+
+### `src/flows/fno/commodities/data.ts`
+
+```ts
+import type { Contract } from '../data'
+import gold from './assets/gold.png'
+import silver from './assets/silver.png'
+import crudeOil from './assets/crude-oil.png'
+import naturalGas from './assets/natural-gas.png'
+import goldMini from './assets/gold-mini.png'
+import goldDefault from './assets/gold-default.png'
+import goldGuinea from './assets/gold-guinea.png'
+import goldPetal from './assets/gold-petal.png'
+import goldTen from './assets/gold-ten.png'
+
+/** Snapshot examples from Figma 6754:63073 (F&O Home → Commodities); these are not live quotes. */
+
+/** The four commodity shortcuts under the product tabs. `change` is the day's percent change. */
+export type Commodity = { id: string; name: string; change: number; image: string }
+export const commodities: Commodity[] = [
+  { id: 'gold', name: 'Gold', change: -5.17, image: gold },
+  { id: 'silver', name: 'Silver', change: 1.58, image: silver },
+  { id: 'crude', name: 'Crude Oil', change: 4.12, image: crudeOil },
+  { id: 'gas', name: 'Natural Gas', change: 2.43, image: naturalGas },
+]
+
+/** Popular commodities. Options shows the Figma frame's rows as drawn (one future among the calls); `margin` is the margin per lot. */
+export type CommodityContract = Contract & { margin?: string }
+export const popularOptions: CommodityContract[] = [
+  { id: 'pop-0', name: 'GOLD 19400 CE', description: 'Call | 14 Jan 26', price: 417, change: 0.1, volume: 23843233, side: 'call' },
+  { id: 'pop-1', name: 'GOLD FUT', description: 'Future | 14 Jan 26', price: 417, change: 0.1, volume: 21102400, margin: '1,65,450.23' },
+  { id: 'pop-2', name: 'GOLD 19400 CE', description: 'Call | 14 Jan 26', price: 417, change: 0.1, volume: 19640000, side: 'call' },
+  { id: 'pop-3', name: 'GOLD 19400 CE', description: 'Call | 14 Jan 26', price: 417, change: 0.1, volume: 17220500, side: 'call' },
+]
+export const popularFutures: CommodityContract[] = ['GOLD FUT', 'SILVER FUT', 'CRUDEOIL FUT', 'NATURALGAS FUT'].map((name, i) => ({ id: `popf-${i}`, name, description: 'Future | 14 Jan 26', price: 417, change: 0.1, volume: 21102400 - i * 1800000, margin: '1,65,450.23' }))
+
+/** Smart Futures on the Commodities tab. */
+export const smartFutures: Contract[] = Array.from({ length: 4 }, (_, i) => ({ id: `cfut-${i}`, name: 'GOLD 19400 CE', description: 'Call | 14 Jan 26', price: 417, change: 0.1, volume: 15400 + i * 1900, side: 'call' }))
+
+/** Futures Heatmap tiles per group. Up / down colour follows each tile's tone, as in the frame. */
+export type HeatTile = { id: string; name: string; change: number; price: string; tone: 'up' | 'down' }
+const tile = (name: string, i: number): HeatTile => ({ id: `${name}-${i}`, name, change: -0.27, price: '2,817.40', tone: i % 2 ? 'up' : 'down' })
+export const heatmapGroups: Record<'bullion' | 'energy' | 'metals', HeatTile[]> = {
+  bullion: ['GOLD MINI', 'GOLD MICRO', 'GOLD', 'SILVER MINI', 'ZINC', 'SILVER MICRO', 'SILVER', 'ZINC MACRO', 'ZINC LARGE'].map(tile),
+  energy: ['CRUDEOIL', 'CRUDEOIL MINI', 'NATURALGAS', 'NATGAS MINI', 'CRUDEOIL', 'NATURALGAS'].map(tile),
+  metals: ['COPPER', 'ALUMINIUM', 'ZINC', 'LEAD', 'NICKEL', 'ALUMINI'].map(tile),
+}
+
+/** The contract picker ("Choose options contract"): Equity indices, and Commodities grouped by commodity. */
+export type PickerContract = { id: string; name: string; price: string; change: number; image?: string; tag?: string }
+export const equityContracts: PickerContract[] = ['NIFTY 50', 'BSE Sensex', 'Nifty Bank', 'Nifty Financial Services', 'Nifty Midcap Select', 'BSE BANKEX', 'Nifty Next 50', 'BSE Sensex 50'].map((name) => ({ id: name, name, price: '₹1,42,557.00', change: -0.68 }))
+export type CommodityGroup = { id: string; name: string; image?: string; contracts: PickerContract[] }
+const contract = (name: string, image?: string, tag?: string): PickerContract => ({ id: name, name, price: '₹1,42,557.00', change: 0.68, image, tag })
+export const commodityGroups: CommodityGroup[] = [
+  { id: 'gold', name: 'Gold', image: gold, contracts: [contract('Gold Mini', goldMini, 'Lowest Margin'), contract('Gold', goldDefault), contract('Gold Guinea', goldGuinea), contract('Gold Petal', goldPetal), contract('Gold Ten', goldTen)] },
+  { id: 'silver', name: 'Silver', image: silver, contracts: ['SILVER', 'SILVER100', 'SILVERM', 'SILVERMIC'].map((n) => contract(n, silver)) },
+  { id: 'crude', name: 'Crude Oil', image: crudeOil, contracts: ['CRUDEOIL', 'CRUDEOILM'].map((n) => contract(n, crudeOil)) },
+  { id: 'gas', name: 'Natural Gas', image: naturalGas, contracts: ['NATURALGAS', 'NATGASMINI'].map((n) => contract(n, naturalGas)) },
+  { id: 'copper', name: 'Copper', contracts: [contract('COPPER')] },
+  { id: 'aluminium', name: 'Aluminium', contracts: [contract('ALUMINIUM'), contract('ALUMINI')] },
+  { id: 'zinc', name: 'Zinc', contracts: [contract('ZINC'), contract('ZINCMINI')] },
+]
+
+/** Lot summary (Gold Summary): one tab per gold lot, its futures and its option contracts. */
+export const goldLots = [
+  { id: 'gold', name: 'Gold', image: goldDefault },
+  { id: 'mini', name: 'Gold Mini', image: goldMini },
+  { id: 'guinea', name: 'Gold Guinea', image: goldGuinea },
+  { id: 'ten', name: 'Gold Ten', image: goldTen },
+  { id: 'petal', name: 'Gold Petal', image: goldPetal },
+]
+export const lotFutures: Contract[] = [
+  { id: 'lf-0', name: 'Gold', description: 'Fut | 5 Oct', price: 417, change: 0.1, volume: 0 },
+  { id: 'lf-1', name: 'Gold', description: 'Fut | 5 Dec', price: 417, change: 0.1, volume: 0 },
+]
+export type LotOption = Contract & { marginPerLot: number }
+export const lotOptions: LotOption[] = Array.from({ length: 6 }, (_, i) => ({ id: `lo-${i}`, name: 'GOLD 19400 CE', description: 'Call | 5 Oct 26', price: 417, change: 0.1, volume: 23843233, marginPerLot: 23345, side: 'call' }))
+export const expiryMonths = ['October', 'November', 'December']
+export type LotSort = 'price' | 'volume' | 'margin'
+```
+
+### `src/flows/fno/commodities/screens/LotSummary.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Actionbar } from '@l3/components/Actionbar'
+import { Button } from '@l3/components/Button'
+import { Card } from '@l3/components/Card'
+import { EmptyState } from '@l3/components/EmptyState'
+import { Icon } from '@l3/components/Icon'
+import { PriceChange } from '@l3/components/PriceChange'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
+import { Tab, Tabs } from '@l3/components/Tabs'
+import { msFilterList, msKeyboardArrowDown } from '@l3/icons/material'
+import { inr } from '../../../../shared/data/format'
+import { Screen } from '../../../../shared/ui/Screen'
+import { ChoiceSheet, DetailSheet } from '../../sheets/HomeSheets'
+import type { Contract } from '../../data'
+import { t } from '../../copy'
+import { expiryMonths, goldLots, lotFutures, lotOptions, type LotOption, type LotSort } from '../data'
+import parts from '../../components/HomeParts.module.css'
+import styles from '../components/Commodities.module.css'
+
+type Modal = { kind: 'detail'; title: string; contract?: Contract } | { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void }
+
+/**
+ * Gold Summary (Figma 6754:65113 by price, 6754:65288 by volume, 6754:65444 margin per lot): the lot tabs sit in the
+ * Actionbar's bottom slot; Futures, then Options with expiry month, category pills, Filter and the sort choice.
+ */
+export function LotSummary({ sort: initialSort = 'price', onBack, onChain }: { sort?: LotSort; onBack: () => void; onChain: () => void }) {
+  const [lot, setLot] = useState(goldLots[0].id)
+  const [month, setMonth] = useState(expiryMonths[0])
+  const [category, setCategory] = useState('top')
+  const [sort, setSort] = useState<LotSort>(initialSort)
+  const [filter, setFilter] = useState(t('filter.all'))
+  const [modal, setModal] = useState<Modal | null>(null)
+  const close = () => setModal(null)
+  const choose = (title: string, values: string[], value: string, onPick: (v: string) => void) => setModal({ kind: 'choice', title, values, value, onPick })
+  const sorts: LotSort[] = ['price', 'volume', 'margin']
+  const sortLabel = (s: LotSort) => t(`sort.${s}`)
+  const value = (option: LotOption) => sort === 'volume' ? option.volume.toLocaleString('en-IN') : sort === 'margin' ? inr(option.marginPerLot, 0) : inr(option.price, 2)
+  const open = (contract: Contract) => setModal({ kind: 'detail', title: contract.name, contract })
+  const options = lotOptions.filter((o) => filter === t('filter.puts') ? o.side === 'put' : true)
+  const lotName = goldLots.find((l) => l.id === lot)!.name
+  const sheet = modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : undefined
+  return <Screen sheet={sheet} top={<Actionbar title={t('lot.title', { name: goldLots[0].name })} onBack={onBack} backLabel={t('lot.back')}
+    bottom={<Tabs aria-label={t('lot.lots')} value={lot} onChange={setLot} width="hug" items={goldLots.map((l) => ({ value: l.id, label: l.name, iconLeft: <img className={styles.tabArt} src={l.image} alt="" /> }))} />} />}>
+    <Stack gap="32" className={styles.lotBody}>
+      <section className={parts.contractSection} aria-label={t('lot.futures')}>
+        <SectionHeader title={t('lot.futures')} action={{ type: 'view-all', label: t('viewAll'), onClick: () => setModal({ kind: 'detail', title: `${lotName} ${t('lot.futures')}` }) }} />
+        <Stack gap="12">{lotFutures.map((future) => <Card key={future.id} onClick={() => open(future)}>
+          <Stack direction="horizontal" gap="08" justify="between" align="center"><Stack gap="04" className={parts.grow}><p className={parts.heading}>{future.name}</p><p className={parts.description}>{future.description}</p></Stack><Stack gap="04" align="end"><p className={parts.heading}>{inr(future.price, 2)}</p><PriceChange value={future.change} unit="percent" size="sm" arrow /></Stack></Stack>
+        </Card>)}</Stack>
+      </section>
+      <section className={parts.contractSection} aria-label={t('lot.options')}>
+        <SectionHeader title={t('lot.options')} action={{ type: 'view-all', label: t('lot.chain'), onClick: onChain }} />
+        <Stack direction="horizontal" gap="08" align="center" className={parts.filterRow}>
+          <Tab appearance="pill" size="sm" emphasis="secondary" action iconRight={<Icon icon={msKeyboardArrowDown} size={16} />} aria-label={t('lot.expiry')} onClick={() => choose(t('lot.expiry'), expiryMonths, month, setMonth)}>{month}</Tab>
+          <span className={styles.pillDivider} aria-hidden />
+          <Tabs aria-label={t('lot.options')} appearance="pill" size="sm" value={category} onChange={setCategory} items={[{ value: 'top', label: t('commodities.top') }, { value: 'active', label: t('lot.active') }, { value: 'oi', label: t('lot.oi') }, { value: 'gainers', label: t('lot.gainers') }]} />
+        </Stack>
+        <Stack direction="horizontal" align="center" justify="between">
+          <Button variant="ghost" size="sm" iconLeft={<Icon icon={msFilterList} size={12} />} onClick={() => choose(t('filter'), [t('filter.all'), t('filter.calls'), t('filter.puts')], filter, setFilter)}>{filter === t('filter.all') ? t('filter') : filter}</Button>
+          <Select size="sm" aria-label={t('sort.label')} onClick={() => choose(t('sort.title'), sorts.map(sortLabel), sortLabel(sort), (label) => setSort(sorts.find((s) => sortLabel(s) === label)!))}>{sortLabel(sort)}</Select>
+        </Stack>
+        <Stack gap="12">{options.length === 0 && <EmptyState title={t('empty')} description={t('empty.description')} />}{options.map((option) => <Card key={option.id} onClick={() => open(option)}>
+          <Stack direction="horizontal" gap="08" justify="between" align="center"><Stack gap="04" className={parts.grow}><p className={parts.heading}>{option.name}</p><p className={parts.description}>{option.description}</p></Stack>
+            {sort === 'price' ? <Stack gap="04" align="end"><p className={parts.heading}>{value(option)}</p><PriceChange value={option.change} unit="percent" size="sm" arrow /></Stack> : <p className={parts.heading}>{value(option)}</p>}</Stack>
+        </Card>)}</Stack>
+      </section>
+    </Stack>
+  </Screen>
+}
+```
+
+### `src/flows/fno/commodities/sheets/ContractPickerSheet.tsx`
+
+```tsx
+import { useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Radio } from '@l3/components/Checkbox'
+import { ListCell } from '@l3/components/ListCell'
+import { Stack } from '@l3/components/Stack'
+import { Tag } from '@l3/components/Tag'
+import { Tabs } from '@l3/components/Tabs'
+import { Sheet } from '../../../../shared/ui/Sheet'
+import { t } from '../../copy'
+import { commodityGroups, equityContracts, type PickerContract } from '../data'
+import parts from '../../components/HomeParts.module.css'
+import styles from '../components/Commodities.module.css'
+
+type Segment = 'equity' | 'commodities'
+
+/**
+ * "Choose options contract" (Figma 6754:65111 Commodities, 6754:65054 Equity): Equity / Commodities tabs in the header's
+ * bottom slot (Commodities also gets a row of commodity chips under them), then the contracts as radio rows. Picking
+ * one selects it and closes the sheet.
+ */
+export function ContractPickerSheet({ segment: initialSegment = 'commodities', value, onPick, onClose }: { segment?: Segment; value: string; onPick: (name: string) => void; onClose: () => void }) {
+  const id = useId()
+  const [segment, setSegment] = useState<Segment>(initialSegment)
+  const [commodity, setCommodity] = useState('all')
+  const commodityCount = commodityGroups.length
+  const tabs = <Tabs aria-label={t('picker.title')} value={segment} onChange={setSegment} items={[{ value: 'equity', label: t('picker.equity', { count: equityContracts.length }) }, { value: 'commodities', label: t('picker.commodities', { count: commodityCount }) }]} />
+  const chips = <div className={styles.chips}><Tabs aria-label={t('picker.filter')} appearance="pill" size="sm" value={commodity} onChange={setCommodity} items={[{ value: 'all', label: t('picker.all') }, ...commodityGroups.map((g) => ({ value: g.id, label: g.name, iconLeft: g.image ? <img className={styles.chipArt} src={g.image} alt="" /> : undefined }))]} /></div>
+  const row = (c: PickerContract) => <ListCell key={c.id} as="label" size="sm" selected={c.name === value}
+    iconLeft={c.image ? <img className={styles.rowArt} src={c.image} alt="" /> : undefined}
+    label={c.name}
+    description={<span className={parts.label}>{c.price} <span className={c.change < 0 ? parts.down : parts.up}>{c.change > 0 ? '+' : ''}{c.change.toFixed(2)}%</span></span>}
+    trailing={<Stack direction="horizontal" gap="08" align="center">{c.tag && <Tag color="discover" variant="secondary" size="sm">{c.tag}</Tag>}<Radio name={id} checked={c.name === value} onChange={() => { onPick(c.name); onClose() }} /></Stack>} />
+  const groups = commodityGroups.filter((g) => commodity === 'all' || g.id === commodity)
+  return <Sheet labelledBy={id} onClose={onClose} header={<BottomSheetHeader heading={t('picker.title')} headingId={id} bottom={<>{tabs}{segment === 'commodities' && chips}</>} />}>
+    <div className={[styles.pickerBody, segment === 'equity' && styles.equity].filter(Boolean).join(' ')}>
+      {segment === 'equity'
+        ? <div className={styles.group}>{equityContracts.map(row)}</div>
+        : <Stack gap="24">{groups.map((g) => <Stack key={g.id} gap="12"><p className={styles.groupLabel}>{g.name}</p><div className={styles.group}>{g.contracts.map(row)}</div></Stack>)}</Stack>}
+    </div>
+  </Sheet>
+}
+```
+
 ### `src/flows/fno/components/ContractSection.tsx`
 
 ```tsx
@@ -343,7 +1272,8 @@ import styles from './HomeParts.module.css'
 
 export type Choose = (title: string, values: string[], value: string, onPick: (value: string) => void) => void
 
-export function ContractSection({ kind, onChoose, onContract, onViewAll }: { kind: 'options' | 'futures'; onChoose: Choose; onContract: (contract: Contract) => void; onViewAll: () => void }) {
+/** `contracts` replaces the Equity sample (the Commodities tab passes its own Smart Futures). */
+export function ContractSection({ kind, contracts, onChoose, onContract, onViewAll }: { kind: 'options' | 'futures'; contracts?: Contract[]; onChoose: Choose; onContract: (contract: Contract) => void; onViewAll: () => void }) {
   const [category, setCategory] = useState(kind === 'options' ? 'top' : 'long')
   const [stock, setStock] = useState(false)
   const [volume, setVolume] = useState(false)
@@ -354,7 +1284,7 @@ export function ContractSection({ kind, onChoose, onContract, onViewAll }: { kin
     { value: 'long', label: t('futures.long') }, { value: 'covering', label: t('futures.covering') }, { value: 'short', label: t('futures.short') }, { value: 'unwind', label: t('futures.unwind') },
   ]
   const keys = categories.map((c) => c.value)
-  const source = kind === 'futures' ? futures : stock ? stockOptions : options
+  const source = contracts ?? (kind === 'futures' ? futures : stock ? stockOptions : options)
   const filterChoices = kind === 'options' ? [t('filter.all'), t('filter.calls'), t('filter.puts')] : [t('filter.all'), t('filter.gainers'), t('filter.losers')]
   const matching = source.filter((c) => filter === t('filter.puts') ? c.side === 'put' : filter === t('filter.calls') ? c.side === 'call' : filter === t('filter.gainers') ? c.change > 0 : filter === t('filter.losers') ? c.change < 0 : true)
   // Categories select distinct orderings of this small snapshot; volume sort is descending.
@@ -613,13 +1543,15 @@ import scalper from '../assets/scalppro.svg'
 import downtrend from '../assets/downtrend.svg'
 import styles from './HomeParts.module.css'
 
-export function TradingChart({ onChoose, onDestination, onScalper }: { onChoose: (title: string, values: string[], value: string, onPick: (v: string) => void) => void; onDestination: (name: string) => void; onScalper: () => void }) {
-  const [index, setIndex] = useState('NIFTY 50')
+/** `instrument` + `onInstrument`: the Commodities tab shows its own instrument and opens the contract picker instead of the index sheet. */
+export function TradingChart({ instrument, onInstrument, onChoose, onDestination, onScalper }: { instrument?: string; onInstrument?: () => void; onChoose: (title: string, values: string[], value: string, onPick: (v: string) => void) => void; onDestination: (name: string) => void; onScalper: () => void }) {
+  const [chosenIndex, setIndex] = useState('NIFTY 50')
+  const index = instrument ?? chosenIndex
   const [metric, setMetric] = useState('price')
   const items = (['price', 'oi', 'change', 'pcr', 'advance'] as const).map((value) => ({ value, label: t(`chart.${value}`) }))
   return <section className={styles.chartSection} aria-label={t('chart.label', { index, metric })}>
     <Stack direction="horizontal" justify="between" align="center">
-      <Stack direction="horizontal" gap="08" align="center"><Select size="lg" aria-label={t('chart.index')} onClick={() => onChoose(t('chart.index'), ['NIFTY 50', 'BANK NIFTY', 'SENSEX'], index, setIndex)}>{index}</Select><span className={styles.down}>5.17%</span></Stack>
+      <Stack direction="horizontal" gap="08" align="center"><Select size="lg" aria-label={t('chart.index')} onClick={onInstrument ?? (() => onChoose(t('chart.index'), ['NIFTY 50', 'BANK NIFTY', 'SENSEX'], index, setIndex))}>{index}</Select><span className={styles.down}>5.17%</span></Stack>
       <Stack direction="horizontal" gap="04" align="center"><Stack gap="04" align="end"><span className={styles.down}>{t('chart.trend')}</span><span className={styles.caption}>{t('chart.since')}</span></Stack><span className={styles.trendIcon}><MaskIcon src={downtrend} /></span></Stack>
     </Stack>
     <Tabs aria-label="Chart metric" appearance="pill" size="sm" items={items} value={metric} onChange={setMetric} />
@@ -1049,7 +1981,81 @@ function clock(start: string, add: number) {
   "tools.noResults": "No indicators match “{query}”.",
   "scalper.indicatorCount": "{count} indicators on the chart",
   "scalper.refresh": "Reset the chart",
-  "tools.createLabel": "Create an indicator with DASH"
+  "tools.createLabel": "Create an indicator with DASH",
+  "commodities.popular": "Popular commodities",
+  "commodities.options": "Options",
+  "commodities.futures": "Futures",
+  "commodities.segment": "Contract type",
+  "commodities.top": "Top traded",
+  "commodities.gainers": "Top gainers",
+  "commodities.losers": "Top Losers",
+  "commodities.advanced": "Advanced declined",
+  "commodities.margin": "Margin / lot : {margin}",
+  "commodities.shortcuts": "Commodities",
+  "heatmap.bullion": "Bullion",
+  "heatmap.energy": "Energy",
+  "heatmap.metals": "Metals",
+  "picker.title": "Choose options contract",
+  "picker.equity": "Equity ({count})",
+  "picker.commodities": "Commodities ({count})",
+  "picker.all": "All",
+  "picker.filter": "Commodity",
+  "lot.title": "{name} Summary",
+  "lot.back": "Back to F&O",
+  "lot.lots": "Gold lots",
+  "lot.futures": "Futures",
+  "lot.options": "Options",
+  "lot.chain": "View option chain",
+  "lot.expiry": "Expiry month",
+  "lot.active": "Most active",
+  "lot.oi": "OI gainers",
+  "lot.gainers": "Top gainers",
+  "sort.margin": "Margin per lot",
+  "sort.title": "Sort by",
+  "strategies.segment": "Strategies for",
+  "strategies.zing": "Zing Trades",
+  "strategies.explore": "Explore",
+  "strategies.builtWith": "Built with DASH Ai",
+  "strategies.todayReturns": "Today’s Returns",
+  "strategies.lastWeek": "Last week",
+  "strategies.avgTrades": "Avg. trades",
+  "strategies.perDay": "{count} per day",
+  "strategies.winRate": "Win rate",
+  "strategies.favourite": "Save {name}",
+  "strategies.learn": "Learn in 30 Secs",
+  "strategies.apply": "Apply",
+  "strategies.dayWin": "{day}: profit",
+  "strategies.dayLoss": "{day}: loss",
+  "strategies.dayFlat": "{day}: no trade",
+  "strategies.smartInvest": "Smart Invest",
+  "strategies.by": "By {name}",
+  "strategies.minDeposit": "Min. deposit",
+  "strategies.pnl7": "7 Days P&L",
+  "strategies.pnl30": "30 Days P&L",
+  "strategies.showPnl": "Show or hide P&L",
+  "strategies.aum": "AUM",
+  "strategies.slots": "Slots left",
+  "strategies.charges": "Monthly charges",
+  "strategies.invest": "Invest now",
+  "strategies.prebuilt": "Pre-build Strategies",
+  "strategies.underlying": "Underlying",
+  "strategies.bullish": "Bullish",
+  "strategies.bearish": "Bearish",
+  "strategies.neutral": "Neutral",
+  "strategies.volatile": "Volatile",
+  "strategies.pop": "Probability of profit",
+  "strategies.funds": "Funds Req: {amount}",
+  "strategies.maxProfit": "Max Profit:",
+  "strategies.maxLoss": "Max Loss:",
+  "strategies.unlimited": "Unlimited",
+  "strategies.payoff": "Payoff: loss below the breakeven, profit above it",
+  "strategies.quick": "Quick Trade",
+  "strategies.beginner": "Beginner friendly",
+  "strategies.which": "Which way will",
+  "strategies.move": "move?",
+  "strategies.up": "Up • Bullish",
+  "strategies.down": "Down • Bearish",
+  "strategies.pickUnderlying": "Choose underlying"
 }
 ```
 
@@ -1161,10 +2167,15 @@ export const lemonnIndicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by Ab
 
 ```tsx
 import type { Flow, Go } from '../types'
-import { Home, type HomePart } from './screens/Home'
+import { Home, type HomePart, type Product } from './screens/Home'
+import { LotSummary } from './commodities/screens/LotSummary'
+import type { Segment } from './strategies/data'
 import { Scalper } from './screens/Scalper'
 
-const home = (go: Go, scrollTo?: HomePart) => <Home scrollTo={scrollTo} onHome={() => go('stocks-01')} onSearch={() => go('search-25')} onProfile={() => go('profile-01')} onWallet={() => go('deposit-01')} onDash={() => go('dash-02')} onOptions={() => go('search-26')} onFutures={() => go('search-27')} onScalper={() => go('fno-05')} />
+/** Each product tab is its own screen: switching tabs goes to that tab's top. */
+const tabScreen = (product: Product, segment?: Segment) => product === 'equity' ? 'fno-01' : product === 'commodities' ? 'fno-08' : segment === 'commodities' ? 'fno-16' : 'fno-15'
+type HomeOptions = { scrollTo?: HomePart; product?: Product; segment?: Segment; picker?: 'equity' | 'commodities' }
+const home = (go: Go, scrollTo?: HomePart, options: HomeOptions = {}) => <Home scrollTo={scrollTo} product={options.product} segment={options.segment} picker={options.picker} onProduct={(product, segment) => go(tabScreen(product, segment))} onCommodity={() => go('fno-12')} onHome={() => go('stocks-01')} onSearch={() => go('search-25')} onProfile={() => go('profile-01')} onWallet={() => go('deposit-01')} onDash={() => go('dash-02')} onOptions={() => go('search-26')} onFutures={() => go('search-27')} onScalper={() => go('fno-05')} />
 
 export const fno: Flow = {
   id: 'fno', title: 'F&O',
@@ -1178,6 +2189,15 @@ export const fno: Flow = {
     { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
+    { id: 'fno-08', group: 'commodities', name: 'Commodities home', figma: '6754:63637', tab: true, note: 'The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. Shortcut buttons are L3 Tertiary Large (48) round buttons; Figma draws 52.', render: (go) => home(go, undefined, { product: 'commodities' }) },
+    { id: 'fno-09', group: 'commodities', name: 'Commodities · heatmap & Smart Futures', figma: '6754:63637', tab: true, note: 'The same long screen, scrolled to the Futures Heatmap.', render: (go) => home(go, 'heatmap', { product: 'commodities' }) },
+    { id: 'fno-10', group: 'commodities', name: 'Contract picker · Commodities', figma: '6754:65111', tab: true, note: 'From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'commodities' }) },
+    { id: 'fno-11', group: 'commodities', name: 'Contract picker · Equity', figma: '6754:65054', tab: true, note: 'The same sheet on its Equity tab: the 8 index contracts.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'equity' }) },
+    { id: 'fno-12', group: 'commodities', name: 'Gold Summary · by price', figma: '6754:65113', note: 'From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.', render: (go) => <LotSummary onBack={() => go('fno-08')} onChain={() => go('search-26')} /> },
+    { id: 'fno-13', group: 'commodities', name: 'Gold Summary · by volume', figma: '6754:65288', note: 'Sorted by volume: each option shows its traded volume, no change.', render: (go) => <LotSummary sort="volume" onBack={() => go('fno-08')} onChain={() => go('search-26')} /> },
+    { id: 'fno-14', group: 'commodities', name: 'Gold Summary · margin per lot', figma: '6754:65444', note: 'Sorted by margin per lot: each option shows the margin for one lot, no change.', render: (go) => <LotSummary sort="margin" onBack={() => go('fno-08')} onChain={() => go('search-26')} /> },
+    { id: 'fno-15', group: 'strategies', name: 'Strategies · Equity', figma: '6754:64178', tab: true, note: 'The Strategies product tab with Equity selected in the pill group: shortcuts, Zing Trades, Smart Invest, Pre-build Strategies (Nifty 50 ⇕, Bullish / Bearish / Neutral / Volatile), Quick Trade. Card footer buttons stay Small (32) as in Figma.', render: (go) => home(go, undefined, { product: 'strategies', segment: 'equity' }) },
+    { id: 'fno-16', group: 'strategies', name: 'Strategies · Commodities', figma: '6754:64607', tab: true, note: 'The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying.', render: (go) => home(go, undefined, { product: 'strategies', segment: 'commodities' }) },
   ],
 }
 ```
@@ -1200,6 +2220,11 @@ import { Heatmap } from '../components/Heatmap'
 import { Overview } from '../components/Overview'
 import { TradingChart } from '../components/TradingChart'
 import { ChoiceSheet, CreateWatchlistSheet, DetailSheet } from '../sheets/HomeSheets'
+import { CommoditiesFeed } from '../commodities/components/CommoditiesFeed'
+import { ContractPickerSheet } from '../commodities/sheets/ContractPickerSheet'
+import type { Commodity } from '../commodities/data'
+import { StrategiesFeed } from '../strategies/components/StrategiesFeed'
+import type { Segment } from '../strategies/data'
 import { watchlists, type Contract } from '../data'
 import { t } from '../copy'
 import equity from '../assets/equity.svg'
@@ -1208,13 +2233,24 @@ import strategies from '../assets/strategies.svg'
 import styles from '../components/HomeParts.module.css'
 
 export type HomePart = 'top' | 'watchlists' | 'options' | 'heatmap' | 'futures'
-type Props = { scrollTo?: HomePart; onHome: () => void; onSearch: () => void; onProfile: () => void; onWallet: () => void; onDash: () => void; onOptions: () => void; onFutures: () => void; onScalper: () => void }
-type Modal = { kind: 'detail'; title: string; contract?: Contract } | { kind: 'create' } | { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void }
+/** The product tab: Equity (fno-01…04), Commodities (fno-08…11), Strategies (fno-15, 16). */
+export type Product = 'equity' | 'commodities' | 'strategies'
+type Props = {
+  product?: Product
+  /** Strategies tab: Equity or Commodities strategies. */
+  segment?: Segment
+  /** Commodities tab: open with the contract picker up, on this tab of it. */
+  picker?: 'equity' | 'commodities'
+  onProduct: (product: Product, segment?: Segment) => void
+  onCommodity: (commodity: Commodity) => void
+  scrollTo?: HomePart; onHome: () => void; onSearch: () => void; onProfile: () => void; onWallet: () => void; onDash: () => void; onOptions: () => void; onFutures: () => void; onScalper: () => void }
+type Modal = { kind: 'detail'; title: string; contract?: Contract } | { kind: 'create' } | { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void } | { kind: 'picker'; segment: 'equity' | 'commodities' }
 
 /** fno-01 … 04 · one scrollable Equity home, with board frames for the lower sections. */
-export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, onDash, onOptions, onFutures, onScalper }: Props) {
+export function Home({ product = 'equity', segment = 'equity', picker, onProduct, onCommodity, scrollTo = 'top', onHome, onSearch, onProfile, onWallet, onDash, onOptions, onFutures, onScalper }: Props) {
   const root = useRef<HTMLDivElement>(null)
-  const [modal, setModal] = useState<Modal | null>(null)
+  const [modal, setModal] = useState<Modal | null>(picker ? { kind: 'picker', segment: picker } : null)
+  const [instrument, setInstrument] = useState('Gold')
   const [lists, setLists] = useState(watchlists)
   const [created, setCreated] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -1239,12 +2275,12 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
     const target = root.current?.querySelector(`[data-fno="${scrollTo}"]`)
     if (body && target && scrollTo !== 'top') body.scrollTop += target.getBoundingClientRect().top - body.getBoundingClientRect().top
   }, [scrollTo])
-  const sheet = modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : modal?.kind === 'create' ? <CreateWatchlistSheet onClose={close} onCreate={(name) => { setLists((ls) => [...ls, { id: `custom-${ls.length}`, name, count: 0 }]); close(); setCreated(true) }} /> : undefined
+  const sheet = modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : modal?.kind === 'picker' ? <ContractPickerSheet segment={modal.segment} value={instrument} onPick={setInstrument} onClose={close} /> : modal?.kind === 'create' ? <CreateWatchlistSheet onClose={close} onCreate={(name) => { setLists((ls) => [...ls, { id: `custom-${ls.length}`, name, count: 0 }]); close(); setCreated(true) }} /> : undefined
   return <Screen top={<Header scrolled={scrolled} initials={user.name.split(' ').map((name) => name[0]).join('')} onSearch={onSearch} onProfile={onProfile} onWallet={onWallet} onDash={onDash} />} bottom={<FnoNav onHome={onHome} onDestination={open} onScalper={onScalper} />} sheet={sheet} toast={created ? <Aerobar floating type="success" heading={t('watchlists.created')} onDismiss={() => setCreated(false)} /> : undefined}>
     <Stack ref={root}>
       <div data-fno="top"><Overview onDestination={open} /></div>
-      <Tabs aria-label="F&O products" appearance="ribbon" size="md" value="equity" onChange={(v) => open(t(v))} items={[{ value: 'equity', label: t('equity'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={equity} /></span> }, { value: 'commodities', label: t('commodities'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={commodities} /></span> }, { value: 'strategies', label: t('strategies'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={strategies} /></span> }]} />
-      <Stack gap="32" className={styles.feed}>
+      <Tabs aria-label="F&O products" appearance="ribbon" size="md" value={product} onChange={(v) => onProduct(v)} items={[{ value: 'equity', label: t('equity'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={equity} /></span> }, { value: 'commodities', label: t('commodities'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={commodities} /></span> }, { value: 'strategies', label: t('strategies'), iconLeft: <span className={styles.ribbonIcon}><MaskIcon src={strategies} /></span> }]} />
+      {product === 'equity' && <Stack gap="32" className={styles.feed}>
         <Shortcuts onWatchlist={() => scroll('watchlists')} onDestination={open} />
         <TradingChart onChoose={choose} onDestination={open} onScalper={onScalper} />
         <div className={styles.divider} />
@@ -1252,7 +2288,9 @@ export function Home({ scrollTo = 'top', onHome, onSearch, onProfile, onWallet, 
         <div data-fno="options"><ContractSection kind="options" onChoose={choose} onContract={(contract) => setModal({ kind: 'detail', title: contract.name, contract })} onViewAll={onOptions} /></div>
         <div data-fno="heatmap"><Heatmap onOpen={open} onViewAll={() => open(t('heatmap.title'))} /></div>
         <div data-fno="futures"><ContractSection kind="futures" onChoose={choose} onContract={(contract) => setModal({ kind: 'detail', title: contract.name, contract })} onViewAll={onFutures} /></div>
-      </Stack>
+      </Stack>}
+      {product === 'commodities' && <CommoditiesFeed instrument={instrument} lists={lists} onCommodity={onCommodity} onPicker={() => setModal({ kind: 'picker', segment: 'commodities' })} onChoose={choose} onContract={(contract) => setModal({ kind: 'detail', title: contract.name, contract })} onDestination={open} onAddWatchlist={() => setModal({ kind: 'create' })} onScalper={onScalper} />}
+      {product === 'strategies' && <StrategiesFeed segment={segment} onSegment={(next) => onProduct('strategies', next)} onChoose={choose} onDestination={open} onWatchlist={() => open(t('shortcut.watchlist'))} />}
     </Stack>
   </Screen>
 }
@@ -2314,6 +3352,253 @@ export function IndicatorDetailsSheet({ name, onChart, onToggle, onOpenInDash, o
       />
     </BottomSheet>
   )
+}
+```
+
+### `src/flows/fno/strategies/components/Strategies.module.css`
+
+```css
+/* Strategies tab — flow-only pieces on L3 tokens. */
+.section { display: flex; flex-direction: column; gap: var(--l3-spacing-16); }
+.pillDivider { flex: none; align-self: stretch; width: 1px; background: var(--l3-border-light); }
+.caption { font: var(--l3-text-label-10); color: var(--l3-content-tertiary); white-space: nowrap; }
+.statLabel { font: var(--l3-text-label-12); color: var(--l3-content-tertiary); white-space: nowrap; }
+.statValue { font: var(--l3-text-heading-12); white-space: nowrap; }
+.title16 { font: var(--l3-text-heading-16); white-space: nowrap; }
+.fill { width: 100%; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; }
+.muted { color: var(--l3-content-tertiary); }
+.strike { font: var(--l3-text-label-10); color: var(--l3-content-tertiary); }
+.apply { flex: none; min-width: var(--l3-size-80); }
+.invest { flex: none; }
+.play { display: inline-flex; color: var(--l3-content-accent-error-default); }
+.fire { display: inline-flex; color: var(--l3-content-accent-warning-default); }
+
+/* Last week: one 16 circle per weekday, tinted by result. */
+.day { display: inline-flex; align-items: center; justify-content: center; width: var(--l3-size-16); height: var(--l3-size-16); border-radius: var(--l3-radius-full); font: var(--l3-text-heading-10); }
+.win { background: var(--l3-surface-accent-indicator-up-light); color: var(--l3-content-accent-indicator-up-default); }
+.loss { background: var(--l3-surface-accent-indicator-down-light); color: var(--l3-content-accent-indicator-down-default); }
+.none { background: var(--l3-surface-secondary); color: var(--l3-content-disabled); }
+
+/* Payoff sketch: loss area left of the breakeven, profit area right of it. */
+.payoff { flex: none; width: var(--l3-size-40); height: var(--l3-size-28); }
+.lossArea { fill: var(--l3-surface-accent-indicator-down-light); }
+.profitArea { fill: var(--l3-surface-accent-indicator-up-light); }
+.lossLine, .profitLine { fill: none; stroke-width: 1.5; }
+.lossLine { stroke: var(--l3-content-accent-indicator-down-default); }
+.profitLine { stroke: var(--l3-content-accent-indicator-up-default); }
+
+/* Quick Trade: outlined up / down buttons (L3 has filled Buy / Sell only — see L3 gaps). */
+.upButton.upButton[data-variant] { --btn-content: var(--l3-content-accent-indicator-up-default); --btn-border: var(--l3-border-accent-indicator-up-default); }
+.downButton.downButton[data-variant] { --btn-content: var(--l3-content-accent-indicator-down-default); --btn-border: var(--l3-border-accent-indicator-down-default); }
+```
+
+### `src/flows/fno/strategies/components/StrategiesFeed.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Avatar } from '@l3/components/Avatar'
+import { Button } from '@l3/components/Button'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
+import { Tab, Tabs } from '@l3/components/Tabs'
+import { lmSwitchArrowVertical } from '@l3/icons/lemonnade'
+import { msBoltFill, msChevronRight, msLocalFireDepartmentFill, msPlayCircleFill, msStar, msTrendingDown, msTrendingUp, msVisibility, msVisibilityOff } from '@l3/icons/material'
+import { inr } from '../../../../shared/data/format'
+import { Rail } from '../../../../shared/ui/Rail'
+import { Shortcuts } from '../../components/Discovery'
+import type { Choose } from '../../components/ContractSection'
+import { t } from '../../copy'
+import { prebuilt, smartInvests, underlyings, zingTrades, type Prebuilt, type Segment, type SmartInvest, type View, type ZingTrade } from '../data'
+import parts from '../../components/HomeParts.module.css'
+import styles from './Strategies.module.css'
+
+type Props = {
+  /** Equity or Commodities (the pill group under the shortcuts). */
+  segment: Segment
+  onSegment: (segment: Segment) => void
+  onChoose: Choose
+  onDestination: (name: string) => void
+  onWatchlist: () => void
+}
+
+/** The Strategies tab of F&O home (Figma 6754:64178 Equity, 6754:64607 Commodities). */
+export function StrategiesFeed({ segment, onSegment, onChoose, onDestination, onWatchlist }: Props) {
+  const [underlying, setUnderlying] = useState(underlyings[segment][0])
+  const [quick, setQuick] = useState(underlyings[segment][0])
+  const [view, setView] = useState<View>('bullish')
+  const switchSegment = (next: Segment) => { onSegment(next); setUnderlying(underlyings[next][0]); setQuick(underlyings[next][0]) }
+  const views = (['bullish', 'bearish', 'neutral', 'volatile'] as const).map((value) => ({ value, label: t(`strategies.${value}`) }))
+  return <Stack gap="32" className={parts.feed}>
+    <Shortcuts onWatchlist={onWatchlist} onDestination={onDestination} />
+    <div className={parts.inset}><Tabs aria-label={t('strategies.segment')} appearance="pill-group" width="fill" value={segment} onChange={switchSegment} items={[{ value: 'equity', label: t('equity') }, { value: 'commodities', label: t('commodities') }]} /></div>
+
+    <section className={styles.section} aria-label={t('strategies.zing')}>
+      <div className={parts.inset}><SectionHeader title={t('strategies.zing')} action={{ type: 'view-all', label: t('strategies.explore'), onClick: () => onDestination(t('strategies.zing')) }} /></div>
+      <Rail label={t('strategies.zing')} visible={1.08}>{zingTrades.map((trade) => <ZingTradeCard key={trade.id} trade={trade} onOpen={onDestination} />)}</Rail>
+    </section>
+
+    <section className={styles.section} aria-label={t('strategies.smartInvest')}>
+      <div className={parts.inset}><SectionHeader title={t('strategies.smartInvest')} action={{ type: 'view-all', label: t('viewAll'), onClick: () => onDestination(t('strategies.smartInvest')) }} /></div>
+      <Rail label={t('strategies.smartInvest')} visible={1.08}>{smartInvests[segment].map((invest) => <SmartInvestCard key={invest.id} invest={invest} onOpen={onDestination} />)}</Rail>
+    </section>
+
+    <section className={styles.section} aria-label={t('strategies.prebuilt')}>
+      <div className={parts.inset}><SectionHeader title={t('strategies.prebuilt')} action={{ type: 'view-all', label: t('strategies.explore'), onClick: () => onDestination(t('strategies.prebuilt')) }} /></div>
+      <Stack direction="horizontal" gap="08" align="center" className={[parts.filterRow, parts.inset].join(' ')}>
+        <Tab appearance="pill" size="sm" emphasis="secondary" action iconRight={<Icon icon={lmSwitchArrowVertical} size={12} />} aria-label={t('strategies.underlying')} onClick={() => onChoose(t('strategies.pickUnderlying'), underlyings[segment], underlying, setUnderlying)}>{underlying}</Tab>
+        <span className={styles.pillDivider} aria-hidden />
+        <Tabs aria-label={t('strategies.prebuilt')} appearance="pill" size="sm" value={view} onChange={setView} items={views} />
+      </Stack>
+      <Rail label={t('strategies.prebuilt')} visible={1.08}>{prebuilt[view].map((strategy) => <PrebuiltCard key={strategy.id} strategy={strategy} onOpen={onDestination} />)}</Rail>
+    </section>
+
+    <div className={parts.inset}><QuickTrade underlying={quick} onUnderlying={() => onChoose(t('strategies.pickUnderlying'), underlyings[segment], quick, setQuick)} onTrade={onDestination} /></div>
+  </Stack>
+}
+
+/** Zing Trades: trader, today's return, last week's Mon–Fri results, average trades and win rate; ☆ · Learn · Apply. */
+function ZingTradeCard({ trade, onOpen }: { trade: ZingTrade; onOpen: (name: string) => void }) {
+  const days = ['M', 'T', 'W', 'T', 'F']
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+  return <Card onClick={() => onOpen(trade.name)} footerFilled footer={<Stack direction="horizontal" gap="08" align="center" className={styles.fill}>
+    <Button variant="secondary" size="sm" aria-label={t('strategies.favourite', { name: trade.name })} iconLeft={<Icon icon={msStar} size={16} />} onClick={() => onOpen(t('strategies.favourite', { name: trade.name }))} />
+    <Button variant="secondary" size="sm" fullWidth iconLeft={<span className={styles.play}><Icon icon={msPlayCircleFill} size={16} /></span>} iconRight={<Icon icon={msChevronRight} size={16} />} onClick={() => onOpen(t('strategies.learn'))}>{t('strategies.learn')}</Button>
+    <Button variant="primary" size="sm" className={styles.apply} onClick={() => onOpen(`${t('strategies.apply')} ${trade.name}`)}>{t('strategies.apply')}</Button>
+  </Stack>}>
+    <Stack gap="12">
+      <Stack direction="horizontal" gap="08" align="center" justify="between">
+        <Stack direction="horizontal" gap="08" align="center"><Avatar initials={trade.trader.split(' ').map((n) => n[0]).join('')} size={32} label={trade.trader} /><Stack gap="04"><p className={parts.heading}>{trade.name}</p><p className={styles.caption}>{t('strategies.builtWith')}</p></Stack></Stack>
+        <Stack gap="04" align="end"><p className={[parts.heading, parts.up].join(' ')}>{trade.todayReturn}%</p><p className={styles.caption}>{t('strategies.todayReturns')}</p></Stack>
+      </Stack>
+      <div className={parts.divider} />
+      <Stack direction="horizontal" align="center" justify="between">
+        <Stack gap="04"><p className={styles.statLabel}>{t('strategies.lastWeek')}</p><Stack direction="horizontal" gap="04">{trade.week.map((result, i) => <span key={i} className={[styles.day, styles[result]].join(' ')} aria-label={t(result === 'win' ? 'strategies.dayWin' : result === 'loss' ? 'strategies.dayLoss' : 'strategies.dayFlat', { day: dayNames[i] })}>{days[i]}</span>)}</Stack></Stack>
+        <Stack gap="04" align="center"><p className={styles.statLabel}>{t('strategies.avgTrades')}</p><p className={styles.statValue}>{t('strategies.perDay', { count: trade.tradesPerDay })}</p></Stack>
+        <Stack gap="04" align="end"><p className={styles.statLabel}>{t('strategies.winRate')}</p><Stack direction="horizontal" gap="04" align="center" className={parts.up}><Icon icon={msTrendingUp} size={16} /><p className={styles.statValue}>{trade.winRate}%</p></Stack></Stack>
+      </Stack>
+    </Stack>
+  </Card>
+}
+
+/** Smart Invest: basket, min. deposit, 7 / 30 day P&L (switcher + hide), AUM, slots left; monthly charges + Invest now. */
+function SmartInvestCard({ invest, onOpen }: { invest: SmartInvest; onOpen: (name: string) => void }) {
+  const [days30, setDays30] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const pnl = days30 ? invest.pnl30 : invest.pnl7
+  // Not a clickable card: its body holds the P&L switcher and the hide button (no buttons inside a button).
+  return <Card footerFilled footer={<Stack direction="horizontal" align="center" justify="between" className={styles.fill}>
+    <Stack gap="04"><p className={styles.statLabel}>{t('strategies.charges')}</p><p className={styles.statValue}>{inr(invest.charges, 0)} <s className={styles.strike}>{inr(invest.chargesBefore, 0)}</s></p></Stack>
+    <Button variant="primary" size="sm" className={styles.invest} onClick={() => onOpen(`${t('strategies.invest')} · ${invest.name}`)}>{t('strategies.invest')}</Button>
+  </Stack>}>
+    <Stack gap="12">
+      <Stack direction="horizontal" gap="08" align="center" justify="between">
+        <Stack direction="horizontal" gap="08" align="center" className={parts.grow}><Avatar initials={invest.name.slice(0, 2)} size={40} /><Stack gap="04" className={parts.grow}><p className={[styles.title16, styles.ellipsis].join(' ')}>{invest.name}</p><p className={styles.statLabel}>{t('strategies.by', { name: invest.by })}</p></Stack></Stack>
+        <Stack gap="04" align="end"><p className={styles.title16}>{inr(invest.minDeposit, 0)}</p><p className={styles.statLabel}>{t('strategies.minDeposit')}</p></Stack>
+      </Stack>
+      <div className={parts.divider} />
+      <Stack direction="horizontal" align="center" justify="between">
+        <Stack gap="04"><Select size="sm" onClick={() => setDays30(!days30)}>{t(days30 ? 'strategies.pnl30' : 'strategies.pnl7')}</Select><Stack direction="horizontal" gap="04" align="center"><p className={[styles.statValue, parts.up].join(' ')}>{hidden ? '••••' : `${pnl}%`}</p><Button variant="ghost" size="sm" aria-label={t('strategies.showPnl')} iconLeft={<Icon icon={hidden ? msVisibilityOff : msVisibility} size={16} />} onClick={() => setHidden(!hidden)} /></Stack></Stack>
+        <Stack gap="04" align="center"><p className={styles.statLabel}>{t('strategies.aum')}</p><p className={styles.statValue}>{invest.aum}</p></Stack>
+        <Stack gap="04" align="end"><p className={styles.statLabel}>{t('strategies.slots')}</p><Stack direction="horizontal" gap="04" align="center"><span className={styles.fire}><Icon icon={msLocalFireDepartmentFill} size={16} /></span><p className={styles.statValue}>{invest.slotsLeft}<span className={styles.muted}>/{invest.slots}</span></p></Stack></Stack>
+      </Stack>
+    </Stack>
+  </Card>
+}
+
+/** A pre-build strategy: probability of profit, name, funds required, max profit / loss and a payoff sketch. */
+function PrebuiltCard({ strategy, onOpen }: { strategy: Prebuilt; onOpen: (name: string) => void }) {
+  return <Card onClick={() => onOpen(strategy.name)}>
+    <Stack gap="12">
+      <Stack direction="horizontal" align="center" justify="between"><p className={styles.title16}>{t('strategies.pop')}</p><p className={[styles.title16, parts.up].join(' ')}>+{strategy.probability}%</p></Stack>
+      <Stack direction="horizontal" align="center" justify="between"><p className={styles.statLabel}>{strategy.name}</p><p className={styles.statLabel}>{t('strategies.funds', { amount: inr(strategy.funds, 0) })}</p></Stack>
+      <div className={parts.divider} />
+      <Stack direction="horizontal" align="center" justify="between">
+        <Stack gap="04">
+          <p className={styles.statLabel}>{t('strategies.maxProfit')} <span className={parts.up}>{strategy.maxProfit === null ? t('strategies.unlimited') : inr(strategy.maxProfit, 0)}</span></p>
+          <p className={styles.statLabel}>{t('strategies.maxLoss')} <span className={parts.down}>{inr(strategy.maxLoss, 0)}</span></p>
+        </Stack>
+        <svg className={styles.payoff} viewBox="0 0 40 28" role="img" aria-label={t('strategies.payoff')}>
+          <rect className={styles.lossArea} x="0" y="14" width="18" height="10" />
+          <rect className={styles.profitArea} x="22" y="4" width="18" height="10" />
+          <polyline className={styles.lossLine} points="0,24 16,24 20,14" />
+          <polyline className={styles.profitLine} points="20,14 24,4 40,4" />
+        </svg>
+      </Stack>
+    </Stack>
+  </Card>
+}
+
+/** Quick Trade: "Which way will GOLD ⌄ move?" and an Up / Down choice. */
+function QuickTrade({ underlying, onUnderlying, onTrade }: { underlying: string; onUnderlying: () => void; onTrade: (name: string) => void }) {
+  return <Card>
+    <Stack gap="12">
+      <Stack direction="horizontal" align="center" justify="between"><Stack direction="horizontal" gap="04" align="center"><Icon icon={msBoltFill} size={16} /><p className={styles.statValue}>{t('strategies.quick')}</p></Stack><p className={styles.statLabel}>{t('strategies.beginner')}</p></Stack>
+      <div className={parts.divider} />
+      <Stack direction="horizontal" gap="04" align="center"><p className={styles.title16}>{t('strategies.which')}</p><Select size="lg" icon="chevron" aria-label={t('strategies.pickUnderlying')} onClick={onUnderlying}>{underlying}</Select><p className={styles.title16}>{t('strategies.move')}</p></Stack>
+      <Stack direction="horizontal" gap="12">
+        <Button variant="secondary" size="md" fullWidth className={styles.upButton} iconLeft={<Icon icon={msTrendingUp} size={16} />} onClick={() => onTrade(`${underlying} · ${t('strategies.up')}`)}>{t('strategies.up')}</Button>
+        <Button variant="secondary" size="md" fullWidth className={styles.downButton} iconLeft={<Icon icon={msTrendingDown} size={16} />} onClick={() => onTrade(`${underlying} · ${t('strategies.down')}`)}>{t('strategies.down')}</Button>
+      </Stack>
+    </Stack>
+  </Card>
+}
+```
+
+### `src/flows/fno/strategies/data.ts`
+
+```ts
+/** Snapshot examples from Figma 6754:64178 (Strategies → Equity) and 6754:64607 (Strategies → Commodities); not live data. */
+
+export type Segment = 'equity' | 'commodities'
+
+/** A Zing Trades card: a strategy built with DASH Ai. `week` is Mon–Fri: won, lost, or no trade. */
+export type ZingTrade = { id: string; name: string; trader: string; todayReturn: number; week: ('win' | 'loss' | 'none')[]; tradesPerDay: number; winRate: number }
+const zing = (id: string, name: string, trader: string): ZingTrade => ({ id, name, trader, todayReturn: 78, week: ['win', 'win', 'none', 'win', 'loss'], tradesPerDay: 2, winRate: 58 })
+export const zingTrades: ZingTrade[] = [zing('ema-9', 'EMA Cross 9', 'Arjun Mehta'), zing('rsi-rev', 'RSI Reversal', 'Neha Iyer'), zing('vwap', 'VWAP Bounce', 'Rahul Verma')]
+
+/** A Smart Invest card: a managed basket. Amounts in rupees; `pnl7` is the 7-day P&L in percent. */
+export type SmartInvest = { id: string; name: string; by: string; minDeposit: number; pnl7: number; pnl30: number; aum: string; slotsLeft: number; slots: number; charges: number; chargesBefore: number }
+export const smartInvests: Record<Segment, SmartInvest[]> = {
+  equity: [
+    { id: 'osa', name: 'OptionsSensexAlpha', by: 'lemonn', minDeposit: 50000, pnl7: 64.4, pnl30: 81.2, aum: '10L', slotsLeft: 80, slots: 100, charges: 0, chargesBefore: 300 },
+    { id: 'nifty-theta', name: 'NiftyThetaPlus', by: 'lemonn', minDeposit: 75000, pnl7: 22.1, pnl30: 40.5, aum: '25L', slotsLeft: 12, slots: 100, charges: 0, chargesBefore: 300 },
+  ],
+  commodities: [
+    { id: 'osa', name: 'OptionsSensexAlpha', by: 'lemonn', minDeposit: 50000, pnl7: 64.4, pnl30: 81.2, aum: '10L', slotsLeft: 80, slots: 100, charges: 0, chargesBefore: 300 },
+    { id: 'gold-carry', name: 'GoldCarryPro', by: 'lemonn', minDeposit: 60000, pnl7: 18.6, pnl30: 33.9, aum: '8L', slotsLeft: 41, slots: 100, charges: 0, chargesBefore: 300 },
+  ],
+}
+
+/** Pre-build strategies per view. `funds` = funds required, `maxLoss` in rupees; `maxProfit` null = unlimited. */
+export type View = 'bullish' | 'bearish' | 'neutral' | 'volatile'
+export type Prebuilt = { id: string; name: string; probability: number; funds: number; maxProfit: number | null; maxLoss: number }
+export const prebuilt: Record<View, Prebuilt[]> = {
+  bullish: [
+    { id: 'bcs', name: 'Bull call spread', probability: 59.8, funds: 186456, maxProfit: null, maxLoss: 99999 },
+    { id: 'bps', name: 'Bull put spread', probability: 64.2, funds: 142300, maxProfit: 42500, maxLoss: 57500 },
+  ],
+  bearish: [
+    { id: 'bpsd', name: 'Bear put spread', probability: 41.5, funds: 120800, maxProfit: 64000, maxLoss: 36000 },
+    { id: 'bccs', name: 'Bear call spread', probability: 62.7, funds: 138900, maxProfit: 38200, maxLoss: 61800 },
+  ],
+  neutral: [
+    { id: 'ic', name: 'Iron condor', probability: 71.3, funds: 165000, maxProfit: 28400, maxLoss: 71600 },
+    { id: 'ss', name: 'Short strangle', probability: 68.9, funds: 245000, maxProfit: 31200, maxLoss: 99999 },
+  ],
+  volatile: [
+    { id: 'ls', name: 'Long straddle', probability: 38.4, funds: 52300, maxProfit: null, maxLoss: 52300 },
+    { id: 'lsg', name: 'Long strangle', probability: 33.1, funds: 31800, maxProfit: null, maxLoss: 31800 },
+  ],
+}
+
+/** The underlying the Pre-build and Quick Trade cards are for, per view. */
+export const underlyings: Record<Segment, string[]> = {
+  equity: ['Nifty 50', 'Bank Nifty', 'Sensex'],
+  commodities: ['GOLD', 'SILVER', 'CRUDEOIL'],
 }
 ```
 
