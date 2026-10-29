@@ -207,6 +207,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-29 — **DASH home V4** (setting DASH home → V4): one home for new and returning users — the Returning V2 home with the heading “Ai creations” (no “+ Create strategy” in that row), and under it small dashed Create cards in one row: Indicator, Rule, and Strategy with the setting **Strategy card** On (opens the chat in strategy mode). Setting **Create cards**: Button (title “Create / indicator” on two lines top left, icon top right, a small primary “Create” button; three cards scroll sideways at 40%) or Outline (the + Create card, the whole card taps). Combined is off the DASH home setting (code kept).
 - 2026-10-27 — Indicator chart: price and time axes, last price, timeframe; typed changes (timeframe, EMA, Supertrend) redraw it after DASH thinks, with the build playing again; change suggestions (faint gradient edge) under a ready indicator; the card folds while typing. The chat always uses the drawn keyboard (a phone's own stays closed). Prototype setting **Indicator tags** (Show / Hide).
 - 2026-10-27 — Settings split: **Chat version** (was “DASH version”) for the chats, **History version** for the history page (1 = Trading rules list, 2 = Created with DASH), each set on its own. Version 1 chats now get the same end-to-end steps as Version 2: Save indicator opens the saved sheet, after Modify the pinned card shows the updated version, and the indicator examples work as in Version 2 (builds straight away / asks the chart / asks the timeframe). Nothing made with DASH can be edited: the details sheet's dock is Add to chart on top, Delete under it (a rule: Delete only).
 - 2026-10-27 — The card setting is now **Card version: Version 1 / Version 2** (was Card style: Current / New), default Version 2 for everyone. Preview: Shift+D flips light / dark.
@@ -7476,6 +7477,12 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.removeConfirm": "Yes, delete",
   "home2.removeKeep": "No, keep it",
   "home2.creations": "Your creations",
+  "home4.creations": "Ai creations",
+  "home4.createLabel": "Create something new",
+  "home4.createButton": "Create",
+  "home4.createTitle.indicator": "Create\nindicator",
+  "home4.createTitle.rule": "Create\nrule",
+  "home4.createTitle.strategy": "Create\nstrategy",
   "home2.triggered": "Triggered {count}× today",
   "home2.notTriggered": "Not triggered today",
   "pineSheet.title": "Upload a Pine Script",
@@ -7687,7 +7694,13 @@ export const dash: Flow = {
   options: [
     { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
     // DASH home: a new user sees what DASH can build; a returning user sees their own work first (dash-28).
-    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'combined', label: 'Combined' }], default: 'returning' },
+    // Combined (HomeCombinedScene, value 'combined') stays in the code but is off the settings panel; so are its two
+    // settings below (Home cards, Home card style), which only show with it.
+    { id: 'home', group: 'Home', icon: msHome, label: 'DASH home', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }, { value: 'v4', label: 'V4' }], default: 'returning' },
+    // DASH home V4: a third Create card, for strategies.
+    { id: 'homeStrategyCard', showIf: { home: ['v4'] }, group: 'Home', icon: msLayers, label: 'Strategy card', values: [{ value: 'hide', label: 'Off' }, { value: 'show', label: 'On' }], default: 'hide' },
+    // DASH home V4: the Create cards with a small button, or the plain dashed + Create card (the whole card taps).
+    { id: 'homeCreateStyle', showIf: { home: ['v4'] }, group: 'Home', icon: msLayers, label: 'Create cards', values: [{ value: 'button', label: 'Button' }, { value: 'outline', label: 'Outline' }], default: 'button' },
     // Returning home: Version 2 (library + live status board) or Version 3. Version 1 (the live layout) stays in the code
     // (ReturningScene) but is off the settings panel.
     { id: 'returningHome', showIf: { home: ['returning'] }, group: 'Home', icon: msDashboard, label: 'Returning home', values: [{ value: '2', label: 'V2' }, { value: '3', label: 'V3' }], default: '2' },
@@ -8750,7 +8763,7 @@ export function DashAI(props: DashAIProps) {
     //   right; back the other way) and the field rises from the bottom (dock animation below);
     // - a home with the field ↔ a chat, or switching kind in the field: the body cross-fades, the field stays put;
     // - otherwise push / back by order.
-    const newUserHome = !(('returning' in props ? props.returning : undefined) ?? returningHome) && homeChoice !== 'combined'
+    const newUserHome = !(('returning' in props ? props.returning : undefined) ?? returningHome) && homeChoice !== 'combined' && homeChoice !== 'v4'
     const touchesHome = lastScene === 'landing' || scene === 'landing'
     setMove(touchesHome && newUserHome ? (scene === 'landing' ? 'back' : 'push') : touchesHome || isSwitchingKind() ? 'fade' : order[scene] < order[lastScene] ? 'back' : 'push')
     setTyping(false)
@@ -8775,7 +8788,9 @@ export function DashAI(props: DashAIProps) {
 
   let body: ReactNode
   if (props.scene === 'landing')
-    body = homeChoice === 'combined' && props.returning === undefined
+    body = homeChoice === 'v4' && props.returning === undefined
+      ? <ReturningV2Scene version4 typing={typing} onTyping={setTyping} onManage={onYourRules} onOpenRule={props.onOpenRule} onOpenIndicator={props.onOpenIndicator} onRules={props.onRules} onIndicator={props.onIndicator} onStrategy={props.onStrategy} onAddToChart={props.onAddToChart} />
+      : homeChoice === 'combined' && props.returning === undefined
       ? <HomeCombinedScene typing={typing} onTyping={setTyping} onManage={onYourRules} onRules={props.onRules} onIndicator={props.onIndicator} />
       : props.returning ?? returningHome
       ? returningVersion === '3'
@@ -9810,6 +9825,8 @@ export type ReturningProps = {
   /** Suggestions / the field: start something new. */
   onRules?: () => void
   onIndicator?: () => void
+  /** Create strategy (DASH home V4's strategy card): the rules chat in strategy mode. */
+  onStrategy?: () => void
   /** "Add my … to a chart": Scalper, its indicators. */
   onAddToChart?: () => void
   /** Typing state (field focused, the drawn keyboard up) — kept by the DASH screen. */
@@ -10341,6 +10358,60 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   display: inline-flex;
   translate: var(--l3-spacing-08) 0;
 }
+
+/* V4 · the Create cards: one row, equal columns (2, or 3 with the strategy card). */
+.createGrid {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: var(--l3-spacing-08);
+}
+
+.createCell.createCell {
+  justify-content: flex-start; /* a title on one line lines up with titles on two */
+  width: auto;
+  min-width: 0;
+}
+
+/* Three Button cards: in a sideways row (.row), each 40% wide, so a title still fits beside its icon. */
+.createScroll {
+  flex: none;
+  width: 40%;
+  scroll-snap-align: start;
+}
+
+/* Style "Button": the dashed outline (.createOutline), the title and icon (.createBlockHead), a small primary button. */
+.createBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--l3-spacing-16); /* title row ↔ button */
+  padding: var(--l3-spacing-12);
+  border-radius: var(--l3-radius-12);
+  background: var(--l3-surface-default);
+}
+
+/* Title top left, icon top right. The title is always two lines ("Create" / "indicator", the line break is in the copy),
+   so every card in the row is the same height and its button sits in the same place. */
+.createBlockHead {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--l3-spacing-08);
+}
+
+.createBlockHead .createIcon {
+  flex: none;
+}
+
+.createBlockTitle {
+  min-width: 0;
+  white-space: pre-line;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -10356,7 +10427,7 @@ import { Inset } from '@l3/components/Inset'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
-import { msAdd, msLightbulb, msChevronRight, msClose, msDelete } from '@l3/icons/material'
+import { msAdd, msAssignmentAdd, msFunction, msLightbulb, msChevronRight, msClose, msDelete, msMonitoring } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
@@ -10396,7 +10467,12 @@ const EXAMPLES = {
   strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
 } as const
 
-export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, typing, onTyping }: ReturningProps & { /** Returning home V3: every kind always has a place (an invite card until one is made) and the newest kind is marked New. */ version3?: boolean }) {
+export function ReturningV2Scene({ version3 = false, version4 = false, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps & {
+  /** Returning home V3: every kind always has a place (an invite card until one is made) and the newest kind is marked New. */
+  version3?: boolean
+  /** DASH home V4 (new and returning users alike): V2 with "Ai creations", and dashed Create cards under it. */
+  version4?: boolean
+}) {
   // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
   const kb = useHomeKeyboard({ typing, onTyping })
   /** Where a draft carries on: its chat. */
@@ -10464,6 +10540,14 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
   const has = { rule: true, indicator: made === 'both', strategy: false }
   // V3 testing: hide one section (setting "Hide section (V3)": None / Indicators / Strategies).
   const hidden = useFlowOption('dash', 'homeHide', 'none')
+  // V4 · the Create cards under Ai creations: indicator and rule; strategy only when the setting "Strategy card" is on.
+  const strategyCard = useFlowOption('dash', 'homeStrategyCard', 'hide') === 'show'
+  const createStyle = useFlowOption('dash', 'homeCreateStyle', 'button')
+  const createCards = [
+    { kind: 'indicator' as const, icon: msMonitoring, onClick: onIndicator },
+    { kind: 'rule' as const, icon: msAssignmentAdd, onClick: onRules },
+    ...(strategyCard ? [{ kind: 'strategy' as const, icon: msFunction, onClick: onStrategy }] : []),
+  ]
 
   // Pine Script (prototype setting): the field's paperclip picks a file, then the indicator chat opens with it attached.
   const pineOn = useFlowOption('dash', 'pineScript', 'on') === 'on'
@@ -10682,11 +10766,12 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                 )}
               </>
             ) : (
-              <Stack as="section" gap="12" aria-label={t('home2.creations')}>
-                <SectionHeader title={t('home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+              <>
+              <Stack as="section" gap="12" aria-label={t(version4 ? 'home4.creations' : 'home2.creations')}>
+                <SectionHeader title={t(version4 ? 'home4.creations' : 'home2.creations')} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
                 <div ref={mixedRow} className={styles.row} role="list">
-                  {/* Strategy picked: none made yet, so "+ Create strategy" leads the row. */}
-                  {shown === 'strategy' && (
+                  {/* Strategy picked: none made yet, so "+ Create strategy" leads the row (not on V4: its Create cards do that). */}
+                  {shown === 'strategy' && !version4 && (
                     <button data-key="create-strategy" type="button" role="listitem" className={`${styles.item} ${styles.createCard}`} onClick={() => { kb.field.onChange(t('home3.strategyStart')); kb.field.onFocus() }}>
                       <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
                               <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
@@ -10696,6 +10781,30 @@ export function ReturningV2Scene({ version3 = false, onManage, onOpenRule, onOpe
                   {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).map(({ item, kind: k }) => card(item, k, true))}
                 </div>
               </Stack>
+              {/* V4 · start something new: one small dashed card per kind, side by side in one row. Style "Button": title
+                  top left (always two lines: Create / the kind), icon top right, a small primary button; style "Outline": the + Create card of the creations row, the whole card taps. */}
+              {version4 && (
+                // Three Button cards leave the title too little room beside the icon: that row scrolls sideways (40% cards).
+                <div className={createStyle === 'button' && createCards.length > 2 ? styles.row : styles.createGrid} role="list" aria-label={t('home4.createLabel')}>
+                  {createCards.map((c) => createStyle === 'outline' ? (
+                    <button key={c.kind} type="button" role="listitem" className={`${styles.item} ${styles.createCard} ${styles.createCell}`} onClick={c.onClick}>
+                      <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
+                      <span className={styles.createIcon}><Icon icon={msAdd} size={20} /></span>
+                      <span className={styles.itemTitle}>{t(`home3.create.${c.kind}`)}</span>
+                    </button>
+                  ) : (
+                    <div key={c.kind} role="listitem" className={`${styles.createBlock} ${createCards.length > 2 ? styles.createScroll : styles.createCell}`}>
+                      <svg className={styles.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
+                      <span className={styles.createBlockHead}>
+                        <span className={styles.createBlockTitle}>{t(`home4.createTitle.${c.kind}`)}</span>
+                        <span className={styles.createIcon}><Icon icon={c.icon} size={20} /></span>
+                      </span>
+                      <Button size="sm" fullWidth onClick={c.onClick}>{t('home4.createButton')}</Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              </>
             )}
             </Stack>
             </div>
