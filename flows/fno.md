@@ -17,7 +17,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-05` | Scalper | — | `fno-01`, `dash-20` | From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators. |
 | `fno-06` | Scalper · DASH indicator | — | `fno-01`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list. |
 | `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles. |
-| `fno-08` | Commodities home | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. Shortcut buttons are L3 Tertiary Large (48) round buttons; Figma draws 52. |
+| `fno-08` | Commodities home | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. |
 | `fno-09` | Commodities · heatmap & Smart Futures | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The same long screen, scrolled to the Futures Heatmap. |
 | `fno-10` | Contract picker · Commodities | [6754:65111](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65111) | — | From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet. |
 | `fno-11` | Contract picker · Equity | [6754:65054](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65054) | — | The same sheet on its Equity tab: the 8 index contracts. |
@@ -26,10 +26,14 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-14` | Gold Summary · margin per lot | [6754:65444](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65444) | `fno-08`, `fno-17` | Sorted by margin per lot: each option shows the margin for one lot, no change. |
 | `fno-15` | Strategies · Equity | [6754:64178](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64178) | — | The Strategies product tab with Equity selected in the pill group: shortcuts, Zing Trades, Smart Invest, Pre-build Strategies (Nifty 50 ⇕, Bullish / Bearish / Neutral / Volatile), Quick Trade. Card footer buttons stay Small (32) as in Figma. |
 | `fno-16` | Strategies · Commodities | [6754:64607](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-64607) | — | The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying. |
-| `fno-17` | Option chain | [11630:16785](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16785) | `fno-01` | From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear. |
-| `fno-18` | Option chain · Buy selected | [11630:16184](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16184) | `fno-01` | A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection. |
-| `fno-19` | Option chain · Sell selected | [11695:26269](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11695-26269) | `fno-01` | The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot. |
-| `fno-20` | Option chain · illiquid contract | — | `fno-01` | Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up. |
+| `fno-17` | Option chain | [11630:16785](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16785) | `fno-01`, `fno-21` | From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear. |
+| `fno-18` | Option chain · Buy selected | [11630:16184](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16184) | `fno-01`, `fno-21` | A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection. |
+| `fno-19` | Option chain · Sell selected | [11695:26269](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11695-26269) | `fno-01`, `fno-21` | The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot. |
+| `fno-20` | Option chain · illiquid contract | — | `fno-01`, `fno-21` | Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up. |
+| `fno-21` | Asset page · Gold MINI | [6754:61613](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613) | `fno-18`, `fno-17` | A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later. |
+| `fno-22` | Asset page · illiquid | [6754:61613](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613) | `fno-17` | Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from. |
+| `fno-23` | Gold Summary · Buy / Sell sheet | — | `fno-08`, `fno-17` | Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary). |
+| `fno-24` | Gold Summary · illiquid sheet | — | `fno-08`, `fno-17` | Product rule (commodities): an illiquid contract carries the ILLIQUID tag on its card (edge case — illiquid contracts shouldn’t be listed, but the state is built) and in the sheet; Buy / Sell are greyed out with “Trading is not allowed as this contract is illiquid”. Only the name › (asset page fno-22) or tapping outside works. |
 
 ## Spec (README.md)
 
@@ -64,6 +68,10 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-18 | Option chain · Buy selected | 11630:16184 |
 | fno-19 | Option chain · Sell selected | 11695:26269 (Sell frame) |
 | fno-20 | Option chain · illiquid contract tooltip | — (Groww reference, 2026-10-29) |
+| fno-21 | Asset page · Gold MINI (commodity) | 6754:61613 |
+| fno-22 | Asset page · illiquid commodity | 6754:61613 + product rule |
+| fno-23 | Gold Summary · Buy / Sell sheet | live app screenshot 2026-10-29 |
+| fno-24 | Gold Summary · illiquid Buy / Sell sheet | live app + product rule |
 
 ### Structure
 
@@ -134,6 +142,19 @@ The other F&O navbar items open a sheet explaining that those destinations are o
 - **Quick Trade**: ⚡ Quick Trade · Beginner friendly; “Which way will GOLD ⌄ move?” (underlying → sheet); Up • Bullish (green outline) and Down • Bearish (red outline).
 - Destinations outside this prototype (Explore, Apply, Invest now, Learn, Up / Down) open the explanatory sheet.
 
+#### Buy / Sell sheet (fno-23, 24)
+
+`commodities/sheets/ContractSheet` (live app, 2026-10-29): any futures or option card on Gold Summary opens it. Name › (asset page) · price; expiry · type · change; Buy (brand) / Sell (secondary) docked. **Illiquid** (commodities, product rule — same from any entry point): ILLIQUID tag in the sheet, Buy / Sell greyed out with “Trading is not allowed as this contract is illiquid”; only the name › (→ the illiquid asset page) or tapping outside work. The card itself also carries the ILLIQUID tag — an edge case kept in development (illiquid contracts aren't meant to be listed in discovery, but can still reach a list). Sample: GOLD 24000 CE.
+
+#### Commodity asset page (fno-21, 22)
+
+`commodities/screens/AssetPage` (Figma 6754:61613), data `AssetPage` in `commodities/data.ts`:
+- Actionbar: back · ☆ (watchlist, toggles). Head: name + contract (“Gold MINI 5 OCT Fut”), price + change, commodity art.
+- Chart (the Scalper's trading pane: candles, price axis with last-price tag, high / low, zoom, time axis, 5m) and the tool row Range · 5m Interval · Indicators · Drawings · Settings; Option chain (→ fno-17).
+- Contract Info (key–value rows with dashed separators: days to expiry, margin, leverage, price unit; the tender-margin notice with ⓘ); {NAME} Futures rail; Performance (24H low / high bar with the last traded price, Prev. Close / Open / circuits / tick size / price unit); Trading details; Market Depth (bids | asks, totals). Buy (brand) / Sell (secondary) docked.
+- **Illiquid (commodities only, product rule):** ILLIQUID tag (error, secondary) next to the name, Buy / Sell disabled, and “Trading is not allowed as this contract is illiquid” above them — whatever the entry point.
+- Entry so far: the contract name in the option-chain order dock (“25,400 Put ›”). More entry points (Gold Summary cards, search, watchlists) to come. Equity contracts get their own, similar page.
+
 #### Option chain (fno-17 … 19)
 
 How option chains behave (Sensibull, Dhan, Zerodha, the live Lemonn app) and how this one does it:
@@ -172,7 +193,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 #### Commodities & Strategies vs Figma (6754:63073)
 
 - D2 parts → L3: section titles → SectionHeader (View all / Explore), D2 pills → Tabs pill / Tab action, the asset list cards → ListCell Small inside a bordered group, D2 tabs → Tabs underline (sheet header bottom slot, Actionbar bottom slot), card buttons → Button, D2 tags → Tag, card shells → Card (footer / footerFilled for the grey strips).
-- Commodity shortcut buttons are L3 Tertiary Large (48, art 24) — Figma draws 52 circles with 32 art; same treatment as the Equity shortcuts.
+- Commodity shortcut buttons match Figma exactly: 52 white circles with a light outline and faint glow, 32 art (L3 Tertiary button overridden; local tokens `--app-size-commodity-shortcut`, `--app-commodity-shortcut-glow`).
 - Card footer buttons (Zing Trades, Smart Invest) and Quick Trade stay Small / Medium as in Figma, not the app's Large default — the user asked for the same UI as the frames.
 - Price changes show their sign (“+0.10%”, L3 PriceChange); Figma shows “0.10%”.
 - Figma's “Gold Gunia” tab → Gold Guinea; “1,65,4500.23” margin → 1,65,450.23; western “₹186,456” → ₹1,86,456; “ViewAll” → View all.
@@ -188,6 +209,8 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
+- 2026-10-29 — Buy / Sell sheet from Gold Summary cards (fno-23) with the illiquid state (fno-24: tag on the card and in the sheet, Buy / Sell disabled).
+- 2026-10-29 — Commodity asset page (fno-21) with the illiquid state (fno-22); opened from the option-chain order dock's contract name.
 - 2026-10-29 — Illiquid contracts in the option chain: block icon, tooltip instead of selecting, ⓘ details sheet (fno-20).
 - 2026-10-29 — Option chain (fno-17 … 19) from Figma 11695:26269: chain with spot pill, OI bars and strike tags, Buy → Sell → clear selection, order dock; opened from the chart's Option chain button and the bottom nav.
 - 2026-10-29 — Product tab switch: every home tab screen is one page (group `home`), so the header, P&L, indices and tabs stay put and only the content under the tabs slides in from the chosen tab's side (scrolls back to the tabs if they were scrolled away). Product tabs and the Zing card rebuilt exactly as in Figma.
@@ -905,6 +928,10 @@ sl��-�""	d ί��n������'�O�gt�s:�#E>�_��
 
 ```css
 /* Commodities tab, contract picker and Lot summary — flow-only pieces on L3 tokens. */
+/* Commodity shortcut (Figma 6754:63662): a 52 white circle, light outline, faint glow, 32 art — overrides the L3 Tertiary
+   button's size, shape and icon slot on purpose (same exception as the F&O ribbon tabs). */
+.shortcut.shortcut { width: var(--app-size-commodity-shortcut); height: var(--app-size-commodity-shortcut); min-width: var(--app-size-commodity-shortcut); padding: 0; --btn-radius: var(--l3-radius-full); --btn-surface: var(--l3-surface-primary); --btn-border: var(--l3-border-light); filter: drop-shadow(0 0 var(--l3-spacing-16) var(--app-commodity-shortcut-glow)); }
+.shortcut.shortcut > span { width: var(--l3-size-32); height: var(--l3-size-32); }
 .shortcutArt { display: block; width: var(--l3-size-32); height: var(--l3-size-32); object-fit: contain; }
 .change { font: var(--l3-text-label-10); }
 .meta { font: var(--l3-text-label-12); color: var(--l3-content-tertiary); white-space: nowrap; }
@@ -1007,7 +1034,7 @@ import styles from './Commodities.module.css'
 /** Gold · Silver · Crude Oil · Natural Gas: artwork in a round Tertiary button, the name and the day's change under it. */
 export function CommodityShortcuts({ onOpen }: { onOpen: (commodity: Commodity) => void }) {
   return <div className={parts.shortcuts} role="list" aria-label={t('commodities.shortcuts')}>{commodities.map((commodity) => <Stack key={commodity.id} gap="08" align="center" role="listitem">
-    <Button variant="tertiary" size="lg" aria-label={commodity.name} iconLeft={<img className={styles.shortcutArt} src={commodity.image} alt="" />} onClick={() => onOpen(commodity)} />
+    <Button variant="tertiary" size="lg" className={styles.shortcut} aria-label={commodity.name} iconLeft={<img className={styles.shortcutArt} src={commodity.image} alt="" />} onClick={() => onOpen(commodity)} />
     <Stack gap="04" align="center">
       <span className={parts.secondaryLabel}>{commodity.name}</span>
       <span className={[styles.change, commodity.change < 0 ? parts.down : parts.up].join(' ')}>{commodity.change > 0 ? '+' : ''}{commodity.change.toFixed(2)}%</span>
@@ -1150,10 +1177,284 @@ export const lotFutures: Contract[] = [
   { id: 'lf-0', name: 'Gold', description: 'Fut | 5 Oct', price: 417, change: 0.1, volume: 0 },
   { id: 'lf-1', name: 'Gold', description: 'Fut | 5 Dec', price: 417, change: 0.1, volume: 0 },
 ]
-export type LotOption = Contract & { marginPerLot: number }
-export const lotOptions: LotOption[] = Array.from({ length: 6 }, (_, i) => ({ id: `lo-${i}`, name: 'GOLD 19400 CE', description: 'Call | 5 Oct 26', price: 417, change: 0.1, volume: 23843233, marginPerLot: 23345, side: 'call' }))
+export type LotOption = Contract & { marginPerLot: number; /** Too few trades: Buy / Sell are blocked (commodities only). */ illiquid?: boolean }
+export const lotOptions: LotOption[] = [
+  ...Array.from({ length: 5 }, (_, i): LotOption => ({ id: `lo-${i}`, name: 'GOLD 19400 CE', description: 'Call | 5 Oct 26', price: 417, change: 0.1, volume: 23843233, marginPerLot: 23345, side: 'call' })),
+  // A far out-of-the-money strike nobody trades: illiquid.
+  { id: 'lo-5', name: 'GOLD 24000 CE', description: 'Call | 5 Oct 26', price: 3, change: -25, volume: 4, marginPerLot: 300, side: 'call', illiquid: true },
+]
 export const expiryMonths = ['October', 'November', 'December']
 export type LotSort = 'price' | 'volume' | 'margin'
+
+/**
+ * A commodity contract's asset page (Figma 6754:61613, Gold MINI 5 OCT Fut). Prices in ₹. `illiquid` (commodities
+ * only): the page shows the ILLIQUID tag and Buy / Sell are disabled.
+ */
+export type AssetPage = {
+  name: string
+  /** Expiry + type, e.g. "5 OCT Fut". */
+  contract: string
+  image?: string
+  price: number
+  change: number
+  illiquid?: boolean
+  daysToExpiry: number
+  margin: string
+  leverage: string
+  priceUnit: string
+  notice: string
+  futures: { id: string; name: string; date: string; price: number; change: number }[]
+  low: number
+  high: number
+  prevClose: number
+  open: number
+  upperCircuit: number
+  lowerCircuit: number
+  tickSize: string
+  unit: string
+  lotSize: number
+  minLot: number
+  lastQty: number
+  lastTime: string
+  expiryDate: string
+  lastTradingDate: string
+  bids: { price: string; qty: number }[]
+  asks: { price: string; qty: number }[]
+  bidTotal: number
+  askTotal: number
+}
+export const goldMiniAsset: AssetPage = {
+  name: 'Gold MINI', contract: '5 OCT Fut', image: gold, price: 159000, change: -0.22,
+  daysToExpiry: 41, margin: '10.84% / 10.84%', leverage: '9.22X / 9.22X', priceUnit: 'Per 10 gram', notice: 'Tender margin period starts 30 Sept',
+  futures: [
+    { id: 'dec', name: 'Gold 5 DEC Fut', date: '05 Dec 2026', price: 153580, change: 2.16 },
+    { id: 'feb', name: 'GOLD 5 FEB FUT', date: '05 Feb 2027', price: 156580, change: -0.12 },
+  ],
+  low: 157000, high: 160000, prevClose: 158000, open: 157000, upperCircuit: 162000, lowerCircuit: 152000, tickSize: '0.05', unit: '10 grams',
+  lotSize: 100, minLot: 1, lastQty: 1, lastTime: '2026-10-29 12:16:42', expiryDate: '2026-10-05', lastTradingDate: '2026-10-05',
+  bids: [{ price: '1,58,000', qty: 1 }, { price: '1,57,000', qty: 2 }, { price: '1,56,000', qty: 3 }, { price: '1,55,000', qty: 3 }, { price: '1,54,500', qty: 900 }],
+  asks: [{ price: '1,59,000', qty: 1 }, { price: '1,60,000', qty: 2 }, { price: '1,61,000', qty: 3 }, { price: '1,62,000', qty: 4 }, { price: '1,62,500', qty: 15007 }],
+  bidTotal: 11003, askTotal: 36367,
+}
+/** The same page for an illiquid commodity contract (Gold Petal, far month): few trades, wide spread. */
+export const illiquidAsset: AssetPage = {
+  ...goldMiniAsset, name: 'Gold PETAL', contract: '5 FEB Fut', image: goldPetal, price: 15880, change: 0, illiquid: true,
+  low: 15880, high: 15880, prevClose: 15880, open: 15880, lastQty: 1, lastTime: '2026-10-27 15:02:11',
+  bids: [{ price: '15,420', qty: 1 }], asks: [{ price: '16,390', qty: 1 }], bidTotal: 1, askTotal: 1,
+}
+
+/** Gold MINI intraday 5-minute candles for the asset page chart (illustrative). */
+const assetCloses = [159600, 159420, 159510, 159380, 159450, 159300, 159200, 158400, 157900, 157600, 157750, 157500, 157400, 157650, 157900, 157800, 157700, 158000, 157600, 157300, 157900, 158300, 158100, 158200, 157900, 157700, 157600, 157500]
+export const assetCandles = assetCloses.map((close, i) => {
+  const open = i ? assetCloses[i - 1] : close + 120
+  return { open, close, high: Math.max(open, close) + 90 + (i % 3) * 40, low: Math.min(open, close) - 80 - (i % 4) * 30, volume: 20 + ((i * 37) % 60) }
+})
+```
+
+### `src/flows/fno/commodities/screens/AssetPage.module.css`
+
+```css
+/* No line under the Actionbar until the page scrolls (then L3's elevated state brings line + shadow). */
+.bar:not([data-elevated]) { box-shadow: none; }
+
+/* Commodity asset page (Figma 6754:61613) — flow-only layout on L3 tokens. Panels are the design's grey info boxes. */
+.page { padding-block: var(--l3-spacing-08) var(--l3-spacing-32); }
+.inset { padding-inline: var(--l3-spacing-16); }
+.grow { flex: 1; min-width: 0; }
+.head { display: flex; align-items: center; gap: var(--l3-spacing-12); padding-inline: var(--l3-spacing-16); }
+.name { margin: 0; font: var(--l3-text-heading-16); }
+.contract { font: var(--l3-text-label-14); color: var(--l3-content-tertiary); white-space: nowrap; }
+.price { font: var(--l3-text-heading-24); white-space: nowrap; }
+.art { flex: none; width: var(--l3-size-48); height: var(--l3-size-48); object-fit: contain; }
+.chart { display: flex; flex-direction: column; height: var(--app-size-asset-chart); }
+.chart > * { flex: 1; min-height: 0; }
+
+/* Chart tools: icon over label, five across. */
+.tools { display: grid; grid-template-columns: repeat(5, 1fr); padding-inline: var(--l3-spacing-08); }
+.tool { display: flex; flex-direction: column; align-items: center; gap: var(--l3-spacing-04); min-height: var(--l3-size-48); padding: var(--l3-spacing-04) 0; border: 0; background: none; color: var(--l3-content-primary); font: var(--l3-text-label-10); cursor: pointer; }
+.tool span:last-child { color: var(--l3-content-secondary); }
+.interval { font: var(--l3-text-heading-14); line-height: var(--l3-size-20); }
+
+.section { display: flex; flex-direction: column; gap: var(--l3-spacing-16); padding-inline: var(--l3-spacing-16); }
+.sectionRail { display: flex; flex-direction: column; gap: var(--l3-spacing-16); }
+.panel { display: flex; flex-direction: column; gap: var(--l3-spacing-12); padding: var(--l3-spacing-16) var(--l3-spacing-12); border-radius: var(--l3-radius-16); background: var(--l3-surface-secondary); }
+/* Contract Info rows: dashed separators, as in Figma. */
+.dashed > * + * { border-top: 1px dashed var(--l3-border-light); padding-top: var(--l3-spacing-12); }
+.notice { display: flex; align-items: center; justify-content: space-between; gap: var(--l3-spacing-08); padding: var(--l3-spacing-10) var(--l3-spacing-12); border: 0; border-radius: var(--l3-radius-08); background: var(--l3-surface-primary); color: var(--l3-content-primary); font: var(--l3-text-label-12); text-align: left; cursor: pointer; }
+.notice svg, .notice :last-child { color: var(--l3-content-secondary); }
+
+.futureTop { display: flex; flex-direction: column; gap: var(--l3-spacing-04); padding: var(--l3-spacing-12); border-bottom: 1px solid var(--l3-border-light); }
+.futureBottom { display: flex; justify-content: space-between; align-items: center; gap: var(--l3-spacing-08); padding: var(--l3-spacing-12); }
+.futureName { font: var(--l3-text-label-12); white-space: nowrap; }
+
+.statValue { font: var(--l3-text-heading-12); white-space: nowrap; }
+.statLabel { font: var(--l3-text-label-12); color: var(--l3-content-tertiary); white-space: nowrap; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--l3-spacing-16) var(--l3-spacing-12); }
+
+/* 24H range: purple → blue bar with a bolt at the last traded price. */
+.range { position: relative; height: var(--l3-size-08); margin-block: var(--l3-spacing-06); border-radius: var(--l3-radius-full); background: linear-gradient(90deg, var(--l3-surface-accent-purple-default), var(--l3-surface-accent-discover-default)); }
+.marker { position: absolute; top: 50%; translate: -50% -50%; display: inline-flex; color: var(--l3-content-accent-discover-default); }
+.ltp { display: flex; align-items: center; gap: var(--l3-spacing-04); font: var(--l3-text-label-12); color: var(--l3-content-tertiary); }
+.ltp strong { font: var(--l3-text-heading-12); color: var(--l3-content-primary); }
+
+/* Market depth: bids | asks, a divider between, totals under a rule. */
+.depth { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: var(--l3-spacing-12) 0; }
+.depthSide { width: 100%; border-collapse: collapse; font: var(--l3-text-heading-12); }
+.depthSide + .depthSide { border-left: 1px solid var(--l3-border-light); }
+.depthSide th { font: var(--l3-text-label-12); color: var(--l3-content-secondary); text-align: left; padding: 0 var(--l3-spacing-12) var(--l3-spacing-08); }
+.depthSide td { padding: var(--l3-spacing-08) var(--l3-spacing-12); }
+.depthSide th:last-child, .depthSide td:last-child { text-align: right; }
+.depthSide tfoot td { border-top: 1px solid var(--l3-border-light); padding-top: var(--l3-spacing-16); font: var(--l3-text-label-12); }
+.up { color: var(--l3-content-accent-indicator-up-default); }
+.down { color: var(--l3-content-accent-indicator-down-default); }
+
+.dock { display: flex; flex-direction: column; gap: var(--l3-spacing-08); background: var(--l3-surface-primary); }
+.illiquidNote { padding: var(--l3-spacing-12) var(--l3-spacing-16) 0; font: var(--l3-text-label-12); color: var(--l3-content-accent-error-default); text-align: center; }
+```
+
+### `src/flows/fno/commodities/screens/AssetPage.tsx`
+
+```tsx
+import { useEffect, useRef, useState } from 'react'
+import { Actionbar } from '@l3/components/Actionbar'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { PriceChange } from '@l3/components/PriceChange'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { Tag } from '@l3/components/Tag'
+import { msArrowRange, msBoltFill, msDraw, msFunction, msInfo, msLink, msSettings, msStar, msStarFill } from '@l3/icons/material'
+import { inr } from '../../../../shared/data/format'
+import { Rail } from '../../../../shared/ui/Rail'
+import { Screen } from '../../../../shared/ui/Screen'
+import { TradingPane } from '../../components/TradingPane'
+import { DetailSheet } from '../../sheets/HomeSheets'
+import { t } from '../../copy'
+import { assetCandles, type AssetPage as Asset } from '../data'
+import styles from './AssetPage.module.css'
+
+type Props = { asset: Asset; onBack: () => void; onChain: () => void }
+
+/**
+ * A commodity contract's asset page (Figma 6754:61613): name + contract and price with the commodity art; the chart and
+ * its tools; Option chain; Contract Info; the other futures; Performance (24H range + key prices); Trading details;
+ * Market Depth; Buy / Sell docked. An illiquid contract (commodities only) shows the ILLIQUID tag and greyed-out Buy /
+ * Sell, whatever screen it was opened from.
+ */
+export function AssetPage({ asset, onBack, onChain }: Props) {
+  const [saved, setSaved] = useState(false)
+  const [detail, setDetail] = useState<string | null>(null)
+  // The Actionbar's bottom line shows only once the page has scrolled under it.
+  const pageRef = useRef<HTMLDivElement>(null)
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const body = pageRef.current?.parentElement
+    if (!body) return
+    const onScroll = () => setScrolled(body.scrollTop > 0)
+    onScroll()
+    body.addEventListener('scroll', onScroll, { passive: true })
+    return () => body.removeEventListener('scroll', onScroll)
+  }, [])
+  // The sample candles are Gold MINI's; scale them to this contract's price.
+  const scale = asset.price / assetCandles[assetCandles.length - 1].close
+  const candles = assetCandles.map((c) => ({ ...c, open: c.open * scale, close: c.close * scale, high: c.high * scale, low: c.low * scale }))
+  const position = ((asset.price - asset.low) / Math.max(1, asset.high - asset.low)) * 100
+  const tools = [
+    { key: 'range', icon: msArrowRange, value: t('asset.range') },
+    { key: 'interval', icon: null, value: t('asset.interval') },
+    { key: 'indicators', icon: msFunction, value: t('asset.indicators') },
+    { key: 'drawings', icon: msDraw, value: t('asset.drawings') },
+    { key: 'settings', icon: msSettings, value: t('asset.settings') },
+  ]
+  const stat = (value: string, label: string) => <Stack gap="04"><p className={styles.statValue}>{value}</p><p className={styles.statLabel}>{label}</p></Stack>
+  const dock = <div className={styles.dock} data-surface="primary">
+    {asset.illiquid && <p className={styles.illiquidNote}>{t('asset.illiquidNote')}</p>}
+    <ButtonGroup aria-label={`${asset.name} ${asset.contract}`} direction="horizontal">
+      <Button variant="brand" disabled={asset.illiquid} onClick={() => setDetail(`${t('asset.buy')} ${asset.name}`)}>{t('asset.buy')}</Button>
+      <Button variant="secondary" disabled={asset.illiquid} onClick={() => setDetail(`${t('asset.sell')} ${asset.name}`)}>{t('asset.sell')}</Button>
+    </ButtonGroup>
+  </div>
+
+  return <Screen
+    top={<Actionbar className={styles.bar} elevated={scrolled} onBack={onBack} backLabel={t('asset.back')} actions={<Button variant="tertiary" size="sm" aria-label={t('asset.watchlist')} aria-pressed={saved} iconLeft={<Icon icon={saved ? msStarFill : msStar} size={20} />} onClick={() => setSaved(!saved)} />} />}
+    bottom={dock}
+    sheet={detail ? <DetailSheet title={detail} onClose={() => setDetail(null)} /> : undefined}>
+    <Stack ref={pageRef} gap="32" className={styles.page}>
+      <Stack gap="16">
+        <div className={styles.head}>
+          <Stack gap="04" className={styles.grow}>
+            <Stack direction="horizontal" gap="08" align="center"><h1 className={styles.name}>{asset.name}</h1><span className={styles.contract}>{asset.contract}</span>{asset.illiquid && <Tag color="error" variant="secondary" size="sm">{t('asset.illiquid')}</Tag>}</Stack>
+            <Stack direction="horizontal" gap="04" align="center"><p className={styles.price}>{inr(asset.price, 2)}</p><PriceChange value={asset.change} unit="percent" size="sm" arrow /></Stack>
+          </Stack>
+          {asset.image && <img className={styles.art} src={asset.image} alt="" />}
+        </div>
+        <div className={styles.chart}><TradingPane candles={candles} start="09:15" minutes={15} label={t('asset.chart', { name: asset.name, contract: asset.contract })} /></div>
+        <div className={styles.tools} role="toolbar" aria-label={t('asset.tools')}>{tools.map((tool) => <button key={tool.key} type="button" className={styles.tool} onClick={() => setDetail(tool.value)}>
+          {tool.icon ? <Icon icon={tool.icon} size={20} /> : <span className={styles.interval}>{t('asset.intervalValue')}</span>}<span>{tool.value}</span>
+        </button>)}</div>
+        <div className={styles.inset}><Button variant="secondary" size="lg" fullWidth iconLeft={<Icon icon={msLink} size={20} />} onClick={onChain}>{t('asset.chain')}</Button></div>
+      </Stack>
+
+      <section className={styles.section} aria-label={t('asset.info')}>
+        <SectionHeader title={t('asset.info')} />
+        <div className={styles.panel}>
+          <KeyValueList aria-label={t('asset.info')} className={styles.dashed}>
+            <KeyValueRow label={t('asset.daysToExpiry')} value={t('asset.days', { count: asset.daysToExpiry })} />
+            <KeyValueRow label={t('asset.margin')} value={asset.margin} />
+            <KeyValueRow label={t('asset.leverage')} value={asset.leverage} />
+            <KeyValueRow label={t('asset.priceUnit')} value={asset.priceUnit} />
+          </KeyValueList>
+          <button type="button" className={styles.notice} onClick={() => setDetail(asset.notice)}><span>{asset.notice}</span><Icon icon={msInfo} size={16} /></button>
+        </div>
+      </section>
+
+      <section className={styles.sectionRail} aria-label={t('asset.futures', { name: asset.name.toUpperCase() })}>
+        <div className={styles.inset}><SectionHeader title={t('asset.futures', { name: asset.name.toUpperCase() })} /></div>
+        <Rail label={t('asset.futures', { name: asset.name.toUpperCase() })} visible={1.9}>{asset.futures.map((f) => <Card key={f.id} surface="secondary" padding="none" onClick={() => setDetail(f.name)}>
+          <div className={styles.futureTop}><p className={styles.futureName}>{f.name}</p><p className={styles.statLabel}>{f.date}</p></div>
+          <div className={styles.futureBottom}><p className={styles.statValue}>{inr(f.price, 2)}</p><PriceChange value={f.change} unit="percent" size="sm" /></div>
+        </Card>)}</Rail>
+      </section>
+
+      <section className={styles.section} aria-label={t('asset.performance')}>
+        <SectionHeader title={t('asset.performance')} />
+        <div className={styles.panel}>
+          <Stack direction="horizontal" justify="between"><Stack gap="04"><p className={styles.statLabel}>{t('asset.low')}</p><p className={styles.statValue}>{inr(asset.low, 2)}</p></Stack><Stack gap="04" align="end"><p className={styles.statLabel}>{t('asset.high')}</p><p className={styles.statValue}>{inr(asset.high, 2)}</p></Stack></Stack>
+          <div className={styles.range}><span className={styles.marker} style={{ left: `${position}%` }}><Icon icon={msBoltFill} size={20} /></span></div>
+          <p className={styles.ltp}><Icon icon={msBoltFill} size={12} /> {t('asset.ltp')} <strong>{inr(asset.price, 2)}</strong></p>
+        </div>
+        <div className={[styles.panel, styles.grid].join(' ')}>
+          {stat(inr(asset.prevClose, 2), t('asset.prevClose'))}{stat(inr(asset.open, 2), t('asset.open'))}
+          {stat(inr(asset.upperCircuit, 2), t('asset.upperCircuit'))}{stat(inr(asset.lowerCircuit, 2), t('asset.lowerCircuit'))}
+          {stat(asset.tickSize, t('asset.tickSize'))}{stat(asset.unit, t('asset.unit'))}
+        </div>
+      </section>
+
+      <section className={styles.section} aria-label={t('asset.trading')}>
+        <SectionHeader title={t('asset.trading')} />
+        <div className={[styles.panel, styles.grid].join(' ')}>
+          {stat(String(asset.lotSize), t('asset.lotSize'))}{stat(String(asset.minLot), t('asset.minLot'))}
+          {stat(String(asset.lastQty), t('asset.lastQty'))}{stat(asset.lastTime, t('asset.lastTime'))}
+          {stat(asset.expiryDate, t('asset.expiry'))}{stat(asset.lastTradingDate, t('asset.lastTradingDate'))}
+        </div>
+      </section>
+
+      <section className={styles.section} aria-label={t('asset.depth')}>
+        <SectionHeader title={t('asset.depth')} />
+        <div className={[styles.panel, styles.depth].join(' ')}>
+          {([['bid', asset.bids, asset.bidTotal, styles.up], ['ask', asset.asks, asset.askTotal, styles.down]] as const).map(([side, rows, total, tone]) => <table key={side} className={styles.depthSide}>
+            <thead><tr><th>{t(side === 'bid' ? 'asset.bid' : 'asset.ask')}</th><th>{t('asset.qty')}</th></tr></thead>
+            <tbody>{rows.map((r, i) => <tr key={i}><td>{r.price}</td><td className={tone}>{r.qty.toLocaleString('en-IN')}</td></tr>)}</tbody>
+            <tfoot><tr><td>{t('asset.total')}</td><td>{total.toLocaleString('en-IN')}</td></tr></tfoot>
+          </table>)}
+        </div>
+      </section>
+    </Stack>
+  </Screen>
+}
 ```
 
 ### `src/flows/fno/commodities/screens/LotSummary.tsx`
@@ -1174,34 +1475,47 @@ import { msFilterList, msKeyboardArrowDown } from '@l3/icons/material'
 import { inr } from '../../../../shared/data/format'
 import { Screen } from '../../../../shared/ui/Screen'
 import { ChoiceSheet, DetailSheet } from '../../sheets/HomeSheets'
+import { ContractSheet } from '../sheets/ContractSheet'
+import { Tag } from '@l3/components/Tag'
 import type { Contract } from '../../data'
 import { t } from '../../copy'
 import { expiryMonths, goldLots, lotFutures, lotOptions, type LotOption, type LotSort } from '../data'
 import parts from '../../components/HomeParts.module.css'
 import styles from '../components/Commodities.module.css'
 
-type Modal = { kind: 'detail'; title: string; contract?: Contract } | { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void }
+type Modal = { kind: 'detail'; title: string; contract?: Contract } | { kind: 'contract'; contract: Contract & { illiquid?: boolean } } | { kind: 'choice'; title: string; values: string[]; value: string; onPick: (v: string) => void }
 
 /**
  * Gold Summary (Figma 6754:65113 by price, 6754:65288 by volume, 6754:65444 margin per lot): the lot tabs sit in the
  * Actionbar's bottom slot; Futures, then Options with expiry month, category pills, Filter and the sort choice.
  */
-export function LotSummary({ sort: initialSort = 'price', onBack, onChain }: { sort?: LotSort; onBack: () => void; onChain: () => void }) {
+type Props = {
+  sort?: LotSort
+  /** Open with the Buy / Sell sheet up on this option (fno-23 a liquid one, fno-24 the illiquid one). */
+  initialSheet?: string
+  onBack: () => void
+  onChain: () => void
+  /** The sheet's contract name › opens the asset page (illiquid = the ILLIQUID page). */
+  onAsset: (illiquid: boolean) => void
+}
+
+export function LotSummary({ sort: initialSort = 'price', initialSheet, onBack, onChain, onAsset }: Props) {
   const [lot, setLot] = useState(goldLots[0].id)
   const [month, setMonth] = useState(expiryMonths[0])
   const [category, setCategory] = useState('top')
   const [sort, setSort] = useState<LotSort>(initialSort)
   const [filter, setFilter] = useState(t('filter.all'))
-  const [modal, setModal] = useState<Modal | null>(null)
+  const [modal, setModal] = useState<Modal | null>(() => { const c = lotOptions.find((o) => o.id === initialSheet); return c ? { kind: 'contract', contract: c } : null })
   const close = () => setModal(null)
   const choose = (title: string, values: string[], value: string, onPick: (v: string) => void) => setModal({ kind: 'choice', title, values, value, onPick })
   const sorts: LotSort[] = ['price', 'volume', 'margin']
   const sortLabel = (s: LotSort) => t(`sort.${s}`)
   const value = (option: LotOption) => sort === 'volume' ? option.volume.toLocaleString('en-IN') : sort === 'margin' ? inr(option.marginPerLot, 0) : inr(option.price, 2)
-  const open = (contract: Contract) => setModal({ kind: 'detail', title: contract.name, contract })
+  // A card opens the Buy / Sell sheet (live app); an illiquid contract's sheet has Buy / Sell greyed out.
+  const open = (contract: Contract & { illiquid?: boolean }) => setModal({ kind: 'contract', contract })
   const options = lotOptions.filter((o) => filter === t('filter.puts') ? o.side === 'put' : true)
   const lotName = goldLots.find((l) => l.id === lot)!.name
-  const sheet = modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : undefined
+  const sheet = modal?.kind === 'contract' ? <ContractSheet contract={modal.contract} onClose={close} onAsset={() => { close(); onAsset(!!modal.contract.illiquid) }} onBuy={() => setModal({ kind: 'detail', title: `${t('asset.buy')} ${modal.contract.name}`, contract: modal.contract })} onSell={() => setModal({ kind: 'detail', title: `${t('asset.sell')} ${modal.contract.name}`, contract: modal.contract })} /> : modal?.kind === 'detail' ? <DetailSheet title={modal.title} contract={modal.contract} onClose={close} /> : modal?.kind === 'choice' ? <ChoiceSheet {...modal} onClose={close} /> : undefined
   return <Screen sheet={sheet} top={<Actionbar title={t('lot.title', { name: goldLots[0].name })} onBack={onBack} backLabel={t('lot.back')}
     bottom={<Tabs aria-label={t('lot.lots')} value={lot} onChange={setLot} width="hug" items={goldLots.map((l) => ({ value: l.id, label: l.name, iconLeft: <img className={styles.tabArt} src={l.image} alt="" /> }))} />} />}>
     <Stack gap="32" className={styles.lotBody}>
@@ -1223,7 +1537,7 @@ export function LotSummary({ sort: initialSort = 'price', onBack, onChain }: { s
           <Select size="sm" aria-label={t('sort.label')} onClick={() => choose(t('sort.title'), sorts.map(sortLabel), sortLabel(sort), (label) => setSort(sorts.find((s) => sortLabel(s) === label)!))}>{sortLabel(sort)}</Select>
         </Stack>
         <Stack gap="12">{options.length === 0 && <EmptyState title={t('empty')} description={t('empty.description')} />}{options.map((option) => <Card key={option.id} onClick={() => open(option)}>
-          <Stack direction="horizontal" gap="08" justify="between" align="center"><Stack gap="04" className={parts.grow}><p className={parts.heading}>{option.name}</p><p className={parts.description}>{option.description}</p></Stack>
+          <Stack direction="horizontal" gap="08" justify="between" align="center"><Stack gap="04" className={parts.grow}><Stack direction="horizontal" gap="08" align="center"><p className={parts.heading}>{option.name}</p>{option.illiquid && <Tag color="error" variant="secondary" size="sm">{t('asset.illiquid')}</Tag>}</Stack><p className={parts.description}>{option.description}</p></Stack>
             {sort === 'price' ? <Stack gap="04" align="end"><p className={parts.heading}>{value(option)}</p><PriceChange value={option.change} unit="percent" size="sm" arrow /></Stack> : <p className={parts.heading}>{value(option)}</p>}</Stack>
         </Card>)}</Stack>
       </section>
@@ -1273,6 +1587,68 @@ export function ContractPickerSheet({ segment: initialSegment = 'commodities', v
       {segment === 'equity'
         ? <div className={styles.group}>{equityContracts.map(row)}</div>
         : <Stack gap="24">{groups.map((g) => <Stack key={g.id} gap="12"><p className={styles.groupLabel}>{g.name}</p><div className={styles.group}>{g.contracts.map(row)}</div></Stack>)}</Stack>}
+    </div>
+  </Sheet>
+}
+```
+
+### `src/flows/fno/commodities/sheets/ContractSheet.module.css`
+
+```css
+/* Buy / Sell contract sheet (live app reference, 2026-10-29) on L3 tokens. */
+.body { display: flex; flex-direction: column; gap: var(--l3-spacing-12); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: var(--l3-spacing-12); }
+.name { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); min-height: var(--l3-size-48); margin-block: calc(-1 * var(--l3-spacing-12)); padding: 0; border: 0; background: none; color: var(--l3-content-primary); font: var(--l3-text-heading-18); text-align: left; cursor: pointer; }
+.price { font: var(--l3-text-heading-18); white-space: nowrap; }
+.expiry { display: inline-flex; align-items: center; gap: var(--l3-spacing-08); font: var(--l3-text-heading-16); }
+.footer { display: flex; flex-direction: column; gap: var(--l3-spacing-08); }
+.note { padding: var(--l3-spacing-12) var(--l3-spacing-16) 0; font: var(--l3-text-label-12); color: var(--l3-content-accent-error-default); text-align: center; }
+```
+
+### `src/flows/fno/commodities/sheets/ContractSheet.tsx`
+
+```tsx
+import { useId } from 'react'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Icon } from '@l3/components/Icon'
+import { PriceChange } from '@l3/components/PriceChange'
+import { Tag } from '@l3/components/Tag'
+import { msChevronRight } from '@l3/icons/material'
+import { inr } from '../../../../shared/data/format'
+import { Sheet } from '../../../../shared/ui/Sheet'
+import { t } from '../../copy'
+import type { Contract } from '../../data'
+import styles from './ContractSheet.module.css'
+
+type Props = { contract: Contract & { illiquid?: boolean }; onAsset: () => void; onBuy: () => void; onSell: () => void; onClose: () => void }
+
+/**
+ * Buy / Sell sheet from a contract card (live app, Gold Summary): name › (asset page) · price, expiry + type · change,
+ * Buy (brand) / Sell (secondary). Illiquid (commodities, product rule): ILLIQUID tag and Buy / Sell greyed out — the
+ * user can only open the asset page or tap outside to close. Same sheet from any entry point.
+ */
+export function ContractSheet({ contract, onAsset, onBuy, onSell, onClose }: Props) {
+  const id = useId()
+  return <Sheet labelledBy={id} onClose={onClose}
+    footer={<div className={styles.footer}>
+      {contract.illiquid && <p className={styles.note}>{t('asset.illiquidNote')}</p>}
+      <ButtonGroup aria-label={t('contractSheet.label', { name: contract.name })} direction="horizontal">
+        <Button variant="brand" disabled={contract.illiquid} onClick={onBuy}>{t('asset.buy')}</Button>
+        <Button variant="secondary" disabled={contract.illiquid} onClick={onSell}>{t('asset.sell')}</Button>
+      </ButtonGroup>
+    </div>}>
+    <div className={styles.body}>
+      <div className={styles.row}>
+        <button type="button" className={styles.name} id={id} onClick={onAsset} aria-label={t('contractSheet.open', { name: contract.name })}>
+          {contract.name}<Icon icon={msChevronRight} size={20} />
+        </button>
+        <span className={styles.price}>{inr(contract.price, 2)}</span>
+      </div>
+      <div className={styles.row}>
+        <span className={styles.expiry}>{contract.description.replace('|', '·')}{contract.illiquid && <Tag color="error" variant="secondary" size="sm">{t('asset.illiquid')}</Tag>}</span>
+        <PriceChange value={contract.change} unit="percent" size="md" arrow />
+      </div>
     </div>
   </Sheet>
 }
@@ -2162,7 +2538,54 @@ function clock(start: string, add: number) {
   "illiquid.volumeValue": "{count} lots",
   "illiquid.spread": "Buy–sell gap",
   "illiquid.tip": "Strikes closer to the spot price trade much more — try one of those.",
-  "illiquid.ok": "Got it"
+  "illiquid.ok": "Got it",
+  "asset.back": "Back",
+  "asset.watchlist": "Add to watchlist",
+  "asset.illiquid": "ILLIQUID",
+  "asset.chart": "{name} {contract}, today, 5-minute candles",
+  "asset.tools": "Chart tools",
+  "asset.range": "Range",
+  "asset.interval": "Interval",
+  "asset.intervalValue": "5m",
+  "asset.indicators": "Indicators",
+  "asset.drawings": "Drawings",
+  "asset.settings": "Settings",
+  "asset.chain": "Option chain",
+  "asset.info": "Contract Info",
+  "asset.daysToExpiry": "Days to Expiry",
+  "asset.days": "{count} Days",
+  "asset.margin": "Margin (Buy/Sell)",
+  "asset.leverage": "Leverage (Buy/Sell)",
+  "asset.priceUnit": "Price unit",
+  "asset.futures": "{name} Futures",
+  "asset.performance": "Performance",
+  "asset.low": "24H Low",
+  "asset.high": "24H High",
+  "asset.ltp": "Last Traded Price :",
+  "asset.prevClose": "Prev. Close",
+  "asset.open": "Open",
+  "asset.upperCircuit": "Upper Circuit",
+  "asset.lowerCircuit": "Lower Circuit",
+  "asset.tickSize": "Tick Size",
+  "asset.unit": "Price Unit",
+  "asset.trading": "Trading details",
+  "asset.lotSize": "Lot Size",
+  "asset.minLot": "Minimum Lot",
+  "asset.lastQty": "Last Traded Qty",
+  "asset.lastTime": "Last Traded Time",
+  "asset.expiry": "Original Expiry date",
+  "asset.lastTradingDate": "Last Trading Date",
+  "asset.depth": "Market Depth",
+  "asset.bid": "Bid Price",
+  "asset.ask": "Ask Price",
+  "asset.qty": "Quantity",
+  "asset.total": "Total",
+  "asset.buy": "Buy",
+  "asset.sell": "Sell",
+  "asset.illiquidNote": "Trading is not allowed as this contract is illiquid",
+  "contractSheet.label": "{name}: buy or sell",
+  "contractSheet.open": "Open {name}",
+  "contractSheet.expiry": "{date}"
 }
 ```
 
@@ -2276,6 +2699,8 @@ export const lemonnIndicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by Ab
 import type { Flow, Go } from '../types'
 import { Home, type HomePart, type Product } from './screens/Home'
 import { LotSummary } from './commodities/screens/LotSummary'
+import { AssetPage } from './commodities/screens/AssetPage'
+import { goldMiniAsset, illiquidAsset } from './commodities/data'
 import { OptionChain } from './option-chain/screens/OptionChain'
 import type { Segment } from './strategies/data'
 import { Scalper } from './screens/Scalper'
@@ -2300,19 +2725,23 @@ export const fno: Flow = {
     { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
-    { id: 'fno-08', group: 'home', name: 'Commodities home', figma: '6754:63637', tab: true, note: 'The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. Shortcut buttons are L3 Tertiary Large (48) round buttons; Figma draws 52.', render: (go) => home(go, undefined, { product: 'commodities' }) },
+    { id: 'fno-08', group: 'home', name: 'Commodities home', figma: '6754:63637', tab: true, note: 'The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals.', render: (go) => home(go, undefined, { product: 'commodities' }) },
     { id: 'fno-09', group: 'home', name: 'Commodities · heatmap & Smart Futures', figma: '6754:63637', tab: true, note: 'The same long screen, scrolled to the Futures Heatmap.', render: (go) => home(go, 'heatmap', { product: 'commodities' }) },
     { id: 'fno-10', group: 'home', name: 'Contract picker · Commodities', figma: '6754:65111', tab: true, note: 'From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'commodities' }) },
     { id: 'fno-11', group: 'home', name: 'Contract picker · Equity', figma: '6754:65054', tab: true, note: 'The same sheet on its Equity tab: the 8 index contracts.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'equity' }) },
-    { id: 'fno-12', group: 'lot', name: 'Gold Summary · by price', figma: '6754:65113', note: 'From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.', render: (go) => <LotSummary onBack={() => go('fno-08')} onChain={() => go('fno-17')} /> },
-    { id: 'fno-13', group: 'lot', name: 'Gold Summary · by volume', figma: '6754:65288', note: 'Sorted by volume: each option shows its traded volume, no change.', render: (go) => <LotSummary sort="volume" onBack={() => go('fno-08')} onChain={() => go('fno-17')} /> },
-    { id: 'fno-14', group: 'lot', name: 'Gold Summary · margin per lot', figma: '6754:65444', note: 'Sorted by margin per lot: each option shows the margin for one lot, no change.', render: (go) => <LotSummary sort="margin" onBack={() => go('fno-08')} onChain={() => go('fno-17')} /> },
+    { id: 'fno-12', group: 'lot', name: 'Gold Summary · by price', figma: '6754:65113', note: 'From a commodity shortcut on fno-08. Gold lot tabs (Gold, Gold Mini, Gold Guinea, Gold Ten, Gold Petal) in the Actionbar’s bottom slot; Futures (View all) and Options (View option chain, expiry month, category pills, Filter, sort). The sort opens a sheet: By Price · By Volume · Margin per lot.', render: (go) => <LotSummary onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
+    { id: 'fno-13', group: 'lot', name: 'Gold Summary · by volume', figma: '6754:65288', note: 'Sorted by volume: each option shows its traded volume, no change.', render: (go) => <LotSummary sort="volume" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
+    { id: 'fno-14', group: 'lot', name: 'Gold Summary · margin per lot', figma: '6754:65444', note: 'Sorted by margin per lot: each option shows the margin for one lot, no change.', render: (go) => <LotSummary sort="margin" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
     { id: 'fno-15', group: 'home', name: 'Strategies · Equity', figma: '6754:64178', tab: true, note: 'The Strategies product tab with Equity selected in the pill group: shortcuts, Zing Trades, Smart Invest, Pre-build Strategies (Nifty 50 ⇕, Bullish / Bearish / Neutral / Volatile), Quick Trade. Card footer buttons stay Small (32) as in Figma.', render: (go) => home(go, undefined, { product: 'strategies', segment: 'equity' }) },
     { id: 'fno-16', group: 'home', name: 'Strategies · Commodities', figma: '6754:64607', tab: true, note: 'The same tab with Commodities selected: commodity Smart Invest baskets, GOLD as the underlying.', render: (go) => home(go, undefined, { product: 'strategies', segment: 'commodities' }) },
-    { id: 'fno-17', group: 'chain', name: 'Option chain', figma: '11630:16785', note: 'From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear.', render: (go) => <OptionChain onBack={() => go('fno-01')} /> },
-    { id: 'fno-18', group: 'chain', name: 'Option chain · Buy selected', figma: '11630:16184', note: 'A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'buy', ltp: 160.54 }} onBack={() => go('fno-01')} /> },
-    { id: 'fno-19', group: 'chain', name: 'Option chain · Sell selected', figma: '11695:26269', note: 'The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'sell', ltp: 160.54 }} onBack={() => go('fno-01')} /> },
-    { id: 'fno-20', group: 'chain', name: 'Option chain · illiquid contract', figma: '', note: 'Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.', render: (go) => <OptionChain initialIlliquid={{ strike: 25700, side: 'put' }} onBack={() => go('fno-01')} /> },
+    { id: 'fno-17', group: 'chain', name: 'Option chain', figma: '11630:16785', note: 'From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear.', render: (go) => <OptionChain onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
+    { id: 'fno-18', group: 'chain', name: 'Option chain · Buy selected', figma: '11630:16184', note: 'A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'buy', ltp: 160.54 }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
+    { id: 'fno-19', group: 'chain', name: 'Option chain · Sell selected', figma: '11695:26269', note: 'The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'sell', ltp: 160.54 }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
+    { id: 'fno-20', group: 'chain', name: 'Option chain · illiquid contract', figma: '', note: 'Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.', render: (go) => <OptionChain initialIlliquid={{ strike: 25700, side: 'put' }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
+    { id: 'fno-21', group: 'asset', name: 'Asset page · Gold MINI', figma: '6754:61613', note: 'A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later.', render: (go) => <AssetPage asset={goldMiniAsset} onBack={() => go('fno-18')} onChain={() => go('fno-17')} /> },
+    { id: 'fno-22', group: 'asset', name: 'Asset page · illiquid', figma: '6754:61613', note: 'Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from.', render: (go) => <AssetPage asset={illiquidAsset} onBack={() => go('fno-17')} onChain={() => go('fno-17')} /> },
+    { id: 'fno-23', group: 'lot', name: 'Gold Summary · Buy / Sell sheet', figma: '', note: 'Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary).', render: (go) => <LotSummary initialSheet="lo-0" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
+    { id: 'fno-24', group: 'lot', name: 'Gold Summary · illiquid sheet', figma: '', note: 'Product rule (commodities): an illiquid contract carries the ILLIQUID tag on its card (edge case — illiquid contracts shouldn’t be listed, but the state is built) and in the sheet; Buy / Sell are greyed out with “Trading is not allowed as this contract is illiquid”. Only the name › (asset page fno-22) or tapping outside works.', render: (go) => <LotSummary initialSheet="lo-5" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
   ],
 }
 ```
@@ -2545,17 +2974,23 @@ export const sellMarginPerLot = 1250
 .spotDown { color: var(--l3-content-accent-indicator-down-default); }
 
 /* Illiquid contracts: a block icon beside the price (strike side); a tap shows the tooltip above instead of selecting. */
-.tipAnchor { display: grid; }
+.illiquidCell { position: relative; display: grid; }
+/* An invisible box over the ⃠ icon: the tooltip's anchor, so its arrow points at the icon. */
+.tipTarget { position: absolute; display: block; pointer-events: none; }
+.tipTarget > * { display: block; width: 100%; height: 100%; pointer-events: auto; }
+.tipDot { display: block; width: 100%; height: 100%; }
 .blocked { display: inline-flex; vertical-align: -2px; margin-inline: var(--l3-spacing-04); color: var(--l3-content-tertiary); }
 .cell[data-illiquid] .ltp { color: var(--l3-content-secondary); }
 .tip { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); white-space: nowrap; }
-.tipInfo { display: inline-grid; place-items: center; width: var(--l3-size-24); height: var(--l3-size-24); margin: calc(-1 * var(--l3-spacing-04)) 0; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.tipInfo { position: relative; margin-right: calc(-1 * var(--l3-spacing-04)); display: inline-grid; place-items: center; width: var(--l3-size-16); height: var(--l3-size-16); padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+/* The icon sits 8 from the bubble edge (like L3 Tooltip ✕: it steps out of the text's 4 inline padding); its touch area stays larger than the 16 icon. */
+.tipInfo::before { content: ''; position: absolute; inset: calc(-1 * var(--l3-spacing-08)); }
 ```
 
 ### `src/flows/fno/option-chain/screens/OptionChain.tsx`
 
 ```tsx
-import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Aerobar } from '@l3/components/Aerobar'
 import { Badge } from '@l3/components/Badge'
 import { Button } from '@l3/components/Button'
@@ -2581,6 +3016,8 @@ type Props = {
   /** Open with the illiquid tooltip up on this contract (fno-20). */
   initialIlliquid?: { strike: number; side: Side }
   onBack: () => void
+  /** The contract name in the order dock opens its asset page. */
+  onAsset: () => void
 }
 
 /** How long the illiquid tooltip stays up. */
@@ -2594,7 +3031,7 @@ const lakh = (n: number) => `${(n / 100000).toFixed(1)}L`
  * chain opens scrolled to it. A price tap selects that contract to Buy, a second tap on it switches to Sell, a third
  * clears it; the order dock rises while a contract is selected.
  */
-export function OptionChain({ initialSelection, initialIlliquid, onBack }: Props) {
+export function OptionChain({ initialSelection, initialIlliquid, onBack, onAsset }: Props) {
   const [underlyingId, setUnderlyingId] = useState(underlyings[0].id)
   const [expiry, setExpiry] = useState(expiries[0])
   const [metric, setMetric] = useState<Metric>('ltp')
@@ -2650,16 +3087,14 @@ export function OptionChain({ initialSelection, initialIlliquid, onBack }: Props
     const s = sub(quote, side, strike)
     const contract = t('chain.contract', { strike: strike.toLocaleString('en-IN'), side: t(`chain.${side}`) })
     // Illiquid: the block icon sits beside the price on the strike side; the price never selects.
-    const blocked = quote.illiquid ? <span className={styles.blocked} aria-hidden><Icon icon={msBlock} size={14} /></span> : null
+    const blocked = quote.illiquid ? <span className={styles.blocked} data-blocked aria-hidden><Icon icon={msBlock} size={14} /></span> : null
     const price = <span className={styles.ltp}>{side === 'put' && blocked}{value(quote)}{side === 'call' && blocked}</span>
     const content = <span className={styles.values}>{price}<span className={[styles.sub, s.tone].join(' ')}>{s.text}</span></span>
     if (quote.illiquid) {
       const key = `${strike}-${side}`
-      // Mobile: the tooltip opens only on a tap (the L3 Tooltip's own hover / focus opening is ignored); tap-away closes it.
-      return <Tooltip className={styles.tipAnchor} placement="top" open={tip === key} onOpenChange={(open) => { if (!open) setTip(null) }}
-        content={<span className={styles.tip}>{t('chain.illiquid')}<button type="button" className={styles.tipInfo} aria-label={t('chain.illiquidMore')} onClick={() => { setTip(null); setModal({ kind: 'illiquid', contract, quote }) }}><Icon icon={msInfo} size={16} /></button></span>}>
-        <button type="button" className={styles.cell} data-side={side} data-illiquid="" onClick={() => setTip(tip === key ? null : key)} aria-label={t('chain.illiquidLabel', { strike: strike.toLocaleString('en-IN'), side: t(`chain.${side}`) })}>{content}</button>
-      </Tooltip>
+      return <IlliquidCell open={tip === key} onToggle={(open) => setTip(open ? key : null)}
+        label={t('chain.illiquidLabel', { strike: strike.toLocaleString('en-IN'), side: t(`chain.${side}`) })} side={side}
+        onMore={() => { setTip(null); setModal({ kind: 'illiquid', contract, quote }) }}>{content}</IlliquidCell>
     }
     return <button type="button" className={styles.cell} data-side={side} data-selected={selected} aria-pressed={!!selected}
       aria-label={t('chain.select', { action: t(selected === 'buy' ? 'chain.sell' : 'chain.buy'), strike: strike.toLocaleString('en-IN'), side: t(`chain.${side}`), price: quote.ltp.toFixed(2) })}
@@ -2702,7 +3137,7 @@ export function OptionChain({ initialSelection, initialIlliquid, onBack }: Props
   </div>
 
   return <Screen top={top} sheet={sheet}
-    bottom={selection ? <OrderDock key={`${selection.strike}-${selection.side}`} selection={selection} lotSize={underlying.lotSize} onContract={() => setModal({ kind: 'detail', title: t('chain.contract', { strike: selection.strike.toLocaleString('en-IN'), side: t(`chain.${selection.side}`) }) })} onOptions={() => setModal({ kind: 'detail', title: `${t('chain.orderOptions')} · ${t('chain.tpsl')}` })} onPlace={(action: Action) => { setPlaced(t('chain.placed', { action: t(action === 'buy' ? 'chain.buy' : 'chain.sell'), contract: t('chain.contract', { strike: selection.strike.toLocaleString('en-IN'), side: t(`chain.${selection.side}`) }) })); setSelection(null) }} /> : undefined}
+    bottom={selection ? <OrderDock key={`${selection.strike}-${selection.side}`} selection={selection} lotSize={underlying.lotSize} onContract={onAsset} onOptions={() => setModal({ kind: 'detail', title: `${t('chain.orderOptions')} · ${t('chain.tpsl')}` })} onPlace={(action: Action) => { setPlaced(t('chain.placed', { action: t(action === 'buy' ? 'chain.buy' : 'chain.sell'), contract: t('chain.contract', { strike: selection.strike.toLocaleString('en-IN'), side: t(`chain.${selection.side}`) }) })); setSelection(null) }} /> : undefined}
     toast={placed ? <Aerobar floating type="success" heading={placed} onDismiss={() => setPlaced(null)} /> : undefined}>
     <div className={styles.chain} data-chain role="list" aria-label={t('chain.title')}>
       {rows.map((row, i) => {
@@ -2723,6 +3158,37 @@ export function OptionChain({ initialSelection, initialIlliquid, onBack }: Props
       })}
     </div>
   </Screen>
+}
+
+/**
+ * An illiquid price cell: the whole cell is the tap target, but the tooltip points at the ⃠ icon so the icon reads as
+ * “illiquid”. The L3 Tooltip anchors on an invisible box laid over the icon (outside the cell's button, so the ⓘ button
+ * in the tooltip isn't nested in another button). Mobile: it opens only on a tap — never hover or focus — and closes on
+ * a second tap, tap-away, after 5 s, or when another contract is tapped (the screen's timer).
+ */
+function IlliquidCell({ open, onToggle, onMore, label, side, children }: { open: boolean; onToggle: (open: boolean) => void; onMore: () => void; label: string; side: Side; children: ReactNode }) {
+  const wrap = useRef<HTMLDivElement>(null)
+  const wasOpen = useRef(false)
+  const [target, setTarget] = useState<CSSProperties | null>(null)
+  // Measure the icon first, then mount the tooltip on the box over it — the L3 Tooltip places itself when it opens,
+  // so its anchor must already sit on the icon (it then flips above / below to fit and aims its arrow at the icon).
+  useLayoutEffect(() => {
+    const icon = wrap.current?.querySelector('[data-blocked]')
+    if (!open) { setTarget(null); return }
+    if (!icon || !wrap.current) return
+    const w = wrap.current.getBoundingClientRect(), r = icon.getBoundingClientRect()
+    setTarget({ left: r.left - w.left, top: r.top - w.top, width: r.width, height: r.height })
+  }, [open])
+  return <div ref={wrap} className={styles.illiquidCell}>
+    <button type="button" className={styles.cell} data-side={side} data-illiquid="" aria-label={label} aria-expanded={open}
+      onPointerDown={() => { wasOpen.current = open }} onClick={() => onToggle(!wasOpen.current)}>{children}</button>
+    {open && target && <span className={styles.tipTarget} style={target}>
+      <Tooltip placement="top" open onOpenChange={(next) => { if (!next) onToggle(false) }}
+        content={<span className={styles.tip}>{t('chain.illiquid')}<button type="button" className={styles.tipInfo} aria-label={t('chain.illiquidMore')} onClick={onMore}><Icon icon={msInfo} size={16} /></button></span>}>
+        <span className={styles.tipDot} />
+      </Tooltip>
+    </span>}
+  </div>
 }
 ```
 
