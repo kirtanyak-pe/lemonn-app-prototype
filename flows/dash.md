@@ -210,7 +210,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
-- 2026-10-29 — **V9 square cards, made state:** no green line; the title alone, on two lines in Heading/14 like “Create Ai / strategies” — “3 active” / “Rules”, “1 active” / “Indicators” (the count is the ones switched on). Ai strategies keep their name. No › on any card: the whole card is the tap target. Not-made “Create Ai …” cards otherwise unchanged and still first.
+- 2026-10-29 — **V9 square cards, made state:** no green line; the title alone, on two lines in Heading/14 like “Create Ai / strategies” — “3 active” / “Rules” (switched on), “2 saved” / “Indicators” (all saved). Ai strategies keep their name. No › on any card: the whole card is the tap target. Not-made “Create Ai …” cards otherwise unchanged and still first.
 - 2026-10-29 — **DASH V10 · First message: your creations.** V8 exactly, but instead of the suggestion pills one glass card over the field (`FirstCreations` in components/FirstAsk): a row per kind (L3 ListCell, no card look per row) — Rules · Strategies · Indicators — with the kind's tile, how many and how many active (“3 of 8 rules active”; all on: “8 rules active”; none: “None yet · …”), and a small, fully round Create button (surface/primary) on the right; the whole row taps too, and both put “Build an Ai … that ” in the field (on the home the pill follows). Once something is typed the card gives way to live suggestion pills (`LiveAsk`, V8's pill style): up to 4 request endings ranked by the typed words, which show in bold — a tap puts the whole request in the field (“Build an Ai rule that caps my daily loss at ₹5,000”); they change with every key (pool: copy `liveAsk.<kind>.1–6`; the kind comes from the opening words, the chat, or the best match on the home).
 - 2026-10-29 — V7 gets V8's first-message suggestions (`firstSuggestions`): while the first message is typed (home or an empty chat) the 4 suggestions stack over the dock and the DASH orb + title step away. V5 and V3 are off the DASH version dropdown (code kept).
 - 2026-10-29 — **DASH V9 · Greeting + square cards** (`screens/HomeV9.tsx`, one home for new and returning users): DASH orb and a time-of-day greeting (Good morning / afternoon / evening, {name}) + “How can I help you trade today?” at the top left; above a plain field, a sideways row of square white cards — Ai rules · Ai indicators · Ai strategies. Not made: “Create Ai rules ›” — tap puts “Build an Ai rule that ” in the field with the keyboard up. Made: a small green line (2 triggered today / 1 on a chart) over “Ai rules ›” — tap opens history on that tab. Send: the opening words (or chart words) pick the chat. Not-made cards come first, with an edge in DASH's light (teal → green → yellow); made ones move to the back. The glow rises behind the cards (`glowRise: 'cards'`). Field: V7's edge-to-edge dock with the Rule · Indicator · Strategy pills; a Create card also picks its pill. Cards are 80% glass (blur). Typing the first message (home or an empty chat): the header (orb + greeting) fades away and the white wash covers the top while DASH's glow climbs up from the bottom behind the field and the cards (`firstMessageWash: 'rise'`); no field edge or suggestions.
@@ -8105,7 +8105,8 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home9.start.rule": "Build an Ai rule that ",
   "home9.start.indicator": "Build an Ai indicator that ",
   "home9.start.strategy": "Build an Ai strategy that ",
-  "home9.made.count": "{count} active",
+  "home9.made.active": "{count} active",
+  "home9.made.saved": "{count} saved",
   "home9.made.rule": "Rules",
   "home9.made.indicator": "Indicators",
   "home9.placeholder": "Ask DASH anything",
@@ -9748,7 +9749,7 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
 .greeting {
   margin: 0;
   color: var(--l3-content-secondary);
-  font: var(--l3-text-heading-20);
+  font: var(--l3-text-heading-16);
 }
 
 .title {
@@ -9914,22 +9915,25 @@ const KINDS: { kind: CreationKind; icon: typeof msRule }[] = [
  * DASH V9 home (new and returning users alike; Synora-like): the DASH orb and the greeting at the top left, a row of
  * square white cards just above a plain chat field — one per kind (Ai rules · Ai indicators · Ai strategies).
  * - Not made yet: "Create Ai rules ›" — tap: the field opens with "Build an Ai rule that " typed, to carry on.
- * - Made: the title on two lines, the same style as "Create Ai / strategies": "3 active / Rules", "1 active /
- *   Indicators" (the ones switched on) — tap: history on that tab.
+ * - Made: the title on two lines, the same style as "Create Ai / strategies": "3 active / Rules", "2 saved /
+ *   Indicators" — tap: history on that tab.
  * Every card: the icon at the top left, no › (the whole card is the tap target).
  */
 export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   const kb = useHomeKeyboard({ typing, onTyping })
   const { made } = useDashUser(returning)
 
-  // Made rules / indicators: how many are on, then the kind on its own line. Strategies can't be made yet.
+  // Made, then the kind on its own line: rules → how many are on ("3 active"); indicators → how many are saved
+  // ("2 saved"). Strategies can't be made yet.
   const title = (kind: CreationKind) => {
     if (!made[kind]) return t(`home9.create.${kind}`)
     if (kind === 'strategy') return t('home9.name.strategy')
-    const active = (kind === 'rule' ? dashRules : savedIndicators).filter((x) => x.on).length
+    const count = kind === 'rule'
+      ? t('home9.made.active', { count: dashRules.filter((r) => r.on).length })
+      : t('home9.made.saved', { count: savedIndicators.length })
     return (
       <>
-        <span className={styles.line}>{t('home9.made.count', { count: active })}</span>
+        <span className={styles.line}>{count}</span>
         <span className={styles.line}>{t(`home9.made.${kind}`)}</span>
       </>
     )
