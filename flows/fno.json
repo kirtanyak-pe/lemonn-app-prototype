@@ -209,7 +209,8 @@
       "note": "A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later.",
       "goesTo": [
         "fno-18",
-        "fno-17"
+        "fno-17",
+        "fno-05"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613"
     },
@@ -219,7 +220,8 @@
       "figma": "6754:61613",
       "note": "Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from.",
       "goesTo": [
-        "fno-17"
+        "fno-17",
+        "fno-05"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613"
     },
@@ -300,14 +302,14 @@
     "src/flows/fno/option-chain/data.ts",
     "src/flows/fno/option-chain/screens/OptionChain.module.css",
     "src/flows/fno/option-chain/screens/OptionChain.tsx",
-    "src/flows/fno/option-chain/sheets/IlliquidSheet.module.css",
-    "src/flows/fno/option-chain/sheets/IlliquidSheet.tsx",
     "src/flows/fno/screens/Home.tsx",
     "src/flows/fno/screens/Scalper.module.css",
     "src/flows/fno/screens/Scalper.tsx",
     "src/flows/fno/sheets/ChartToolsSheet.module.css",
     "src/flows/fno/sheets/ChartToolsSheet.tsx",
     "src/flows/fno/sheets/HomeSheets.tsx",
+    "src/flows/fno/sheets/IlliquidSheet.module.css",
+    "src/flows/fno/sheets/IlliquidSheet.tsx",
     "src/flows/fno/sheets/IndicatorDetailsSheet.tsx",
     "src/flows/fno/strategies/components/Strategies.module.css",
     "src/flows/fno/strategies/components/StrategiesFeed.tsx",
