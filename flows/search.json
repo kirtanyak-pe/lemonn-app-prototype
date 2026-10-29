@@ -88,6 +88,17 @@
       "figmaUrl": "https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728"
     },
     {
+      "id": "search-28",
+      "name": "F&O · “Gold” results (illiquid)",
+      "figma": "",
+      "note": "Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”.",
+      "goesTo": [
+        "fno-01",
+        "search-26"
+      ],
+      "figmaUrl": ""
+    },
+    {
       "id": "search-26",
       "name": "F&O home · all Smart Options",
       "figma": "4912:13925",
@@ -308,6 +319,7 @@
   ],
   "files": [
     "src/flows/search/README.md",
+    "src/flows/search/assets/gold.png",
     "src/flows/search/components/GroupHeader.module.css",
     "src/flows/search/components/GroupHeader.tsx",
     "src/flows/search/components/ResultList.module.css",
@@ -332,6 +344,8 @@
     "src/shared/copy.ts",
     "src/shared/data/format.ts",
     "src/shared/prototype.ts",
+    "src/shared/ui/IlliquidSheet.module.css",
+    "src/shared/ui/IlliquidSheet.tsx",
     "src/shared/ui/Raised.module.css",
     "src/shared/ui/Screen.module.css",
     "src/shared/ui/Screen.tsx",

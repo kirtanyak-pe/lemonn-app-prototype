@@ -17,6 +17,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/search · machi
 | `search-04` | Stocks · no matching watchlist | [4912:13587](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13587) | `stocks-01`, `search-18` | Same results without the watchlist group. |
 | `search-05` | Stocks · nothing found | [4912:13703](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13703) | `stocks-01` | L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field. |
 | `search-25` | F&O · search from home | [4912:13728](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728) | `fno-01`, `search-26` | From F&O home; Back returns there. |
+| `search-28` | F&O · “Gold” results (illiquid) | — | `fno-01`, `search-26` | Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”. |
 | `search-26` | F&O home · all Smart Options | [4912:13925](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13925) | `fno-01` |  |
 | `search-27` | F&O home · all Smart Futures | [4912:14019](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-14019) | `fno-01` | Uses the existing combined Smart Options & Futures stock list. |
 | `search-06` | F&O · before typing | [4912:13728](https://www.figma.com/design/sG24GPizTdwbMBxLm0IpTA/?node-id=4912-13728) | `stocks-01`, `search-09` | Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows). |
@@ -174,6 +175,12 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 - **Search field keyboard:** the Actionbar search input can't be told not to open the phone's own keyboard (the
   prototype draws one), so on a phone both may show.
 
+### ILLIQUID contracts (2026-10-29)
+
+- **search-28** — typing “Gold” on the F&O tab (live app reference): MCX gold options, each with the gold artwork (32, kept at its size in the small row via `data-avatar`). Commodity results that are illiquid (`SearchResult.illiquid`; GOLD 135000 Put, GOLD 150000 Call) carry the **ILLIQUID** tag after the name (L3 Tag error · secondary · sm, block icon) — ListCell `labelSuffix`.
+- Tapping the tag (its own tap target inside the row) opens **“What does illiquidity mean?”** — the shared `src/shared/ui/IlliquidSheet` with this flow's words (`illiquid.*` in copy.json): small header, three icon points, Got it. Same sheet as the F&O flow.
+- Product rule: illiquid applies to commodity contracts only; equity / index contracts never carry the tag.
+
 ### Changelog
 
 - 2026-10-21 — layout moved from CSS-module classes to the L3 layout blocks (Section, Stack, Inset, Grid); nothing moved (measured at 392).
@@ -187,6 +194,53 @@ any screen ─back─▶ where Search was opened from (stocks-01 / market-01)
 
 
 ## Source — this flow
+
+### `src/flows/search/assets/gold.png`
+
+```tsx
+�PNG
+
+   IHDR   `   `   �w8  ciCCPkCGColorSpaceDisplayP3  (�}��K�PƿV��u2�C��
+�8�DqU�ꔾ����G�"7�����
+�n�::8�������y/��"z��~|��8 9npn��;�[\�+��-%��� �񜮯J��?��>��N�Y�������1����]H�����%����qK���r��g�X �&VXͨ�������`�r���l��9�X�<p�0Є�?�����]r7�R��|�ɑ"'���p�0�XC�R�w��w�O���'`�#�����p6G'k���<02\�����G��V��S`���P϶W�j���<0�(��$�:�-!>���S�p�|�b��[   cICP n��   8eXIfMM *    �i            �       `�       `    ��}t  YiTXtXML:com.adobe.xmp     <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description rdf:about=""
+            xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+         <xmp:CreatorTool>Figma</xmp:CreatorTool>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta>
+�\�  .ZIDATx���W���u�A��eٖ,K�	d��6ql������k����̞e���{v��x&l�#㄃�le�rK��V�V�^��W��q�e�Asu��{oݺu���n����������Q+_���S7?�䌟���SۂW��D�M�hMd�_�jK�_Y���k�ϯ���*)�+��?2R��m�OV>������ٞ�ڟ���_����=;��-*���&5���Q���|���"�[p���[h���}��4�ػs�}��=�� =QAϵ�Dv@��?m8cqޗ��+[��6l����e|�@�N�,/J��"�)�g۴��l��t�����};��ܣ���`�O��	�{n�K��nwϛg7���m�FF�|���NH�*�#(�룬��f�|��O�m�c������E��5���[#�1]'�P��u6w�i��N�;j�����lxX�� �O����3&� ��<)𪮸$���lu��`������g�n���ٟu?r��v�D��	ါϴ�kϷ�.�gwΛmo��3��΀�y�@��6ў	�L>����A��-O�u3l��δTI�uwtno۳��[�5<p��홖oݧ���uo��?��N���fڥ,%=����XE�sa(i�.'d YW ?��3Bu��b��V���2�:w�U�<�F�m�v�b��߾�+�+%��l�2뭡��[|�T�R]�}���
+�:3KK~,72�#�#̈́�K6О���u�Hk��*Ծ2u�\�����z�P{���[�7?��<��ہ����7�w}�j��gf��gk�l&?4���X�"�Y���X�Iӊ�(�Q��j���!�a��<G��)�l�Iˬ�z�u�6ٻ�g{6m���/�ڐ#S��A����I�q�4�����a�j 0<��X�  #�c	��_�Dvl��w�����1�x�v�;�`y׬(�4dy�����Gz�7=�R��|�w��W�v�7�d�O�p��>�ƾTSm*)�B6YN7 ��x�*Ϛ�;�B��Y@��q � :B9�)�M[ؾ�$:Bw�U����ج�n���?ˆ�k��u������R�D�����E���7��I�R[a��*��WUڌ�-7C��G�,���9嘨c���->ewb�(����ܬ#`B��3��"�C�fFIy���Yh���5[��;�v�l�u?����D4������2��3�Q����
+;gT�>@��'x��	��\@���
+,N��Y��"��}�'!�R3���!�ԓ�b��u.ʜ��mʜ�V5���j�Ӵ���5������?��:��5]����O��i5vWy�}���
+��M>��`� �Fʱ#"�)i�� H@�>c���z�NR.w��B����#��Q6A����SefgŴV3�l�/�������}�����5�E�WKa��m�{���6���>WQi���Yj�"O�� �OY2>@B9�����I2��[r(�F?��^��d>2:�����@���T�1\��L-������Xa�B��>Ա��W:=}k�]�=�1SN7���w���
+n9�n�/�/��R�="�h�.£\=��R)� ��q	 wN�gа���� S�:b���K�� �z�����낯v��G=�*�Y�f�Vq��ֶeu��G��?y�^s��19iX����);��ܾZ�g7��z����2h�TUf�I��Tu!�*'�5�Œ3@�Q��@�;@	�:%:C�K�	�ȃ��1����b��/	�]w"��)R72<fM����jg�.k������>�M��n���^���j�ϵ;ug�=k��F
+�x<�q��䠌ђ�5_e�s�hyZz��|6$y���^�1� = �2u�� ��?���Dw�yQY=�*]	�iv��1�b��g�ڸ�֭�^ܤǐ���Jk�Mw�̞����^��n�w�;�������2��|��n ���*��8_2��N!�%��j�}Ʌ.�8��4Q�}��aOR���y_N�׿�C|-�^'f�Cu8�C=z���oX'���f�[��kY���$�7d=��\��b�h?�1���S��s/?���SS����p_�!��b2�1�/�q3�Q�x24��H.�����A��-ҁ(�<)�~U0'!7M��-�x�GT��~_7�Q‐��=�֦����-C�>E�n,�՚]yY�-<��~���ʍ����: L����런��Uw���\EQ�+�jy#>N��0}��  �0��g��L_'�i !�$�80�%yt�lB,��]?:Ћb�t^�S����2>��Sg�56
+��f��`Zr��-\d��u�Uή�uM�u�h����=�ƴ;�2�\�p���U����|�����l�՞t�͜6j�y��s��K� L�0��0��<��
+rPUp��4fO�q�DrL"��8u!��*}�^䘉^vA�� ^�������6m4ۺ��^����Į���6u��6޳������>��CM��Ƿ��W�cr�;O��F����]���笲��Ԝk����=�<�>e��X�Xv`��D;�y���^�&e?v�G;@|s���D2�gy|H&�����!�q�OFBў"6�N�xؾWѾFKN�~-9r���f׿w��w�VXQb�-����o�Cz�]Pd}����G7L�nR���3��Wd벚�<;�w�voj���g�����.��Yٌy�V[�m�^EI�AgΔ�A%�~� �����#�%KIs)��}� �	E{"di{�`&d�!K�У<�d6k�]�AN8�@Q�Ņ��[�����-o챎m�Y�����l��#����m����[��Z���H�����r�ɖ���˯�c��'ٖU;m��l��_�Ⳟ�yg]l����o?Ϧ��[�ص�Z���#�GmT����`�ِ�x>`��#�`�h����ϑE��}.��N�B7���S�|�@
+[2���]:�p�٩��u��+�5��v��^�\=���_eM���d91X^�@:(�&��ی��\M�U4l����![t�B[���{�l��۷s������˛��J�\h3O��i��V�?`c�Ze���#Yxx �7s ���q�a��������'�rp���'Ō$��	�Y�%--f/���/���Sv�-�l������z��k7ZCÈ���ņ�����>̀_�5͛W�I���V72n�Ѵ*m��=�{m���*ͳ�-�9����׶o�#��V>�U��:WYqݙz�[k5��f�Ng��Ȇ�� H*� x����"�m��U��l��BΏ����Iwȡ��r��|����i�Y��?��vN��{n���o|���Xd��u�Jk�?�#��i/�sA���?���<��8���6�����zV�� ҫ�����z�ﳩS����셳����vo���V��f����+�=�j�J���ˆ��lH�ǈ]�(7�D$�̄��-49�dT��4���,�%9<'�1�J�R֦�z��~Q/�.</e��z�͹�:�ɳ�����ͻl��ak�{l��NE��%���5C�5���z�-�+Ӥ3��.���A�]S�$�o,}:	t��69b�[p�e6mv��{ض�;`]��[�5ZI�K՞oe3�T9��d��{-��́D�lt`�q�r"��ƁV2D/�0:|�P=*z;����(�!�-��z�p@N ꯾��.��22t�쬷�]O؎u���qܺ�䠃w#
+$�g�!�Kd8A�Xψ}�h��x��6M��RX�� G��s�gm���ΖC6ܺ[�hgقη�)����m~q���U��L8��]e�s��Q�VY.K��l|T����;���YH�L���^ǌ�W��Б��}Be���M��ɥ���6�^T��l����<�������JmJmxߣv`s�կ��Z�y�Ag,�\��;n�~)�P23 _���]w3��Xmg��.�Jy�Q�k��$��Ay�p눵�6t�Q�4�c�^|����hl�]Z/��ڨ�Zuq��My���:ͦ�.���.Ռ �����J���(�����.,����!�y��#�-V8���YcS�^X=n-�im���(�������i���֥�o�Ю�V����RI��Y��D{v��V�J���u�}�n<�=��w��RND��m���u��1J��H;��gc]m�i:1]p�U������v`G��[����V˫^��<+�>ݦL�W8���?���Q�2`�}�*!��J�/��0T
+%|��_YS�%"�6m��ZNz��ͮ�i�-��
+�/�����ֺ}�5l���bcf�b͇ԝ��ر�)�C��U���������[���wwh�0���Ė�1�� iDF�uY{�Ku��ŋl���弔��~�Z�l��)9�GN8��kϳ���6´
+���[ޘ��0}�C_�������K��(P"@h_R�o��2RG[�֯����R�+�Qb��x�U�r��{Y���M��f�Tiy`.��@˦8j��G ��P����`�}l�q,A|�f@�}J�JY��:t@�3`@�T�s�R ����~�mi���>�;�T��L�6>4�{s[j���<oee�W{�q�q�UVXj��Ɔ�}s���:�@��[(���90J��N-�TQ��[�m��a;�'�O�F��v��-�r�����r˳�c˰�Z��i0@]�p c�}��.ߌY�-��v�p\���V����+�38]1��ր/0E����Ŭ��k*Z��>���d��N�}�9��Ku�鷦�����z+�h��r���,���Ӭ�jH����/M�^]}�җ��a���L�+us���@�V=�mk��<�/�(ߖ��v�^r�Nd������.ܸ{�:��@�A�Ǻ� ]/����~� �^��h��3��<Q?��J{T�W�I�WʠR��)#ayT�'Pvc�Y7�.�ɂ}��虝�h��{��K}�^d'�7b{׭���v��-�������uq��V,����ڌ���޸�:w�w����E��2;�������Ҫ�ֲ눭]�k:�ټY�^r���P˳vd�;�o�:�M8_�Y� }(e\��X�B��d��4!�v)9�P�����Z��Bx���<��G�:"���#*���:�I7N|�s�HV���;�y�:㬷�f.����#�c�AkkXce�M�>����J+�z�UΨ�ѵO�C��ɛ 3�>���M�=E V��u�l��?^^tn�]s�96���dL��l���^��v�J��? ���-e �z�����<���+�x}`�A�E;-�Cze�'�N�W:�:��K����>%��F�� �a�;@� �%)�k '2[0��<�s�`j��+���u晩�'�Y_{�5m8d��h��Y�{g��r��.��ZECq��{���ᆪV߁��Qg����Um��aLw�f�\[gg^�^+�}���b������G��E6�\���eG@�'���!�ӏx LE ��7_���u�fှ������4�K�&S���z�u	ؤ_��'�X~h���4�1�r����_L���d3�,�3nx��<d{W��͏���F�s�YV>o����XY��g�֒��F�;4�SVT:E@ۦmÆ!��ca�T-�n�U�~��9��!;�Po͍f��zn��[�1kÒ�+�W6S��.ڱ3#|	]���q��ĝ�&�
+�D����un��U���Cx� Q�%� 1��ž��j�
+���A��lƂ=6���l���	j�5���^x�y�6k����s�\�ñ9��#V<�]�����m��!���אּe�_��?[�]�4��Z��׉ڟ�H��/��{4'vb?v{`)e|0d�\�u�GeFU���x �>:T����n����>0@�#��6/h\��,Ao�p���7�_�ط���ZWX� �������[m�=�]�Q�x�杶�\�^+�s�:��ԽFϤ�ٺ���nZ�.�e�՞~��Ȟ'���M�Ԙ��Ti��HP���v�؍�����T��DvR�u�ڑ�Y����4���g��fB�t�=��}#���b�b,@sÄ�ܙ� �\^�(c<z�-z�ƁP
+�C�-�lh��-[ݼ:���";ﶳ�{�=��jMO~O�a�����ִf�m����"{��o�3�l�{�l}��7���O�b9�u] �|���;ӵ��m�Gf:��f.ʪ`L��Ty��<�t�*P�j���&u�o�脙 �n�@r U�e'"����B�3�ў:��z_ { ���Y���d2��uz�f�El��WY���l��k|�!۸~�mn�E�g����97Xz�
+���S۷kПnv�q��ʬ��ɛ+@�YǸT��ǩ���I�'����AK� "�{��SCz21���;Z�N�Y'>�0�t�1B��`��4�W?�� %ﺐ�<��a4�uJɣ����q`g����6�w��̹�N���=Td��KNz�+�jw]gk�����E�H��G��s�)�*a\؈��1>r"l@;X��6�Sf<��d�^�ҙ��Ҥ3��VHI�\?��7QK� �Ð!e�`k���e�~DU�(w��}CV}a�;�6bqG=~d̆�=b3��N?�̗}G�T/T�ZV)�m;���~=��׬��Щ4Nd4v�lȈ{���ڏ��{d�����3�|�B�,ˏN#���\	 I����%FtN�aPD�b8��K&����ĝF!�<� ׫���8�n~�҇��s.�g��wْ����u��m�^%�d���3��;tTv	T��{�����i��w��'��|��'���9�~及�d�-=Ñ�~�IT��H9:'��G��Y׽Y��0w��ʚ
+�	Z�<�hH\�AR>�<:h��%O���q�^VHNǙ�~���s��u ��g���r�v1���)��� �GJ}�x�#ߍ��G}Y�ջ�<����ߧI0� ]���P��=c@��"*T�˔��HRnV ��Rճ��i7��L��,w������z_��{�;>>�[ ��Q����ހ���G�v �=���,}8����Ot�$�{?j�"}�Nx�(�������]�OD�:�?3��%�#=Jq@�y��ME# :�B�h���l��s��e!х�e`��2�v��)k�xZ/q�<�cs�e
+��S�>_��qVR9�)�+=��I(fr؂M���(�Yx��n��4e_�&u�XJ�LˎdD�tD�2C!ep�!�I�f~�:�0r}�3�Ȼ�dGGBl�>`1L�7̀q! �D[���%���qRe����L|5��������z�S�
+�Qv���ّV_'�I0< �����; J#���<�� � �����Ȼi�a� |�H��E����1�$D���X`�M�7R� l�:gHr ���ם 6��A�����̒ e��Rv���}E*)�>=:v�H���p �$N`��0����KU�- p�4m�M>2|�B�qm�L.���q>� �.�,���F�*�1�!_~���U�mrd�:$G^�\����(4�������4�h�Ay�+��� ���d;h���$� ���|��N䜒Ax�nL�&ᓠ�"u�s�ľ�G�/���u�g�B}R����s~�QF�Kc��<���q6���&u�~Z�'�2?C���nl�)5��]�<�SE��Yƃ���` ��q�	h�	�#r��6��e��
+=��L�'d�u�r��mK�e(��)�.�SN"�ӝ����9]�/w���ؤ��)OF�y�摪4�S�P��x����p�q�����v*#�h���M?{7Lu���]$�A �}����a�f��}ҍ݀����BY�)�9��N��'�̰Y�" X�r�����f���(4�z�I(��O=�	�x>���+Ũ č�u�61�.H��<%������=��
+�hڏi�u�|P�"WD�.>���1�R��?չ�3]�3C�+i�~�(�:)�\��&�I�w�B/�
+����+&���D&������AR� 2b C=�^�Dꐡ^Y'xN�	S��g�J�|�ê�$E7`�,��&���<3�I~�L#���:�#G?�i���#�;�7b5R�1hT�,�^0")b��=�V,��)8&��''~� ��U��9_o����D��X6X� 
+�7�Ͷ�)��6��|!�6%)P��j�R���s�r�tЖ�H7}�F4|�޹R�F���ߤVفN��D�6>8�Ĥ=K�� ���6f���<.E耫��XٍWe8-t�l�$e���}��Y������>�۩�Ε\8�t�����j�k���|J��jӜ���:�L�#��/�,�#|v��m 9��pܜ�5�\ȹ#�� @� *���.� D)�py.WC]"�(e�iw̔]P	���Z-���&u -R2���Pt��I�߀	���8r0��/PQ���.�|�N�	y<��c�����$~�ţ��=��<t��T F�6�feT��Q|�-�P��\!��fB:&hZ�b���3x��#R���%��[�h��L���C�a���G<1�AUJ�o�TǠ=�5�#3*��l i@SB�8�" �Ԟ: $��')y.�q�D�<�QG�؃2D�mZ�,��&u��o`��Q���j��:�p HA�W[�7L<f��%���~��Ֆ~�q���h�dO���d�F�1��ER�S�0:\���r�QށV�IWY��l��I�hCcuyD��A�&�I�?C�q�910�`:���a6�S��iHel��Hۤ�����sՖ'��TP���n�SGY��߹�;qEI�؆Nʾ<�U�Tc[6�U�	�!�	�(�l���'3�yt��)7�M1����&u��a���֙P �w'H?��r1��X<�T�Ȋ�� ��>+Tt�>h˦�N[e�   �2�Io��/��!瀠Oe�!xX�EY����D.���"�կ�ԇ>��)~��SG �0�J�ܣ��t ��1���գFF��Qe��4F�Pv�����:N�x)���S��J]��� |����1<o/!�g#�+ԇ�ΧO.�Od�!T��/�	]2�:��ݑOR%�B�;u�AF�ğ�:��R�����D���'���I|u`!����(�G��XJ��ʫ>�P��L�Ѵ����$�M�%�~��#����E��r*f�������a�/�G����m�)�T�/��:�� k�S^�=��R�X��tFbHR'`gЬ��H �D����� ���`%�Lf	�W����T�<�c�\�MV'���C=W�9��Sv�e�����L<�1�W�/�f��(d�����~S�Wm��ͷ0�θ�y�,r�r�;"dD`�2�uG�A �^���:w@�31�!�!꣍7���$��8q�(a����QP��!2����Ix�!�S�%G��#O�oz�1|��s�J���`����v��c锁�D^L��B���f��-D;(fE�s���'�p'P��$E���-�/��ڤ��Gm�I{��+fBn��ٙ�P�D��Ccv�ov؃��1~����Z���]s��>�Ǥ|q��J�wP�}���yʺL�|�	hq��"e�>�w�%��)M��3�� �� JbN��vI�(�m�';U���#��U��oUu�Q�ﭰ�lx�?���@翪�ճ
+쏴�ޡ�4lf6` ���ԀH��2@��hp�L	 G9dHy� u�Nry꤇ �܈�$O{N)�O��"�w{�� �}���R�t�'�=�@�`\���M����N�G��S�CR{��������~�޾�{�+�/�ӾV�i��?� b9�G @	�rR�`�#���A>X��v�ِ&�Y��З��mNuH�^�.�8/q4ˍO%��+���?6��9?�=���!�v�.{"1�5%���N?z���S�]`���ٗ�{�z����4Tv渖� �9>�@�r�	aXB;���Ʃ��! �I��y���ʶ~�1���Km�ч�%���G��3�<}�B3g�u�3;���F}���ڵ��E{�z�n�/F}|�^�ڨ?��ץx{� TlʤD3�10��,8�Hw���2��E|����6�Y�#@'�?�@���V;_r��:�����D��;_m����̮}j�}�%i:x���8��Y�~�����+w�i:������ �h�ʹ`�s ^�2� >p�!Q�Q��R��.3���^��8�p'��9�*SG��~�c�3Ovs����<���m��y�踖�W2���_����η�����ܦ_�-��zia�|�n����8 �˼	�8����E=:2��T��CF�@���C� �.�� �F�(cy**�I�r��-�"ڼ���6^nԃ���{��Gt�pk�[۲_��狾�bЀ� ��=�|լ:/ї���� ��Ǭ��|�.R�A�w��6�i7���j��l���o����9 ��}+��]�vU[����k��d�8B#�h&�%�ye2w��P�(���I��\0��Q�y҃|��4i�u���w,=�f�W6��m�l���[��cy�C��Jo�0�G���{����_�R7p�U���W�)�[]  "� ?����s ����Prk9 +ɂ�p��E
+��h���خ_����*x?����]e{Xe_���PW44g�%�d"��`� &�m�SY._8Ͻ�>�q�8*f���(Hړ��gA2c4C�Cv�_���_���~S�Mu@����۪�S�&��'��Z��jY���FH� "�Sf N�L��S�Kf9�ޝ$ �[w���K
+�".�p���c�UMw���+�U�5�G����^h���-�~�l����w��ݖ�т��Q8�#���;f��C`�>>sN���`�ؓO����Ԣ��+�zL!'�( v�M���,���}��5�"��lzKf@� �e����U���;�A�hK���W/} J� ��'�3Q���z�ssځ�{DD�t����H]���Ń���h-��-�x�c��*۸d�}p`�n�s�V�?�[�<��w��
+X_����
+<��S�o�R�;�*�<����Z�{�Ck�k��!Z�}��	� r����K��*U���h��n�?qU=���RE:���a�B?���&��/��f�Qf����)Yھ�W�7�t�='ѷ�^�;��cD�>ez�a��K�a���;�9ӭdV��g6i�٬�c�7%E�4	t ��fc���qkַ����idjO�Ϸl>��k�>�q��l�t{N?�4K/�N�2��_��(3�9}�Z�Gl���#�J=�=�s3�o��R�"�o~h�=y,���2'��-��i��aO�ڻl�~/b�/9Z@��l��qkԣ����}��Bq�F����U؟?�r�o(Dof�L�7����냗�l=}�K-E�W�Z?��� ���Њ�Z�v����������m�o��G/��uC�Y����<C� ���˱��p*G|�����xvN���u@��3l�P��dS�����婆��?^������? �z"���5�=e$|    IEND�B`�
+```
 
 ### `src/flows/search/components/GroupHeader.module.css`
 
@@ -289,6 +343,13 @@ export function ViewAll({ onClick, label }: { onClick?: () => void; label: strin
   color: var(--l3-content-primary);
   white-space: nowrap;
 }
+
+/* Commodity contracts: the commodity's artwork (32). */
+.art { display: grid; place-items: center; flex: none; width: var(--l3-size-32); height: var(--l3-size-32); }
+.art img { display: block; width: var(--l3-size-32); height: var(--l3-size-32); object-fit: contain; }
+/* ILLIQUID tag: its own tap target inside the row's button (explains illiquidity). */
+.tagTap { position: relative; display: inline-flex; cursor: pointer; }
+.tagTap::before { content: ''; position: absolute; inset: calc(-1 * var(--l3-spacing-12)) calc(-1 * var(--l3-spacing-04)); }
 ```
 
 ### `src/flows/search/components/ResultList.tsx`
@@ -300,6 +361,8 @@ import { Icon } from '@l3/components/Icon'
 import { ListCell } from '@l3/components/ListCell'
 import { PriceChange } from '@l3/components/PriceChange'
 import { Stack } from '@l3/components/Stack'
+import { Tag } from '@l3/components/Tag'
+import { msBlock } from '@l3/icons/material'
 import { lmWatchlistAdd, lmWatchlistAdded } from '@l3/icons/lemonnade'
 import { inr } from '../../../shared/data/format'
 import type { SearchResult } from '../data'
@@ -318,6 +381,8 @@ type ResultListProps = {
   saved?: string[]
   onOpen?: (item: SearchResult) => void
   onBookmark?: (item: SearchResult) => void
+  /** The ILLIQUID tag on a row: explains illiquidity. */
+  onIlliquid?: (item: SearchResult) => void
 }
 
 /**
@@ -327,7 +392,7 @@ type ResultListProps = {
  * bookmark (an L3 Ghost icon button with the L3 custom icons watchlist_add — outline + — and watchlist_added — filled,
  * ✓ cut out — once the item is in a watchlist).
  */
-export function ResultList({ items, label, showVolume, bookmarks = true, saved, onOpen, onBookmark }: ResultListProps) {
+export function ResultList({ items, label, showVolume, bookmarks = true, saved, onOpen, onBookmark, onIlliquid }: ResultListProps) {
   return (
     <Stack as="ul" aria-label={label}>
       {items.map((item) => {
@@ -339,8 +404,10 @@ export function ResultList({ items, label, showVolume, bookmarks = true, saved, 
               size="sm"
               density="breathable"
               as="button"
-              iconLeft={item.initials ? <Avatar initials={item.initials} src={item.logoUrl} size={32} /> : undefined}
+              iconLeft={item.image ? <span data-avatar="" className={styles.art}><img src={item.image} alt="" /></span> : item.initials ? <Avatar initials={item.initials} src={item.logoUrl} size={32} /> : undefined}
               label={item.name}
+              // ILLIQUID tag after the name; it sits inside the row's button, so it's a tappable span that stops the row's tap.
+              labelSuffix={item.illiquid ? <span className={styles.tagTap} onClick={(e) => { e.stopPropagation(); onIlliquid?.(item) }}><Tag color="error" variant="secondary" size="sm" iconLeft={<Icon icon={msBlock} size={12} />}>{t('result.illiquid')}</Tag></span> : undefined}
               description={item.detail}
               trailing={<Trailing item={item} showVolume={showVolume} />}
               onClick={() => onOpen?.(item)}
@@ -628,7 +695,15 @@ export function WatchlistMatches({ watchlists, onOpen }: { watchlists: Watchlist
   "createSheet.placeholder": "e.g. Banking",
   "createSheet.create": "Create",
   "toast.added": "Stock added to watchlist successfully",
-  "toast.ok": "OK"
+  "toast.ok": "OK",
+  "result.illiquid": "ILLIQUID",
+  "result.illiquidOpen": "What does illiquidity mean?",
+  "illiquid.title": "What does illiquidity mean?",
+  "illiquid.forContract": "{contract} is ILLIQUID right now",
+  "illiquid.point1": "Very few people are buying or selling it",
+  "illiquid.point2": "Buy and sell prices are far apart, which increases chances of slippage",
+  "illiquid.point3": "To protect you, Lemonn doesn’t allow orders in it",
+  "illiquid.ok": "Got it"
 }
 ```
 
@@ -648,6 +723,8 @@ export const t = makeCopy('search', copy)
 // Sample data for Search — the shapes are the API contract; the values are examples (from the Figma frames).
 
 /** The four search tabs, in order. */
+import goldArt from './assets/gold.png'
+
 export type SearchTab = 'stocks' | 'fno' | 'mf' | 'ipo'
 
 /** A recent or popular search, shown as a chip (max 200 wide; at most 5 recent ones are kept). */
@@ -675,6 +752,13 @@ export type SearchResult = {
   volume?: number
   /** Already in one of the user's watchlists (filled bookmark). */
   saved?: boolean
+  /** Commodity contracts: the commodity's artwork instead of a logo. */
+  image?: string
+  /**
+   * Too few trades — orders are blocked (commodities only, product rule). The row carries the ILLIQUID tag; tapping
+   * the tag explains illiquidity.
+   */
+  illiquid?: boolean
 }
 
 /** What one tab shows for a query. */
@@ -860,6 +944,27 @@ export const energy: SearchResults = {
   },
 }
 
+/** "Gold": MCX gold options (live app reference, 2026-10-29). Two far-from-the-money strikes are illiquid. */
+const goldContracts: SearchResult[] = [
+  { id: 'gold-140000-pe', name: 'GOLD 140000', detail: 'MCX • Put • 30OCT2026', image: goldArt, price: 142.5, changePct: -43.68 },
+  { id: 'gold-145000-ce', name: 'GOLD 145000', detail: 'MCX • Call • 30OCT2026', image: goldArt, price: 291.5, changePct: -53.77 },
+  { id: 'gold-146000-ce', name: 'GOLD 146000', detail: 'MCX • Call • 30OCT2026', image: goldArt, price: 130.5, changePct: -62.34 },
+  { id: 'gold-142000-pe', name: 'GOLD 142000', detail: 'MCX • Put • 30OCT2026', image: goldArt, price: 455, changePct: -23.59 },
+  { id: 'gold-144000-ce', name: 'GOLD 144000', detail: 'MCX • Call • 30OCT2026', image: goldArt, price: 612, changePct: -42.64 },
+  { id: 'gold-135000-pe', name: 'GOLD 135000', detail: 'MCX • Put • 30OCT2026', image: goldArt, price: 16.5, changePct: -40, illiquid: true },
+  { id: 'gold-147000-ce', name: 'GOLD 147000', detail: 'MCX • Call • 30OCT2026', image: goldArt, price: 63, changePct: -67.1 },
+  { id: 'gold-150000-ce', name: 'GOLD 150000', detail: 'MCX • Call • 30OCT2026', image: goldArt, price: 11, changePct: -71.43, illiquid: true },
+  { id: 'gold-141000-pe', name: 'GOLD 141000', detail: 'MCX • Put • 30OCT2026', image: goldArt, price: 256, changePct: -34.19 },
+  { id: 'gold-143000-pe', name: 'GOLD 143000', detail: 'MCX • Put • 30OCT2026', image: goldArt, price: 765.5, changePct: -16.38 },
+]
+
+/** "Gold": only F&O contracts in this sample. */
+export const gold: SearchResults = {
+  query: 'Gold',
+  counts: { stocks: 0, fno: goldContracts.length, mf: 0, ipo: 0 },
+  tabs: { fno: { watchlists: [], listTitle: 'Contracts', items: goldContracts } },
+}
+
 /** A query nothing matches ("Vanf", "Adsf"): the empty state on every tab. */
 export const nothing = (query: string): SearchResults => ({ query, counts: { stocks: 0, fno: 0, mf: 0, ipo: 0 }, tabs: {} })
 
@@ -870,7 +975,7 @@ export const nothing = (query: string): SearchResults => ({ query, counts: { sto
 export function search(query: string): SearchResults | undefined {
   const q = query.trim().toLowerCase()
   if (!q) return undefined
-  const sample = [bank, penny, energy].find((s) => s.query.toLowerCase().startsWith(q))
+  const sample = [bank, penny, energy, gold].find((s) => s.query.toLowerCase().startsWith(q))
   return sample ? { ...sample, query } : nothing(query)
 }
 
@@ -966,6 +1071,7 @@ export const search: Flow = {
     { id: 'search-05', section: 'stocks', name: 'Stocks · nothing found', figma: '4912:13703', note: 'L3 empty state with the L3 default illustration (Figma still has the old magnifier). Clear Search empties the field.', render: (go) => <Search results={nothing('Vanf')} onBack={() => go('stocks-01')} /> },
     // ---- F&O
     { id: 'search-25', section: 'fno', name: 'F&O · search from home', figma: '4912:13728', note: 'From F&O home; Back returns there.', render: (go) => <Search tab="fno" onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
+    { id: 'search-28', section: 'fno', name: 'F&O · “Gold” results (illiquid)', figma: '', note: 'Typing “Gold” on the F&O tab (live app reference, 2026-10-29): MCX gold options with the gold artwork. Illiquid contracts (GOLD 135000 Put, GOLD 150000 Call) carry the ILLIQUID tag after the name; tapping the tag opens “What does illiquidity mean?”.', render: (go) => <Search tab="fno" query="Gold" keyboard={false} onBack={() => go('fno-01')} onSignals={() => go('search-26')} /> },
     { id: 'search-26', section: 'fno', name: 'F&O home · all Smart Options', figma: '4912:13925', render: (go) => <Signals scope="indices" onBack={() => go('fno-01')} /> },
     { id: 'search-27', section: 'fno', name: 'F&O home · all Smart Futures', figma: '4912:14019', note: 'Uses the existing combined Smart Options & Futures stock list.', render: (go) => <Signals scope="stocks" onBack={() => go('fno-01')} /> },
     { id: 'search-06', section: 'fno', name: 'F&O · before typing', figma: '4912:13728', note: 'Recent and popular contracts, then the Smart Options & Futures lists as tiles (a long name wraps; its row grows).', render: (go) => <Search tab="fno" onBack={() => go('stocks-01')} onSignals={() => go('search-09')} /> },
@@ -1028,6 +1134,7 @@ import { Tabs } from '@l3/components/Tabs'
 import { msClose, msDeleteForever } from '@l3/icons/material'
 import { usePreview } from '../../../shared/prototype'
 import { Screen } from '../../../shared/ui/Screen'
+import { IlliquidSheet } from '../../../shared/ui/IlliquidSheet'
 import { TextKeyboard, typeText } from '../../../shared/ui/TextKeyboard'
 import { GroupHeader, ViewAll } from '../components/GroupHeader'
 import { ResultList } from '../components/ResultList'
@@ -1079,6 +1186,9 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
 
   const tabItems = TABS.map((id) => ({ value: id, label: shown ? t('tab.withCount', { tab: t(`tab.${id}`), count: shown.counts[id] }) : t(`tab.${id}`) }))
   const clear = () => setQuery('')
+  // An ILLIQUID tag on a result explains illiquidity (the shared sheet, this flow's words).
+  const [illiquid, setIlliquid] = useState<SearchResult | null>(null)
+  const illiquidSheet = illiquid ? <IlliquidSheet onClose={() => setIlliquid(null)} copy={{ title: t('illiquid.title'), description: t('illiquid.forContract', { contract: illiquid.name }), points: [t('illiquid.point1'), t('illiquid.point2'), t('illiquid.point3')], ok: t('illiquid.ok') }} /> : undefined
 
   return (
     <Screen
@@ -1092,12 +1202,12 @@ export function Search({ tab: initialTab = 'stocks', query: initialQuery, result
       }
       bottom={keyboard ? <TextKeyboard onKey={(k) => setQuery((q) => typeText(q, k))} /> : undefined}
       toast={toast}
-      sheet={sheet}
+      sheet={sheet ?? illiquidSheet}
     >
       {!shown ? (
         <BeforeTyping tab={tab} onSignals={onSignals} />
       ) : shown.tabs[tab] ? (
-        <Results tab={tab} results={shown} saved={saved} onBookmark={onBookmark} />
+        <Results tab={tab} results={shown} saved={saved} onBookmark={onBookmark} onIlliquid={setIlliquid} />
       ) : (
         <Stack direction="horizontal" className={styles.fill}>
           <EmptyState
@@ -1141,7 +1251,7 @@ function BeforeTyping({ tab, onSignals }: { tab: SearchTab; onSignals?: (categor
 }
 
 /** Something typed and this tab has matches (watchlists, items, or both). */
-function Results({ tab, results, saved, onBookmark }: { tab: SearchTab; results: SearchResults; saved?: string[]; onBookmark?: (item: SearchResult) => void }) {
+function Results({ tab, results, saved, onBookmark, onIlliquid }: { tab: SearchTab; results: SearchResults; saved?: string[]; onBookmark?: (item: SearchResult) => void; onIlliquid?: (item: SearchResult) => void }) {
   const { watchlists, listTitle, items } = results.tabs[tab]!
   return (
     <Section paddingBlock="16" gap="24">
@@ -1151,7 +1261,7 @@ function Results({ tab, results, saved, onBookmark }: { tab: SearchTab; results:
           title={t('results.title', { list: listTitle, count: items.length })}
           action={tab === 'mf' && items.length > 0 ? <Select size="sm" icon="swap" aria-label={t('results.returnsPeriod')} onClick={() => {}}>{t('results.returns3y')}</Select> : undefined}
         />
-        <ResultList items={items} label={listTitle} saved={saved} onBookmark={onBookmark} />
+        <ResultList items={items} label={listTitle} saved={saved} onBookmark={onBookmark} onIlliquid={onIlliquid} />
       </Stack>
     </Section>
   )
@@ -1541,6 +1651,63 @@ export function useFlowOptionsChanged(flow: { id: string; options?: { id: string
  */
 export function useSystemKeyboard() {
   return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+}
+```
+
+### `src/shared/ui/IlliquidSheet.module.css`
+
+```css
+/* “What does illiquidity mean?” sheet — the DASH Pine Script sheet's points pattern, on L3 tokens. */
+/* No padding of its own: the sheet's content area already frames it. */
+.body { padding: 0; }
+.points { display: flex; flex-direction: column; gap: var(--l3-spacing-12); margin: 0; padding: 0; list-style: none; }
+.point { display: flex; align-items: center; gap: var(--l3-spacing-12); min-height: var(--l3-size-32); font: var(--l3-text-description-14); color: var(--l3-content-primary); }
+.pointIcon { display: grid; flex: none; place-items: center; width: var(--l3-size-32); height: var(--l3-size-32); border-radius: var(--l3-radius-08); background: var(--l3-surface-secondary); color: var(--l3-content-secondary); }
+```
+
+### `src/shared/ui/IlliquidSheet.tsx`
+
+```tsx
+import { useId } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { msCompareArrows, msGroup, msShieldFill } from '@l3/icons/material'
+import { Sheet } from './Sheet'
+import styles from './IlliquidSheet.module.css'
+
+export type IlliquidSheetCopy = {
+  /** “What does illiquidity mean?” */
+  title: string
+  /** “{contract} is ILLIQUID right now”, or a general line. */
+  description: string
+  /** The three points: few traders · prices far apart (slippage) · Lemonn blocks orders. */
+  points: [string, string, string]
+  /** “Got it”. */
+  ok: string
+}
+
+/**
+ * “What does illiquidity mean?” — one sheet for every illiquid entry point in the app (F&O option chain, asset page,
+ * Buy / Sell sheet, Gold Summary, Search). Small header, three icon + one-line points in a card (the DASH Pine Script
+ * sheet's pattern), Got it. Each flow passes its own words (its copy.json).
+ */
+export function IlliquidSheet({ copy, onClose }: { copy: IlliquidSheetCopy; onClose: () => void }) {
+  const id = useId()
+  const icons = [msGroup, msCompareArrows, msShieldFill]
+  return <Sheet labelledBy={id} onClose={onClose}
+    header={<BottomSheetHeader headingId={id} heading={copy.title} description={copy.description} />}
+    footer={<ButtonGroup aria-label={copy.title}><Button onClick={onClose}>{copy.ok}</Button></ButtonGroup>}>
+    <div className={styles.body}>
+      <Card as="section" aria-label={copy.title}>
+        <ul className={styles.points}>{copy.points.map((text, i) => <li key={text} className={styles.point}>
+          <span className={styles.pointIcon}><Icon icon={icons[i]} size={16} /></span>{text}
+        </li>)}</ul>
+      </Card>
+    </div>
+  </Sheet>
 }
 ```
 

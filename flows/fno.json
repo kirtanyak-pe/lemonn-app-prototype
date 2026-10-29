@@ -195,7 +195,7 @@
       "id": "fno-20",
       "name": "Option chain · illiquid contract",
       "figma": "",
-      "note": "Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.",
+      "note": "Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “ILLIQUID contract” / “Can’t be traded” ⓘ; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.",
       "goesTo": [
         "fno-01",
         "fno-21"
@@ -308,7 +308,6 @@
     "src/flows/fno/sheets/ChartToolsSheet.module.css",
     "src/flows/fno/sheets/ChartToolsSheet.tsx",
     "src/flows/fno/sheets/HomeSheets.tsx",
-    "src/flows/fno/sheets/IlliquidSheet.module.css",
     "src/flows/fno/sheets/IlliquidSheet.tsx",
     "src/flows/fno/sheets/IndicatorDetailsSheet.tsx",
     "src/flows/fno/strategies/components/Strategies.module.css",
@@ -320,6 +319,8 @@
     "src/shared/data/format.ts",
     "src/shared/data/user.ts",
     "src/shared/prototype.ts",
+    "src/shared/ui/IlliquidSheet.module.css",
+    "src/shared/ui/IlliquidSheet.tsx",
     "src/shared/ui/Rail.module.css",
     "src/shared/ui/Rail.tsx",
     "src/shared/ui/Raised.module.css",

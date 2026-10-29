@@ -29,7 +29,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-17` | Option chain | [11630:16785](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16785) | `fno-01`, `fno-21` | From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear. |
 | `fno-18` | Option chain · Buy selected | [11630:16184](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11630-16184) | `fno-01`, `fno-21` | A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection. |
 | `fno-19` | Option chain · Sell selected | [11695:26269](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11695-26269) | `fno-01`, `fno-21` | The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot. |
-| `fno-20` | Option chain · illiquid contract | — | `fno-01`, `fno-21` | Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up. |
+| `fno-20` | Option chain · illiquid contract | — | `fno-01`, `fno-21` | Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “ILLIQUID contract” / “Can’t be traded” ⓘ; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up. |
 | `fno-21` | Asset page · Gold MINI | [6754:61613](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613) | `fno-18`, `fno-17`, `fno-05` | A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later. |
 | `fno-22` | Asset page · illiquid | [6754:61613](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-61613) | `fno-17`, `fno-05` | Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from. |
 | `fno-23` | Gold Summary · Buy / Sell sheet | — | `fno-08`, `fno-17` | Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary). |
@@ -2583,8 +2583,8 @@ function clock(start: string, add: number) {
   "chain.sell": "Sell",
   "chain.placed": "{action} order placed · {contract}",
   "chain.oiLegend": "Call OI {call} · Put OI {put}",
-  "chain.illiquid": "Illiquid contract",
-  "chain.illiquidIcon": "Illiquid",
+  "chain.illiquid": "ILLIQUID contract",
+  "chain.illiquidIcon": "ILLIQUID",
   "chain.illiquidMore": "Why can’t I trade this?",
   "chain.illiquidLabel": "{strike} {side}, illiquid: can’t be traded",
   "asset.back": "Back",
@@ -2630,12 +2630,12 @@ function clock(start: string, add: number) {
   "asset.total": "Total",
   "asset.buy": "Buy",
   "asset.sell": "Sell",
-  "asset.illiquidNote": "Trading is not allowed as this contract is illiquid",
+  "asset.illiquidNote": "Trading is not allowed as this contract is ILLIQUID",
   "contractSheet.label": "{name}: buy or sell",
   "contractSheet.open": "Open {name}",
   "contractSheet.expiry": "{date}",
   "illiquid.title": "What does illiquidity mean?",
-  "illiquid.forContract": "{contract} is illiquid right now",
+  "illiquid.forContract": "{contract} is ILLIQUID right now",
   "illiquid.general": "Some contracts barely trade",
   "illiquid.point1": "Very few people are buying or selling it",
   "illiquid.point2": "Buy and sell prices are far apart, which increases chances of slippage",
@@ -2794,7 +2794,7 @@ export const fno: Flow = {
     { id: 'fno-17', group: 'chain', name: 'Option chain', figma: '11630:16785', note: 'From Option chain on the F&O chart (any product tab) or the Option Chain bottom-nav tab; Back → F&O home. Opens scrolled to the spot pill. BankNifty ▾ and Expiry ▾ open sheets; Σ shows delta instead of the day change; the basket and Zing tile open the explanatory sheet. Column heads: Call / Put metric (LTP, OI, OI Chg, IV) and the strike range (All, ±5, ±10). Tap a price to Buy, tap it again to Sell, a third time to clear.', render: (go) => <OptionChain onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
     { id: 'fno-18', group: 'chain', name: 'Option chain · Buy selected', figma: '11630:16184', note: 'A put price tapped once: B badge, green wash, the order dock with the contract, Balance / Req, quantity in lots and Buy (brand). Buy places a sample order (toast) and clears the selection.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'buy', ltp: 160.54 }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
     { id: 'fno-19', group: 'chain', name: 'Option chain · Sell selected', figma: '11695:26269', note: 'The same put tapped again: S badge, red wash, Sell (secondary) in the dock; Req becomes the margin per lot.', render: (go) => <OptionChain initialSelection={{ strike: 25400, side: 'put', action: 'sell', ltp: 160.54 }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
-    { id: 'fno-20', group: 'chain', name: 'Option chain · illiquid contract', figma: '', note: 'Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “Illiquid contract · can’t be traded ⓘ”; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.', render: (go) => <OptionChain initialIlliquid={{ strike: 25700, side: 'put' }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
+    { id: 'fno-20', group: 'chain', name: 'Option chain · illiquid contract', figma: '', note: 'Illiquid contracts (deep in-the-money calls, far out-of-the-money puts) carry a block icon beside the price, like Groww. Unlike Groww, a tap never selects them: a tooltip opens just above — “ILLIQUID contract” / “Can’t be traded” ⓘ; tapping away closes it, ⓘ opens a sheet with why it’s blocked, its traded lots and buy–sell gap, and a tip. Opens on the 25,700 put with the tooltip up.', render: (go) => <OptionChain initialIlliquid={{ strike: 25700, side: 'put' }} onBack={() => go('fno-01')} onAsset={() => go('fno-21')} /> },
     { id: 'fno-21', group: 'asset', name: 'Asset page · Gold MINI', figma: '6754:61613', note: 'A commodity contract page. Entry (one of several): the contract name in the option chain order dock (“25,400 Put ›”). Back returns where it came from; Option chain → fno-17; Buy / Sell open the sample sheet. Equity contracts get their own (similar) page later.', render: (go) => <AssetPage asset={goldMiniAsset} onBack={() => go('fno-18')} onChain={() => go('fno-17')} onScalper={() => go('fno-05')} /> },
     { id: 'fno-22', group: 'asset', name: 'Asset page · illiquid', figma: '6754:61613', note: 'Product rule (commodities only): an illiquid contract’s page shows the ILLIQUID tag next to its name and Buy / Sell greyed out, with “Trading is not allowed as this contract is illiquid” above them — whatever screen it was opened from.', render: (go) => <AssetPage asset={illiquidAsset} onBack={() => go('fno-17')} onChain={() => go('fno-17')} onScalper={() => go('fno-05')} /> },
     { id: 'fno-23', group: 'lot', name: 'Gold Summary · Buy / Sell sheet', figma: '', note: 'Tapping any futures or option card opens the Buy / Sell sheet (live app, 2026-10-29): name › (asset page fno-21) · price, expiry · change, Buy (brand) / Sell (secondary).', render: (go) => <LotSummary initialSheet="lo-0" onBack={() => go('fno-08')} onChain={() => go('fno-17')} onAsset={(illiquid) => go(illiquid ? 'fno-22' : 'fno-21')} /> },
@@ -4378,60 +4378,20 @@ export function DetailSheet({ title, contract, onClose }: { title: string; contr
 }
 ```
 
-### `src/flows/fno/sheets/IlliquidSheet.module.css`
-
-```css
-/* “What does illiquidity mean?” sheet — the DASH Pine Script sheet's points pattern, on L3 tokens. */
-/* No padding of its own: the sheet's content area already frames it. */
-.body { padding: 0; }
-.points { display: flex; flex-direction: column; gap: var(--l3-spacing-12); margin: 0; padding: 0; list-style: none; }
-.point { display: flex; align-items: center; gap: var(--l3-spacing-12); min-height: var(--l3-size-32); font: var(--l3-text-description-14); color: var(--l3-content-primary); }
-.pointIcon { display: grid; flex: none; place-items: center; width: var(--l3-size-32); height: var(--l3-size-32); border-radius: var(--l3-radius-08); background: var(--l3-surface-secondary); color: var(--l3-content-secondary); }
-```
-
 ### `src/flows/fno/sheets/IlliquidSheet.tsx`
 
 ```tsx
-import { useId } from 'react'
-import { BottomSheetHeader } from '@l3/components/BottomSheet'
-import { Button } from '@l3/components/Button'
-import { ButtonGroup } from '@l3/components/ButtonGroup'
-import { Card } from '@l3/components/Card'
-import { Icon } from '@l3/components/Icon'
-import { msCompareArrows, msGroup, msShieldFill } from '@l3/icons/material'
-import { Sheet } from '../../../shared/ui/Sheet'
+import { IlliquidSheet as SharedIlliquidSheet } from '../../../shared/ui/IlliquidSheet'
 import { t } from '../copy'
-import styles from './IlliquidSheet.module.css'
 
-type Props = {
-  /** The contract it's about (“24,700 Call”); without one (a tag) the description is general. */
-  contract?: string
-  onClose: () => void
-}
-
-/**
- * “What does illiquidity mean?” — one shared sheet for every illiquid entry point in F&O (the ⓘ in the option chain's
- * tooltip, any ILLIQUID tag). Small header, then three icon + one-line points in a card (the DASH Pine Script sheet's
- * pattern), Got it.
- */
-export function IlliquidSheet({ contract, onClose }: Props) {
-  const id = useId()
-  const points = [
-    { icon: msGroup, text: t('illiquid.point1') },
-    { icon: msCompareArrows, text: t('illiquid.point2') },
-    { icon: msShieldFill, text: t('illiquid.point3') },
-  ]
-  return <Sheet labelledBy={id} onClose={onClose}
-    header={<BottomSheetHeader headingId={id} heading={t('illiquid.title')} description={contract ? t('illiquid.forContract', { contract }) : t('illiquid.general')} />}
-    footer={<ButtonGroup aria-label={t('illiquid.title')}><Button onClick={onClose}>{t('illiquid.ok')}</Button></ButtonGroup>}>
-    <div className={styles.body}>
-      <Card as="section" aria-label={t('illiquid.title')}>
-        <ul className={styles.points}>{points.map((point) => <li key={point.text} className={styles.point}>
-          <span className={styles.pointIcon}><Icon icon={point.icon} size={16} /></span>{point.text}
-        </li>)}</ul>
-      </Card>
-    </div>
-  </Sheet>
+/** F&O's “What does illiquidity mean?” sheet: the shared sheet with this flow's words. */
+export function IlliquidSheet({ contract, onClose }: { contract?: string; onClose: () => void }) {
+  return <SharedIlliquidSheet onClose={onClose} copy={{
+    title: t('illiquid.title'),
+    description: contract ? t('illiquid.forContract', { contract }) : t('illiquid.general'),
+    points: [t('illiquid.point1'), t('illiquid.point2'), t('illiquid.point3')],
+    ok: t('illiquid.ok'),
+  }} />
 }
 ```
 
@@ -4925,6 +4885,63 @@ export function useFlowOptionsChanged(flow: { id: string; options?: { id: string
  */
 export function useSystemKeyboard() {
   return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+}
+```
+
+### `src/shared/ui/IlliquidSheet.module.css`
+
+```css
+/* “What does illiquidity mean?” sheet — the DASH Pine Script sheet's points pattern, on L3 tokens. */
+/* No padding of its own: the sheet's content area already frames it. */
+.body { padding: 0; }
+.points { display: flex; flex-direction: column; gap: var(--l3-spacing-12); margin: 0; padding: 0; list-style: none; }
+.point { display: flex; align-items: center; gap: var(--l3-spacing-12); min-height: var(--l3-size-32); font: var(--l3-text-description-14); color: var(--l3-content-primary); }
+.pointIcon { display: grid; flex: none; place-items: center; width: var(--l3-size-32); height: var(--l3-size-32); border-radius: var(--l3-radius-08); background: var(--l3-surface-secondary); color: var(--l3-content-secondary); }
+```
+
+### `src/shared/ui/IlliquidSheet.tsx`
+
+```tsx
+import { useId } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { msCompareArrows, msGroup, msShieldFill } from '@l3/icons/material'
+import { Sheet } from './Sheet'
+import styles from './IlliquidSheet.module.css'
+
+export type IlliquidSheetCopy = {
+  /** “What does illiquidity mean?” */
+  title: string
+  /** “{contract} is ILLIQUID right now”, or a general line. */
+  description: string
+  /** The three points: few traders · prices far apart (slippage) · Lemonn blocks orders. */
+  points: [string, string, string]
+  /** “Got it”. */
+  ok: string
+}
+
+/**
+ * “What does illiquidity mean?” — one sheet for every illiquid entry point in the app (F&O option chain, asset page,
+ * Buy / Sell sheet, Gold Summary, Search). Small header, three icon + one-line points in a card (the DASH Pine Script
+ * sheet's pattern), Got it. Each flow passes its own words (its copy.json).
+ */
+export function IlliquidSheet({ copy, onClose }: { copy: IlliquidSheetCopy; onClose: () => void }) {
+  const id = useId()
+  const icons = [msGroup, msCompareArrows, msShieldFill]
+  return <Sheet labelledBy={id} onClose={onClose}
+    header={<BottomSheetHeader headingId={id} heading={copy.title} description={copy.description} />}
+    footer={<ButtonGroup aria-label={copy.title}><Button onClick={onClose}>{copy.ok}</Button></ButtonGroup>}>
+    <div className={styles.body}>
+      <Card as="section" aria-label={copy.title}>
+        <ul className={styles.points}>{copy.points.map((text, i) => <li key={text} className={styles.point}>
+          <span className={styles.pointIcon}><Icon icon={icons[i]} size={16} /></span>{text}
+        </li>)}</ul>
+      </Card>
+    </div>
+  </Sheet>
 }
 ```
 
