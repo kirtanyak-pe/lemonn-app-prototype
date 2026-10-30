@@ -81,6 +81,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-23` | Indicator · building | — | The indicator preview builds in the pinned card |
 | `dash-24` | Indicator · ready | — | Preview with Modify and Save indicator |
 | `dash-25` | Indicator · saved | — | The preview card closes; DASH confirms it was saved and offers View indicator |
+| `dash-30` | Past chats | — | Every chat with DASH by day (Today / Yesterday / Earlier), newest first; a row opens its chat |
 
 ### Navigation
 
@@ -92,7 +93,10 @@ dash-07/08/09 rule description ─▶ dash-10/11/12 (Okay ─▶ back) · Yes, s
 dash-08 Yes, improve my rule ─▶ dash-05
 dash-13 View Rules ─▶ dash-14 · Cancel ─▶ back to the chat
 dash-14 Delete ─▶ dash-15 ─Yes─▶ dash-16 ─Okay─▶ dash-17 · No ─▶ dash-14 · Create New ─▶ dash-03
-dash-02 ☰ and the history action on every chat page ─▶ dash-14
+home / empty chat top bar: history ─▶ dash-30 Past chats · Your creations ─▶ dash-14
+a started chat's top bar: ⋮ ─▶ dropdown: Past chats ─▶ dash-30 · Your creations ─▶ dash-14 · Delete this chat ─▶ Delete this chat? ─Yes─▶ home
+home Pick up where you left off: a card ─▶ its chat · View all ─▶ dash-30 · (compact card) hold ─▶ Delete this draft?
+dash-30 a row ─▶ its chat (rule ─▶ dash-06, indicator ─▶ dash-24)
 dash-02 Create Custom Indicator ─▶ dash-20 ─prompt─▶ dash-21 ─chart─▶ dash-22 ─timeframe─▶ dash-23 ─built─▶ dash-24
 dash-24 Modify ─▶ DASH asks for a manual change ─send─▶ same preview + Modify / Save indicator · Save indicator ─▶ dash-25
 dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH indicator in Your indicators)
@@ -108,13 +112,18 @@ dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH 
   profit (DASH calls the rule weak); `none` = not enough history.
 - `SavedRule { id, title, summary, on, activity: { text, strong?, after? } }` — the Active rules list. `activity` is the
   footer line ("Stepped in **3 times** this month"), `strong` the bold part.
+- `PastChat { id, kind: 'rule' | 'indicator', title, day, time, saved, edited? }` — chat history (Past chats, dash-30).
+  `saved` = the rule / indicator the chat built was saved. Newest first.
+- **Pick up where you left off** (home, setting "Resume chats") = `pastChats` where `saved === false` only
+  (`homeDrafts` is derived from them). A chat whose creation was saved is **never** shown upfront: the creation is in
+  Your creations and the chat stays in Past chats. No unsaved chats → no section (the home's centre-stage layout).
 - First name for greetings comes from the app's user (`Rohan` — fictional; Figma's "Samaira" isn't used).
 
 ### Components
 
 | Area | L3 / DASH part | Notes |
 |---|---|---|
-| Top bar | L3 `Actionbar` (see-through on DASH pages: `DashBar`) | Back, title "Trading rules", history (Tertiary action); the draft rule card sits in its **bottom slot** (pinned) |
+| Top bar | L3 `Actionbar` (see-through on DASH pages: `DashBar`) | Back; home / empty chat: history + widgets (Tertiary actions), a started chat: ⋮ dropdown (`components/ChatMenu`) + `DeleteChatSheet` (sheets/ChatSheets); the draft rule card sits in its **bottom slot** (pinned) |
 | Background | DASH `DashScreen` | A blurred lime ring (angular gradient, 50%, blur 50) + white wave lines; `glow`: header / landing / bottom; `tone="loss"` = red |
 | Mascot | shared `DashOrb` (src/shared/ui/dash; lg 96 · md 64 · sm 32 · xs 24) | The Figma vector parts (leaves, fill, ring) + a blurred halo copy |
 | Chat input | DASH `ChatInput` | White pill, 56 tall, 1px DASH green edge, float shadow; Send = L3 Button primary md, icon-only, round |
@@ -137,6 +146,15 @@ dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH 
 - A long rule summary on Active rules wraps to 2 lines, then "…".
 - Switch changes are instant (no confirm). Delete always asks first.
 - Create Custom Strategy (landing) is another DASH flow — not designed yet.
+- **Top bar actions.** On the home and in an empty chat: two Tertiary actions — history (→ Past chats) then widgets
+  (→ Your creations). As soon as a chat has started (a message sent, or a past chat / draft opened): **one ⋮ menu**
+  instead, a small dropdown that opens over it (`components/ChatMenu`) with Past chats · Your creations · Delete this chat.
+- **Delete this chat** asks first (large header + bin): "Delete this chat?" with a checkbox **"Also delete what this
+  chat created" — off by default**. One chat can create several things of any kind (rules, indicators, strategies — the
+  field's Rule · Indicator · Strategy pills only hint DASH, they don't limit the chat), so the checkbox covers all of
+  them. Off: only the conversation goes, its creations stay in Your creations. On: they're deleted too. Then back to
+  the home.
+- Drafts on the home: tap opens the chat; the compact card's press-and-hold (0.5 s) asks "Delete this draft?".
 - The custom-indicator preview has a secondary **Modify** button with an edit icon and a primary **Save indicator** button.
   Modify opens a manual text prompt in the chat. Its submitted reply keeps the illustrative preview and returns to the
   same actions. Saving removes the preview card and adds DASH's saved confirmation with **View indicator**, which opens
@@ -161,6 +179,7 @@ dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH 
 ### L3 gaps
 
 - An **AI accent family** (DASH green `#50c83e`, glow lime / yellow / green) — local tokens `--app-dash-*`.
+- No **menu / dropdown** component — the chat's ⋮ dropdown is L3 ListCell rows on a raised surface (`components/ChatMenu`, local token `--app-dash-menu-width`).
 - SectionHeader: no **icon** slot before the title (“Your creations” puts the icon in the title).
 - ListCell: a tappable card has no **flat** option (no drop shadow) — Past chats overrides it locally.
 - Actionbar: no **see-through** option for decorative backgrounds (`DashBar` clears its surface and hairline).
@@ -218,6 +237,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
 - 2026-10-30 — **Top bar: Past chats + Your creations.** The bar's right action (everything made with DASH) gets its own icon (widgets, was history; label “Your creations”), and a history button left of it opens **Past chats** (dash-30, `screens/PastChats`): every chat with DASH by day (Today / Yesterday / Earlier), newest first — the kind's icon in an L3 Avatar, the title, “Rule · 9:20 am” (drafts: “Draft, not saved”), ›; a row opens its chat. Data: `pastChats` in data.ts. Rows: the L3 card row on surface/primary with only its 1px edge (no drop shadow). The home's “Your creations” heading carries the same widgets icon. “Pick up where you left off” has View all → Past chats. The compact resume card's title is one line (… when longer) and its history avatar has no edge.
 - 2026-10-30 — **Resume card: Compact** (new setting under Resume chats; default Compact, Big = the old card). Like a creation card: the history avatar (L3 Avatar, icon type), the green “Edited 2 hours ago” over the title, ›. A tap opens the draft's chat; press and hold (0.5 s, or right-click) opens the delete sheet — no ✕. Data: `HomeDraft.edited`.
 - 2026-10-30 — **V1 · Classic and V2 · Pills archived; V7 · Pills is the default.** Both are off the dropdown (kept in the code as hidden “Old · V1 Classic” / “Old · V2 Pills”, ids '1' / '2'); the other versions keep their names (V3–V7). V5 · Cards' title is Heading/24 on two lines: “How can I help you / trade today?”. Its cards scale with the screen: 2.5 always in view, and the whole card (icon, text, padding, corners) zooms with it — laid out at the 392 screen's size (`--app-dash-v9-card`, 144) and zoomed by HomeV9's `useCardZoom`.
@@ -3341,6 +3361,104 @@ export function ReplyChips({ options, asButtons = false, glow = false }: { optio
         </button>
       ))}
     </Stack>
+  )
+}
+```
+
+### `src/flows/dash/components/ChatMenu.module.css`
+
+```css
+/* The ⋮ and its dropdown, anchored to its right edge. */
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The dropdown: opens over the ⋮ (its top-right corner on the button's), a white raised surface (radius 16, light
+   edge, elevation high). A tap outside closes it. */
+.menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 20; /* over the chat; stacking order isn't a design token */
+  display: flex;
+  flex-direction: column;
+  min-width: var(--app-dash-menu-width);
+  padding: var(--l3-spacing-04);
+  border: 1px solid var(--l3-border-light); /* 1px: the menu's edge */
+  border-radius: var(--l3-radius-16);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-high);
+  transform-origin: top right;
+  animation: chat-menu-in var(--l3-motion-duration-short) var(--l3-motion-easing-decelerate);
+}
+
+.menu > * {
+  border-radius: var(--l3-radius-12);
+  white-space: nowrap;
+}
+
+/* Delete this chat: the error colour, like other destructive actions. */
+.danger.danger {
+  color: var(--l3-content-accent-error-default);
+}
+
+@keyframes chat-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    animation: none;
+  }
+}
+```
+
+### `src/flows/dash/components/ChatMenu.tsx`
+
+```tsx
+import { useEffect, useRef, useState } from 'react'
+import { ActionbarAction } from '@l3/components/Actionbar'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { msDelete, msHistory, msMoreVert, msWidgets } from '@l3/icons/material'
+import { t } from '../copy'
+import styles from './ChatMenu.module.css'
+
+/**
+ * A started chat's ⋮ in the top bar: a small dropdown that opens over it (three options don't need a sheet) — Past chats,
+ * Your creations, Delete this chat. A tap outside or Esc closes it. L3 gap: no menu / popover component, so this is
+ * L3 list rows on a raised surface.
+ */
+export function ChatMenu({ onPastChats, onCreations, onDelete }: { onPastChats?: () => void; onCreations?: () => void; onDelete: () => void }) {
+  const [open, setOpen] = useState(false)
+  const wrap = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const outside = (e: PointerEvent) => { if (!wrap.current?.contains(e.target as Node)) setOpen(false) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('pointerdown', outside)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('pointerdown', outside)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [open])
+  const pick = (go?: () => void) => () => { setOpen(false); go?.() }
+  return (
+    <span ref={wrap} className={styles.wrap}>
+      <ActionbarAction icon={msMoreVert} label={t('chatMenu.button')} onClick={() => setOpen((o) => !o)} />
+      {open && (
+        <div className={styles.menu} role="group" aria-label={t('chatMenu.button')}>
+          <ListCell as="button" size="sm" iconLeft={<Icon icon={msHistory} />} label={t('landing.pastChats')} onClick={pick(onPastChats)} />
+          <ListCell as="button" size="sm" iconLeft={<Icon icon={msWidgets} />} label={t('landing.menu')} onClick={pick(onCreations)} />
+          <ListCell as="button" size="sm" className={styles.danger} iconLeft={<Icon icon={msDelete} />} label={t('chatMenu.delete')} onClick={pick(onDelete)} />
+        </div>
+      )}
+    </span>
   )
 }
 ```
@@ -6547,9 +6665,14 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
   text-overflow: ellipsis;
 }
 
-/* The history avatar: the grey disc without L3 Avatar's 1px edge. */
+/* The history avatar: the grey disc without L3 Avatar's 1px edge, the icon in content/primary (L3's icon type is
+   content/secondary at 60%). */
 .compact .compactAvatar::after {
   box-shadow: none;
+}
+
+.compact .compactAvatar > * {
+  color: var(--l3-content-primary);
 }
 
 .compactCaret {
@@ -8234,6 +8357,16 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
 {
   "landing.menu": "Your creations",
   "landing.pastChats": "Past chats",
+  "chatMenu.button": "Chat options",
+  "chatMenu.title": "This chat",
+  "chatMenu.delete": "Delete this chat",
+  "chatMenu.deleteTitle": "Delete this chat?",
+  "chatMenu.deleteText": "The conversation is deleted for good. Anything you created in it stays in Your creations.",
+  "chatMenu.alsoDelete": "Also delete what this chat created",
+  "chatMenu.alsoDeleteText": "Rules, indicators or strategies made here are removed from Your creations",
+  "chatMenu.deleteConfirm": "Yes, delete",
+  "chatMenu.deleteKeep": "No, keep it",
+  "chatMenu.deleted": "Chat deleted",
   "pastChats.title": "Past chats",
   "pastChats.today": "Today",
   "pastChats.yesterday": "Yesterday",
@@ -8749,26 +8882,32 @@ export const dashRules: SavedRule[] = [
 export const rupees = (n: number) => inr(n, 0)
 
 /**
- * Returning home v2 · sample status (in the app: from the rules engine and the charts). The draft is an indicator the
- * user built and didn't save; the events are what their rules and indicators did lately.
+ * Past chats (DASH's history button, dash-30): every chat with DASH, newest first. `saved` = what the chat built (its
+ * rule / indicator) was saved; `false` = left before saving (a draft). `edited` = when it was last touched, for drafts.
  */
-export type HomeDraft = { id: string; kind: 'rule' | 'indicator'; title: string; meta: string; /** Compact card's green line. */ edited: string }
-/** Chats left before saving (drafts) — usually none, sometimes one or two. */
-export const homeDrafts: HomeDraft[] = [
-  { id: 'draft-supertrend', kind: 'indicator', title: 'Supertrend (10, 3) with EMA 20', meta: 'Draft, not saved · edited 2 hours ago', edited: 'Edited 2 hours ago' },
-  { id: 'draft-max-loss', kind: 'rule', title: 'Max daily loss at ₹5,000', meta: 'Draft, not saved · edited yesterday', edited: 'Edited yesterday' },
-]
-/** Past chats (DASH's history button): every chat with DASH, newest first — saved ones and drafts left unsaved. */
-export type PastChat = { id: string; kind: 'rule' | 'indicator'; title: string; day: 'today' | 'yesterday' | 'earlier'; time: string; draft?: boolean }
+export type PastChat = { id: string; kind: 'rule' | 'indicator'; title: string; day: 'today' | 'yesterday' | 'earlier'; time: string; saved: boolean; edited?: string }
 export const pastChats: PastChat[] = [
-  { id: 'chat-supertrend', kind: 'indicator', title: 'Supertrend (10, 3) with EMA 20', day: 'today', time: '2 hours ago', draft: true },
-  { id: 'chat-cooldown', kind: 'rule', title: 'Expiry Day Options Entry Warning', day: 'today', time: '9:20 am' },
-  { id: 'chat-max-loss', kind: 'rule', title: 'Max daily loss at ₹5,000', day: 'yesterday', time: '6:45 pm', draft: true },
-  { id: 'chat-rsi', kind: 'indicator', title: 'RSI 14 with overbought at 70', day: 'yesterday', time: '11:02 am' },
-  { id: 'chat-overtrade', kind: 'rule', title: 'Stop after 5 trades a day', day: 'earlier', time: '24 Oct' },
-  { id: 'chat-vwap', kind: 'indicator', title: 'VWAP with 2 bands', day: 'earlier', time: '21 Oct' },
-  { id: 'chat-revenge', kind: 'rule', title: 'Pause 30 min after a loss of ₹2,000', day: 'earlier', time: '18 Oct' },
+  { id: 'chat-supertrend', kind: 'indicator', title: 'Supertrend (10, 3) with EMA 20', day: 'today', time: '2 hours ago', saved: false, edited: 'Edited 2 hours ago' },
+  { id: 'chat-cooldown', kind: 'rule', title: 'Expiry Day Options Entry Warning', day: 'today', time: '9:20 am', saved: true },
+  { id: 'chat-max-loss', kind: 'rule', title: 'Max daily loss at ₹5,000', day: 'yesterday', time: '6:45 pm', saved: false, edited: 'Edited yesterday' },
+  { id: 'chat-rsi', kind: 'indicator', title: 'RSI 14 with overbought at 70', day: 'yesterday', time: '11:02 am', saved: true },
+  { id: 'chat-overtrade', kind: 'rule', title: 'Stop after 5 trades a day', day: 'earlier', time: '24 Oct', saved: true },
+  { id: 'chat-vwap', kind: 'indicator', title: 'VWAP with 2 bands', day: 'earlier', time: '21 Oct', saved: true },
+  { id: 'chat-revenge', kind: 'rule', title: 'Pause 30 min after a loss of ₹2,000', day: 'earlier', time: '18 Oct', saved: true },
 ]
+
+/** A "Pick up where you left off" card on the home. */
+export type HomeDraft = { id: string; kind: 'rule' | 'indicator'; title: string; meta: string; /** Compact card's green line. */ edited: string }
+/**
+ * Pick up where you left off = only the past chats whose rule / indicator was NOT saved (newest first). A chat whose
+ * creation was saved never shows here — it lives in Your creations, and the chat stays reachable from Past chats.
+ */
+export const homeDrafts: HomeDraft[] = pastChats
+  .filter((c) => !c.saved)
+  .map((c) => {
+    const edited = c.edited ?? c.time
+    return { id: c.id, kind: c.kind, title: c.title, meta: `Draft, not saved · ${edited.charAt(0).toLowerCase()}${edited.slice(1)}`, edited }
+  })
 export type HomeEvent = { id: string; kind: 'rule' | 'indicator'; text: string; time: string }
 export const homeEvents: HomeEvent[] = [
   { id: 'cooldown-stop', kind: 'rule', text: 'Expiry Day Options Entry Warning stopped a new entry', time: '11:42' },
@@ -9496,6 +9635,8 @@ import { LandingScene, type LandingProps } from './Landing'
 import { homeScenes } from './homes'
 import { defaultDashVersion, useDashUser, useDashVersion } from '../components/dashVersion'
 import { RuleScene, type RuleChatProps } from './RuleChat'
+import { DeleteChatSheet } from '../sheets/ChatSheets'
+import { ChatMenu } from '../components/ChatMenu'
 
 type Common = {
   onBack?: () => void
@@ -9554,6 +9695,8 @@ export function DashAI(props: DashAIProps) {
     watch.observe(dockHost, { childList: true })
     return () => watch.disconnect()
   }, [dockHost])
+  // Delete this chat? (from a started chat's ⋮ dropdown).
+  const [chatSheet, setChatSheet] = useState<'delete' | null>(null)
   const [lastScene, setLastScene] = useState(scene)
   const [move, setMove] = useState<SceneMove>('push')
   if (lastScene !== scene) {
@@ -9567,6 +9710,7 @@ export function DashAI(props: DashAIProps) {
     const touchesHome = lastScene === 'landing' || scene === 'landing'
     setMove(touchesHome && newUserHome ? (scene === 'landing' ? 'back' : 'push') : touchesHome || isSwitchingKind() ? 'fade' : order[scene] < order[lastScene] ? 'back' : 'push')
     setTyping(false)
+    setChatSheet(null)
   }
 
   // Escape (laptop) puts the drawn keyboard away, like tapping the chat.
@@ -9582,6 +9726,8 @@ export function DashAI(props: DashAIProps) {
   }, [typing])
 
   const tone = props.scene === 'rules' && props.step === 'cost' ? 'loss' : 'brand'
+  /** A chat has started (not the home, not an empty chat): the top bar's ⋮ menu. */
+  const inChat = props.scene !== 'landing' && props.step !== 'empty'
   // The background ends above the drawn keyboard (laptop). Scenes turn typing on only where the keyboard comes up
   // (the empty chat's input, Modify) and off again when it goes.
   const keyboardUp = typing // the drawn keyboard, on a phone too (the home screens' field included)
@@ -9599,13 +9745,19 @@ export function DashAI(props: DashAIProps) {
     <DashScreen
       tone={tone}
       keyboard={keyboardUp}
-      chatting={props.scene !== 'landing' && props.step !== 'empty'}
+      chatting={inChat}
       firstFocus={typing && (props.scene === 'landing' || props.step === 'empty') && (dashVersion.firstMessageFocus ? 'rise' : dashVersion.firstMessageWash ?? false)}
       // The input's fixed place (DashDock): every scene renders its field here, so it stays put while the body changes.
       bottom={<div ref={setDockHost} className={styles.dockHost} />}
-      // Right of the bar: past chats (history), then what they've made.
-      top={<DashBar onBack={onBack} actions={<><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={() => onPastChats?.()} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
-      sheet={sheet}
+      // Right of the bar — on the home and an empty chat: past chats (history), then what they've made. Once a chat has
+      // started (a message sent, or a past chat opened): one ⋮ dropdown with those two and Delete this chat.
+      top={<DashBar onBack={onBack} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={() => onPastChats?.()} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
+      sheet={
+        chatSheet === 'delete' ? (
+          // Prototype: deleting goes back to the home (with or without the creation — the sample data stays).
+          <DeleteChatSheet onClose={() => setChatSheet(null)} onDelete={() => { setChatSheet(null); onBack?.() }} />
+        ) : sheet
+      }
     >
       <DockHost.Provider value={dockHost}>
         <SceneSwap sceneKey={scene} move={move}>
@@ -10805,6 +10957,11 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
   background-color: var(--l3-surface-primary);
   box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the card's edge */
 }
+
+/* The kind's icon in content/primary (L3's icon avatar is content/secondary at 60%), as on the resume cards. */
+.row .avatar > * {
+  color: var(--l3-content-primary);
+}
 ```
 
 ### `src/flows/dash/screens/PastChats.tsx`
@@ -10846,9 +11003,9 @@ export function PastChats({ onBack, onOpen }: { onBack?: () => void; onOpen?: (k
                     as="button"
                     variant="card"
                     className={styles.row}
-                    iconLeft={<Avatar size={40} icon={<Icon icon={c.kind === 'indicator' ? msMonitoring : msRule} size={20} />} />}
+                    iconLeft={<Avatar size={40} className={styles.avatar} icon={<Icon icon={c.kind === 'indicator' ? msMonitoring : msRule} size={20} />} />}
                     label={c.title}
-                    description={`${t(`home.kind.${c.kind}`)} · ${c.draft ? t('pastChats.draft') : c.time}`}
+                    description={`${t(`home.kind.${c.kind}`)} · ${!c.saved ? t('pastChats.draft') : c.time}`}
                     iconRight={<Icon icon={msChevronRight} />}
                     onClick={() => onOpen?.(c.kind)}
                   />
@@ -12728,6 +12885,73 @@ export const homeScenes: Record<string, HomeScenes> = {
   '10': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   '11': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
+}
+```
+
+### `src/flows/dash/sheets/ChatSheets.module.css`
+
+```css
+/* Delete this chat?: the bin in a red circle, 64 (large header, like Delete rule / Delete this draft). */
+.binIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-64);
+  height: var(--l3-size-64);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-error-light);
+  color: var(--l3-content-accent-error-default);
+}
+```
+
+### `src/flows/dash/sheets/ChatSheets.tsx`
+
+```tsx
+import { useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Checkbox } from '@l3/components/Checkbox'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { msDelete } from '@l3/icons/material'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { t } from '../copy'
+import styles from './ChatSheets.module.css'
+
+/**
+ * Delete this chat? — large header with the bin (like Delete rule). A checkbox, off by default, also deletes everything
+ * the chat created — one chat can make several things of any kind (rules, indicators, strategies: the field's pills
+ * only hint DASH, they don't limit it). Left off, only the conversation goes; its creations stay in Your creations.
+ */
+export function DeleteChatSheet({ onClose, onDelete }: {
+  onClose: () => void
+  /** `withCreation`: the checkbox was ticked. */
+  onDelete: (withCreation: boolean) => void
+}) {
+  const headingId = useId()
+  const [withCreation, setWithCreation] = useState(false)
+  return (
+    <Sheet
+      labelledBy={headingId}
+      onClose={onClose}
+      header={<BottomSheetHeader size="lg" headingId={headingId} heading={t('chatMenu.deleteTitle')} description={t('chatMenu.deleteText')} icon={<span className={styles.binIcon}><Icon icon={msDelete} size={24} /></span>} />}
+      footer={
+        <ButtonGroup aria-label={t('chatMenu.deleteTitle')} direction="vertical">
+          <Button onClick={() => onDelete(withCreation)}>{t('chatMenu.deleteConfirm')}</Button>
+          <Button variant="secondary" onClick={onClose}>{t('chatMenu.deleteKeep')}</Button>
+        </ButtonGroup>
+      }
+    >
+      <ListCell
+        as="label"
+        variant="card"
+        multiline
+        label={t('chatMenu.alsoDelete')}
+        description={t('chatMenu.alsoDeleteText')}
+        trailing={<Checkbox checked={withCreation} onChange={(e) => setWithCreation(e.target.checked)} />}
+      />
+    </Sheet>
+  )
 }
 ```
 
