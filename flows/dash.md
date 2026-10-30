@@ -237,6 +237,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card (“N more” when some are left out) that opens the full page (`HOME_CREATIONS` in ReturningV2).
 - 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary; the compact card's green line reads “Draft · Edited 2 hr ago”. Past chats rows: no kind icon or Rule / Indicator word (a chat can make mixed things) — the title and when; drafts show the same green “Draft · Edited …”. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
 - 2026-10-30 — **Top bar: Past chats + Your creations.** The bar's right action (everything made with DASH) gets its own icon (widgets, was history; label “Your creations”), and a history button left of it opens **Past chats** (dash-30, `screens/PastChats`): every chat with DASH by day (Today / Yesterday / Earlier), newest first — the kind's icon in an L3 Avatar, the title, “Rule · 9:20 am” (drafts: “Draft, not saved”), ›; a row opens its chat. Data: `pastChats` in data.ts. Rows: the L3 card row on surface/primary with only its 1px edge (no drop shadow). The home's “Your creations” heading carries the same widgets icon. “Pick up where you left off” has View all → Past chats. The compact resume card's title is one line (… when longer) and its history avatar has no edge.
 - 2026-10-30 — **Resume card: Compact** (new setting under Resume chats; default Compact, Big = the old card). Like a creation card: the history avatar (L3 Avatar, icon type), the green “Edited 2 hours ago” over the title, ›. A tap opens the draft's chat; press and hold (0.5 s, or right-click) opens the delete sheet — no ✕. Data: `HomeDraft.edited`.
@@ -8639,6 +8640,8 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.removeConfirm": "Yes, delete",
   "home2.removeKeep": "No, keep it",
   "home2.creations": "Your creations",
+  "home2.viewAll": "View all",
+  "home2.viewAllMore": "{count} more",
   "home4.creations": "Ai creations",
   "home4.createLabel": "Create something new",
   "home4.createButton": "Create",
@@ -11684,6 +11687,27 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   align-items: center;
   gap: var(--l3-spacing-08);
 }
+
+/* Your creations · the fourth card when there are more than three: View all (→ the full page). Narrow like the create
+   card, content centred: an arrow on a grey disc, "View all", "+2 more". */
+.viewAllCard.viewAllCard {
+  justify-content: center;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  width: 30%;
+  text-align: center;
+}
+
+.viewAllIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  margin-bottom: var(--l3-spacing-04);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-secondary);
+  color: var(--l3-content-primary);
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -11698,7 +11722,7 @@ import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { raised } from '@l3/components/Raised'
-import { msAdd, msAssignmentAdd, msFunction, msLightbulb, msChevronRight, msMonitoring, msWidgets } from '@l3/icons/material'
+import { msAdd, msAssignmentAdd, msFunction, msLightbulb, msChevronRight, msMonitoring, msWidgets, msArrowForward } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { openHistoryOn } from '../components/historyFilter'
@@ -11740,6 +11764,9 @@ const EXAMPLES = {
   indicator: ['home3.ex.indicator1', 'home3.ex.indicator2', 'home3.ex.indicator3'],
   strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
 } as const
+
+/** Your creations on the home: at most this many cards, then the View all card. */
+const HOME_CREATIONS = 3
 
 export function ReturningV2Scene({ version3 = false, version4 = false, returning, onManage, onPastChats, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps & {
   /** Returning home V3: every kind always has a place (an invite card until one is made) and the newest kind is marked New. */
@@ -12033,7 +12060,16 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                       <span className={styles.itemTitle}>{t(`home3.create.${shown}`)}</span>
                     </button>
                   )}
-                  {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).map(({ item, kind: k }) => card(item, k, true))}
+                  {/* At most three creations here (the picked kind first), then a "View all" card to the full page (with
+                      "N more" when some are left out), so the row doesn't scroll on and on. */}
+                  {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).slice(0, HOME_CREATIONS).map(({ item, kind: k }) => card(item, k, true))}
+                  {(
+                    <button data-key="view-all" type="button" role="listitem" className={`${styles.item} ${styles.viewAllCard}`} onClick={() => onManage?.()}>
+                      <span className={styles.viewAllIcon}><Icon icon={msArrowForward} size={20} /></span>
+                      <span className={styles.itemTitle}>{t('home2.viewAll')}</span>
+                      {creations.length > HOME_CREATIONS && <span className={styles.itemMeta}>{t('home2.viewAllMore', { count: creations.length - HOME_CREATIONS })}</span>}
+                    </button>
+                  )}
                 </div>
               </Stack>
               )}
