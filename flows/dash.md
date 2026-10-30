@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — Fix: V8 · Tabs' top-bar pills — the picked one's black thumb was hidden under a leftover white fill on the pill list; the white track now comes only from `--pills-track`.
 - 2026-10-31 — **V12 · Center and V13 · Center pills** (ids '16', '17'; new and returning users; `screens/HomeCenter`): a landing page like desktop AI chats. The field sits on the screen's centre line (an empty slot in the page; the field itself stays in the DASH dock and is lifted there), the orb and "How can I help you trade better?" stack up from its top, **Your creations** hangs from its bottom (no Create card; the heading "Your creations ›" opens them all). Tap the field: the rest steps away and the field glides straight down to its place over the keyboard (frame by frame from where it is, so the keyboard moving under it can't drag it); back the same way. The field's edge is the green → lime → yellow gradient, turning (`edgeTurn`). V13 has Rule · Indicator · Strategy inside the field (text on top; pills, + and Send under it); the section below follows the pick — that kind's creations, or **Suggestions** (the "Try" cards) when nothing of it is made yet.
   - **Chats:** once the first message is sent the field drops its pills and becomes one line (text, then + and Send) — no accidental kind switch mid-chat (`useChatKind` returns none; V11's ribbon still sinks its tabs first).
 - 2026-10-30 — **V11 · Ribbon as one union** (Figma "Union" 6850:44252): the field and the picked tab are ONE SVG shape behind the form (`components/RibbonTabs`, path built from the measured tab) — white, a 1px inside edge in a green → lime → yellow gradient (50%, full while typing) that turns slowly (4 s a turn), low shadow. The picked tab slides and stretches to a new pick; the other kinds are white tabs with a light edge drawn under it (the picked one is always on top). Coming in, the tabs rise out of the field one by one; once a conversation starts (`useChatKind` → `sunk`) they sink back and the row closes, leaving + · text · Send. Local tokens `--app-dash-union-edge-1/2/3`, `--app-dash-union-shadow`. The rule chat's field now has the + (Pine Script upload) like the indicator chat and the homes.
@@ -3868,15 +3869,6 @@ export function DashDock({ children }: { children: ReactNode }) {
 /* The tabs' track on surface/primary (L3's pill group is surface/secondary): it sits on DASH's glow, not a white bar. */
 .barCenter.barCenter {
   --pills-track: var(--l3-surface-primary);
-}
-
-.barCenter.barCenter [data-appearance='pill-group'] {
-  background: var(--l3-surface-primary);
-}
-
-/* …and the unpicked pills share it (L3 gives them surface/secondary, the track's usual colour). */
-.barCenter.barCenter [data-appearance='pill'][data-emphasis='tertiary'][aria-selected='false'] {
-  --tab-surface: var(--l3-surface-primary);
 }
 
 .barCenter {
