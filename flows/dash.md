@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-30 — **V8 · Tabs:** the body sits centred between the top bar and the field; with the field active (typing) the body steps away and suggestions for the tab show over the field (FirstAsk; a suggestion's kind pill moves the top bar's tab), as in V7. **Resume card:** always the compact card — the Big card (Continue + ✕) and the setting Resume card are archived in `archive/dash-resume-card-big/`.
 - 2026-10-29 — **Chats: Version 1 only.** The rule / indicator card is always pinned above the conversation (folding to a mini card on scroll); the setting Chat version is gone and Version 2 (the card inside DASH's message, a new card per change) is archived in `archive/dash-chat-versions/`.
 - 2026-10-29 — **Pine Script: one behaviour.** Always on; the tip is the animated story, shown every time the field is empty (until it's closed or the + is used), floating over the content, which dims. The settings Pine Script / Pine Script tip / Show Pine Script tip / Tip placement are gone; the simple tip card, “once”, “push up” and “off” are archived in `archive/dash-pine-versions/`.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
@@ -324,7 +325,6 @@ the product team tells you otherwise; the other values are experiments.
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
-| Resume card | Compact (hold to delete) | Big (Continue + ✕) |
 
 The version list is `components/dashVersion.ts` (each version's chat input) + `screens/homes.tsx` (its homes).
 
@@ -6587,80 +6587,6 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
   width: 100%;
 }
 
-.draft {
-  position: relative;
-  display: flex;
-}
-
-.draft > :first-child {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.draft > :first-child > * {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.resume.resume {
-  position: relative;
-  box-sizing: border-box;
-  border-color: color-mix(in srgb, var(--app-dash-green) 60%, transparent);
-  transition: background var(--l3-motion-duration-short) var(--l3-motion-easing-standard), transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
-}
-
-/* The whole card is one tap target (it opens the draft's chat): hover / press anywhere and the card responds as one. */
-.resumeTap {
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  .resumeTap:hover .resume.resume {
-    background: var(--l3-surface-secondary);
-  }
-}
-
-.resumeTap:active .resume.resume {
-  transform: scale(var(--l3-motion-scale-press-default));
-}
-
-.resumeBody {
-  flex: 1;
-}
-
-/* Continue at the bottom of each card (cards are equal height). */
-.resumeBody > :last-child {
-  margin-top: auto;
-}
-
-/* The text leaves room for the ✕. */
-.resumeText {
-  padding-right: var(--l3-spacing-32);
-}
-
-.resumeClose.resumeClose {
-  position: absolute;
-  top: var(--l3-spacing-08);
-  right: var(--l3-spacing-08);
-  z-index: 1; /* over the card, its own tap target */
-}
-
-.resumeTitle {
-  font: var(--l3-text-heading-14);
-  color: var(--l3-content-primary);
-}
-
-.resumeMeta {
-  font: var(--l3-text-description-12);
-  color: var(--l3-content-secondary);
-}
-
-.resumeButton.resumeButton {
-  align-self: flex-start;
-}
-
 /* The remove sheet has no content slot, and L3's large header has no bottom space of its own (it expects the
    content's): 24 here so the description doesn't run into the buttons (local fix; designer to audit L3). */
 .removeSheet header[data-size='lg'] {
@@ -6754,11 +6680,10 @@ import { Avatar } from '@l3/components/Avatar'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
-import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
-import { msChevronRight, msClose, msDelete, msHistory } from '@l3/icons/material'
+import { msChevronRight, msDelete, msHistory } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { t } from '../copy'
@@ -6803,7 +6728,8 @@ function CompactDraft({ draft, onOpen, onHold }: { draft: HomeDraft; onOpen: () 
 
 /**
  * Pick up where you left off: chats left before saving (rare, so only when there are some) — one card each, swiped
- * sideways when there are two or more. The whole card opens the draft's chat; ✕ removes one (a sheet asks first).
+ * sideways when there are two or more: the compact card (the big Continue + ✕ card is archived in
+ * archive/dash-resume-card-big). A tap opens the draft's chat; press and hold removes one (a sheet asks first).
  */
 export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
   drafts: HomeDraft[]
@@ -6814,39 +6740,13 @@ export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
 }) {
   const [removing, setRemoving] = useState<HomeDraft | null>(null)
   const sheetId = useId()
-  // Setting "Resume card": Compact (default) or Big.
-  const compact = useFlowOption('dash', 'resumeCard', 'compact') === 'compact'
   if (drafts.length === 0) return null
   return (
     <Stack as="section" gap="12" aria-label={t('home2.resume')}>
       <SectionHeader title={t('home2.resume')} headingLevel={2} action={onViewAll && { type: 'view-all', onClick: onViewAll }} />
-      {compact ? (
-        <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
-          {drafts.map((d) => <CompactDraft key={d.id} draft={d} onOpen={() => onOpen(d.kind)} onHold={() => setRemoving(d)} />)}
-        </div>
-      ) : (
-        <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
-          {drafts.map((d) => (
-            <div key={d.id} role="listitem" className={styles.draft}>
-              {/* One tap target: the whole card opens the draft's chat (Continue is its keyboard-reachable button;
-                  the card lights up as one). ✕ is outside the card, with its own touch area. */}
-              <div className={styles.resumeTap} onClick={() => onOpen(d.kind)}>
-              <Card className={styles.resume}>
-                <Stack gap="12" className={styles.resumeBody}>
-                  <Stack gap="04" className={styles.resumeText}>
-                    <span className={styles.resumeTitle}>{d.title}</span>
-                    <span className={styles.resumeMeta}>{t(`home.kind.${d.kind}`)} · {d.meta}</span>
-                  </Stack>
-                  {/* The card's tap handles it (no second navigation from here). */}
-                  <Button size="sm" iconRight={<Icon icon={msChevronRight} />} className={styles.resumeButton}>{t('home2.continue')}</Button>
-                </Stack>
-              </Card>
-              </div>
-              <Button variant="ghost" size="sm" iconLeft={<Icon icon={msClose} />} aria-label={t('home2.removeDraft', { name: d.title })} onClick={() => setRemoving(d)} className={styles.resumeClose} />
-            </div>
-          ))}
-        </div>
-      )}
+      <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
+        {drafts.map((d) => <CompactDraft key={d.id} draft={d} onOpen={() => onOpen(d.kind)} onHold={() => setRemoving(d)} />)}
+      </div>
 
       {removing && (
         <Sheet
@@ -9084,8 +8984,6 @@ export const dash: Flow = {
     { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', picker: 'toggle', values: [{ value: 'hide', label: 'Hide' }, { value: 'show', label: 'Show' }], default: 'hide' },
     // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
     { id: 'pastChats', group: 'Home', icon: msChat, label: 'Has past chats', picker: 'toggle', values: [{ value: 'none', label: 'Empty' }, { value: 'some', label: 'With chats' }], default: 'some' },
-    // Resume chats · the card: Compact (history avatar, green "Edited …", title, ›; hold to delete) or Big (Continue + ✕).
-    { id: 'resumeCard', showIf: { user: ['returning'], resumeChats: ['show'] }, group: 'Home', icon: msPlayCircle, label: 'Resume card', values: [{ value: 'compact', label: 'Compact' }, { value: 'big', label: 'Big' }], default: 'compact' },
     // V5, for testing: hide one section.
     { id: 'homeHide', showIf: { dashVersion: ['5'], user: ['returning'] }, group: 'Home', icon: msVisibility, label: 'Hide section', values: [{ value: 'none', label: 'None' }, { value: 'indicators', label: 'Indicators' }, { value: 'strategies', label: 'Strategies' }], default: 'none' },
     // Combined (hidden): its card style.
@@ -10193,12 +10091,28 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
 /* DASH V8 · Tabs home. The cards, header text and field come from ReturningV2.module.css. */
 .page {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  /* The whole body sits in the middle of the space between the top bar and the field (from the top once it's taller). */
+  justify-content: safe center;
 }
 
 /* A tab change: the body fades and rises in (the top bar and the field stay). */
 .body {
   animation: tabs-body-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate);
+}
+
+/* The field active: the body fades and lifts away (the suggestions over the field take over). */
+.body {
+  transition:
+    opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.body[data-hidden] {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--l3-spacing-12)));
+  pointer-events: none;
 }
 
 .heading {
@@ -10215,6 +10129,7 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
 @media (prefers-reduced-motion: reduce) {
   .body {
     animation: none;
+    transition: none;
   }
 }
 ```
@@ -10235,7 +10150,8 @@ import { DashDock } from '../components/DashDock'
 import { useDashUser } from '../components/dashVersion'
 import { openHistoryOn } from '../components/historyFilter'
 import { useHomeKeyboard } from '../components/homeKeyboard'
-import { useHomeKind } from '../components/homeKind'
+import { setHomeKind, useHomeKind } from '../components/homeKind'
+import { FirstAsk } from '../components/FirstAsk'
 import { usePineUpload } from '../components/pineUpload'
 import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { t } from '../copy'
@@ -10264,6 +10180,7 @@ const EXAMPLES = {
  *    its details sheet. Nothing made (strategies, for now) → no section;
  * 4. Start one — "+ Create <kind>" (types the opening words), then three examples to try (tap → into the field);
  * 5. the plain floating field (no pills): its placeholder and where Send goes follow the tab; + uploads a Pine Script.
+ *    Active (typing): the body steps away and suggestions for the tab show over the field (FirstAsk), as in V7.
  */
 export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator, onPastChats, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   const kind = useHomeKind()
@@ -10310,7 +10227,8 @@ export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator
       <div className={cards.scroll} onClick={kb.close}>
         <Inset paddingInline="16" paddingBlock="24" className={styles.page}>
           {/* The whole body follows the top bar's tab: a new key fades it in. */}
-          <Stack key={kind} gap="32" className={styles.body}>
+          {/* Typing (the field active): the body steps away and the suggestions over the field take over, as in V7. */}
+          <Stack key={kind} gap="32" className={styles.body} data-hidden={typing || undefined}>
             <Stack gap="16" align="center" className={styles.header}>
               <span className={cards.orbNudge}><DashOrb size="md" /></span>
               <Stack gap="04" className={styles.heading}>
@@ -10378,6 +10296,9 @@ export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator
       <DashDock>
         <div className={cards.dock}>
           <Inset paddingInline="16" paddingBlock="16">
+            {/* The field active: suggestions for the tab's kind over it (picking one fills the field; their kind pills
+                move the top bar's tab); once something is typed, ones that finish it. */}
+            {typing && <FirstAsk kind="home" mode={kind} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} onKind={(k) => setHomeKind(k)} />}
             <ChatInput {...kb.field} firstMessage onSend={kb.sending(send)} placeholder={t(`askModes.placeholder.${kind}`)} onAttach={pine.onAttach} />
             {pine.ui}
           </Inset>
