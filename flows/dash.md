@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — V16 · Explained: pills 56 tall, fully round. Pill counts: the count badge has no white ring (pills and V11's ribbon tabs).
 - 2026-10-31 — **V16 · Explained** (id '20'): V15 with a small explainer line inside each kind pill — "Limits your trades" · "Chart signals" · "When to buy & sell" (L3 Tab `subLabel`, set to Label/10); pills 44 (`--app-dash-pill-explained`), names in capitals, no 4 ring round the pills, a count (Pill counts) on the name's line. New settings group **Pills**: **Pill height** (0 = the version's own, 24–64) and **Pill corner radius** (0–32; the pills, the thumb and the track share it).
 - 2026-10-31 — V14 / V15: the row under the pills is only the picked kind — its creations, or (nothing made, e.g. Strategy) the Create card then the "Try" suggestions (a tap types it in). V15's orb is 48 and sits 24 above the heading; the heading sits 32 above the pills.
 - 2026-10-31 — Setting **Big pills** (every version, A/B): the Rule · Indicator · Strategy pills 8 taller (32 → 40), fully round. V15: the small orb sits 4 right of centre and is still (its animation paused).
@@ -7050,6 +7051,12 @@ export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
     transition: none;
   }
 }
+
+/* Setting "Pill counts": the count sits flat on the pill — no white ring (L3's Badge draws one to stand off busy
+   backgrounds). */
+.row [role='tab'] [class*='_badge_'] {
+  box-shadow: none;
+}
 ```
 
 ### `src/flows/dash/components/RibbonTabs.tsx`
@@ -7959,6 +7966,12 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
 
 .track[data-fill] .tabs {
   flex: 1;
+}
+
+/* Setting "Pill counts": the count sits flat on the pill — no white ring (L3's Badge draws one to stand off busy
+   backgrounds). */
+.track [role='tab'] [class*='_badge_'] {
+  box-shadow: none;
 }
 ```
 
