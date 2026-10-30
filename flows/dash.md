@@ -233,7 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
-- 2026-10-31 — V14 / V15: the row under the pills is only the picked kind — its creations, or (nothing made, e.g. Strategy) the Create card then the "Try" suggestions (a tap types it in). V15's orb is 48 and sits 24 above the heading.
+- 2026-10-31 — V14 / V15: the row under the pills is only the picked kind — its creations, or (nothing made, e.g. Strategy) the Create card then the "Try" suggestions (a tap types it in). V15's orb is 48 and sits 24 above the heading; the heading sits 32 above the pills.
 - 2026-10-31 — Setting **Big pills** (every version, A/B): the Rule · Indicator · Strategy pills 8 taller (32 → 40), fully round. V15: the small orb sits 4 right of centre and is still (its animation paused).
 - 2026-10-31 — **V14 · Clean and V15 · Clean still** (ids '18', '19'; from V10 · Heading, after senior feedback — a calmer middle):
   - The top bar reads **DASH AI** with a small **BETA** tag (L3 Tag, neutral tertiary), centred (`DashBar center`); no orb or greeting in the middle, no "Your creations" header (View all is the last card); the cards sit 24 under the full-width pills.
@@ -13515,7 +13515,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
             {/* 1 · Header, centred in both states: the DASH orb, then the greeting under it. Big with nothing to resume
                 (centre stage); a size smaller while drafts are shown, so the sections fit. */}
             {/* V7 / V8 · typing the first message: the header steps away (the field and the suggestions take over). */}
-            <Stack gap={dashVersion.barTitle ? '24' : '16'} align="center" className={`${styles.reveal} ${styles.header}`} data-hidden={(typing && firstSuggest) || undefined}>
+            <Stack gap={dashVersion.stillHeading ? '32' : dashVersion.barTitle ? '24' : '16'} align="center" className={`${styles.reveal} ${styles.header}`} data-hidden={(typing && firstSuggest) || undefined}>
               {/* 8 to the right: the ring sits left of the art's box (the leaves fill its right), so it reads centred */}
               {/* V14 · Clean: no orb or greeting here — "DASH AI · BETA" is in the top bar; only the pills stay. */}
               {!dashVersion.barTitle && (
