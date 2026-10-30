@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — Fix: V12 / V13 · Center don't scroll — the page fits the screen exactly (the held page height less the dock's room) and its scroll is locked, so nothing slides past the centred field.
 - 2026-10-31 — Setting **Pill counts** (every version, A/B; off by default): a tiny neutral count on each unpicked Rule · Indicator · Strategy pill / ribbon tab — how many of that kind are made (none → no tag; `usePillCount` in SlidingPills). **V10 · Heading:** the pills under the question are full width (three equal). **V8 · Tabs:** one row only — "Your creations": "+ Create <kind>" (follows the top tab) then that kind's cards; the "Start a …" row with the Try examples is gone.
 - 2026-10-31 — Fix: V8 · Tabs' top-bar pills — the picked one's black thumb was hidden under a leftover white fill on the pill list; the white track now comes only from `--pills-track`.
 - 2026-10-31 — **V12 · Center and V13 · Center pills** (ids '16', '17'; new and returning users; `screens/HomeCenter`): a landing page like desktop AI chats. The field sits on the screen's centre line (an empty slot in the page; the field itself stays in the DASH dock and is lifted there), the orb and "How can I help you trade better?" stack up from its top, **Your creations** hangs from its bottom (no Create card; the heading "Your creations ›" opens them all). Tap the field: the rest steps away and the field glides straight down to its place over the keyboard (frame by frame from where it is, so the keyboard moving under it can't drag it); back the same way. The field's edge is the green → lime → yellow gradient, turning (`edgeTurn`). V13 has Rule · Indicator · Strategy inside the field (text on top; pills, + and Send under it); the section below follows the pick — that kind's creations, or **Suggestions** (the "Try" cards) when nothing of it is made yet.
@@ -10293,6 +10294,12 @@ export function DashAI(props: DashAIProps) {
 
 ```css
 /* DASH V12 · Center. */
+
+/* The page doesn't scroll (doubled class: over the shared scroll area's overflow). */
+.still.still {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
 .page {
   display: flex;
   flex: 1;
@@ -10583,10 +10590,12 @@ export function HomeCenterScene({ returning, onManage, onOpenRule, onOpenIndicat
 
   return (
     <div className={cards.scene}>
-      <div ref={scroll} className={cards.scroll} onClick={kb.close}>
-        {/* Kept at its idle height while the keyboard is up, so the slot (the field's centre line) never moves. */}
+      {/* A landing: the page never scrolls (the field is pinned to its centre slot; a scrolling page would slide past it). */}
+      <div ref={scroll} className={`${cards.scroll} ${styles.still}`} onClick={kb.close}>
+        {/* Kept at its idle height (less the dock's room above it, so the two fill the screen exactly — nothing to
+            scroll) while the keyboard is up, so the slot (the field's centre line) never moves. */}
         <Inset paddingInline="16" className={styles.page}>
-          <div className={styles.pageBox} style={{ height: pageH || undefined }}>
+          <div className={styles.pageBox} style={{ height: pageH ? pageH - dockH : undefined }}>
           <div className={styles.dockRoom} style={{ height: dockH }} aria-hidden="true" />
           {/* The field's slot is the screen's centre line: two equal halves around it — the orb and heading stack up
               from its top, the suggestions hang from its bottom. Both step away while the field is active. */}
