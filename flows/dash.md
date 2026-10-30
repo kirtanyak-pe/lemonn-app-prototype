@@ -81,7 +81,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-23` | Indicator · building | — | The indicator preview builds in the pinned card |
 | `dash-24` | Indicator · ready | — | Preview with Modify and Save indicator |
 | `dash-25` | Indicator · saved | — | The preview card closes; DASH confirms it was saved and offers View indicator |
-| `dash-30` | Past chats | — | Every chat with DASH by day (Today / Yesterday / Earlier), newest first; a row opens its chat |
+| `dash-30` | Past chats | — | Every chat with DASH by day (Today / Yesterday / Earlier), newest first: title + when (drafts: green “Draft · Edited …”); no kind — a chat can make mixed things; a row opens its chat |
 
 ### Navigation
 
@@ -237,7 +237,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
-- 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
+- 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary; the compact card's green line reads “Draft · Edited 2 hr ago”. Past chats rows: no kind icon or Rule / Indicator word (a chat can make mixed things) — the title and when; drafts show the same green “Draft · Edited …”. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
 - 2026-10-30 — **Top bar: Past chats + Your creations.** The bar's right action (everything made with DASH) gets its own icon (widgets, was history; label “Your creations”), and a history button left of it opens **Past chats** (dash-30, `screens/PastChats`): every chat with DASH by day (Today / Yesterday / Earlier), newest first — the kind's icon in an L3 Avatar, the title, “Rule · 9:20 am” (drafts: “Draft, not saved”), ›; a row opens its chat. Data: `pastChats` in data.ts. Rows: the L3 card row on surface/primary with only its 1px edge (no drop shadow). The home's “Your creations” heading carries the same widgets icon. “Pick up where you left off” has View all → Past chats. The compact resume card's title is one line (… when longer) and its history avatar has no edge.
 - 2026-10-30 — **Resume card: Compact** (new setting under Resume chats; default Compact, Big = the old card). Like a creation card: the history avatar (L3 Avatar, icon type), the green “Edited 2 hours ago” over the title, ›. A tap opens the draft's chat; press and hold (0.5 s, or right-click) opens the delete sheet — no ✕. Data: `HomeDraft.edited`.
 - 2026-10-30 — **V1 · Classic and V2 · Pills archived; V7 · Pills is the default.** Both are off the dropdown (kept in the code as hidden “Old · V1 Classic” / “Old · V2 Pills”, ids '1' / '2'); the other versions keep their names (V3–V7). V5 · Cards' title is Heading/24 on two lines: “How can I help you / trade today?”. Its cards scale with the screen: 2.5 always in view, and the whole card (icon, text, padding, corners) zooms with it — laid out at the 392 screen's size (`--app-dash-v9-card`, 144) and zoomed by HomeV9's `useCardZoom`.
@@ -6719,7 +6719,7 @@ export function useResumeDrafts() {
 const HOLD_MS = 500
 
 /**
- * Compact resume card (like a creation card): the history avatar, then the green "Edited …" line over the title, and ›.
+ * Compact resume card (like a creation card): the history avatar, then the green "Draft · Edited …" line over the title, and ›.
  * A tap opens the draft's chat; press and hold (or right-click) asks to delete it.
  */
 function CompactDraft({ draft, onOpen, onHold }: { draft: HomeDraft; onOpen: () => void; onHold: () => void }) {
@@ -6761,7 +6761,7 @@ function CompactDraft({ draft, onOpen, onHold }: { draft: HomeDraft; onOpen: () 
     >
       <Avatar size={40} icon={<Icon icon={msHistory} size={20} />} className={styles.compactAvatar} />
       <span className={styles.compactText}>
-        <span className={styles.compactEdited}>{draft.edited}</span>
+        <span className={styles.compactEdited}>{t('home2.draftEdited', { edited: draft.edited })}</span>
         <span className={styles.compactTitle}>{draft.title}</span>
       </span>
       <span className={styles.compactCaret}><Icon icon={msChevronRight} size={16} /></span>
@@ -8371,7 +8371,6 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "pastChats.today": "Today",
   "pastChats.yesterday": "Yesterday",
   "pastChats.earlier": "Earlier",
-  "pastChats.draft": "Draft, not saved",
   "landing.greeting": "Hi {name}!",
   "landing.title": "Let me know what you would like to do today?",
   "landing.choose": "Choose what to build",
@@ -8559,6 +8558,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home2.helloSub": "Here’s how your DASH tools are doing",
   "home2.resume": "Pick up where you left off",
   "home2.continue": "Continue",
+  "home2.draftEdited": "Draft · {edited}",
   "home2.resumeHold": "{name}. {edited}. Opens the chat; press and hold to delete",
   "home2.today": "Today",
   "home2.stepIns": "Stepped in {count}× today",
@@ -8887,7 +8887,7 @@ export const rupees = (n: number) => inr(n, 0)
  */
 export type PastChat = { id: string; kind: 'rule' | 'indicator'; title: string; day: 'today' | 'yesterday' | 'earlier'; time: string; saved: boolean; edited?: string }
 export const pastChats: PastChat[] = [
-  { id: 'chat-supertrend', kind: 'indicator', title: 'Supertrend (10, 3) with EMA 20', day: 'today', time: '2 hours ago', saved: false, edited: 'Edited 2 hours ago' },
+  { id: 'chat-supertrend', kind: 'indicator', title: 'Supertrend (10, 3) with EMA 20', day: 'today', time: '2 hours ago', saved: false, edited: 'Edited 2 hr ago' },
   { id: 'chat-cooldown', kind: 'rule', title: 'Expiry Day Options Entry Warning', day: 'today', time: '9:20 am', saved: true },
   { id: 'chat-max-loss', kind: 'rule', title: 'Max daily loss at ₹5,000', day: 'yesterday', time: '6:45 pm', saved: false, edited: 'Edited yesterday' },
   { id: 'chat-rsi', kind: 'indicator', title: 'RSI 14 with overbought at 70', day: 'yesterday', time: '11:02 am', saved: true },
@@ -10958,9 +10958,9 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
   box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the card's edge */
 }
 
-/* The kind's icon in content/primary (L3's icon avatar is content/secondary at 60%), as on the resume cards. */
-.row .avatar > * {
-  color: var(--l3-content-primary);
+/* A draft's line: green, like the resume card's "Draft · Edited …". */
+.draft {
+  color: var(--l3-content-accent-success-default);
 }
 ```
 
@@ -10968,13 +10968,12 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 
 ```tsx
 import { Actionbar } from '@l3/components/Actionbar'
-import { Avatar } from '@l3/components/Avatar'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
 import { ListCell } from '@l3/components/ListCell'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
-import { msChevronRight, msMonitoring, msRule } from '@l3/icons/material'
+import { msChevronRight } from '@l3/icons/material'
 import { Screen } from '../../../shared/ui/Screen'
 import { t } from '../copy'
 import { pastChats, type PastChat } from '../data'
@@ -10985,8 +10984,9 @@ const DAYS: PastChat['day'][] = ['today', 'yesterday', 'earlier']
 /**
  * Past chats — from the history button in DASH's top bar: every chat with DASH, so one that's no longer on the home
  * (not a draft, or a draft removed from "Pick up where you left off") can still be opened. Plain screen (L3 Actionbar,
- * no DASH background), grouped by day, newest first. A row: the kind's icon in an L3 Avatar, the title, "Rule · 9:20 am"
- * (drafts: "Draft, not saved"), ›. A tap opens its chat.
+ * no DASH background), grouped by day, newest first. A row: the title, when it was ("9:20 am"; a draft: the green
+ * "Draft · Edited 2 hr ago"), ›. No kind or kind icon — one chat can create rules, indicators and strategies alike.
+ * A tap opens its chat.
  */
 export function PastChats({ onBack, onOpen }: { onBack?: () => void; onOpen?: (kind: PastChat['kind']) => void }) {
   return (
@@ -11003,9 +11003,10 @@ export function PastChats({ onBack, onOpen }: { onBack?: () => void; onOpen?: (k
                     as="button"
                     variant="card"
                     className={styles.row}
-                    iconLeft={<Avatar size={40} className={styles.avatar} icon={<Icon icon={c.kind === 'indicator' ? msMonitoring : msRule} size={20} />} />}
                     label={c.title}
-                    description={`${t(`home.kind.${c.kind}`)} · ${!c.saved ? t('pastChats.draft') : c.time}`}
+                    // No kind: one chat can create several things of any kind. A draft: the green "Draft · Edited …"
+                    // (as on the home's resume card); a saved chat: when it was.
+                    description={!c.saved ? <span className={styles.draft}>{t('home2.draftEdited', { edited: c.edited ?? c.time })}</span> : c.time}
                     iconRight={<Icon icon={msChevronRight} />}
                     onClick={() => onOpen?.(c.kind)}
                   />
