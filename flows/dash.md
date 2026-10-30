@@ -238,6 +238,8 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — V8 · Tabs: one ☰ on the right of the top bar opens the dropdown (Past chats, Your creations), so the tabs sit centred; the tabs' track and unpicked pills are surface/primary. **Settings:** yes / no settings are one on / off switch (`picker: 'toggle'`, values[0] = off): New user, Resume chats, Has past chats, Strategy card.
+- 2026-10-30 — **V8 · Tabs** (id '12', returning user; new user = Landing): Rule · Indicator · Strategy are L3 pill tabs in the middle of the top bar (`DashBar center`), not in the field — the plain floating field (as in V1) sits at the bottom. The whole body follows the tab (`components/homeKind`, fades in): the header question for that kind, that kind's drafts, “Your rules / indicators” (3 + View all → history on that tab), then “Start a …” — + Create and three examples to try. The field's placeholder and Send follow the tab (`screens/HomeTabs`).
 - 2026-10-30 — Dropdown name: **V4 · Focus → V4 · Floating** (id '8' unchanged).
 - 2026-10-30 — DASH top bar: action buttons are always round (`.bar` in DashScreen.module.css sets `--btn-radius` to full; L3's small Tertiary is radius 8). L3 gap: Actionbar actions have no round option.
 - 2026-10-30 — V5 · Cards: the title is “How can I help you today?” (Heading/24, one line); the time-of-day greeting (“Good morning, Rohan”) shows above it only when there's nothing to resume (Resume chats off, or no drafts). With nothing to resume the orb, greeting and title sit centred in the middle of the space (like the other versions); with drafts they move to the top left.
@@ -318,7 +320,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -2965,6 +2967,11 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   box-shadow: inset 0 0 0 1px var(--l3-border-intense); /* 1px: the outline */
   color: var(--l3-content-primary);
 }
+
+/* The plain floating field (+ on the left, then the text): 8 between the + and the text (the row's 4 + 4). */
+.input[data-attach]:not([data-dock]):not([data-inline]):not([data-modes]) .attachWrap {
+  margin-right: var(--l3-spacing-04);
+}
 ```
 
 ### `src/flows/dash/components/Chat.tsx`
@@ -3440,7 +3447,14 @@ import styles from './ChatMenu.module.css'
  * Your creations, Delete this chat. A tap outside or Esc closes it. L3 gap: no menu / popover component, so this is
  * L3 list rows on a raised surface.
  */
-export function ChatMenu({ onPastChats, onCreations, onDelete }: { onPastChats?: () => void; onCreations?: () => void; onDelete: () => void }) {
+export function ChatMenu({ onPastChats, onCreations, onDelete, icon = msMoreVert, label = t('chatMenu.button') }: {
+  onPastChats?: () => void
+  onCreations?: () => void
+  /** Leave out for a menu without Delete this chat (V8 · Tabs' home: ☰ with Past chats and Your creations). */
+  onDelete?: () => void
+  icon?: string
+  label?: string
+}) {
   const [open, setOpen] = useState(false)
   const wrap = useRef<HTMLSpanElement>(null)
   useEffect(() => {
@@ -3457,12 +3471,12 @@ export function ChatMenu({ onPastChats, onCreations, onDelete }: { onPastChats?:
   const pick = (go?: () => void) => () => { setOpen(false); go?.() }
   return (
     <span ref={wrap} className={styles.wrap}>
-      <ActionbarAction icon={msMoreVert} label={t('chatMenu.button')} onClick={() => setOpen((o) => !o)} />
+      <ActionbarAction icon={icon} label={label} onClick={() => setOpen((o) => !o)} />
       {open && (
-        <div className={styles.menu} role="group" aria-label={t('chatMenu.button')}>
+        <div className={styles.menu} role="group" aria-label={label}>
           <ListCell as="button" size="sm" iconLeft={<Icon icon={msHistory} />} label={t('landing.pastChats')} onClick={pick(onPastChats)} />
           <ListCell as="button" size="sm" iconLeft={<Icon icon={msWidgets} />} label={t('landing.menu')} onClick={pick(onCreations)} />
-          <ListCell as="button" size="sm" className={styles.danger} iconLeft={<Icon icon={msDelete} />} label={t('chatMenu.delete')} onClick={pick(onDelete)} />
+          {onDelete && <ListCell as="button" size="sm" className={styles.danger} iconLeft={<Icon icon={msDelete} />} label={t('chatMenu.delete')} onClick={pick(onDelete)} />}
         </div>
       )}
     </span>
@@ -3768,6 +3782,31 @@ export function DashDock({ children }: { children: ReactNode }) {
   box-shadow: none;
 }
 
+/* V8 · Tabs: the kind tabs centred on the bar's 48 row (under the status-bar space), between back and the actions. */
+.barWrap {
+  position: relative;
+}
+
+/* The tabs' track on surface/primary (L3's pill group is surface/secondary): it sits on DASH's glow, not a white bar. */
+.barCenter.barCenter [data-appearance='pill-group'] {
+  background: var(--l3-surface-primary);
+}
+
+/* …and the unpicked pills share it (L3 gives them surface/secondary, the track's usual colour). */
+.barCenter.barCenter [data-appearance='pill'][data-emphasis='tertiary'][aria-selected='false'] {
+  --tab-surface: var(--l3-surface-primary);
+}
+
+.barCenter {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  height: var(--l3-size-48);
+  translate: -50% 0;
+}
+
 /* DASH's top bar: its action buttons are always round (history, Your creations, the chat ⋮) — L3's small Tertiary
    button is a rounded square (radius 8). */
 .bar.bar button {
@@ -3790,7 +3829,7 @@ export function DashDock({ children }: { children: ReactNode }) {
 ### `src/flows/dash/components/DashScreen.tsx`
 
 ```tsx
-import { useEffect, useRef, type ComponentProps } from 'react'
+import { useEffect, useRef, type ComponentProps, type ReactNode } from 'react'
 import { Actionbar, type ActionbarProps } from '@l3/components/Actionbar'
 import { Screen } from '../../../shared/ui/Screen'
 import gradient from '../assets/bg-gradient.png'
@@ -3852,8 +3891,14 @@ export function DashScreen({ tone = 'brand', keyboard = false, chatting = false,
  * The L3 Actionbar on DASH's background: see-through (the gradient runs under it) and without the hairline. The DASH
  * pages carry no title (Figma): back on the left, one Tertiary action on the right.
  */
-export function DashBar(props: ActionbarProps) {
-  return <Actionbar {...props} className={styles.bar} />
+export function DashBar({ center, ...props }: ActionbarProps & { /** Something in the middle of the bar's row (V8 · Tabs: the kind tabs). */ center?: ReactNode }) {
+  if (!center) return <Actionbar {...props} className={styles.bar} />
+  return (
+    <div className={styles.barWrap}>
+      <Actionbar {...props} className={styles.bar} />
+      <div className={styles.barCenter}>{center}</div>
+    </div>
+  )
 }
 
 /** The background glow turns at full speed this long after arriving on DASH, then at GLOW_SLOW_RATE. */
@@ -7775,6 +7820,9 @@ export type DashVersionInfo = {
   /** The glow rises higher from the bottom (the white disc ends higher): 'dock' behind the field (V7), 'cards' up
    *  behind the cards above it too (V9). */
   glowRise?: 'dock' | 'cards'
+  /** V8 · Tabs: Rule · Indicator · Strategy as tabs in the middle of the top bar (not in the field); the whole home
+   *  body follows the pick. The field is the plain floating one. */
+  topKinds?: boolean
 }
 
 // The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
@@ -7793,6 +7841,7 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '9', label: 'V5 · Cards', field: 'switch', dock: true, glowRise: 'cards', firstMessageWash: 'rise' },
   { value: '10', label: 'V6 · Creations', field: 'switch', firstMessageFocus: true, firstCard: true },
   { value: '11', label: 'V7 · Pills', field: 'plain', dock: true, glowRise: 'dock', createPills: true, firstSuggestions: true },
+  { value: '12', label: 'V8 · Tabs', field: 'plain', topKinds: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -8025,6 +8074,33 @@ export function useHomeKeyboard({ typing = false, onTyping }: { typing?: boolean
       </div>
     ),
   }
+}
+```
+
+### `src/flows/dash/components/homeKind.ts`
+
+```ts
+import { useSyncExternalStore } from 'react'
+import type { Mode } from './askModes'
+
+/**
+ * V8 · Tabs: what the home is about (Rule · Indicator · Strategy). The pick lives in the top bar (DashAI) and the home
+ * body follows it (HomeTabs), so it's one small shared value both read.
+ */
+let kind: Mode = 'rule'
+const listeners = new Set<() => void>()
+
+export function setHomeKind(next: Mode) {
+  if (next === kind) return
+  kind = next
+  listeners.forEach((l) => l())
+}
+
+export function useHomeKind(): Mode {
+  return useSyncExternalStore(
+    (l) => { listeners.add(l); return () => { listeners.delete(l) } },
+    () => kind,
+  )
 }
 ```
 
@@ -8388,6 +8464,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "landing.menu": "Your creations",
   "landing.pastChats": "Past chats",
   "chatMenu.button": "Chat options",
+  "chatMenu.menu": "Menu",
   "chatMenu.title": "This chat",
   "chatMenu.delete": "Delete this chat",
   "chatMenu.deleteTitle": "Delete this chat?",
@@ -8782,6 +8859,12 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "liveAsk.strategy.5": "trades the opening range breakout",
   "liveAsk.strategy.6": "sells when RSI crosses 70",
   "liveAsk.label": "Suggestions for what you're typing",
+  "home8.title.rule": "What should a rule do for you?",
+  "home8.title.indicator": "What should your indicator show?",
+  "home8.title.strategy": "What should your strategy trade?",
+  "home8.start.rule": "Start a rule",
+  "home8.start.indicator": "Start an indicator",
+  "home8.start.strategy": "Start a strategy",
   "home3.start.rule": "Build a rule that ",
   "home3.start.indicator": "Build an indicator that ",
   "home3.start.strategy": "Build a strategy that ",
@@ -8990,17 +9073,17 @@ export const dash: Flow = {
     // components/dashVersion.ts (+ its homes in screens/homes.tsx). Hidden ones (Combined) stay in the code, off the panel.
     { id: 'dashVersion', group: 'Home', icon: msHome, label: 'DASH version', picker: 'dropdown', values: dashVersions.filter((v) => !v.hidden).map(({ value, label }) => ({ value, label })), default: defaultDashVersion },
     // Who is using DASH — every version reads it (useDashUser) and adapts its cards.
-    { id: 'user', group: 'Home', icon: msPerson, label: 'User', values: [{ value: 'new', label: 'New user' }, { value: 'returning', label: 'Returning user' }], default: 'returning' },
+    { id: 'user', group: 'Home', icon: msPerson, label: 'New user', picker: 'toggle', values: [{ value: 'returning', label: 'Returning user' }, { value: 'new', label: 'New user' }], default: 'returning' },
     // A returning user: what they've made so far. A made kind shows its numbers / cards; the others are promoted.
     { id: 'made', showIf: { user: ['returning'] }, group: 'Home', icon: msRule, label: 'Made so far', values: [{ value: 'rules', label: 'Rules' }, { value: 'indicators', label: 'Indicators' }, { value: 'both', label: 'Both' }], default: 'both' },
     // V6: a Create card for strategies too.
-    { id: 'homeStrategyCard', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Strategy card', values: [{ value: 'hide', label: 'Off' }, { value: 'show', label: 'On' }], default: 'hide' },
+    { id: 'homeStrategyCard', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Strategy card', picker: 'toggle', values: [{ value: 'hide', label: 'Off' }, { value: 'show', label: 'On' }], default: 'hide' },
     // V6: the Create cards with a small button, or the plain dashed + Create card (the whole card taps).
     { id: 'homeCreateStyle', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Create cards', values: [{ value: 'button', label: 'Button' }, { value: 'outline', label: 'Outline' }], default: 'button' },
     // Every version, returning user · drafts to resume: Show (two sample drafts) or Hide (default; none — the centre-stage layout).
-    { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
+    { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', picker: 'toggle', values: [{ value: 'hide', label: 'Hide' }, { value: 'show', label: 'Show' }], default: 'hide' },
     // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
-    { id: 'pastChats', group: 'Home', icon: msChat, label: 'Past chats', values: [{ value: 'some', label: 'With chats' }, { value: 'none', label: 'Empty' }], default: 'some' },
+    { id: 'pastChats', group: 'Home', icon: msChat, label: 'Has past chats', picker: 'toggle', values: [{ value: 'none', label: 'Empty' }, { value: 'some', label: 'With chats' }], default: 'some' },
     // Resume chats · the card: Compact (history avatar, green "Edited …", title, ›; hold to delete) or Big (Continue + ✕).
     { id: 'resumeCard', showIf: { user: ['returning'], resumeChats: ['show'] }, group: 'Home', icon: msPlayCircle, label: 'Resume card', values: [{ value: 'compact', label: 'Compact' }, { value: 'big', label: 'Big' }], default: 'compact' },
     // V5, for testing: hide one section.
@@ -9658,7 +9741,7 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
 ```tsx
 import { useEffect, useState, type ReactNode } from 'react'
 import { ActionbarAction } from '@l3/components/Actionbar'
-import { msHistory, msWidgets } from '@l3/icons/material'
+import { msHistory, msMenu, msWidgets } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { DashBar, DashScreen } from '../components/DashScreen'
 import { SceneSwap, type SceneMove } from '../components/SceneSwap'
@@ -9673,6 +9756,9 @@ import { defaultDashVersion, useDashUser, useDashVersion } from '../components/d
 import { RuleScene, type RuleChatProps } from './RuleChat'
 import { DeleteChatSheet } from '../sheets/ChatSheets'
 import { ChatMenu } from '../components/ChatMenu'
+import { Tabs } from '@l3/components/Tabs'
+import { setHomeKind, useHomeKind } from '../components/homeKind'
+import type { Mode } from '../components/askModes'
 import { PastChatsSheet } from './PastChats'
 import type { PastChat } from '../data'
 
@@ -9770,6 +9856,20 @@ export function DashAI(props: DashAIProps) {
   }, [typing])
 
   const tone = props.scene === 'rules' && props.step === 'cost' ? 'loss' : 'brand'
+  // V8 · Tabs, returning user's home: Rule · Indicator · Strategy in the middle of the top bar (the body follows), and
+  // one ☰ on the right (Past chats, Your creations) so the tabs sit centred between back and it.
+  const homeKind = useHomeKind()
+  const kindTabs = dashVersion.topKinds && props.scene === 'landing' && returning ? (
+    <Tabs
+      aria-label={t('askModes.label')}
+      appearance="pill-group"
+      behavior="toggle"
+      size="sm"
+      items={(['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`) }))}
+      value={homeKind}
+      onChange={(v) => setHomeKind(v as Mode)}
+    />
+  ) : undefined
   /** A chat has started (not the home, not an empty chat): the top bar's ⋮ menu. */
   const inChat = props.scene !== 'landing' && props.step !== 'empty'
   // The background ends above the drawn keyboard (laptop). Scenes turn typing on only where the keyboard comes up
@@ -9795,7 +9895,7 @@ export function DashAI(props: DashAIProps) {
       bottom={<div ref={setDockHost} className={styles.dockHost} />}
       // Right of the bar — on the home and an empty chat: past chats (history), then what they've made. Once a chat has
       // started (a message sent, or a past chat opened): one ⋮ dropdown with those two and Delete this chat.
-      top={<DashBar onBack={onBack} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={onPastChats} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
+      top={<DashBar onBack={onBack} center={kindTabs} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : kindTabs ? <ChatMenu icon={msMenu} label={t('chatMenu.menu')} onPastChats={onPastChats} onCreations={onYourRules} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={onPastChats} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
       sheet={
         chatSheet === 'history' ? (
           <PastChatsSheet
@@ -10081,6 +10181,208 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
         </Inset>
       </div>
       {kb.keyboard}
+      </DashDock>
+    </div>
+  )
+}
+```
+
+### `src/flows/dash/screens/HomeTabs.module.css`
+
+```css
+/* DASH V8 · Tabs home. The cards, header text and field come from ReturningV2.module.css. */
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A tab change: the body fades and rises in (the top bar and the field stay). */
+.body {
+  animation: tabs-body-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate);
+}
+
+.heading {
+  text-align: center;
+}
+
+@keyframes tabs-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--l3-spacing-08));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body {
+    animation: none;
+  }
+}
+```
+
+### `src/flows/dash/screens/HomeTabs.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { raised } from '@l3/components/Raised'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { msAdd, msChevronRight, msLightbulb } from '@l3/icons/material'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { ChatInput } from '../components/Chat'
+import { DashDock } from '../components/DashDock'
+import { useDashUser } from '../components/dashVersion'
+import { openHistoryOn } from '../components/historyFilter'
+import { useHomeKeyboard } from '../components/homeKeyboard'
+import { useHomeKind } from '../components/homeKind'
+import { usePineUpload } from '../components/pineUpload'
+import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
+import { t } from '../copy'
+import { dashRules, firstName, homeTriggers, savedIndicators, type SavedRule } from '../data'
+import { CreationDetailsSheet } from '../sheets/RuleSheets'
+import type { ReturningProps } from './Returning'
+// The creation / create / try cards are the same as the other returning homes'.
+import cards from './ReturningV2.module.css'
+import styles from './HomeTabs.module.css'
+
+/** Made ones shown before View all. */
+const MAX_MADE = 3
+const EXAMPLES = {
+  rule: ['home3.ex.rule1', 'home3.ex.rule2', 'home3.ex.rule3'],
+  indicator: ['home3.ex.indicator1', 'home3.ex.indicator2', 'home3.ex.indicator3'],
+  strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
+} as const
+
+/**
+ * DASH V8 · Tabs — the returning user's home. Rule · Indicator · Strategy are tabs in the middle of the top bar
+ * (DashAI), not in the field, so the page reads top-down: what it's about → what's there → ask. The whole body
+ * follows the tab (fading in):
+ * 1. the header, centred: the DASH orb, "Hey Rohan," and a question for that kind;
+ * 2. Pick up where you left off — that kind's drafts only (setting "Resume chats");
+ * 3. Your rules / indicators — what's been made of that kind (3, then View all → history on that tab); a card opens
+ *    its details sheet. Nothing made (strategies, for now) → no section;
+ * 4. Start one — "+ Create <kind>" (types the opening words), then three examples to try (tap → into the field);
+ * 5. the plain floating field (no pills): its placeholder and where Send goes follow the tab; + uploads a Pine Script.
+ */
+export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator, onPastChats, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
+  const kind = useHomeKind()
+  const kb = useHomeKeyboard({ typing, onTyping })
+  const { made } = useDashUser(returning)
+  const [allDrafts, setDrafts] = useResumeDrafts()
+  const drafts = allDrafts.filter((d) => d.kind === kind)
+  const pine = usePineUpload(onIndicator)
+  const [details, setDetails] = useState<{ item: SavedRule; kind: 'rule' | 'indicator' } | null>(null)
+  const [onMap, setOnMap] = useState<Record<string, boolean>>({})
+  const isOn = (item: SavedRule) => onMap[item.id] ?? item.on
+
+  // That kind's creations: rules that stepped in today first; indicators as saved. No strategies yet.
+  const items: SavedRule[] = !made[kind] ? [] : kind === 'rule'
+    ? [...dashRules.filter((r) => homeTriggers[r.id]), ...dashRules.filter((r) => !homeTriggers[r.id])]
+    : kind === 'indicator' ? savedIndicators : []
+
+  // Send opens the tab's chat (a strategy: the strategy chat).
+  const send = () => {
+    if (kind === 'rule') onRules?.()
+    else if (kind === 'indicator') onIndicator?.()
+    else (onStrategy ?? onRules)?.()
+  }
+  const start = (text: string) => { kb.field.onChange(text); kb.field.onFocus() }
+
+  const card = (item: SavedRule, k: 'rule' | 'indicator') => {
+    const triggered = homeTriggers[item.id] ?? 0
+    const on = isOn(item)
+    const status = k === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
+    const lit = k === 'rule' ? on && triggered > 0 : on
+    return (
+      <button key={item.id} type="button" role="listitem" className={cards.item} onClick={() => setDetails({ item, kind: k })}>
+        <span className={cards.itemTop}>
+          <span className={cards.itemStatus}><span data-on={lit || undefined}>{status}</span></span>
+          <Icon icon={msChevronRight} size={16} />
+        </span>
+        <span className={cards.itemTitle}>{item.title}</span>
+      </button>
+    )
+  }
+
+  return (
+    <div className={cards.scene}>
+      <div className={cards.scroll} onClick={kb.close}>
+        <Inset paddingInline="16" paddingBlock="24" className={styles.page}>
+          {/* The whole body follows the top bar's tab: a new key fades it in. */}
+          <Stack key={kind} gap="32" className={styles.body}>
+            <Stack gap="16" align="center" className={styles.header}>
+              <span className={cards.orbNudge}><DashOrb size="md" /></span>
+              <Stack gap="04" className={styles.heading}>
+                <p className={cards.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
+                <h1 className={cards.centreTitle}>{t(`home8.title.${kind}`)}</h1>
+              </Stack>
+            </Stack>
+
+            <ResumeDrafts drafts={drafts} onViewAll={onPastChats} onOpen={(k) => (k === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
+
+            {items.length > 0 && kind !== 'strategy' && (
+              <Stack as="section" gap="12" aria-label={t(`home2.group.${kind}`)}>
+                <SectionHeader
+                  title={t(`home2.group.${kind}`)}
+                  headingLevel={2}
+                  action={{ type: 'view-all', onClick: () => { openHistoryOn(kind === 'rule' ? 'rules' : 'indicators'); onManage?.() } }}
+                />
+                <div className={cards.row} role="list">
+                  {items.slice(0, MAX_MADE).map((item) => card(item, kind))}
+                </div>
+              </Stack>
+            )}
+
+            <Stack as="section" gap="12" aria-label={t(`home8.start.${kind}`)}>
+              <SectionHeader title={t(`home8.start.${kind}`)} headingLevel={2} />
+              <div className={cards.row} role="list">
+                <button type="button" role="listitem" className={`${cards.item} ${cards.createCard}`} onClick={() => start(t(`home3.start.${kind}`))}>
+                  <svg className={cards.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
+                  <span className={cards.createIcon} {...raised('strong')}><Icon icon={msAdd} size={20} /></span>
+                  <span className={cards.itemTitle}>{t(`home3.create.${kind}`)}</span>
+                </button>
+                {EXAMPLES[kind].map((key) => (
+                  <button key={key} type="button" role="listitem" className={cards.item} onClick={() => start(t(key))}>
+                    <span className={cards.itemTop}>
+                      <span className={cards.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
+                      <Icon icon={msChevronRight} size={16} />
+                    </span>
+                    <span className={cards.itemTitle}>{t(key)}</span>
+                  </button>
+                ))}
+              </div>
+            </Stack>
+          </Stack>
+        </Inset>
+      </div>
+
+      {details && (
+        <CreationDetailsSheet
+          item={details.item}
+          kind={details.kind}
+          on={isOn(details.item)}
+          onToggle={(on) => setOnMap((m) => ({ ...m, [details.item.id]: on }))}
+          onClose={() => setDetails(null)}
+          onEdit={() => {
+            const k = details.kind
+            setDetails(null)
+            if (k === 'rule') onOpenRule?.()
+            else onOpenIndicator?.()
+          }}
+          onDelete={() => setDetails(null)}
+        />
+      )}
+
+      {/* The plain floating field, as in V1: no pills (they're the top bar's tabs). */}
+      <DashDock>
+        <div className={cards.dock}>
+          <Inset paddingInline="16" paddingBlock="16">
+            <ChatInput {...kb.field} firstMessage onSend={kb.sending(send)} placeholder={t(`askModes.placeholder.${kind}`)} onAttach={pine.onAttach} />
+            {pine.ui}
+          </Inset>
+        </div>
+        {kb.keyboard}
       </DashDock>
     </div>
   )
@@ -13131,6 +13433,7 @@ import { HomeV9Scene } from './HomeV9'
 import { LandingScene } from './Landing'
 import { type ReturningProps } from './Returning'
 import { ReturningV2Scene } from './ReturningV2'
+import { HomeTabsScene } from './HomeTabs'
 
 /**
  * Each DASH version's homes (setting "DASH version"; the list, labels and chat input are in components/dashVersion.ts,
@@ -13164,6 +13467,8 @@ export const homeScenes: Record<string, HomeScenes> = {
   '9': { newUser: HomeV9Scene, returning: HomeV9Scene },
   '10': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   '11': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V8 · Tabs (returning user): the kind tabs in the top bar, the body follows them, the plain floating field.
+  '12': { newUser: Landing, returning: HomeTabsScene, newUserNoField: true },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
