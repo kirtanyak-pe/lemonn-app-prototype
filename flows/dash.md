@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — Fix: the rule chat's field takes typing once a rule card is there ("Describe a change to your rule": keyboard up; Send clears and puts it away), like the indicator chat.
 - 2026-10-31 — V8 · Tabs: nothing of the tab's kind made yet (Strategy, for now) → the "Try" suggestion cards follow the Create card in the row (a tap types it in).
 - 2026-10-31 — Fix: V12 / V13 · Center don't scroll — the page fits the screen exactly (the held page height less the dock's room) and its scroll is locked, so nothing slides past the centred field.
 - 2026-10-31 — Setting **Pill counts** (every version, A/B; off by default): a tiny neutral count on each unpicked Rule · Indicator · Strategy pill / ribbon tab — how many of that kind are made (none → no tag; `usePillCount` in SlidingPills). **V10 · Heading:** the pills under the question are full width (three equal). **V8 · Tabs:** one row only — "Your creations": "+ Create <kind>" (follows the top tab) then that kind's cards; the "Start a …" row with the Try examples is gone.
@@ -13978,7 +13979,9 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
   const thinking = step === 'thinking' || pending != null
   const asking = step === 'question' && !pending
   // Typing in the empty chat; the drawn keyboard only on a laptop (a phone opens its own).
-  const typingNow = empty && typing
+  // The field takes typing in the empty chat and, once a rule card is there, for a change to it (keyboard up).
+  const canChange = hasCard
+  const typingNow = typing && (empty || canChange)
   // DASH V8: typing the chat's first message — the intro washes out, suggestions over the glowing field.
   const dashVersion = useDashVersion()
   const firstFocus = !!dashVersion.firstMessageFocus && typingNow
@@ -14062,7 +14065,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
         <Inset paddingInline="16" paddingBlock="16">
           {firstSuggest && <FirstAsk kind={strategy ? 'strategy' : 'rule'} text={draft} onPick={setDraft} />}
           {/* + (Pine Script upload) on the left, as on the homes and the indicator chat: a script becomes an indicator. */}
-          <ChatInput onAttach={pine.onAttach} firstMessage={empty} modes={chatKind ?? undefined} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
+          <ChatInput onAttach={pine.onAttach} firstMessage={empty} modes={chatKind ?? undefined} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty || canChange ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => { setDraft(''); onTyping?.(false) }} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
           {pine.ui}
         </Inset>
       </div>
