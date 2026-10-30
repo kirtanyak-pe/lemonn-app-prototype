@@ -233,6 +233,10 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — **V14 · Clean and V15 · Clean still** (ids '18', '19'; from V10 · Heading, after senior feedback — a calmer middle):
+  - The top bar reads **DASH AI** with a small **BETA** tag (L3 Tag, neutral tertiary), centred (`DashBar center`); no orb or greeting in the middle, no "Your creations" header (View all is the last card); the cards sit 24 under the full-width pills.
+  - **V14:** a heading over the pills in DASH's voice (`components/FlipHeading`): a small grey line ("Tell me a habit, I'll make it a rule" · "Tell me what you watch, I'll chart it" · "Tell me your idea, I'll build and test it") and, bigger, a request that flips every 2.6 s ("Stop me after 3 losses", "Don't let me trade after 3 PM"…). Each line stays one line (no reflow).
+  - **V15:** no flipping — a small DASH orb (new 40 size, `compact`) over the one line "Tell me a habit, I'll make it a rule" (follows the pick).
 - 2026-10-31 — Fix: the rule chat's field takes typing once a rule card is there ("Describe a change to your rule": keyboard up; Send clears and puts it away), like the indicator chat.
 - 2026-10-31 — V8 · Tabs: nothing of the tab's kind made yet (Strategy, for now) → the "Try" suggestion cards follow the Create card in the row (a tap types it in).
 - 2026-10-31 — Fix: V12 / V13 · Center don't scroll — the page fits the screen exactly (the held page height less the dock's room) and its scroll is locked, so nothing slides past the centred field.
@@ -336,7 +340,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -4225,6 +4229,102 @@ function LiveAsk({ kind, text, onPick }: { kind: FirstAskKind; text: string; onP
         </button>
       ))}
     </div>
+  )
+}
+```
+
+### `src/flows/dash/components/FlipHeading.module.css`
+
+```css
+/* V14 · Clean: the heading over the pills — a small lead (what DASH offers), then the example it flips through, which
+   carries the attention. Each is one line at a fixed height, so nothing reflows as the example changes. */
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  margin: 0;
+  text-align: center;
+}
+
+/* Small and quiet: Label/14, content/secondary. */
+.lead {
+  display: block;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-14);
+  white-space: nowrap;
+}
+
+/* The example's line: Heading/18, one line (clipped, so the new one rises in from under it). */
+.flip {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-18);
+  white-space: nowrap;
+}
+
+.example {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: flip-in var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes flip-in {
+  from {
+    opacity: 0;
+    transform: translateY(60%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .example {
+    animation: none;
+  }
+}
+```
+
+### `src/flows/dash/components/FlipHeading.tsx`
+
+```tsx
+import { useEffect, useState } from 'react'
+import { t } from '../copy'
+import type { Mode } from './askModes'
+import styles from './FlipHeading.module.css'
+
+/** How long each example stays before the next flips in (ms). */
+const HOLD_MS = 2600
+
+const LINES = {
+  rule: ['home14.rule1', 'home14.rule2', 'home14.rule3'],
+  indicator: ['home14.indicator1', 'home14.indicator2', 'home14.indicator3'],
+  strategy: ['home14.strategy1', 'home14.strategy2', 'home14.strategy3'],
+} as const satisfies Record<Mode, readonly string[]>
+
+/**
+ * V14 · Clean: the heading over the pills is DASH speaking — "Tell me a habit, I'll make it a rule" stays, and the line
+ * under it flips through habits in the user's own words ("I stop after 3 losses"…), one every 2.6 s (each new one
+ * rises in), in a quiet colour. Follows the pick; with reduced motion it stays on the first example.
+ */
+export function FlipHeading({ kind }: { kind: Mode }) {
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    setI(0)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const id = window.setInterval(() => setI((n) => (n + 1) % LINES[kind].length), HOLD_MS)
+    return () => window.clearInterval(id)
+  }, [kind])
+  const line = LINES[kind][i]
+  return (
+    <h1 className={styles.heading}>
+      <span className={styles.lead}>{t(`home14.lead.${kind}`)}</span>
+      {/* The example: a new key each time, so it rises in. Read out as one heading. */}
+      <span className={styles.flip} aria-live="off">
+        <span key={`${kind}-${i}`} className={styles.example}>{t(line)}</span>
+      </span>
+    </h1>
   )
 }
 ```
@@ -8181,6 +8281,11 @@ export type DashVersionInfo = {
   ribbonTabs?: boolean
   /** V12 · Center: the field's edge is the green → lime → yellow gradient, turning slowly round it. */
   edgeTurn?: boolean
+  /** V14 · Clean: the top bar reads "DASH AI" with a small BETA tag; the home has no orb or greeting in the middle. */
+  barTitle?: boolean
+  /** V15 · Clean (still): as V14, but the heading stays put — a small DASH orb over "Tell me a habit, I'll make it a
+   *  rule" (follows the pick), no flipping examples. */
+  stillHeading?: boolean
 }
 
 // The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
@@ -8205,6 +8310,8 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '15', label: 'V11 · Ribbon', field: 'above', switchFullTop: true, ribbonTabs: true, firstSuggestions: true },
   { value: '16', label: 'V12 · Center', field: 'plain', firstSuggestions: true, edgeTurn: true },
   { value: '17', label: 'V13 · Center pills', field: 'switch', firstSuggestions: true, edgeTurn: true },
+  { value: '18', label: 'V14 · Clean', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true },
+  { value: '19', label: 'V15 · Clean still', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -8825,6 +8932,20 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
 ```json
 {
   "landing.menu": "Your creations",
+  "landing.barTitle": "DASH AI",
+  "home14.lead.rule": "Tell me a habit, I’ll make it a rule",
+  "home14.lead.indicator": "Tell me what you watch, I’ll chart it",
+  "home14.lead.strategy": "Tell me your idea, I’ll build and test it",
+  "home14.rule1": "“Stop me after 3 losses”",
+  "home14.rule2": "“Don’t let me lose over ₹5,000 a day”",
+  "home14.rule3": "“Don’t let me trade after 3 PM”",
+  "home14.indicator1": "“Show me when RSI crosses 70”",
+  "home14.indicator2": "“Mark every Supertrend flip”",
+  "home14.indicator3": "“Draw VWAP with bands”",
+  "home14.strategy1": "“Buy NIFTY on a 1% dip”",
+  "home14.strategy2": "“Sell when I’m up 2%”",
+  "home14.strategy3": "“Trade the opening range breakout”",
+  "landing.beta": "BETA",
   "landing.pastChats": "Past chats",
   "chatMenu.button": "Chat options",
   "chatMenu.menu": "Menu",
@@ -10099,6 +10220,17 @@ export function Creations({ rules, indicators, strategies, onBack, onDeleteRule,
   flex: none;
   flex-direction: column;
 }
+
+/* V14 · Clean: "DASH AI" and the BETA tag on one line, centred in the top bar (Heading/14, as an L2 bar title). */
+.barTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  margin: 0;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-14);
+  white-space: nowrap;
+}
 ```
 
 ### `src/flows/dash/screens/DashAI.tsx`
@@ -10122,6 +10254,7 @@ import { RuleScene, type RuleChatProps } from './RuleChat'
 import { DeleteChatSheet } from '../sheets/ChatSheets'
 import { ChatMenu } from '../components/ChatMenu'
 import { SlidingPills } from '../components/SlidingPills'
+import { Tag } from '@l3/components/Tag'
 import { setHomeKind, useHomeKind } from '../components/homeKind'
 import type { Mode } from '../components/askModes'
 import { PastChatsSheet } from './PastChats'
@@ -10234,6 +10367,13 @@ export function DashAI(props: DashAIProps) {
       onChange={(v) => setHomeKind(v as Mode)}
     />
   ) : undefined
+  // V14 · Clean: the home's top bar says what this is — "DASH AI" and a small BETA tag (neutral, tertiary), centred.
+  const barTitle = dashVersion.barTitle && props.scene === 'landing' ? (
+    <span className={styles.barTitle}>
+      {t('landing.barTitle')}
+      <Tag variant="tertiary" color="neutral" size="sm">{t('landing.beta')}</Tag>
+    </span>
+  ) : undefined
   /** A chat has started (not the home, not an empty chat): the top bar's ⋮ menu. */
   const inChat = props.scene !== 'landing' && props.step !== 'empty'
   // The background ends above the drawn keyboard (laptop). Scenes turn typing on only where the keyboard comes up
@@ -10259,7 +10399,7 @@ export function DashAI(props: DashAIProps) {
       bottom={<div ref={setDockHost} className={styles.dockHost} />}
       // Right of the bar — on the home and an empty chat: past chats (history), then what they've made. Once a chat has
       // started (a message sent, or a past chat opened): one ⋮ dropdown with those two and Delete this chat.
-      top={<DashBar onBack={onBack} center={kindTabs} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : kindTabs ? <ChatMenu icon={msMenu} label={t('chatMenu.menu')} onPastChats={onPastChats} onCreations={onYourRules} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={onPastChats} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
+      top={<DashBar onBack={onBack} center={kindTabs ?? barTitle} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : kindTabs ? <ChatMenu icon={msMenu} label={t('chatMenu.menu')} onPastChats={onPastChats} onCreations={onYourRules} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={onPastChats} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
       sheet={
         chatSheet === 'history' ? (
           <PastChatsSheet
@@ -13063,6 +13203,15 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 .pillsUnderTitle {
   align-self: stretch;
 }
+
+/* V15 · Clean still: the one heading line under the small orb (Heading/18, centred, one line). */
+.stillTitle {
+  margin: 0;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-18);
+  text-align: center;
+  white-space: nowrap;
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -13090,6 +13239,7 @@ import { useDashUser, useDashVersion } from '../components/dashVersion'
 import { FirstAsk } from '../components/FirstAsk'
 import { CreatePills } from '../components/CreatePills'
 import { SlidingPills } from '../components/SlidingPills'
+import { FlipHeading } from '../components/FlipHeading'
 import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
@@ -13327,17 +13477,32 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
     <div className={styles.scene}>
       <div className={styles.scroll} onClick={kb.close}>
         <Inset paddingInline="16" className={styles.page}>
-          <Stack gap={centre ? '40' : '48'} className={styles.content} data-centre={centre || undefined}>
+          {/* V14 · Clean: the heading, pills and cards read as one block — 24 between the pills and the cards. */}
+          <Stack gap={dashVersion.barTitle ? '24' : centre ? '40' : '48'} className={styles.content} data-centre={centre || undefined}>
             {/* 1 · Header, centred in both states: the DASH orb, then the greeting under it. Big with nothing to resume
                 (centre stage); a size smaller while drafts are shown, so the sections fit. */}
             {/* V7 / V8 · typing the first message: the header steps away (the field and the suggestions take over). */}
-            <Stack gap="16" align="center" className={`${styles.reveal} ${styles.header}`} data-hidden={(typing && firstSuggest) || undefined}>
+            <Stack gap={dashVersion.barTitle ? '24' : '16'} align="center" className={`${styles.reveal} ${styles.header}`} data-hidden={(typing && firstSuggest) || undefined}>
               {/* 8 to the right: the ring sits left of the art's box (the leaves fill its right), so it reads centred */}
-              <span className={styles.orbNudge}><DashOrb size={centre ? 'lg' : 'md'} /></span>
-              <Stack gap="04" className={styles.centreHeading}>
-                <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
-                <h1 className={styles.centreTitle}>{t('home.title')}</h1>
-              </Stack>
+              {/* V14 · Clean: no orb or greeting here — "DASH AI · BETA" is in the top bar; only the pills stay. */}
+              {!dashVersion.barTitle && (
+                <>
+                  <span className={styles.orbNudge}><DashOrb size={centre ? 'lg' : 'md'} /></span>
+                  <Stack gap="04" className={styles.centreHeading}>
+                    <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
+                    <h1 className={styles.centreTitle}>{t('home.title')}</h1>
+                  </Stack>
+                </>
+              )}
+              {/* V14 · Clean: a heading over the pills that follows the pick — "Make a rule that" + a flipping example. */}
+              {dashVersion.barTitle && askModes && (dashVersion.stillHeading ? (
+                // V15 · Clean still: a small orb over one still line — what DASH does for the picked kind.
+                <Stack gap="12" align="center">
+                  {/* 8 to the right, as on the other homes: the ring sits left of the art's box, so it reads centred */}
+                  <span className={styles.orbNudge}><DashOrb size="compact" /></span>
+                  <h1 className={styles.stillTitle}>{t(`home14.lead.${askModes.mode}`)}</h1>
+                </Stack>
+              ) : <FlipHeading kind={askModes.mode} />)}
               {/* V10 · Heading: what to build sits right under the question (the field below has no pills). */}
               {pillsUnderTitle && askModes && (
                 // Full width (the page's 16 in each side), the three sharing it equally.
@@ -13417,7 +13582,10 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
               <Stack as="section" gap="12" aria-label={t(version4 ? 'home4.creations' : 'home2.creations')}>
                 {/* The heading carries the top bar's Your creations icon (widgets), so the two read as the same place. L3 gap:
                     SectionHeader has no icon slot — the icon goes in the title. */}
-                <SectionHeader title={<span className={styles.creationsTitle}><Icon icon={msWidgets} size={16} />{t(version4 ? 'home4.creations' : 'home2.creations')}</span>} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+                {/* V14 · Clean: no section header (the heading over the pills says what this is; View all is the last card). */}
+                {!dashVersion.barTitle && (
+                  <SectionHeader title={<span className={styles.creationsTitle}><Icon icon={msWidgets} size={16} />{t(version4 ? 'home4.creations' : 'home2.creations')}</span>} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+                )}
                 <div ref={mixedRow} className={styles.row} role="list">
                   {/* "+ Create <picked kind>" leads the row (flips with the field's pill): the opening words go into the field,
                       keyboard up (not on the old V6: its Create cards do that). */}
@@ -14316,6 +14484,10 @@ export const homeScenes: Record<string, HomeScenes> = {
   '16': { newUser: HomeCenterScene, returning: HomeCenterScene },
   // V13 · Center pills: V12 with Rule · Indicator · Strategy inside the field (text on top; pills, + and Send under it).
   '17': { newUser: HomeCenterScene, returning: HomeCenterScene },
+  // V14 · Clean: V10 with the orb and greeting moved out of the middle ("DASH AI · BETA" in the top bar).
+  '18': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V15 · Clean still: V14 with a small orb over a still heading ("Tell me a habit, I'll make it a rule").
+  '19': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
@@ -15595,6 +15767,7 @@ export const typeText = (value: string, key: string) => {
 
 .orb[data-size='lg'] { --orb-box: var(--l3-size-96); }
 .orb[data-size='md'] { --orb-box: var(--l3-size-64); }
+.orb[data-size='compact'] { --orb-box: var(--l3-size-40); }
 .orb[data-size='sm'] { --orb-box: var(--l3-size-32); }
 
 /* The art is drawn at 100 and scaled to the box. */
@@ -15736,7 +15909,7 @@ import orbFill from './assets/orb-fill.svg'
 import orbRing from './assets/orb-ring.svg'
 import styles from './DashOrb.module.css'
 
-export type DashOrbSize = 'sm' | 'md' | 'lg'
+export type DashOrbSize = 'sm' | 'compact' | 'md' | 'lg' // 32 · 40 · 64 · 96
 
 /**
  * DASH's mascot — the lime ring with two leaves (Figma "Logo" / "BotIcon", the 100 × 100 vector component), drawn from

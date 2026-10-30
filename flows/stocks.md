@@ -18139,6 +18139,7 @@ export function DashEntry({ label, ariaLabel, onClick }: DashEntryProps) {
 
 .orb[data-size='lg'] { --orb-box: var(--l3-size-96); }
 .orb[data-size='md'] { --orb-box: var(--l3-size-64); }
+.orb[data-size='compact'] { --orb-box: var(--l3-size-40); }
 .orb[data-size='sm'] { --orb-box: var(--l3-size-32); }
 
 /* The art is drawn at 100 and scaled to the box. */
@@ -18280,7 +18281,7 @@ import orbFill from './assets/orb-fill.svg'
 import orbRing from './assets/orb-ring.svg'
 import styles from './DashOrb.module.css'
 
-export type DashOrbSize = 'sm' | 'md' | 'lg'
+export type DashOrbSize = 'sm' | 'compact' | 'md' | 'lg' // 32 · 40 · 64 · 96
 
 /**
  * DASH's mascot — the lime ring with two leaves (Figma "Logo" / "BotIcon", the 100 × 100 vector component), drawn from

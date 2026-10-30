@@ -402,6 +402,8 @@
     "src/flows/dash/components/DashScreen.tsx",
     "src/flows/dash/components/FirstAsk.module.css",
     "src/flows/dash/components/FirstAsk.tsx",
+    "src/flows/dash/components/FlipHeading.module.css",
+    "src/flows/dash/components/FlipHeading.tsx",
     "src/flows/dash/components/IndicatorCard.module.css",
     "src/flows/dash/components/IndicatorCard.tsx",
     "src/flows/dash/components/IndicatorFullView.module.css",
