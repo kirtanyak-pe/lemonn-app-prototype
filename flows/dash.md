@@ -215,6 +215,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — **Resume chats in every version** (returning user; off by default): “Pick up where you left off” is one component (`components/ResumeDrafts`) used by every home — V5 · Cards shows it under the greeting (it steps away with the greeting while typing).
 - 2026-10-30 — **Glass settings removed**: glass is always 80% opacity · 16px blur (the defaults); the dock isn't blurred. The settings' code is archived in `archive/dash-glass-settings/`.
 - 2026-10-29 — **V7 · Pills** (id '11'): V3 Dock's edge-to-edge dock without the Rule · Indicator · Strategy pills, and just above it a row of two Create pills (`components/CreatePills`): white with a 1px light border, the black raised disc with a pencil, then “Create strategy” · “Create indicator”. The field is one row (ChatInput `inline`, 16 in on both sides): the text across, then the + (white, light outline) beside Send. While the first message is typed the Create pills make way for the suggestion pills (`firstSuggestions`) — mixed at first, then ones that finish what's typed. A tap types “Build a strategy / an indicator that ” and brings the keyboard up; Send opens the strategy chat for a strategy, the indicator chat for chart words, else rules. “Your creations” shows only creations here (no + Create card).
 - 2026-10-29 — Homes with “Your creations” (V1–V4, V6 in the dropdown): “+ Create <picked kind>” leads the row for every pill (rule, indicator, strategy — not only strategy), the + a black raised disc (L3 Raised strong); a tap types “Build a rule / an indicator / a strategy that ”. V5 · Cards (id 9): › at the bottom right of every card; the strategy invite reads “Create new strategy”.
@@ -6372,6 +6373,218 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
 }
 ```
 
+### `src/flows/dash/components/ResumeDrafts.module.css`
+
+```css
+/* DASH homes · Pick up where you left off (setting "Resume chats"): moved here from ReturningV2 so every version shows it. */
+
+/* Pick up where you left off: one card per draft, side by side and swiped (snapping), edge to edge; one draft fills
+   the width. Each card: the DASH green edge, ✕ at the top right, Continue hugging its label. */
+.drafts {
+  display: flex;
+  gap: var(--l3-spacing-12);
+  margin-inline: calc(-1 * var(--l3-spacing-16));
+  padding-inline: var(--l3-spacing-16);
+  overflow-x: auto;
+  scroll-padding-inline: var(--l3-spacing-16);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+/* Two or more drafts: 85 % wide, so the next one peeks in. Every card is as tall as the tallest one (the row
+   stretches them; each card fills its slot), whatever its text — Continue sits at the bottom of each. */
+.drafts > * {
+  flex: none;
+  width: 85%;
+  scroll-snap-align: start;
+}
+
+/* Only one draft: it fills the width (nothing to swipe to). */
+.drafts[data-single] > * {
+  width: 100%;
+}
+
+.draft {
+  position: relative;
+  display: flex;
+}
+
+.draft > :first-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.draft > :first-child > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.resume.resume {
+  position: relative;
+  box-sizing: border-box;
+  border-color: color-mix(in srgb, var(--app-dash-green) 60%, transparent);
+  transition: background var(--l3-motion-duration-short) var(--l3-motion-easing-standard), transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+/* The whole card is one tap target (it opens the draft's chat): hover / press anywhere and the card responds as one. */
+.resumeTap {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .resumeTap:hover .resume.resume {
+    background: var(--l3-surface-secondary);
+  }
+}
+
+.resumeTap:active .resume.resume {
+  transform: scale(var(--l3-motion-scale-press-default));
+}
+
+.resumeBody {
+  flex: 1;
+}
+
+/* Continue at the bottom of each card (cards are equal height). */
+.resumeBody > :last-child {
+  margin-top: auto;
+}
+
+/* The text leaves room for the ✕. */
+.resumeText {
+  padding-right: var(--l3-spacing-32);
+}
+
+.resumeClose.resumeClose {
+  position: absolute;
+  top: var(--l3-spacing-08);
+  right: var(--l3-spacing-08);
+  z-index: 1; /* over the card, its own tap target */
+}
+
+.resumeTitle {
+  font: var(--l3-text-heading-14);
+  color: var(--l3-content-primary);
+}
+
+.resumeMeta {
+  font: var(--l3-text-description-12);
+  color: var(--l3-content-secondary);
+}
+
+.resumeButton.resumeButton {
+  align-self: flex-start;
+}
+
+/* The remove sheet has no content slot, and L3's large header has no bottom space of its own (it expects the
+   content's): 24 here so the description doesn't run into the buttons (local fix; designer to audit L3). */
+.removeSheet header[data-size='lg'] {
+  padding-bottom: var(--l3-spacing-24);
+}
+
+/* The remove sheet's header icon (large header, like Delete rule): the bin in a red circle, 64. */
+.removeIcon {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-64);
+  height: var(--l3-size-64);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-error-light);
+  color: var(--l3-content-accent-error-default);
+}
+```
+
+### `src/flows/dash/components/ResumeDrafts.tsx`
+
+```tsx
+import { useEffect, useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { msChevronRight, msClose, msDelete } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { t } from '../copy'
+import { homeDrafts, type HomeDraft } from '../data'
+import styles from './ResumeDrafts.module.css'
+
+/** Prototype setting "Resume chats" (every DASH version, returning user): Show → the sample drafts, Hide (default) → none. */
+export function useResumeDrafts() {
+  const shown = useFlowOption('dash', 'resumeChats', 'hide') === 'show'
+  const [drafts, setDrafts] = useState<HomeDraft[]>(shown ? homeDrafts : [])
+  useEffect(() => setDrafts(shown ? homeDrafts : []), [shown])
+  return [drafts, setDrafts] as const
+}
+
+/**
+ * Pick up where you left off: chats left before saving (rare, so only when there are some) — one card each, swiped
+ * sideways when there are two or more. The whole card opens the draft's chat; ✕ removes one (a sheet asks first).
+ */
+export function ResumeDrafts({ drafts, onOpen, onRemove }: {
+  drafts: HomeDraft[]
+  onOpen: (kind: HomeDraft['kind']) => void
+  onRemove: (id: string) => void
+}) {
+  const [removing, setRemoving] = useState<HomeDraft | null>(null)
+  const sheetId = useId()
+  if (drafts.length === 0) return null
+  return (
+    <Stack as="section" gap="12" aria-label={t('home2.resume')}>
+      <SectionHeader title={t('home2.resume')} headingLevel={2} />
+      <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
+        {drafts.map((d) => (
+          <div key={d.id} role="listitem" className={styles.draft}>
+            {/* One tap target: the whole card opens the draft's chat (Continue is its keyboard-reachable button;
+                the card lights up as one). ✕ is outside the card, with its own touch area. */}
+            <div className={styles.resumeTap} onClick={() => onOpen(d.kind)}>
+            <Card className={styles.resume}>
+              <Stack gap="12" className={styles.resumeBody}>
+                <Stack gap="04" className={styles.resumeText}>
+                  <span className={styles.resumeTitle}>{d.title}</span>
+                  <span className={styles.resumeMeta}>{t(`home.kind.${d.kind}`)} · {d.meta}</span>
+                </Stack>
+                {/* The card's tap handles it (no second navigation from here). */}
+                <Button size="sm" iconRight={<Icon icon={msChevronRight} />} className={styles.resumeButton}>{t('home2.continue')}</Button>
+              </Stack>
+            </Card>
+            </div>
+            <Button variant="ghost" size="sm" iconLeft={<Icon icon={msClose} />} aria-label={t('home2.removeDraft', { name: d.title })} onClick={() => setRemoving(d)} className={styles.resumeClose} />
+          </div>
+        ))}
+      </div>
+
+      {removing && (
+        <Sheet
+          labelledBy={sheetId}
+          onClose={() => setRemoving(null)}
+          className={styles.removeSheet}
+          header={<BottomSheetHeader size="lg" headingId={sheetId} heading={t('home2.removeTitle')} description={t('home2.removeText', { name: removing.title })} icon={<span className={styles.removeIcon}><Icon icon={msDelete} size={24} /></span>} />}
+          footer={
+            <ButtonGroup aria-label={t('home2.removeTitle')} direction="vertical">
+              <Button
+                onClick={() => {
+                  onRemove(removing.id)
+                  setRemoving(null)
+                }}
+              >
+                {t('home2.removeConfirm')}
+              </Button>
+              <Button variant="secondary" onClick={() => setRemoving(null)}>{t('home2.removeKeep')}</Button>
+            </ButtonGroup>
+          }
+        />
+      )}
+    </Stack>
+  )
+}
+```
+
 ### `src/flows/dash/components/RuleCard.module.css`
 
 ```css
@@ -8457,8 +8670,8 @@ export const dash: Flow = {
     { id: 'homeStrategyCard', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Strategy card', values: [{ value: 'hide', label: 'Off' }, { value: 'show', label: 'On' }], default: 'hide' },
     // V6: the Create cards with a small button, or the plain dashed + Create card (the whole card taps).
     { id: 'homeCreateStyle', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Create cards', values: [{ value: 'button', label: 'Button' }, { value: 'outline', label: 'Outline' }], default: 'button' },
-    // V1–V4, returning user · drafts to resume: Show (two sample drafts) or Hide (none: the centre-stage layout).
-    { id: 'resumeChats', showIf: { dashVersion: ['1', '2', '3', '4'], user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
+    // Every version, returning user · drafts to resume: Show (two sample drafts) or Hide (default; none — the centre-stage layout).
+    { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
     // V5, for testing: hide one section.
     { id: 'homeHide', showIf: { dashVersion: ['5'], user: ['returning'] }, group: 'Home', icon: msVisibility, label: 'Hide section', values: [{ value: 'none', label: 'None' }, { value: 'indicators', label: 'Indicators' }, { value: 'strategies', label: 'Strategies' }], default: 'none' },
     // Combined (hidden): its card style.
@@ -9715,6 +9928,7 @@ import { useDashUser, type CreationKind } from '../components/dashVersion'
 import { openHistoryOn } from '../components/historyFilter'
 import { useHomeKeyboard } from '../components/homeKeyboard'
 import { usePineUpload } from '../components/pineUpload'
+import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { t } from '../copy'
 import { dashRules, firstName, savedIndicators } from '../data'
 import type { ReturningProps } from './Returning'
@@ -9740,9 +9954,10 @@ const KINDS: { kind: CreationKind; icon: typeof msRule }[] = [
  *   Indicators" — tap: history on that tab.
  * Every card: the icon at the top left, a › at the bottom right (the whole card is the tap target).
  */
-export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
+export function HomeV9Scene({ returning, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   const kb = useHomeKeyboard({ typing, onTyping })
   const { made } = useDashUser(returning)
+  const [drafts, setDrafts] = useResumeDrafts()
 
   // Made, then the kind on its own line: rules → how many are on ("3 active"); indicators → how many are saved
   // ("2 saved"). Strategies can't be made yet.
@@ -9790,12 +10005,16 @@ export function HomeV9Scene({ returning, onManage, onRules, onIndicator, onStrat
         <Inset paddingInline="16" className={styles.page}>
           {/* Top: the orb, then the greeting (left-aligned). */}
           {/* Typing: the header steps away (the field, the cards and the glow take over). */}
-          <Stack gap="16" className={styles.header} data-hidden={typing || undefined}>
-            <DashOrb size="md" />
-            <Stack gap="04">
-              <p className={styles.greeting}>{t(`home9.greeting.${partOfDay()}`, { name: firstName })}</p>
-              <h1 className={styles.title}>{t('home9.title')}</h1>
+          {/* Resume chats (setting, off by default): the drafts under the greeting, stepping away with it. */}
+          <Stack gap="32" className={styles.header} data-hidden={typing || undefined}>
+            <Stack gap="16">
+              <DashOrb size="md" />
+              <Stack gap="04">
+                <p className={styles.greeting}>{t(`home9.greeting.${partOfDay()}`, { name: firstName })}</p>
+                <h1 className={styles.title}>{t('home9.title')}</h1>
+              </Stack>
             </Stack>
+            <ResumeDrafts drafts={drafts} onOpen={(kind) => (kind === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
           </Stack>
         </Inset>
       </div>
@@ -10747,106 +10966,6 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   color: var(--l3-content-secondary);
 }
 
-/* Pick up where you left off: one card per draft, side by side and swiped (snapping), edge to edge; one draft fills
-   the width. Each card: the DASH green edge, ✕ at the top right, Continue hugging its label. */
-.drafts {
-  display: flex;
-  gap: var(--l3-spacing-12);
-  margin-inline: calc(-1 * var(--l3-spacing-16));
-  padding-inline: var(--l3-spacing-16);
-  overflow-x: auto;
-  scroll-padding-inline: var(--l3-spacing-16);
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-/* Two or more drafts: 85 % wide, so the next one peeks in. Every card is as tall as the tallest one (the row
-   stretches them; each card fills its slot), whatever its text — Continue sits at the bottom of each. */
-.drafts > * {
-  flex: none;
-  width: 85%;
-  scroll-snap-align: start;
-}
-
-/* Only one draft: it fills the width (nothing to swipe to). */
-.drafts[data-single] > * {
-  width: 100%;
-}
-
-.draft {
-  position: relative;
-  display: flex;
-}
-
-.draft > :first-child {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.draft > :first-child > * {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.resume.resume {
-  position: relative;
-  box-sizing: border-box;
-  border-color: color-mix(in srgb, var(--app-dash-green) 60%, transparent);
-  transition: background var(--l3-motion-duration-short) var(--l3-motion-easing-standard), transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
-}
-
-/* The whole card is one tap target (it opens the draft's chat): hover / press anywhere and the card responds as one. */
-.resumeTap {
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  .resumeTap:hover .resume.resume {
-    background: var(--l3-surface-secondary);
-  }
-}
-
-.resumeTap:active .resume.resume {
-  transform: scale(var(--l3-motion-scale-press-default));
-}
-
-.resumeBody {
-  flex: 1;
-}
-
-/* Continue at the bottom of each card (cards are equal height). */
-.resumeBody > :last-child {
-  margin-top: auto;
-}
-
-/* The text leaves room for the ✕. */
-.resumeText {
-  padding-right: var(--l3-spacing-32);
-}
-
-.resumeClose.resumeClose {
-  position: absolute;
-  top: var(--l3-spacing-08);
-  right: var(--l3-spacing-08);
-  z-index: 1; /* over the card, its own tap target */
-}
-
-.resumeTitle {
-  font: var(--l3-text-heading-14);
-  color: var(--l3-content-primary);
-}
-
-.resumeMeta {
-  font: var(--l3-text-description-12);
-  color: var(--l3-content-secondary);
-}
-
-.resumeButton.resumeButton {
-  align-self: flex-start;
-}
-
 /* Your library: one sideways row, edge to edge (16 in at both ends), small cards — two lines each. */
 .row {
   display: flex;
@@ -10924,23 +11043,6 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   font: var(--l3-text-label-14);
   -webkit-line-clamp: 2; /* long rule names read in full more often */
   -webkit-box-orient: vertical;
-}
-
-/* The remove sheet has no content slot, and L3's large header has no bottom space of its own (it expects the
-   content's): 24 here so the description doesn't run into the buttons (local fix; designer to audit L3). */
-.removeSheet header[data-size='lg'] {
-  padding-bottom: var(--l3-spacing-24);
-}
-
-/* The remove sheet's header icon (large header, like Delete rule): the bin in a red circle, 64. */
-.removeIcon {
-  display: grid;
-  place-items: center;
-  width: var(--l3-size-64);
-  height: var(--l3-size-64);
-  border-radius: var(--l3-radius-full);
-  background: var(--l3-surface-accent-error-light);
-  color: var(--l3-content-accent-error-default);
 }
 
 .dock {
@@ -11163,10 +11265,8 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 ### `src/flows/dash/screens/ReturningV2.tsx`
 
 ```tsx
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Button } from '@l3/components/Button'
-import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Card } from '@l3/components/Card'
 import { Icon } from '@l3/components/Icon'
 import { Inset } from '@l3/components/Inset'
@@ -11174,9 +11274,8 @@ import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
 import { Tag } from '@l3/components/Tag'
 import { raised } from '@l3/components/Raised'
-import { msAdd, msAssignmentAdd, msFunction, msLightbulb, msChevronRight, msClose, msDelete, msMonitoring } from '@l3/icons/material'
+import { msAdd, msAssignmentAdd, msFunction, msLightbulb, msChevronRight, msMonitoring } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
-import { Sheet } from '../../../shared/ui/Sheet'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { openHistoryOn } from '../components/historyFilter'
 import { holdFile } from '../components/pendingFile'
@@ -11187,9 +11286,10 @@ import { useAskModes } from '../components/askModes'
 import { useDashUser, useDashVersion } from '../components/dashVersion'
 import { FirstAsk } from '../components/FirstAsk'
 import { CreatePills } from '../components/CreatePills'
+import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
-import { dashRules, firstName, homeDrafts, homeTriggers, savedIndicators, type HomeDraft, type SavedRule } from '../data'
+import { dashRules, firstName, homeTriggers, savedIndicators, type SavedRule } from '../data'
 import { CreationDetailsSheet } from '../sheets/RuleSheets'
 import type { ReturningProps } from './Returning'
 import styles from './ReturningV2.module.css'
@@ -11228,9 +11328,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   /** Where a draft carries on: its chat. */
   const open = (kind: 'rule' | 'indicator') => (kind === 'indicator' ? onOpenIndicator : onOpenRule) ?? (() => {})
   // Prototype setting "Resume chats": Show (the sample drafts) / Hide (none — the centre-stage state).
-  const resumeShown = useFlowOption('dash', 'resumeChats', 'hide') === 'show'
-  const [drafts, setDrafts] = useState<HomeDraft[]>(resumeShown ? homeDrafts : [])
-  useEffect(() => setDrafts(resumeShown ? homeDrafts : []), [resumeShown])
+  const [drafts, setDrafts] = useResumeDrafts()
   const grouped = false // Your creations: always Mixed (one row, kinds together); the Grouped code stays for reference
   const rulesTriggered = dashRules.filter((r) => homeTriggers[r.id]).length
   /** Rules that stepped in today first. */
@@ -11273,9 +11371,6 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   /** No draft to resume: the centre-stage layout. */
   const centre = drafts.length === 0
   const [details, setDetails] = useState<{ item: SavedRule; kind: 'rule' | 'indicator' } | null>(null)
-  /** The draft whose ✕ was tapped: the sheet asks before it goes. */
-  const [removing, setRemoving] = useState<HomeDraft | null>(null)
-  const sheetId = useId()
   // The field (prototype): a request about charts goes to the indicator chat, anything else to rules.
   const ask = (text: string) =>
     // A strategy started from a Create pill opens the strategy chat; charts → indicators; anything else → rules.
@@ -11442,32 +11537,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
             <Stack gap="32" className={styles.sections}>
             {/* 2 · Pick up where you left off: chats left before saving (rare, so only when there are some) — one card
                 each, swiped sideways when there are two or more; ✕ removes one (asks first). */}
-            {drafts.length > 0 && (
-              <Stack as="section" gap="12" aria-label={t('home2.resume')}>
-                <SectionHeader title={t('home2.resume')} headingLevel={2} />
-                <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
-                  {drafts.map((d) => (
-                    <div key={d.id} role="listitem" className={styles.draft}>
-                      {/* One tap target: the whole card opens the draft's chat (Continue is its keyboard-reachable button;
-                          the card lights up as one). ✕ is outside the card, with its own touch area. */}
-                      <div className={styles.resumeTap} onClick={open(d.kind)}>
-                      <Card className={styles.resume}>
-                        <Stack gap="12" className={styles.resumeBody}>
-                          <Stack gap="04" className={styles.resumeText}>
-                            <span className={styles.resumeTitle}>{d.title}</span>
-                            <span className={styles.resumeMeta}>{t(`home.kind.${d.kind}`)} · {d.meta}</span>
-                          </Stack>
-                          {/* The card's tap handles it (no second navigation from here). */}
-                          <Button size="sm" iconRight={<Icon icon={msChevronRight} />} className={styles.resumeButton}>{t('home2.continue')}</Button>
-                        </Stack>
-                      </Card>
-                      </div>
-                      <Button variant="ghost" size="sm" iconLeft={<Icon icon={msClose} />} aria-label={t('home2.removeDraft', { name: d.title })} onClick={() => setRemoving(d)} className={styles.resumeClose} />
-                    </div>
-                  ))}
-                </div>
-              </Stack>
-            )}
+            <ResumeDrafts drafts={drafts} onOpen={(kind) => open(kind)()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
 
             {/* 3 · What they made. Grouped (default): a section per kind — Your rules / Your indicators / Your strategies,
                 each with its count and what's active, View all, and its own row. Mixed: one "Your creations" row, kinds
@@ -11573,27 +11643,6 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
         </Inset>
       </div>
 
-      {removing && (
-        <Sheet
-          labelledBy={sheetId}
-          onClose={() => setRemoving(null)}
-          className={styles.removeSheet}
-          header={<BottomSheetHeader size="lg" headingId={sheetId} heading={t('home2.removeTitle')} description={t('home2.removeText', { name: removing.title })} icon={<span className={styles.removeIcon}><Icon icon={msDelete} size={24} /></span>} />}
-          footer={
-            <ButtonGroup aria-label={t('home2.removeTitle')} direction="vertical">
-              <Button
-                onClick={() => {
-                  setDrafts((list) => list.filter((d) => d.id !== removing.id))
-                  setRemoving(null)
-                }}
-              >
-                {t('home2.removeConfirm')}
-              </Button>
-              <Button variant="secondary" onClick={() => setRemoving(null)}>{t('home2.removeKeep')}</Button>
-            </ButtonGroup>
-          }
-        />
-      )}
 
       {details && (
         <CreationDetailsSheet

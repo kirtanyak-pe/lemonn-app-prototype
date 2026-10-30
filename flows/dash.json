@@ -400,6 +400,8 @@
     "src/flows/dash/components/PineStory.tsx",
     "src/flows/dash/components/QuestionCard.module.css",
     "src/flows/dash/components/QuestionCard.tsx",
+    "src/flows/dash/components/ResumeDrafts.module.css",
+    "src/flows/dash/components/ResumeDrafts.tsx",
     "src/flows/dash/components/RuleCard.module.css",
     "src/flows/dash/components/RuleCard.tsx",
     "src/flows/dash/components/RuleSummary.module.css",
