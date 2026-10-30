@@ -238,6 +238,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — V5 · Cards: the title is “How can I help you today?” (Heading/24, one line) and the time-of-day greeting (“Good morning, Rohan”) is gone.
 - 2026-10-30 — **Past chats is a sheet.** The history button, View all on drafts and the chat ⋮ open Past chats as a bottom sheet over DASH (dash-30 = the home with it open): half the screen at first, tall once the list is scrolled or swiped up. Hold a row → a small Delete this chat menu → the confirmation sheet → back to the list. New setting **Past chats**: With chats / Empty (L3 empty state; no drafts on the home either). Long press is one hook (`components/longPress`) shared with the compact resume card. Prototype floating buttons: 24 disc in a 48 touch area, never overlapping.
 - 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card (“N more” when some are left out) that opens the full page (`HOME_CREATIONS` in ReturningV2).
 - 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary; the compact card's green line reads “Draft · Edited 2 hr ago”. Past chats rows: no kind icon or Rule / Indicator word (a chat can make mixed things) — the title and when; drafts show the same green “Draft · Edited …”. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
@@ -8718,10 +8719,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "firstAsk.strategy.2": "Scalp the 5-min EMA cross",
   "firstAsk.strategy.3": "Buy the dip after a 3% fall",
   "firstAsk.strategy.4": "Exit at 2% profit or 1% loss",
-  "home9.greeting.morning": "Good morning, {name}",
-  "home9.greeting.afternoon": "Good afternoon, {name}",
-  "home9.greeting.evening": "Good evening, {name}",
-  "home9.title": "How can I help you\ntrade today?",
+  "home9.title": "How can I help you today?",
   "home9.cardsLabel": "What DASH builds",
   "home9.name.rule": "Ai rules",
   "home9.name.indicator": "Ai indicators",
@@ -10120,17 +10118,10 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
   pointer-events: none;
 }
 
-.greeting {
-  margin: 0;
-  color: var(--l3-content-secondary);
-  font: var(--l3-text-heading-16);
-}
-
 .title {
   margin: 0;
   color: var(--l3-content-primary);
   font: var(--l3-text-heading-24);
-  white-space: pre-line; /* the copy's line break: "How can I help you / trade today?" */
 }
 
 .dock {
@@ -10298,15 +10289,9 @@ import { useHomeKeyboard } from '../components/homeKeyboard'
 import { usePineUpload } from '../components/pineUpload'
 import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { t } from '../copy'
-import { dashRules, firstName, savedIndicators } from '../data'
+import { dashRules, savedIndicators } from '../data'
 import type { ReturningProps } from './Returning'
 import styles from './HomeV9.module.css'
-
-/** The greeting by the time of day. */
-const partOfDay = () => {
-  const h = new Date().getHours()
-  return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'
-}
 
 const KINDS: { kind: CreationKind; icon: typeof msRule }[] = [
   { kind: 'rule', icon: msRule },
@@ -10339,7 +10324,7 @@ function useCardZoom() {
 }
 
 /**
- * DASH V9 home (new and returning users alike; Synora-like): the DASH orb and the greeting at the top left, a row of
+ * DASH V9 home (new and returning users alike; Synora-like): the DASH orb and "How can I help you today?" at the top left, a row of
  * square white cards just above a plain chat field — one per kind (Ai rules · Ai indicators · Ai strategies).
  * - Not made yet: "Create Ai rules ›" — tap: the field opens with "Build an Ai rule that " typed, to carry on.
  * - Made: the title on two lines, the same style as "Create Ai / strategies": "3 active / Rules", "2 saved /
@@ -10396,16 +10381,13 @@ export function HomeV9Scene({ returning, onManage, onPastChats, onOpenRule, onOp
     <div className={styles.scene}>
       <div className={styles.scroll} onClick={kb.close}>
         <Inset paddingInline="16" className={styles.page}>
-          {/* Top: the orb, then the greeting (left-aligned). */}
+          {/* Top: the orb, then the title (left-aligned; no time-of-day greeting). */}
           {/* Typing: the header steps away (the field, the cards and the glow take over). */}
-          {/* Resume chats (setting, off by default): the drafts under the greeting, stepping away with it. */}
+          {/* Resume chats (setting, off by default): the drafts under the title, stepping away with it. */}
           <Stack gap="32" className={styles.header} data-hidden={typing || undefined}>
             <Stack gap="16">
               <DashOrb size="md" />
-              <Stack gap="04">
-                <p className={styles.greeting}>{t(`home9.greeting.${partOfDay()}`, { name: firstName })}</p>
-                <h1 className={styles.title}>{t('home9.title')}</h1>
-              </Stack>
+              <h1 className={styles.title}>{t('home9.title')}</h1>
             </Stack>
             <ResumeDrafts drafts={drafts} onViewAll={onPastChats} onOpen={(kind) => (kind === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
           </Stack>
