@@ -241,7 +241,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-30 — DASH top bar: action buttons are always round (`.bar` in DashScreen.module.css sets `--btn-radius` to full; L3's small Tertiary is radius 8). L3 gap: Actionbar actions have no round option.
 - 2026-10-30 — V5 · Cards: the title is “How can I help you today?” (Heading/24, one line); the time-of-day greeting (“Good morning, Rohan”) shows above it only when there's nothing to resume (Resume chats off, or no drafts). With nothing to resume the orb, greeting and title sit centred in the middle of the space (like the other versions); with drafts they move to the top left.
 - 2026-10-30 — **Past chats is a sheet.** The history button, View all on drafts and the chat ⋮ open Past chats as a bottom sheet over DASH (dash-30 = the home with it open): half the screen at first, tall once the list is scrolled or swiped up. Hold a row → a small Delete this chat menu → the confirmation sheet → back to the list. New setting **Past chats**: With chats / Empty (L3 empty state; no drafts on the home either). Long press is one hook (`components/longPress`) shared with the compact resume card. Prototype floating buttons: 24 disc in a 48 touch area, never overlapping.
-- 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card (“N more” when some are left out) that opens the full page (`HOME_CREATIONS` in ReturningV2).
+- 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card that opens the full page — always as tall as the other cards, never taller: it shows what fits (the arrow; + “View all”; + “N more”), via size containment and container queries (`HOME_CREATIONS` in ReturningV2).
 - 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary; the compact card's green line reads “Draft · Edited 2 hr ago”. Past chats rows: no kind icon or Rule / Indicator word (a chat can make mixed things) — the title and when; drafts show the same green “Draft · Edited …”. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
 - 2026-10-30 — **Top bar: Past chats + Your creations.** The bar's right action (everything made with DASH) gets its own icon (widgets, was history; label “Your creations”), and a history button left of it opens **Past chats** (dash-30, `screens/PastChats`): every chat with DASH by day (Today / Yesterday / Earlier), newest first — the kind's icon in an L3 Avatar, the title, “Rule · 9:20 am” (drafts: “Draft, not saved”), ›; a row opens its chat. Data: `pastChats` in data.ts. Rows: the L3 card row on surface/primary with only its 1px edge (no drop shadow). The home's “Your creations” heading carries the same widgets icon. “Pick up where you left off” has View all → Past chats. The compact resume card's title is one line (… when longer) and its history avatar has no edge.
 - 2026-10-30 — **Resume card: Compact** (new setting under Resume chats; default Compact, Big = the old card). Like a creation card: the history avatar (L3 Avatar, icon type), the green “Edited 2 hours ago” over the title, ›. A tap opens the draft's chat; press and hold (0.5 s, or right-click) opens the delete sheet — no ✕. Data: `HomeDraft.edited`.
@@ -11912,14 +11912,30 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   gap: var(--l3-spacing-08);
 }
 
-/* Your creations · the fourth card when there are more than three: View all (→ the full page). Narrow like the create
-   card, content centred: an arrow on a grey disc, "View all", "+2 more". */
+/* Your creations · the last card: View all (→ the full page). Narrow, content centred: an arrow on a grey disc,
+   "View all", "N more". It never sets the row's height: size containment gives it no height of its own, so the row's
+   stretch makes it exactly as tall as the other cards — then it shows only what fits (below). */
 .viewAllCard.viewAllCard {
   justify-content: center;
   align-items: center;
   gap: var(--l3-spacing-04);
   width: 30%;
   text-align: center;
+  container-type: size;
+}
+
+/* What fits, by the card's inner height (container queries take no tokens; values = the parts' own sizes:
+   arrow 32 + 4 · label 20 + gap 4 · "N more" 16 + gap 4). Short cards: only the arrow; then + "View all"; then + "N more". */
+@container (max-height: 79.9px) {
+  .viewAllMore {
+    display: none;
+  }
+}
+
+@container (max-height: 59.9px) {
+  .viewAllLabel {
+    display: none;
+  }
 }
 
 .viewAllIcon {
@@ -12288,10 +12304,12 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                       "N more" when some are left out), so the row doesn't scroll on and on. */}
                   {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).slice(0, HOME_CREATIONS).map(({ item, kind: k }) => card(item, k, true))}
                   {(
-                    <button data-key="view-all" type="button" role="listitem" className={`${styles.item} ${styles.viewAllCard}`} onClick={() => onManage?.()}>
+                    // As tall as the other cards, never taller: it shows what fits — the arrow, then "View all", then
+                    // "N more" (CSS container queries). The name is on the button, so the arrow alone still reads.
+                    <button data-key="view-all" type="button" role="listitem" aria-label={t('home2.viewAll')} className={`${styles.item} ${styles.viewAllCard}`} onClick={() => onManage?.()}>
                       <span className={styles.viewAllIcon}><Icon icon={msArrowForward} size={20} /></span>
-                      <span className={styles.itemTitle}>{t('home2.viewAll')}</span>
-                      {creations.length > HOME_CREATIONS && <span className={styles.itemMeta}>{t('home2.viewAllMore', { count: creations.length - HOME_CREATIONS })}</span>}
+                      <span className={`${styles.itemTitle} ${styles.viewAllLabel}`} aria-hidden="true">{t('home2.viewAll')}</span>
+                      {creations.length > HOME_CREATIONS && <span className={`${styles.itemMeta} ${styles.viewAllMore}`} aria-hidden="true">{t('home2.viewAllMore', { count: creations.length - HOME_CREATIONS })}</span>}
                     </button>
                   )}
                 </div>
