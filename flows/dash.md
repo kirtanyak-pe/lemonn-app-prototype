@@ -210,10 +210,12 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-29 — **Chats: Version 1 only.** The rule / indicator card is always pinned above the conversation (folding to a mini card on scroll); the setting Chat version is gone and Version 2 (the card inside DASH's message, a new card per change) is archived in `archive/dash-chat-versions/`.
 - 2026-10-29 — **Pine Script: one behaviour.** Always on; the tip is the animated story, shown every time the field is empty (until it's closed or the + is used), floating over the content, which dims. The settings Pine Script / Pine Script tip / Show Pine Script tip / Tip placement are gone; the simple tip card, “once”, “push up” and “off” are archived in `archive/dash-pine-versions/`.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — **Glass settings removed**: glass is always 80% opacity · 16px blur (the defaults); the dock isn't blurred. The settings' code is archived in `archive/dash-glass-settings/`.
 - 2026-10-29 — **V7 · Pills** (id '11'): V3 Dock's edge-to-edge dock without the Rule · Indicator · Strategy pills, and just above it a row of two Create pills (`components/CreatePills`): white with a 1px light border, the black raised disc with a pencil, then “Create strategy” · “Create indicator”. The field is one row (ChatInput `inline`, 16 in on both sides): the text across, then the + (white, light outline) beside Send. While the first message is typed the Create pills make way for the suggestion pills (`firstSuggestions`) — mixed at first, then ones that finish what's typed. A tap types “Build a strategy / an indicator that ” and brings the keyboard up; Send opens the strategy chat for a strategy, the indicator chat for chart words, else rules. “Your creations” shows only creations here (no + Create card).
 - 2026-10-29 — Homes with “Your creations” (V1–V4, V6 in the dropdown): “+ Create <picked kind>” leads the row for every pill (rule, indicator, strategy — not only strategy), the + a black raised disc (L3 Raised strong); a tap types “Build a rule / an indicator / a strategy that ”. V5 · Cards (id 9): › at the bottom right of every card; the strategy invite reads “Create new strategy”.
 - 2026-10-29 — **Dropdown renumbered in order:** V1 Classic · V2 Pills · V3 Dock (id '7', called V7 below) · V4 Focus (id '8', V8) · V5 Cards (id '9', V9) · V6 Creations (id '10', V10). The ids, the code and the entries below keep the original numbers; the hidden older versions show as “Old · …”.
@@ -286,7 +288,6 @@ the product team tells you otherwise; the other values are experiments.
 | DASH version | V2 · Pills (new user: Landing, big cards; returning: Returning home V2) | V1 Classic · V3 Dock (id 7) · V4 Focus (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V7 Pills (id 11) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
-| Chat version | V1 | V2 |
 | Resume chats | Hide | Show |
 
 The version list is `components/dashVersion.ts` (each version's chat input) + `screens/homes.tsx` (its homes).
@@ -323,7 +324,7 @@ The version list is `components/dashVersion.ts` (each version's chat input) + `s
 
 ### 5. Cards
 - [ ] Indicator card (`IndicatorCard.*`): border-light, **radius 16**, 12 inside; builds live (wave → candles → lines), part tags pop in one by one, 3 build steps (spinner / tick / ring). Ready = DASH-green edge. A change sweeps a band of light across it once (1.2 s) and shows "Indicator updated" for 2.8 s. An earlier version folds to a dimmed mini card.
-- [ ] Chat V1 pins the card on top and shrinks it to a mini card (80 × 40 chart) on scroll.
+- [ ] The chat pins the card on top and shrinks it to a mini card (80 × 40 chart) on scroll.
 - [ ] No shadows on DASH or home cards. Hover / press tint on landing cards = orb green at 10%.
 - [ ] Dashed "Create" cards: 1px `border-intense`, **6 on / 4 off dashes** (drawn as an SVG rect inside the card, not a CSS dashed border), radius 12, + on a light DASH-green disc.
 
@@ -2819,8 +2820,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   border-width: 1px 0 0; /* 1px: only the top edge — the sides and bottom are the screen's */
   border-radius: var(--l3-radius-24) var(--l3-radius-24) 0 0;
   /* See-through, so DASH's glow shows behind it. No backdrop blur: it smudged the screen's rounded bottom corners. */
-  background: rgb(from var(--l3-surface-primary) r g b / var(--dash-glass-alpha, var(--l3-opacity-80))); /* setting "Glass opacity" */
-  backdrop-filter: blur(var(--dash-dock-blur, 0px)); /* setting "Glass blur" (none unless picked: it can smudge the screen's corners) */
+  background: rgb(from var(--l3-surface-primary) r g b / var(--l3-opacity-80)); /* glass: 80% */
   box-shadow: none;
   /* On the see-through dock the pills' grey track would read as a smudge: it's surface/primary instead. */
   --pills-track: var(--l3-surface-primary);
@@ -2913,9 +2913,14 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   box-shadow: var(--l3-shadow-elevation-low);
 }
 
-/* A taller (wrapped) text: the + and Send stay at the bottom of the row, beside the last line, like other chat boxes. */
+/* A taller (wrapped) text: the + and Send stay at the bottom of the row, beside the last line, like other chat boxes.
+   The text area is at least the buttons' 40, so a single line sits on their centre line. */
 .input[data-inline] {
   align-items: flex-end;
+}
+
+.input[data-inline] .fieldWrap.fieldWrap {
+  min-height: var(--l3-size-40);
 }
 
 /* The + in every field and version: an outline button — white (surface/primary), a 1px border/intense ring, the +
@@ -3646,14 +3651,13 @@ export function DashDock({ children }: { children: ReactNode }) {
 ### `src/flows/dash/components/DashScreen.tsx`
 
 ```tsx
-import { useEffect, useRef, type ComponentProps, type CSSProperties } from 'react'
+import { useEffect, useRef, type ComponentProps } from 'react'
 import { Actionbar, type ActionbarProps } from '@l3/components/Actionbar'
 import { Screen } from '../../../shared/ui/Screen'
 import gradient from '../assets/bg-gradient.png'
 import grids from '../assets/grids.svg'
 import styles from './DashScreen.module.css'
 import { useDashVersion } from './dashVersion'
-import { useFlowOption } from '../../../shared/prototype'
 
 /** brand = lime-green (every page); loss = the same gradient turned red, when the backtest says the rule would cost money. */
 export type DashTone = 'brand' | 'loss'
@@ -3682,15 +3686,6 @@ type DashScreenProps = ComponentProps<typeof Screen> & {
 export function DashScreen({ tone = 'brand', keyboard = false, chatting = false, firstFocus = false, className, ...screen }: DashScreenProps) {
   // Some DASH versions raise the glow: behind the see-through dock (V7), or up behind the cards too (V9).
   const glowRise = useDashVersion().glowRise
-  // Settings "Glass opacity" / "Glass blur": every see-through DASH surface (glass cards, the see-through dock) reads them.
-  const glassOpacity = useFlowOption('dash', 'glassOpacity', '80')
-  const glassBlur = useFlowOption('dash', 'glassBlur', '16')
-  const glass = {
-    '--dash-glass-alpha': `var(--l3-opacity-${glassOpacity})`,
-    '--dash-glass-blur': `${glassBlur}px`,
-    // the dock is only blurred when a blur is picked other than the default (it can smudge the screen's corners)
-    ...(glassBlur !== '16' ? { '--dash-dock-blur': `${glassBlur}px` } : {}),
-  } as CSSProperties
   // The turning colour glow: normal speed for the first 5 s on DASH, then half speed (it slows from where it is — the
   // running animation's playback rate, so nothing jumps). The frame stays mounted across DASH screens, so this is
   // once per visit to DASH.
@@ -3700,7 +3695,7 @@ export function DashScreen({ tone = 'brand', keyboard = false, chatting = false,
     return () => window.clearTimeout(id)
   }, [])
   return (
-    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-chatting={chatting || undefined} data-glow-rise={glowRise} style={glass} data-first-focus={firstFocus || undefined} data-edge-to-edge="" data-dash="">
+    <div className={styles.frame} data-tone={tone} data-keyboard={keyboard || undefined} data-chatting={chatting || undefined} data-glow-rise={glowRise} data-first-focus={firstFocus || undefined} data-edge-to-edge="" data-dash="">
       <div className={styles.background} aria-hidden="true">
         <div ref={glow} className={styles.gradientBox}>
           <img src={gradient} alt="" className={styles.gradient} />
@@ -3785,8 +3780,8 @@ const GLOW_SLOW_RATE = 0.5
   border: 1px solid var(--l3-border-light); /* 1px: the card's edge */
   border-radius: var(--l3-radius-20);
   overflow: clip; /* a row's press / hover tint stays inside the rounded corners */
-  background: rgb(from var(--l3-surface-primary) r g b / var(--dash-glass-alpha, var(--l3-opacity-80))); /* setting "Glass opacity" */
-  backdrop-filter: blur(var(--dash-glass-blur, var(--app-dash-glass-blur))); /* setting "Glass blur" */
+  background: rgb(from var(--l3-surface-primary) r g b / var(--l3-opacity-80)); /* glass: 80% */
+  backdrop-filter: blur(var(--app-dash-glass-blur)); /* glass: 16px */
   animation: first-ask-in var(--app-dash-reveal) var(--l3-motion-easing-decelerate) both;
 }
 
@@ -8451,7 +8446,6 @@ export const dash: Flow = {
   // Prototype setting: Version 1 = the cards (rule, indicator) pinned above the chat. Version 2 = the cards inside the
   // chat as a turn. Both: three indicator examples (asks nothing / the timeframe / where it goes).
   options: [
-    { id: 'version', group: 'Chat', icon: msChat, label: 'Chat version', values: [{ value: '1', label: 'V1' }, { value: '2', label: 'V2' }], default: '1' },
     // DASH version (dropdown — there will be many): the whole home experience, homes + chat input style. The list is in
     // components/dashVersion.ts (+ its homes in screens/homes.tsx). Hidden ones (Combined) stay in the code, off the panel.
     { id: 'dashVersion', group: 'Home', icon: msHome, label: 'DASH version', picker: 'dropdown', values: dashVersions.filter((v) => !v.hidden).map(({ value, label }) => ({ value, label })), default: defaultDashVersion },
@@ -8470,9 +8464,6 @@ export const dash: Flow = {
     // Combined (hidden): its card style.
     { id: 'homeCardStyle', showIf: { dashVersion: ['combined'] }, group: 'Home', icon: msLayers, label: 'Home card style', values: [{ value: 'plain', label: 'Plain' }, { value: 'glow', label: 'Green' }], default: 'glow' },
     // Pine Script: upload a file (the paperclip, or the 4th suggestion) or paste one in the indicator chat — on / off.
-    // Glass: every see-through DASH surface (V5 · Cards' cards, V6 · Creations' card, the see-through docks).
-    { id: 'glassOpacity', group: 'Glass', icon: msLayers, label: 'Glass opacity', picker: 'slider', range: { min: 0, max: 100, step: 5, unit: '%' }, values: [], default: '80' },
-    { id: 'glassBlur', group: 'Glass', icon: msVisibility, label: 'Glass blur', picker: 'slider', range: { min: 0, max: 40, step: 1, unit: 'px' }, values: [], default: '16' },
   ],
   sections: [
     { id: 'entry', title: 'Entry' },
@@ -9133,7 +9124,7 @@ import { IndicatorScene, type IndicatorChatProps } from './IndicatorChat'
 import { LandingScene, type LandingProps } from './Landing'
 import { homeScenes } from './homes'
 import { defaultDashVersion, useDashUser, useDashVersion } from '../components/dashVersion'
-import { RuleScene, type DashVersion, type RuleChatProps } from './RuleChat'
+import { RuleScene, type RuleChatProps } from './RuleChat'
 
 type Common = {
   onBack?: () => void
@@ -9165,9 +9156,6 @@ const order = { landing: 0, rules: 1, indicator: 1 } as const
  */
 export function DashAI(props: DashAIProps) {
   const { scene, onBack, onYourRules, sheet } = props
-  /** Prototype setting "Chat version": the card's place only — 1 = pinned above the chat (folds on scroll), 2 = in the
-   *  chat as a message. Everything else is the same. */
-  const version = useFlowOption('dash', 'version', '1') as DashVersion
   /** Prototype settings "DASH version" (which homes, components/dashVersion.ts + screens/homes.tsx) and "User" (new /
    *  returning; a screen may force it with the `returning` prop, e.g. dash-28). */
   const forcedReturning = 'returning' in props ? props.returning : undefined
@@ -9231,8 +9219,8 @@ export function DashAI(props: DashAIProps) {
     const Home = returning ? home.returning : home.newUser
     body = <Home {...homeProps} />
   }
-  else if (props.scene === 'rules') body = <RuleScene {...props} version={version} typing={typing} onTyping={setTyping} />
-  else body = <IndicatorScene {...props} version={version} typing={typing} onTyping={setTyping} />
+  else if (props.scene === 'rules') body = <RuleScene {...props} typing={typing} onTyping={setTyping} />
+  else body = <IndicatorScene {...props} typing={typing} onTyping={setTyping} />
 
   return (
     <DashScreen
@@ -9599,8 +9587,8 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
   border: 1px solid var(--l3-border-light); /* 1px: the card's edge */
   border-radius: var(--l3-radius-16);
   /* Glass: 80% white with the glow blurred through it. */
-  background: rgb(from var(--l3-surface-primary) r g b / var(--dash-glass-alpha, var(--l3-opacity-80))); /* setting "Glass opacity" */
-  backdrop-filter: blur(var(--dash-glass-blur, var(--app-dash-glass-blur))); /* setting "Glass blur" */
+  background: rgb(from var(--l3-surface-primary) r g b / var(--l3-opacity-80)); /* glass: 80% */
+  backdrop-filter: blur(var(--app-dash-glass-blur)); /* glass: 16px */
   text-align: start;
   cursor: pointer;
   scroll-snap-align: start;
@@ -9869,7 +9857,6 @@ import { useChatKind } from '../components/askModes'
 import { t } from '../copy'
 import { firstName } from '../data'
 import { applyChange, chartQuestion, defaultSettings, draftFor, indicatorPrompts, indicatorPromptsV2, looksLikePine, minutesOf, pineBuildSteps, timeframeLabel, timeframeQuestion, type IndicatorChange, type IndicatorPrompt, type IndicatorSettings } from '../indicatorData'
-import type { DashVersion } from './RuleChat'
 // The same chat layout and motion as Trading rules (panel, dock, entrances, the pinned card's opening).
 import styles from './RuleChat.module.css'
 
@@ -9877,8 +9864,6 @@ import styles from './RuleChat.module.css'
 export type IndicatorStep = 'empty' | 'chart' | 'timeframe' | 'building' | 'ready' | 'saved'
 
 export type IndicatorChatProps = {
-  /** DASH design version (prototype setting): '1' pins the card above the chat; '2' puts it in the chat. Both ask only what the request doesn't say. */
-  version?: DashVersion
   step: IndicatorStep
   /** Version 2: go to a step of the chat (which question comes next depends on the request). */
   onStep?: (step: IndicatorStep) => void
@@ -9922,7 +9907,7 @@ const SWIPE_PX = 8
  * Ready (BUY / SELL labels, notes, Modify and Save indicator) → saved confirmation. Modify opens a plain-language
  * revision prompt; this prototype keeps the same preview after a submitted change.
  */
-export function IndicatorScene({ version = '1', step, onStep, request: initialRequest, onSend, onChart, onTimeframe, onBuilt, onSaved, onSaveSheet, onViewIndicator, typing = false, onTyping, onSwitchKind }: IndicatorChatProps) {
+export function IndicatorScene({ step, onStep, request: initialRequest, onSend, onChart, onTimeframe, onBuilt, onSaved, onSaveSheet, onViewIndicator, typing = false, onTyping, onSwitchKind }: IndicatorChatProps) {
   // The field keeps the home's shape: one pill naming this chat's kind where the home has its switch.
   const chatKind = useChatKind('indicator', step === 'empty' ? {
     onChange: (k) => {
@@ -9932,10 +9917,9 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     },
   } : null)
   const { interactive } = usePreview()
-  const v2 = version === '2'
-  // Save opens the saved sheet (both versions; onSaved is the fallback where a screen has no sheet).
+  // Save opens the saved sheet (onSaved is the fallback where a screen has no sheet).
   const save = onSaveSheet ?? onSaved
-  // The request decides what DASH asks (both versions). Opened straight on a step, it's the example that leads there.
+  // The request decides what DASH asks. Opened straight on a step, it's the example that leads there.
   const [prompt, setPrompt] = useState<IndicatorPrompt>(() => indicatorPromptsV2.find((p) => (step === 'chart' || step === 'timeframe' ? p.asks[0] === step : p.asks.length === 0)) ?? indicatorPromptsV2[0])
   const asks = prompt.asks
   const [request, setRequest] = useState(initialRequest ?? prompt.text)
@@ -9984,7 +9968,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     setIntroLeaving(true)
     onTyping?.(false)
     window.setTimeout(() => setIntroLeaving(false), INTRO_OUT_MS)
-    // Both versions: an example asks only what it doesn't say (nothing / the timeframe / the chart); a typed request
+    // An example asks only what it doesn't say (nothing / the timeframe / the chart); a typed request
     // gets both questions.
     const next: IndicatorPrompt = fromPine
       ? { text, asks: [], chart: 'any chart', timeframe: '15 min' } // the script says what it draws: no questions
@@ -10045,7 +10029,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   useEffect(() => {
     if (step !== 'empty') return
     const held = takeMessage()
-    const from = stage.current?.closest('[data-dash]')?.querySelector<HTMLElement>('form input:not([type=file])') // the field lives in the screen's input place (DashDock), not in this scene
+    const from = stage.current?.closest('[data-dash]')?.querySelector<HTMLElement>('form textarea, form input:not([type=file])') // the field lives in the screen's input place (DashDock), not in this scene
     if (held && from) send(held, from)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -10067,7 +10051,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   const chatStarted = step !== 'empty' || pending != null
   const built = step === 'building' || step === 'ready' || step === 'saved'
   // Version 1 pins the card above the chat (until it's saved); Version 2 shows it in the chat, where it stays.
-  const pinned = !v2 && (step === 'building' || step === 'ready')
+  const pinned = step === 'building' || step === 'ready'
   const cardState: IndicatorCardState =
     step === 'building' ? { kind: 'building', step: buildStep } : step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }
   const asking = !pending && (step === 'chart' || step === 'timeframe')
@@ -10085,7 +10069,7 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
   // Typing a change: the newest card folds to its mini form, so the chat and the keyboard get the room. Sending puts
   // the keyboard away; after DASH thinks, the changed card comes back full size and draws itself again.
   const folding = step === 'ready' && (typingNow || changing)
-  const compact = !v2 && compactWanted && step === 'ready'
+  const compact = compactWanted && step === 'ready'
   const userScroll = (down: boolean) => {
     const el = scroller.current
     if (!el) return
@@ -10127,18 +10111,14 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     turns.push({ key: 'a-timeframe', node: <UserMessage>{timeframe}</UserMessage> })
   }
   // A typed change is read into new settings (timeframe, EMA, Supertrend): after DASH thinks, the chart is redrawn
-  // with them. Version 2: every change shares a new card under DASH's reply, the ones before it fold to "Earlier
-  // version"; Version 1: the pinned card redraws. (Prototype: any message is taken as a change.)
+  // with them: the pinned card redraws. (Prototype: any message is taken as a change.)
   const base: IndicatorSettings = { ...defaultSettings, timeframe: minutesOf(timeframe) }
   const results = changes.reduce<IndicatorChange[]>((acc, c) => [...acc, applyChange(acc.at(-1)?.settings ?? base, c)], [])
   const answered = changing ? results.slice(0, -1) : results
   const lastCard = answered.map((r) => r.changed.length > 0).lastIndexOf(true)
   const latest = answered.at(-1)?.settings ?? base
   const versions = lastCard + 1
-  if (v2 && built) {
-    turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingBelow', { chart, timeframe })}</AssistantMessage> })
-    turns.push({ key: 'card', node: versions > 0 ? <IndicatorCard draft={draftFor(base)} settings={base} state={{ kind: 'ready' }} superseded /> : <IndicatorCard draft={draftFor(base)} settings={base} steps={pine ? pineBuildSteps : undefined} state={cardState} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} /> })
-  } else if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
+  if (step === 'building') turns.push({ key: 'building', node: <AssistantMessage>{t('indicator.buildingNow', { chart, timeframe })}</AssistantMessage> })
   if (step === 'ready' || step === 'saved') turns.push({ key: 'ready', node: <AssistantMessage title={pine ? t('indicator.pineReadyTitle') : t('indicator.readyTitle')}>{t('indicator.readyText')}</AssistantMessage> })
   if (revisionRequested) turns.push({ key: 'revision-prompt', node: <AssistantMessage>{t('indicator.revisionPrompt')}</AssistantMessage> })
   changes.forEach((c, i) => {
@@ -10146,18 +10126,8 @@ export function IndicatorScene({ version = '1', step, onStep, request: initialRe
     const result = answered[i]
     if (!result) return // DASH is still working on it
     const summary = describeChange(result)
-    if (!v2) {
-      // Version 1: the same reply as Version 2 — the pinned card above is what redraws (no card here).
-      turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{summary}</AssistantMessage> })
-      return
-    }
-    turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{`${summary} ${t('indicator.earlierFolded')}`}</AssistantMessage> })
-    turns.push({
-      key: `card-${i}`,
-      node: i === lastCard
-        ? <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} redrawn updated={i + 1} state={step === 'saved' ? { kind: 'saved' } : { kind: 'ready' }} onModify={modify} onSave={save} compact={folding} onExpand={() => onTyping?.(false)} />
-        : <IndicatorCard draft={draftFor(result.settings)} settings={result.settings} state={{ kind: 'ready' }} superseded />,
-    })
+    // The pinned card above is what redraws (no card in the chat).
+    turns.push({ key: `changed-${i}`, node: <AssistantMessage title={t('indicator.updatedTitle')}>{summary}</AssistantMessage> })
   })
   // Ready: a few changes to try, as chips — a tap asks for it (like typing it). They suggest values not in use yet.
   if (step === 'ready' && !changing && !pending && !revisionRequested) {
@@ -11971,11 +11941,8 @@ export type RuleChatStep =
   | 'cost' //       weak: it would have cut trades that ended in profit
   | 'none' //       ready, but there's not enough history to test it
 
-/** DASH design version (prototype setting): '1' pins the rule card above the chat, '2' puts it in the chat. */
-export type DashVersion = '1' | '2'
 
 export type RuleChatProps = {
-  version?: DashVersion
   step: RuleChatStep
   /** What the user asked for (the chip they tapped or what they typed). */
   request?: string
@@ -12021,7 +11988,7 @@ const INTRO_OUT_MS = 300
 /** Strategy suggestions for the empty chat in strategy mode. */
 const strategyTop = [t('home3.ex.strategy1'), t('home3.ex.strategy2'), t('home3.ex.strategy3')]
 
-export function RuleScene({ version = '1', step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping, onSwitchKind, created = false, onViewRules }: RuleChatProps) {
+export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, onSend, onThought, onAnswer, onRefine, onProceed, onSave, onImprove, onReadMore, typing = false, onTyping, onSwitchKind, created = false, onViewRules }: RuleChatProps) {
   // The field keeps the home's shape: one pill naming this chat's kind where the home has its switch.
   // The empty chat can be about a strategy too (picked in the field's switch, or arriving from the indicator chat's):
   // its own heading, suggestions and placeholder; sending carries on in this chat (no strategy builder yet).
@@ -12074,7 +12041,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   useEffect(() => {
     if (step !== 'empty') return
     const held = takeMessage()
-    const from = scene.current?.closest('[data-dash]')?.querySelector<HTMLElement>('form input:not([type=file])') // the field lives in the screen's input place (DashDock), not in this scene
+    const from = scene.current?.closest('[data-dash]')?.querySelector<HTMLElement>('form textarea, form input:not([type=file])') // the field lives in the screen's input place (DashDock), not in this scene
     if (held && from) send(held, from)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -12117,9 +12084,9 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   const backtest: Backtest | undefined = step === 'saved' || step === 'cost' || step === 'none' ? backtests[step] : undefined
   const empty = step === 'empty'
   const hasCard = !empty && step !== 'thinking' && step !== 'question'
-  // The only difference between the versions: Version 1 pins the rule card above the chat (it folds to its title row
-  // while the chat is scrolled); Version 2 shows it inside DASH's message, like any other turn.
-  const pinned = version === '1' && hasCard
+  // The rule card is pinned above the chat (it folds to its title row while the chat is scrolled). (The card inside
+  // DASH's message — Chat V2 — is in archive/dash-chat-versions.)
+  const pinned = hasCard
   const card = <RuleCard rule={maxDailyLoss} backtest={backtest} onOpen={onReadMore} compact={pinned && compactWanted} onExpand={() => setCompactWanted(false)} />
   const thinking = step === 'thinking' || pending != null
   const asking = step === 'question' && !pending
@@ -12176,7 +12143,6 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
                   created,
                   onViewRules,
                   busy: pending != null,
-                  card: version === '2' && hasCard ? card : undefined,
                   buttons: true,
                 })}
                 {asking && (
@@ -12223,7 +12189,7 @@ export function RuleScene({ version = '1', step, request: initialRequest = maxDa
   )
 }
 
-type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove' | 'created' | 'onViewRules'> & { onProceed: () => void; busy: boolean; /** Version 2: replies as buttons. */ buttons?: boolean; /** Version 2: the rule card, inside DASH's preview message. */ card?: ReactNode }
+type Replies = Pick<RuleChatProps, 'onRefine' | 'onSave' | 'onImprove' | 'created' | 'onViewRules'> & { onProceed: () => void; busy: boolean; /** Replies as buttons. */ buttons?: boolean }
 
 /**
  * The conversation so far — every turn stays, like the live app. Each turn has a stable key, so when the page moves on
@@ -12246,7 +12212,6 @@ function conversation(step: RuleChatStep, request: string, answered: string | nu
     node: (
       <Stack gap="16">
         <AssistantMessage title={t('chat.previewTitle')}>{maxDailyLoss.description}</AssistantMessage>
-        {on.card}
         {!tested && !on.busy && (
           <ReplyChips asButtons={on.buttons} options={[{ label: t('chat.refine'), onClick: on.onRefine }, { label: t('chat.proceed'), onClick: on.onProceed, suggested: true }]} />
         )}
