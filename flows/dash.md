@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-30 — **V11 · Ribbon as one union** (Figma "Union" 6850:44252): the field and the picked tab are ONE SVG shape behind the form (`components/RibbonTabs`, path built from the measured tab) — white, a 1px inside edge in a green → lime → yellow gradient (50%, full while typing) that turns slowly (4 s a turn), low shadow. The picked tab slides and stretches to a new pick; the other kinds are white tabs with a light edge drawn under it (the picked one is always on top). Coming in, the tabs rise out of the field one by one; once a conversation starts (`useChatKind` → `sunk`) they sink back and the row closes, leaving + · text · Send. Local tokens `--app-dash-union-edge-1/2/3`, `--app-dash-union-shadow`. The rule chat's field now has the + (Pine Script upload) like the indicator chat and the homes.
 - 2026-10-30 — **New versions V9–V11, pills, suggestions.**
   - **V9 · Switch** (id '13'): the floating field with a full-width Rule · Indicator · Strategy toggle as its top row and + · text · Send under it (`switchFullTop`); setting **Switch outside** puts the toggle just above the field instead.
   - **V10 · Heading** (id '14'): the kind pills right under "How can I help you trade better?" (`pillsUnderTitle`), the field without pills.
@@ -2853,10 +2854,8 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   order: 0;
 }
 
-/* V11 · Ribbon: the field's box starts under the tabs row (drawn by ::before), so the picked tab can grow out of it
-   (RibbonTabs). The form itself is see-through; --ribbon-edge is the box's edge, shared with the tab. */
+/* V11 · Ribbon: the form is see-through; RibbonTabs draws the field + picked tab as one union shape behind it. */
 .input[data-ribbon] {
-  --ribbon-edge: var(--l3-border-light);
   isolation: isolate;
   padding-top: 0;
   border-color: transparent;
@@ -2866,24 +2865,13 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 
 .input[data-ribbon][data-typing],
 .input[data-ribbon]:focus-within {
-  --ribbon-edge: var(--app-dash-green);
   border-color: transparent;
 }
 
-.input[data-ribbon]::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: var(--l3-size-40) -1px -1px; /* under the 40 tabs row, over the form's own (transparent) 1px edge */
-  border: 1px solid var(--ribbon-edge);
-  border-radius: var(--l3-radius-24);
-  background: var(--l3-surface-primary);
-  box-shadow: var(--app-dash-float-shadow);
-  transition: border-color var(--app-dash-scene) var(--app-dash-scene-easing);
-}
-
 .input[data-ribbon] .modesTop {
-  flex-basis: calc(100% + 2 * var(--l3-spacing-08));
+  /* always its own line (edge to edge, never shrinking), so + · text · Send keep the line under it — also once the
+     tabs have sunk and the row is closed (the 8 row gap is then the field's top padding) */
+  flex: 0 0 calc(100% + 2 * var(--l3-spacing-08));
   margin: 0 calc(-1 * var(--l3-spacing-08));
 }
 
@@ -3083,7 +3071,7 @@ type ChatInputProps = {
    * What to build, chosen in the field itself (DASH home, setting "Ask field: With switch"; like Claude Desktop's
    * Chat / Cowork): the field grows to two rows — the text on top, then + · the switch (L3 Tabs pill-group, md: the 40 of the + and Send) · Send.
    */
-  modes?: { value: string; items: { value: string; label: string; /** Just launched: a New dot (pills) / New after the name (dropdown). */ isNew?: boolean }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group inside the field; menu: one pill that opens a dropdown (room for more); above: the pill group outside, full width over the field. */ display?: 'pills' | 'menu' | 'above' }
+  modes?: { value: string; items: { value: string; label: string; /** Just launched: a New dot (pills) / New after the name (dropdown). */ isNew?: boolean }[]; onChange: (value: string) => void; label: string; /** pills: the L3 pill group inside the field; menu: one pill that opens a dropdown (room for more); above: the pill group outside, full width over the field. */ display?: 'pills' | 'menu' | 'above'; /** V11 · Ribbon: the conversation has started — the tabs sink back into the field. */ sunk?: boolean }
 }
 
 /**
@@ -3154,7 +3142,7 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
         <span className={styles.modesTop}>
           {dashVersion.ribbonTabs ? (
             // V11 · Ribbon: folder tabs growing out of the field; the white one slides to the pick.
-            <RibbonTabs label={modes.label} items={modes.items.map(({ value, label }) => ({ value, label, iconLeft: pillIcon(value) }))} value={modes.value} onChange={modes.onChange} />
+            <RibbonTabs sunk={modes.sunk} label={modes.label} items={modes.items.map(({ value, label }) => ({ value, label, iconLeft: pillIcon(value) }))} value={modes.value} onChange={modes.onChange} />
           ) : (
             <SlidingPills value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} newLabel={t('askModes.new')} fill />
           )}
@@ -6840,60 +6828,70 @@ export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
 ### `src/flows/dash/components/RibbonTabs.module.css`
 
 ```css
-/* V11 · Ribbon. The row of labels on the page, over the field's top edge (the field draws its box under this row:
-   Chat.module.css [data-ribbon]). --ribbon-edge is the field's edge colour (light; DASH green while typing). */
+/* V11 · Ribbon. The tabs row sits over the field; the field + picked tab union is an SVG behind the whole form
+   (the form itself is see-through: Chat.module.css [data-ribbon]). Once a conversation has started the tabs sink
+   back into the field and the row closes (height → 0). */
 .row {
-  position: relative;
   display: flex;
   width: 100%;
-  /* 24 in: the first tab's flare lands on the field's straight top edge, past its rounded corner */
-  padding-inline: var(--l3-spacing-24);
+  height: var(--l3-size-40);
+  transition: height var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+  /* 36 in: past the field's rounded corner (its radius + the tab's 12 curve), so the curves land on the straight edge */
+  padding-inline: var(--l3-spacing-36);
 }
 
-/* The white tab under the picked label: the field's surface and edge (top and sides), reaching 1px down over the
-   field's top edge so the two read as one piece; it glides to the next pick. */
-.bump {
+/* The tabs sunk (a conversation going): the row closes; the labels are gone. */
+.row[data-closed] {
+  height: 0;
+}
+
+.row[data-closed] .tabs {
+  visibility: hidden;
+}
+
+/* The union: covers the form's border box, behind its content. */
+.union {
   position: absolute;
-  top: 0;
-  bottom: -1px;
-  border-radius: var(--l3-radius-12) var(--l3-radius-12) 0 0;
-  background: var(--l3-surface-primary);
-  box-shadow:
-    inset 1px 1px 0 var(--ribbon-edge),
-    inset -1px 0 0 var(--ribbon-edge); /* 1px: the field's edge */
-  transition: border-color var(--app-dash-scene) var(--app-dash-scene-easing);
+  z-index: -1;
+  top: -1px;
+  left: -1px;
+  overflow: visible;
+  filter: var(--app-dash-union-shadow);
+  pointer-events: none;
 }
 
-.bump[data-ready='yes'] {
-  transition:
-    left var(--l3-motion-duration-medium) var(--l3-motion-easing-standard),
-    width var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+.fill {
+  fill: var(--l3-surface-primary);
 }
 
-/* The two flares where the tab meets the field (as L3's ribbon tab): a quarter circle each side — clear inside, the
-   1px edge on the curve, white outside — so the white widens into the field. */
-.bump::before {
-  --ring: transparent calc(var(--l3-radius-12) - 1.5px), var(--ribbon-edge) calc(var(--l3-radius-12) - 1px) var(--l3-radius-12), var(--l3-surface-primary) calc(var(--l3-radius-12) + 0.5px);
-  content: '';
-  position: absolute;
-  bottom: 1px;
-  left: calc(1px - var(--l3-radius-12));
-  right: calc(1px - var(--l3-radius-12));
-  height: var(--l3-radius-12);
-  background:
-    radial-gradient(circle at 0 0, var(--ring)) left bottom / var(--l3-radius-12) var(--l3-radius-12) no-repeat,
-    radial-gradient(circle at 100% 0, var(--ring)) right bottom / var(--l3-radius-12) var(--l3-radius-12) no-repeat;
+/* Figma: 1px inside, the gradient at 50%; full while typing (the field is active). */
+.stroke {
+  fill: none;
+  stroke-width: 2px;
+  stroke-opacity: 0.5;
+  transition: stroke-opacity var(--app-dash-scene) var(--app-dash-scene-easing);
 }
 
-/* L3's ribbon row and tabs go see-through: only the sliding white tab is drawn. */
+:global(form[data-typing]) .stroke,
+:global(form:focus-within) .stroke {
+  stroke-opacity: 1;
+}
+
+.edge1 { stop-color: var(--app-dash-union-edge-1); }
+.edge2 { stop-color: var(--app-dash-union-edge-2); }
+.edge3 { stop-color: var(--app-dash-union-edge-3); }
+
+/* L3's ribbon row and tabs go see-through: the union draws the picked one. */
 .tabs.tabs {
   position: relative;
+  gap: var(--l3-spacing-04);
   padding: 0;
   background: transparent;
   box-shadow: none;
 }
 
 .tabs.tabs [role='tab'][role='tab'] {
+  --tab-padding-inline: var(--l3-spacing-08); /* 8 (L3 ribbon: 12): three tabs with icons fit the field's width */
   --tab-surface: transparent;
   --tab-border: transparent;
   --tab-content: var(--l3-content-secondary);
@@ -6905,12 +6903,18 @@ export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
   content: none;
 }
 
+/* The other kinds' tabs are drawn in the SVG under the union (the picked tab always on top): white, a light edge. */
+.otherTab {
+  fill: var(--l3-surface-primary);
+  stroke: var(--l3-border-light);
+  stroke-width: 1px;
+}
+
 .tabs.tabs [role='tab'][role='tab'][aria-selected='true'] {
   --tab-content: var(--l3-content-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bump[data-ready='yes'],
   .tabs [role='tab'] {
     transition: none;
   }
@@ -6920,43 +6924,222 @@ export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
 ### `src/flows/dash/components/RibbonTabs.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Tabs } from '@l3/components/Tabs'
 import styles from './RibbonTabs.module.css'
 
+/** The tab's top corners and the curves where it meets the field (Figma "Union": ~12). */
+const CORNER = 12
+const FLARE = 12
+/** Tab → tab: the union's tab part slides and stretches (ms). */
+const SLIDE_MS = 250
+/** Coming in: each tab rises out of the field (ms), the next one this much later. */
+const RISE_MS = 320
+const RISE_STAGGER_MS = 90
+/** A conversation started: the tabs sink back into the field together (ms), then the row closes. */
+const SINK_MS = 260
+const ease = (t: number) => 1 - Math.pow(1 - t, 3)
+/** The union's gradient edge: one full turn (s). */
+const EDGE_TURN_S = 4
+
+type Span = [number, number]
+
 /**
- * V11 · Ribbon: Rule · Indicator · Strategy as folder tabs growing out of the top of the field. The labels sit on the
- * page; under the picked one the field's white swells up into a tab (same edge, curved flares where it meets the
- * field) and slides to the next pick (250 ms), like the field's material stretching. Built on L3 Tabs (ribbon,
- * keyboard and a11y); the white tab is drawn here so it can glide.
+ * The union outline (Figma "Union" 6850:44252): the field (a pill under the tabs row) and the picked tab as ONE shape —
+ * tab corners, curves into the field's top edge. `rise` 0–1: how far the tab is out of the field (0 = a plain pill).
  */
-export function RibbonTabs({ value, items, onChange, label }: {
+function unionPath(w: number, h: number, rowH: number, [x0, x1]: Span, rise: number) {
+  const r = Math.min((h - rowH) / 2, 28) // the field: a pill
+  const tabH = rowH * rise
+  const f = Math.min(FLARE, tabH / 2)
+  const c = Math.min(CORNER, tabH / 2)
+  const top = rowH - tabH + 0.5
+  const tab = tabH < 0.5
+    ? [`H ${w - r}`]
+    : [
+        `H ${x0 - f}`,
+        `A ${f} ${f} 0 0 0 ${x0} ${rowH - f}`,
+        `V ${top + c}`,
+        `A ${c} ${c} 0 0 1 ${x0 + c} ${top}`,
+        `H ${x1 - c}`,
+        `A ${c} ${c} 0 0 1 ${x1} ${top + c}`,
+        `V ${rowH - f}`,
+        `A ${f} ${f} 0 0 0 ${x1 + f} ${rowH}`,
+        `H ${w - r}`,
+      ]
+  return [
+    `M ${r} ${rowH}`,
+    ...tab,
+    `A ${r} ${r} 0 0 1 ${w} ${rowH + r}`,
+    `V ${h - r}`,
+    `A ${r} ${r} 0 0 1 ${w - r} ${h}`,
+    `H ${r}`,
+    `A ${r} ${r} 0 0 1 0 ${h - r}`,
+    `V ${rowH + r}`,
+    `A ${r} ${r} 0 0 1 ${r} ${rowH}`,
+    'Z',
+  ].join(' ')
+}
+
+/** Another kind's tab (rounded top, open at the bottom — the field covers it), `rise` 0–1 out of the field. */
+function tabPath(rowH: number, [a, b]: Span, rise: number) {
+  const tabH = rowH * rise
+  if (tabH < 0.5) return ''
+  const c = Math.min(CORNER, tabH)
+  const top = rowH - tabH + 0.5
+  return `M ${a + 0.5} ${rowH + 1} V ${top + c} A ${c} ${c} 0 0 1 ${a + c} ${top} H ${b - c} A ${c} ${c} 0 0 1 ${b - 0.5} ${top + c} V ${rowH + 1}`
+}
+
+/**
+ * V11 · Ribbon: Rule · Indicator · Strategy as folder tabs growing out of the top of the field. The field and the
+ * picked tab are one union (white, a green → lime → yellow 1px inside edge, low shadow — Figma "Union"); the other
+ * kinds are white tabs with a light edge behind it, so the picked one is always on top.
+ * - Coming in: the tabs rise out of the field one by one (labels fade up with them).
+ * - A new pick: the union's tab slides and stretches there.
+ * - `sunk` (a conversation has started): the tabs sink back into the field and the row closes.
+ * Built on L3 Tabs (ribbon: keyboard and a11y); the shapes are one SVG behind the whole field.
+ */
+export function RibbonTabs({ value, items, onChange, label, sunk = false }: {
   value: string
   items: { value: string; label: string; iconLeft?: ReactNode }[]
   onChange: (value: string) => void
   label: string
+  sunk?: boolean
 }) {
   const row = useRef<HTMLSpanElement>(null)
-  const bump = useRef<HTMLSpanElement>(null)
-  const first = useRef(true)
-  useLayoutEffect(() => {
-    const picked = row.current?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')
-    const el = bump.current
-    if (!picked || !el) return
-    // Within the row (the bump's box): the tab's place in the L3 tab list + the list's place in the row (layout px, so
-    // the preview's scaled phone doesn't skew it).
-    const list = picked.offsetParent as HTMLElement | null
-    el.style.left = `${picked.offsetLeft + (list && list !== row.current ? list.offsetLeft : 0)}px`
-    el.style.width = `${picked.offsetWidth}px`
-    // No slide for the first placement; it switches on a frame later so the first pick already glides.
-    if (first.current) {
-      first.current = false
-      requestAnimationFrame(() => { el.dataset.ready = 'yes' })
+  const id = useId()
+  const [shape, setShape] = useState<{ w: number; h: number; rowH: number; picked: Span; tabs: Span[]; pickedIndex: number } | null>(null)
+  // What's on screen right now (animated): the union's tab span and each tab's rise.
+  const shownSpan = useRef<Span | null>(null)
+  const rises = useRef<number[]>(items.map(() => (sunk ? 1 : 0)))
+  const [closed, setClosed] = useState(false)
+  const slideFrame = useRef(0)
+  const riseFrame = useRef(0)
+
+  // Read the layout and draw with the current animated values.
+  const render = () => {
+    const el = row.current
+    const form = el?.closest('form')
+    if (!el || !form) return
+    const tabEls = [...el.querySelectorAll<HTMLElement>('[role=tab]')]
+    const span = (tab: HTMLElement): Span => {
+      let x = tab.offsetLeft
+      for (let n = tab.offsetParent as HTMLElement | null; n && n !== form; n = n.offsetParent as HTMLElement | null) x += n.offsetLeft
+      return [x + form.clientLeft, x + form.clientLeft + tab.offsetWidth]
     }
+    const pickedIndex = tabEls.findIndex((t) => t.getAttribute('aria-selected') === 'true')
+    if (pickedIndex < 0) return
+    const rowH = el.offsetHeight + form.clientTop
+    // The labels ride with their tab: up out of the field, fading in.
+    tabEls.forEach((t, i) => {
+      const r = rises.current[i] ?? 1
+      t.style.transform = r < 1 ? `translateY(${(1 - r) * 0.6 * rowH}px)` : ''
+      t.style.opacity = r < 1 ? String(r) : ''
+    })
+    setShape({ w: form.offsetWidth, h: form.offsetHeight, rowH, picked: shownSpan.current ?? span(tabEls[pickedIndex]), tabs: tabEls.map(span), pickedIndex })
+  }
+  const targetSpan = (): Span | null => {
+    const el = row.current
+    const form = el?.closest('form')
+    const picked = el?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')
+    if (!el || !form || !picked) return null
+    let x = picked.offsetLeft
+    for (let n = picked.offsetParent as HTMLElement | null; n && n !== form; n = n.offsetParent as HTMLElement | null) x += n.offsetLeft
+    return [x + form.clientLeft, x + form.clientLeft + picked.offsetWidth]
+  }
+
+  // A new pick: slide the union's tab there (the first placement doesn't slide).
+  useLayoutEffect(() => {
+    const to = targetSpan()
+    if (!to) return
+    const from = shownSpan.current
+    cancelAnimationFrame(slideFrame.current)
+    if (!from || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      shownSpan.current = to
+      render()
+      return
+    }
+    const start = performance.now()
+    const step = (now: number) => {
+      const t = ease(Math.min(1, (now - start) / SLIDE_MS))
+      shownSpan.current = [from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t]
+      render()
+      if (t < 1) slideFrame.current = requestAnimationFrame(step)
+    }
+    slideFrame.current = requestAnimationFrame(step)
   }, [value, items.map((i) => `${i.value}${i.iconLeft ? '+' : ''}`).join('|')])
+
+  // Coming in (rise one by one) or a conversation started (sink together, then close the row).
+  useLayoutEffect(() => {
+    cancelAnimationFrame(riseFrame.current)
+    if (!sunk) setClosed(false)
+    const from = rises.current.slice()
+    const to = items.map(() => (sunk ? 0 : 1))
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      rises.current = to
+      setClosed(sunk)
+      render()
+      return
+    }
+    const start = performance.now()
+    const step = (now: number) => {
+      let done = true
+      rises.current = from.map((r, i) => {
+        const delay = sunk ? 0 : i * RISE_STAGGER_MS
+        const t = Math.max(0, Math.min(1, (now - start - delay) / (sunk ? SINK_MS : RISE_MS)))
+        if (t < 1) done = false
+        return r + (to[i] - r) * ease(t)
+      })
+      render()
+      if (!done) riseFrame.current = requestAnimationFrame(step)
+      else if (sunk) setClosed(true)
+    }
+    riseFrame.current = requestAnimationFrame(step)
+  }, [sunk])
+
+  // The field grows with its text (and the row closes): redraw in place. (The first callback, on starting to watch,
+  // is skipped — it would cut a slide short.)
+  useLayoutEffect(() => {
+    const form = row.current?.closest('form')
+    if (!form) return
+    let watching = false
+    const watch = new ResizeObserver(() => {
+      if (watching) render()
+      watching = true
+    })
+    watch.observe(form)
+    return () => {
+      watch.disconnect()
+      cancelAnimationFrame(slideFrame.current)
+      cancelAnimationFrame(riseFrame.current)
+    }
+  }, [])
+
+  const rise = (i: number) => rises.current[i] ?? 1
+  const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   return (
-    <span ref={row} className={styles.row}>
-      <span ref={bump} className={styles.bump} aria-hidden="true" />
+    <span ref={row} className={styles.row} data-closed={closed || undefined}>
+      {shape && (
+        <svg className={styles.union} width={shape.w} height={shape.h} viewBox={`0 0 ${shape.w} ${shape.h}`} aria-hidden="true">
+          <defs>
+            <linearGradient id={`${id}-edge`} x1="0" y1="0" x2="0.15" y2="1">
+              <stop offset="0" className={styles.edge1} />
+              <stop offset="0.57" className={styles.edge2} />
+              <stop offset="1" className={styles.edge3} />
+              {/* The edge's colours turn slowly round the shape (one turn per EDGE_TURN_S), like V5's create cards. */}
+              {!reduceMotion && <animateTransform attributeName="gradientTransform" type="rotate" from="0 0.5 0.5" to="360 0.5 0.5" dur={`${EDGE_TURN_S}s`} repeatCount="indefinite" />}
+            </linearGradient>
+            <clipPath id={`${id}-clip`}>
+              <path d={unionPath(shape.w, shape.h, shape.rowH, shape.picked, rise(shape.pickedIndex))} />
+            </clipPath>
+          </defs>
+          {/* Behind: the other kinds' tabs. */}
+          {shape.tabs.map((s, i) => (i === shape.pickedIndex ? null : <path key={i} className={styles.otherTab} d={tabPath(shape.rowH, s, rise(i))} />))}
+          {/* The union: white fill, then a 2px stroke clipped to the inside = a 1px inside edge (Figma's inside stroke). */}
+          <path d={unionPath(shape.w, shape.h, shape.rowH, shape.picked, rise(shape.pickedIndex))} className={styles.fill} />
+          <path d={unionPath(shape.w, shape.h, shape.rowH, shape.picked, rise(shape.pickedIndex))} className={styles.stroke} stroke={`url(#${id}-edge)`} clipPath={`url(#${id}-clip)`} />
+        </svg>
+      )}
       <Tabs aria-label={label} appearance="ribbon" size="md" items={items} value={value} onChange={onChange} className={styles.tabs} />
     </span>
   )
@@ -7877,6 +8060,8 @@ export function useChatKind(kind: Mode, switcher?: { onChange: (kind: Mode) => v
       else setPicked(v as Mode)
     },
     display: field === 'above' ? ('above' as const) : ('pills' as const),
+    /** The conversation has started (no switcher): V11's ribbon tabs sink back into the field. */
+    sunk: !switcher,
   }
 }
 ```
@@ -13159,6 +13344,7 @@ import { DashDock } from '../components/DashDock'
 import { FirstAsk } from '../components/FirstAsk'
 import { useDashVersion } from '../components/dashVersion'
 import { useChatKind } from '../components/askModes'
+import { usePineUpload } from '../components/pineUpload'
 import { t } from '../copy'
 import { backtests, dailyLossQuestion, maxDailyLoss, type Backtest, topSuggestions, firstName } from '../data'
 import styles from './RuleChat.module.css'
@@ -13225,6 +13411,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
   // The empty chat can be about a strategy too (picked in the field's switch, or arriving from the indicator chat's):
   // its own heading, suggestions and placeholder; sending carries on in this chat (no strategy builder yet).
   const [strategy, setStrategy] = useState(() => takeKind() === 'strategy')
+  const pine = usePineUpload(onSwitchKind ? () => onSwitchKind('indicator') : undefined)
   const chatKind = useChatKind(strategy ? 'strategy' : 'rule', step === 'empty' ? {
     onChange: (k) => {
       if (k === 'indicator') {
@@ -13406,7 +13593,9 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
       <div className={styles.dock}>
         <Inset paddingInline="16" paddingBlock="16">
           {firstSuggest && <FirstAsk kind={strategy ? 'strategy' : 'rule'} text={draft} onPick={setDraft} />}
-          <ChatInput firstMessage={empty} modes={chatKind ?? undefined} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
+          {/* + (Pine Script upload) on the left, as on the homes and the indicator chat: a script becomes an indicator. */}
+          <ChatInput onAttach={pine.onAttach} firstMessage={empty} modes={chatKind ?? undefined} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
+          {pine.ui}
         </Inset>
       </div>
 
