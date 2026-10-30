@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — Setting **Big pills** (every version, A/B): the Rule · Indicator · Strategy pills 8 taller (32 → 40), fully round. V15: the small orb sits 4 right of centre and is still (its animation paused).
 - 2026-10-31 — **V14 · Clean and V15 · Clean still** (ids '18', '19'; from V10 · Heading, after senior feedback — a calmer middle):
   - The top bar reads **DASH AI** with a small **BETA** tag (L3 Tag, neutral tertiary), centred (`DashBar center`); no orb or greeting in the middle, no "Your creations" header (View all is the last card); the cards sit 24 under the full-width pills.
   - **V14:** a heading over the pills in DASH's voice (`components/FlipHeading`): a small grey line ("Tell me a habit, I'll make it a rule" · "Tell me what you watch, I'll chart it" · "Tell me your idea, I'll build and test it") and, bigger, a request that flips every 2.6 s ("Stop me after 3 losses", "Don't let me trade after 3 PM"…). Each line stays one line (no reflow).
@@ -7863,6 +7864,13 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
   transition: color var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
 }
 
+/* Setting "Big pills": every pill 8 taller (32 → 40), fully round; the thumb follows (it spans the pill's height). */
+.track[data-big] .tabs.tabs [role='tab'][role='tab'][role='tab'] {
+  --tab-height: var(--l3-size-40);
+  --tab-radius: var(--l3-radius-full);
+  border-radius: var(--l3-radius-full);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .thumb[data-ready='yes'],
   .tabs [role='tab'] {
@@ -7935,6 +7943,8 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
   fill?: boolean
 }) {
   const icons = useFlowOption('dash', 'pillIcons', 'off') === 'on'
+  // Setting "Big pills" (A/B): the pills 8 taller (40), still fully round.
+  const big = useFlowOption('dash', 'pillBig', 'off') === 'on'
   // The thumb re-measures when counts come or go (they change the pills' widths).
   const countsOn = useFlowOption('dash', 'pillCounts', 'off') === 'on'
   const track = useRef<HTMLSpanElement>(null)
@@ -7952,7 +7962,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
       first.current = false
       requestAnimationFrame(() => { el.dataset.ready = 'yes' })
     }
-  }, [value, fill, icons, countsOn, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
+  }, [value, fill, icons, countsOn, big, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
   const count = usePillCount()
   const withBadges = items.map(({ isNew, ...item }) => ({
     ...item,
@@ -7961,7 +7971,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
     ...(isNew ? { badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : count(item.value, item.value === value) ? { badge: count(item.value, item.value === value) } : {}),
   }))
   return (
-    <span ref={track} className={styles.track} data-fill={fill || undefined}>
+    <span ref={track} className={styles.track} data-fill={fill || undefined} data-big={big || undefined}>
       <span ref={thumb} className={styles.thumb} data-raised="strong" aria-hidden="true" />
       <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width={fill ? 'fill' : 'hug'} items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
     </span>
@@ -9568,6 +9578,8 @@ export const dash: Flow = {
     { id: 'pillIcons', group: 'Home', icon: msRule, label: 'Pill icons', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
     // Every version (A/B): a tiny count on each unpicked Rule · Indicator · Strategy pill — how many of it are made.
     { id: 'pillCounts', group: 'Home', icon: msLabel, label: 'Pill counts', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
+    // Every version (A/B): the Rule · Indicator · Strategy pills 8 taller (40), fully round.
+    { id: 'pillBig', group: 'Home', icon: msViewAgenda, label: 'Big pills', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
     // V9 · Switch: the Rule · Indicator · Strategy toggle inside the field (top row) or just above it, outside.
     { id: 'switchOutside', showIf: { dashVersion: ['13'] }, group: 'Home', icon: msViewAgenda, label: 'Switch outside', picker: 'toggle', values: [{ value: 'off', label: 'Inside' }, { value: 'on', label: 'Outside' }], default: 'off' },
     // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
@@ -13212,6 +13224,16 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   text-align: center;
   white-space: nowrap;
 }
+
+/* V15 · Clean still: the small orb, 4 right of centre so it reads centred, and paused (no animation in it). */
+.stillOrb {
+  display: inline-flex;
+  translate: var(--l3-spacing-04) 0;
+}
+
+.stillOrb * {
+  animation-play-state: paused !important; /* the orb's own motion, stopped */
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -13498,8 +13520,8 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
               {dashVersion.barTitle && askModes && (dashVersion.stillHeading ? (
                 // V15 · Clean still: a small orb over one still line — what DASH does for the picked kind.
                 <Stack gap="12" align="center">
-                  {/* 8 to the right, as on the other homes: the ring sits left of the art's box, so it reads centred */}
-                  <span className={styles.orbNudge}><DashOrb size="compact" /></span>
+                  {/* 4 to the right (the ring sits left of the art's box) and still — no motion, so it doesn't pull focus */}
+                  <span className={styles.stillOrb}><DashOrb size="compact" /></span>
                   <h1 className={styles.stillTitle}>{t(`home14.lead.${askModes.mode}`)}</h1>
                 </Stack>
               ) : <FlipHeading kind={askModes.mode} />)}
