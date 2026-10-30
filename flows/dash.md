@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — V15 · Clean still: the kind pills' names at 14px (Label/14); other versions keep 12.
 - 2026-10-31 — V16 · Explained: pills 56 tall, fully round. Pill counts: the count badge has no white ring (pills and V11's ribbon tabs).
 - 2026-10-31 — **V16 · Explained** (id '20'): V15 with a small explainer line inside each kind pill — "Limits your trades" · "Chart signals" · "When to buy & sell" (L3 Tab `subLabel`, set to Label/10); pills 44 (`--app-dash-pill-explained`), names in capitals, no 4 ring round the pills, a count (Pill counts) on the name's line. New settings group **Pills**: **Pill height** (0 = the version's own, 24–64) and **Pill corner radius** (0–32; the pills, the thumb and the track share it).
 - 2026-10-31 — V14 / V15: the row under the pills is only the picked kind — its creations, or (nothing made, e.g. Strategy) the Create card then the "Try" suggestions (a tap types it in). V15's orb is 48 and sits 24 above the heading; the heading sits 32 above the pills.
@@ -7880,6 +7881,12 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
   border-radius: var(--l3-radius-full);
 }
 
+/* V15 · Clean still: the names at Label/14 (L3's pill tabs use 12). */
+.track[data-label14] [role='tab'][role='tab'] {
+  font-size: var(--l3-text-label-14-size);
+  line-height: var(--l3-text-label-14-line-height);
+}
+
 /* V16 · Explained: room for the second line — pills 44 tall, the sub-label Label/10 (L3's is 8: too small to read). */
 .track[data-explained] .tabs.tabs [role='tab'][role='tab'][role='tab'] {
   --tab-height: var(--app-dash-pill-explained);
@@ -8039,7 +8046,10 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
     '--pill-radius': `${radius}px`,
   } as CSSProperties
   // V16 · Explained: a small second line in each kind pill — what it is.
-  const explained = !!useDashVersion().pillSubLabels
+  const dashVersion = useDashVersion()
+  const explained = !!dashVersion.pillSubLabels
+  // V15 · Clean still: the names at Label/14.
+  const label14 = !!dashVersion.pillLabel14
   // The thumb re-measures when counts come or go (they change the pills' widths).
   const countsOn = useFlowOption('dash', 'pillCounts', 'off') === 'on'
   const track = useRef<HTMLSpanElement>(null)
@@ -8057,7 +8067,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
       first.current = false
       requestAnimationFrame(() => { el.dataset.ready = 'yes' })
     }
-  }, [value, fill, icons, countsOn, big, explained, height, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
+  }, [value, fill, icons, countsOn, big, explained, label14, height, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
   const count = usePillCount()
   const withBadges = items.map(({ isNew, ...item }) => ({
     ...item,
@@ -8067,7 +8077,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
     ...(isNew ? { badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : count(item.value, item.value === value) ? { badge: count(item.value, item.value === value) } : {}),
   }))
   return (
-    <span ref={track} className={styles.track} data-fill={fill || undefined} data-big={big || undefined} data-explained={explained || undefined} data-height={height >= 24 || undefined} style={shape}>
+    <span ref={track} className={styles.track} data-fill={fill || undefined} data-big={big || undefined} data-explained={explained || undefined} data-label14={label14 || undefined} data-height={height >= 24 || undefined} style={shape}>
       <span ref={thumb} className={styles.thumb} data-raised="strong" aria-hidden="true" />
       <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width={fill ? 'fill' : 'hug'} items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
     </span>
@@ -8394,6 +8404,8 @@ export type DashVersionInfo = {
   stillHeading?: boolean
   /** V16 · Explained (V15 + this): a small second line inside each kind pill saying what it is ("Limits your trades"). */
   pillSubLabels?: boolean
+  /** V15 · Clean still: the kind pills' names at Label/14 (the others keep L3's 12). */
+  pillLabel14?: boolean
 }
 
 // The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
@@ -8419,7 +8431,7 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '16', label: 'V12 · Center', field: 'plain', firstSuggestions: true, edgeTurn: true },
   { value: '17', label: 'V13 · Center pills', field: 'switch', firstSuggestions: true, edgeTurn: true },
   { value: '18', label: 'V14 · Clean', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true },
-  { value: '19', label: 'V15 · Clean still', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true },
+  { value: '19', label: 'V15 · Clean still', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillLabel14: true },
   { value: '20', label: 'V16 · Explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillSubLabels: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
