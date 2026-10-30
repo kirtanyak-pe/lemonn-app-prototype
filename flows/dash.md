@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — Setting **Pill counts** (every version, A/B; off by default): a tiny neutral count on each unpicked Rule · Indicator · Strategy pill / ribbon tab — how many of that kind are made (none → no tag; `usePillCount` in SlidingPills). **V10 · Heading:** the pills under the question are full width (three equal). **V8 · Tabs:** one row only — "Your creations": "+ Create <kind>" (follows the top tab) then that kind's cards; the "Start a …" row with the Try examples is gone.
 - 2026-10-31 — Fix: V8 · Tabs' top-bar pills — the picked one's black thumb was hidden under a leftover white fill on the pill list; the white track now comes only from `--pills-track`.
 - 2026-10-31 — **V12 · Center and V13 · Center pills** (ids '16', '17'; new and returning users; `screens/HomeCenter`): a landing page like desktop AI chats. The field sits on the screen's centre line (an empty slot in the page; the field itself stays in the DASH dock and is lifted there), the orb and "How can I help you trade better?" stack up from its top, **Your creations** hangs from its bottom (no Create card; the heading "Your creations ›" opens them all). Tap the field: the rest steps away and the field glides straight down to its place over the keyboard (frame by frame from where it is, so the keyboard moving under it can't drag it); back the same way. The field's edge is the green → lime → yellow gradient, turning (`edgeTurn`). V13 has Rule · Indicator · Strategy inside the field (text on top; pills, + and Send under it); the section below follows the pick — that kind's creations, or **Suggestions** (the "Try" cards) when nothing of it is made yet.
   - **Chats:** once the first message is sent the field drops its pills and becomes one line (+ on the left, the text, Send on the right) — no accidental kind switch mid-chat (`useChatKind` returns none; V11's ribbon still sinks its tabs first).
@@ -3056,7 +3057,7 @@ import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
 import { ModeMenu } from './ModeMenu'
 import { useDashVersion } from './dashVersion'
-import { SlidingPills, usePillIcon } from './SlidingPills'
+import { SlidingPills, usePillCount, usePillIcon } from './SlidingPills'
 import { RibbonTabs } from './RibbonTabs'
 import { PineStory } from './PineStory'
 import styles from './Chat.module.css'
@@ -3131,6 +3132,7 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
   // DASH version with a dock field (V7): edge to edge, text on top, controls under it.
   const dashVersion = useDashVersion()
   const pillIcon = usePillIcon()
+  const pillCount = usePillCount()
   const dock = dashVersion.dock
   // DASH V8: the first message's field glows while it's being typed.
   const firstGlow = !!dashVersion.firstMessageFocus && firstMessage && typing
@@ -3174,7 +3176,7 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
         <span className={styles.modesTop}>
           {dashVersion.ribbonTabs ? (
             // V11 · Ribbon: folder tabs growing out of the field; the white one slides to the pick.
-            <RibbonTabs sunk={modes.sunk} label={modes.label} items={modes.items.map(({ value, label }) => ({ value, label, iconLeft: pillIcon(value) }))} value={modes.value} onChange={modes.onChange} />
+            <RibbonTabs sunk={modes.sunk} label={modes.label} items={modes.items.map(({ value, label }) => ({ value, label, iconLeft: pillIcon(value), badge: pillCount(value, value === modes.value) }))} value={modes.value} onChange={modes.onChange} />
           ) : (
             <SlidingPills value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} newLabel={t('askModes.new')} fill />
           )}
@@ -7024,7 +7026,7 @@ function tabPath(rowH: number, [a, b]: Span, rise: number) {
  */
 export function RibbonTabs({ value, items, onChange, label, sunk = false }: {
   value: string
-  items: { value: string; label: string; iconLeft?: ReactNode }[]
+  items: { value: string; label: string; iconLeft?: ReactNode; /** Setting "Pill counts": a tiny count on the unpicked ones. */ badge?: ReactNode }[]
   onChange: (value: string) => void
   label: string
   sunk?: boolean
@@ -7090,7 +7092,7 @@ export function RibbonTabs({ value, items, onChange, label, sunk = false }: {
       if (t < 1) slideFrame.current = requestAnimationFrame(step)
     }
     slideFrame.current = requestAnimationFrame(step)
-  }, [value, items.map((i) => `${i.value}${i.iconLeft ? '+' : ''}`).join('|')])
+  }, [value, items.map((i) => `${i.value}${i.iconLeft ? '+' : ''}${i.badge ? '#' : ''}`).join('|')])
 
   // Coming in (rise one by one) or a conversation started (sink together, then close the row).
   useLayoutEffect(() => {
@@ -7786,10 +7788,28 @@ import { Icon } from '@l3/components/Icon'
 import { Tabs } from '@l3/components/Tabs'
 import { msFunction, msMonitoring, msRule } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
+import { dashRules, savedIndicators } from '../data'
+import { useDashUser } from './dashVersion'
 import styles from './SlidingPills.module.css'
 
 /** Setting "Pill icons": each kind's icon before its name (the same marks as V5 · Cards' cards). */
 const KIND_ICONS: Record<string, string> = { rule: msRule, indicator: msMonitoring, strategy: msFunction }
+
+/**
+ * Setting "Pill counts" (A/B, every version): a tiny rounded count on each unpicked kind — how many of it the user
+ * has made (none → no tag). Returns the badge for a pill, or nothing.
+ */
+export function usePillCount() {
+  const on = useFlowOption('dash', 'pillCounts', 'off') === 'on'
+  const { made } = useDashUser()
+  const counts: Record<string, number> = {
+    rule: made.rule ? dashRules.length : 0,
+    indicator: made.indicator ? savedIndicators.length : 0,
+    strategy: 0, // strategies can't be made yet
+  }
+  return (value: string, picked: boolean): ReactNode =>
+    on && !picked && counts[value] ? <Badge count={counts[value]} color="neutral" size="sm" label={`${counts[value]}`} /> : undefined
+}
 
 /** The kind switcher's icon for a value while the setting "Pill icons" is on (also used by V11's ribbon tabs). */
 export function usePillIcon() {
@@ -7812,6 +7832,8 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
   fill?: boolean
 }) {
   const icons = useFlowOption('dash', 'pillIcons', 'off') === 'on'
+  // The thumb re-measures when counts come or go (they change the pills' widths).
+  const countsOn = useFlowOption('dash', 'pillCounts', 'off') === 'on'
   const track = useRef<HTMLSpanElement>(null)
   const thumb = useRef<HTMLSpanElement>(null)
   const first = useRef(true)
@@ -7827,11 +7849,13 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
       first.current = false
       requestAnimationFrame(() => { el.dataset.ready = 'yes' })
     }
-  }, [value, fill, icons, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
+  }, [value, fill, icons, countsOn, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
+  const count = usePillCount()
   const withBadges = items.map(({ isNew, ...item }) => ({
     ...item,
     ...(icons && KIND_ICONS[item.value] ? { iconLeft: <Icon icon={KIND_ICONS[item.value]} size={16} /> } : {}),
-    ...(isNew ? { badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : {}),
+    // A New dot wins over a count; a count only on the unpicked pills (setting "Pill counts").
+    ...(isNew ? { badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : count(item.value, item.value === value) ? { badge: count(item.value, item.value === value) } : {}),
   }))
   return (
     <span ref={track} className={styles.track} data-fill={fill || undefined}>
@@ -9198,9 +9222,6 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home8.title.rule": "What should a rule do for you?",
   "home8.title.indicator": "What should your indicator show?",
   "home8.title.strategy": "What should your strategy trade?",
-  "home8.start.rule": "Start a rule",
-  "home8.start.indicator": "Start an indicator",
-  "home8.start.strategy": "Start a strategy",
   "home12.suggestions": "Suggestions",
   "home3.start.rule": "Build a rule that ",
   "home3.start.indicator": "Build an indicator that ",
@@ -9421,6 +9442,8 @@ export const dash: Flow = {
     { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', picker: 'toggle', values: [{ value: 'hide', label: 'Hide' }, { value: 'show', label: 'Show' }], default: 'hide' },
     // Every version: an icon in each Rule · Indicator · Strategy pill (off by default).
     { id: 'pillIcons', group: 'Home', icon: msRule, label: 'Pill icons', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
+    // Every version (A/B): a tiny count on each unpicked Rule · Indicator · Strategy pill — how many of it are made.
+    { id: 'pillCounts', group: 'Home', icon: msLabel, label: 'Pill counts', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
     // V9 · Switch: the Rule · Indicator · Strategy toggle inside the field (top row) or just above it, outside.
     { id: 'switchOutside', showIf: { dashVersion: ['13'] }, group: 'Home', icon: msViewAgenda, label: 'Switch outside', picker: 'toggle', values: [{ value: 'off', label: 'Inside' }, { value: 'on', label: 'Outside' }], default: 'off' },
     // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
@@ -10981,7 +11004,7 @@ import { Inset } from '@l3/components/Inset'
 import { raised } from '@l3/components/Raised'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
-import { msAdd, msChevronRight, msLightbulb } from '@l3/icons/material'
+import { msAdd, msChevronRight } from '@l3/icons/material'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { ChatInput } from '../components/Chat'
 import { DashDock } from '../components/DashDock'
@@ -11002,11 +11025,6 @@ import styles from './HomeTabs.module.css'
 
 /** Made ones shown before View all. */
 const MAX_MADE = 3
-const EXAMPLES = {
-  rule: ['home3.ex.rule1', 'home3.ex.rule2', 'home3.ex.rule3'],
-  indicator: ['home3.ex.indicator1', 'home3.ex.indicator2', 'home3.ex.indicator3'],
-  strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
-} as const
 
 /**
  * DASH V8 · Tabs — the returning user's home. Rule · Indicator · Strategy are tabs in the middle of the top bar
@@ -11014,9 +11032,8 @@ const EXAMPLES = {
  * follows the tab (fading in):
  * 1. the header, centred: the DASH orb, "Hey Rohan," and a question for that kind;
  * 2. Pick up where you left off — that kind's drafts only (setting "Resume chats");
- * 3. Your rules / indicators — what's been made of that kind (3, then View all → history on that tab); a card opens
- *    its details sheet. Nothing made (strategies, for now) → no section;
- * 4. Start one — "+ Create <kind>" (types the opening words), then three examples to try (tap → into the field);
+ * 3. Your creations — one row: "+ Create <kind>" (follows the tab; types the opening words), then what's been made
+ *    of that kind (3, then View all → history on that tab); a card opens its details sheet;
  * 5. the plain floating field (no pills): its placeholder and where Send goes follow the tab; + uploads a Pine Script.
  *    Active (typing): the body steps away and suggestions for the tab show over the field (FirstAsk), as in V7.
  */
@@ -11077,36 +11094,21 @@ export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator
 
             <ResumeDrafts drafts={drafts} onViewAll={onPastChats} onOpen={(k) => (k === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
 
-            {items.length > 0 && kind !== 'strategy' && (
-              <Stack as="section" gap="12" aria-label={t(`home2.group.${kind}`)}>
-                <SectionHeader
-                  title={t(`home2.group.${kind}`)}
-                  headingLevel={2}
-                  action={{ type: 'view-all', onClick: () => { openHistoryOn(kind === 'rule' ? 'rules' : 'indicators'); onManage?.() } }}
-                />
-                <div className={cards.row} role="list">
-                  {items.slice(0, MAX_MADE).map((item) => card(item, kind))}
-                </div>
-              </Stack>
-            )}
-
-            <Stack as="section" gap="12" aria-label={t(`home8.start.${kind}`)}>
-              <SectionHeader title={t(`home8.start.${kind}`)} headingLevel={2} />
+            {/* One row: Your creations — "+ Create <kind>" first (follows the tab; types the opening words), then what's
+                been made of that kind (3, then View all → history on that tab). Nothing made yet: just the Create card. */}
+            <Stack as="section" gap="12" aria-label={t('home2.creations')}>
+              <SectionHeader
+                title={t('home2.creations')}
+                headingLevel={2}
+                action={items.length > 0 ? { type: 'view-all', onClick: () => { openHistoryOn(kind === 'rule' ? 'rules' : 'indicators'); onManage?.() } } : undefined}
+              />
               <div className={cards.row} role="list">
                 <button type="button" role="listitem" className={`${cards.item} ${cards.createCard}`} onClick={() => start(t(`home3.start.${kind}`))}>
                   <svg className={cards.createOutline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
                   <span className={cards.createIcon} {...raised('strong')}><Icon icon={msAdd} size={20} /></span>
                   <span className={cards.itemTitle}>{t(`home3.create.${kind}`)}</span>
                 </button>
-                {EXAMPLES[kind].map((key) => (
-                  <button key={key} type="button" role="listitem" className={cards.item} onClick={() => start(t(key))}>
-                    <span className={cards.itemTop}>
-                      <span className={cards.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
-                      <Icon icon={msChevronRight} size={16} />
-                    </span>
-                    <span className={cards.itemTitle}>{t(key)}</span>
-                  </button>
-                ))}
+                {kind !== 'strategy' && items.slice(0, MAX_MADE).map((item) => card(item, kind))}
               </div>
             </Stack>
           </Stack>
@@ -13027,6 +13029,11 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 .switchOutside {
   margin-bottom: var(--l3-spacing-08);
 }
+
+/* V10 · Heading: the pills under the question, full width. */
+.pillsUnderTitle {
+  align-self: stretch;
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -13304,7 +13311,10 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
               </Stack>
               {/* V10 · Heading: what to build sits right under the question (the field below has no pills). */}
               {pillsUnderTitle && askModes && (
-                <SlidingPills value={askModes.modes.value} items={askModes.modes.items} onChange={askModes.modes.onChange} label={askModes.modes.label} newLabel={t('askModes.new')} />
+                // Full width (the page's 16 in each side), the three sharing it equally.
+                <div className={styles.pillsUnderTitle}>
+                  <SlidingPills value={askModes.modes.value} items={askModes.modes.items} onChange={askModes.modes.onChange} label={askModes.modes.label} newLabel={t('askModes.new')} fill />
+                </div>
               )}
             </Stack>
 
