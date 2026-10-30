@@ -238,6 +238,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — DASH top bar: action buttons are always round (`.bar` in DashScreen.module.css sets `--btn-radius` to full; L3's small Tertiary is radius 8). L3 gap: Actionbar actions have no round option.
 - 2026-10-30 — V5 · Cards: the title is “How can I help you today?” (Heading/24, one line) and the time-of-day greeting (“Good morning, Rohan”) is gone.
 - 2026-10-30 — **Past chats is a sheet.** The history button, View all on drafts and the chat ⋮ open Past chats as a bottom sheet over DASH (dash-30 = the home with it open): half the screen at first, tall once the list is scrolled or swiped up. Hold a row → a small Delete this chat menu → the confirmation sheet → back to the list. New setting **Past chats**: With chats / Empty (L3 empty state; no drafts on the home either). Long press is one hook (`components/longPress`) shared with the compact resume card. Prototype floating buttons: 24 disc in a 48 touch area, never overlapping.
 - 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card (“N more” when some are left out) that opens the full page (`HOME_CREATIONS` in ReturningV2).
@@ -3764,6 +3765,12 @@ export function DashDock({ children }: { children: ReactNode }) {
 .bar.bar {
   background: transparent;
   box-shadow: none;
+}
+
+/* DASH's top bar: its action buttons are always round (history, Your creations, the chat ⋮) — L3's small Tertiary
+   button is a rounded square (radius 8). */
+.bar.bar button {
+  --btn-radius: var(--l3-radius-full);
 }
 
 @media (prefers-reduced-motion: reduce) {
