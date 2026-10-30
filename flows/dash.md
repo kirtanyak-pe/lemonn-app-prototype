@@ -233,6 +233,13 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-30 — **New versions V9–V11, pills, suggestions.**
+  - **V9 · Switch** (id '13'): the floating field with a full-width Rule · Indicator · Strategy toggle as its top row and + · text · Send under it (`switchFullTop`); setting **Switch outside** puts the toggle just above the field instead.
+  - **V10 · Heading** (id '14'): the kind pills right under "How can I help you trade better?" (`pillsUnderTitle`), the field without pills.
+  - **V11 · Ribbon** (id '15'): the kinds as folder tabs growing out of the field's top edge (`components/RibbonTabs`): labels on the page, the field's white swells into a tab under the pick (same edge, curved flares) and slides to the next pick.
+  - **Sliding pills always animate:** the first pick after the pills appear glides too (the slide switches on a frame after the first placement); V8's top-bar tabs use the sliding pills (white track).
+  - Setting **Pill icons** (every version): each kind's icon in its pill / tab (rule, monitoring, function).
+  - **Suggestions in every version:** with the field active the page steps away and suggestions for the picked kind show over the field — added to V5 · Cards, V9, V10, V11 (V3, V4, V7, V8 had it; V6 keeps its create card until something is typed).
 - 2026-10-30 — **V8 · Tabs:** the body sits centred between the top bar and the field; with the field active (typing) the body steps away and suggestions for the tab show over the field (FirstAsk; a suggestion's kind pill moves the top bar's tab), as in V7. **Resume card:** always the compact card — the Big card (Continue + ✕) and the setting Resume card are archived in `archive/dash-resume-card-big/`.
 - 2026-10-29 — **Chats: Version 1 only.** The rule / indicator card is always pinned above the conversation (folding to a mini card on scroll); the setting Chat version is gone and Version 2 (the card inside DASH's message, a new card per change) is archived in `archive/dash-chat-versions/`.
 - 2026-10-29 — **Pine Script: one behaviour.** Always on; the tip is the animated story, shown every time the field is empty (until it's closed or the + is used), floating over the content, which dims. The settings Pine Script / Pine Script tip / Show Pine Script tip / Tip placement are gone; the simple tip card, “once”, “push up” and “off” are archived in `archive/dash-pine-versions/`.
@@ -321,7 +328,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -2837,6 +2844,49 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   padding-left: var(--l3-spacing-08);
 }
 
+/* V9 · Switch: the toggle takes the whole top row; the + goes back to the start of the row under it (+ · text · Send). */
+.input[data-pills-full] .modesTop {
+  flex-basis: 100%;
+}
+
+.input[data-pills-full] .attachWrap {
+  order: 0;
+}
+
+/* V11 · Ribbon: the field's box starts under the tabs row (drawn by ::before), so the picked tab can grow out of it
+   (RibbonTabs). The form itself is see-through; --ribbon-edge is the box's edge, shared with the tab. */
+.input[data-ribbon] {
+  --ribbon-edge: var(--l3-border-light);
+  isolation: isolate;
+  padding-top: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.input[data-ribbon][data-typing],
+.input[data-ribbon]:focus-within {
+  --ribbon-edge: var(--app-dash-green);
+  border-color: transparent;
+}
+
+.input[data-ribbon]::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: var(--l3-size-40) -1px -1px; /* under the 40 tabs row, over the form's own (transparent) 1px edge */
+  border: 1px solid var(--ribbon-edge);
+  border-radius: var(--l3-radius-24);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--app-dash-float-shadow);
+  transition: border-color var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+.input[data-ribbon] .modesTop {
+  flex-basis: calc(100% + 2 * var(--l3-spacing-08));
+  margin: 0 calc(-1 * var(--l3-spacing-08));
+}
+
 /* The + right beside Send (with the switch, or the one-row field): 12 between them (the row's 4 gap + 8). */
 .input[data-modes] .attachWrap,
 .input[data-inline] .attachWrap {
@@ -2987,7 +3037,8 @@ import { useFlowOption, useSystemKeyboard } from '../../../shared/prototype'
 import { t } from '../copy'
 import { ModeMenu } from './ModeMenu'
 import { useDashVersion } from './dashVersion'
-import { SlidingPills } from './SlidingPills'
+import { SlidingPills, usePillIcon } from './SlidingPills'
+import { RibbonTabs } from './RibbonTabs'
 import { PineStory } from './PineStory'
 import styles from './Chat.module.css'
 
@@ -3060,6 +3111,7 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
   }, [typing, value, field])
   // DASH version with a dock field (V7): edge to edge, text on top, controls under it.
   const dashVersion = useDashVersion()
+  const pillIcon = usePillIcon()
   const dock = dashVersion.dock
   // DASH V8: the first message's field glows while it's being typed.
   const firstGlow = !!dashVersion.firstMessageFocus && firstMessage && typing
@@ -3084,6 +3136,8 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
       data-attach={onAttach ? '' : undefined}
       data-modes={modes && modes.display !== 'above' ? '' : undefined}
       data-pills-top={modes?.display === 'above' || undefined}
+      data-pills-full={(modes?.display === 'above' && dashVersion.switchFullTop) || undefined}
+      data-ribbon={(modes?.display === 'above' && dashVersion.ribbonTabs) || undefined}
       data-top={top ? '' : undefined}
       data-inline={inline || undefined}
       data-dock={dock || undefined}
@@ -3098,7 +3152,12 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
       {/* "Pills above" (DASH V3): the switch is the field's top row, full width (equal pills); text and Send under it. */}
       {modes?.display === 'above' && (
         <span className={styles.modesTop}>
-          <SlidingPills value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} newLabel={t('askModes.new')} fill />
+          {dashVersion.ribbonTabs ? (
+            // V11 · Ribbon: folder tabs growing out of the field; the white one slides to the pick.
+            <RibbonTabs label={modes.label} items={modes.items.map(({ value, label }) => ({ value, label, iconLeft: pillIcon(value) }))} value={modes.value} onChange={modes.onChange} />
+          ) : (
+            <SlidingPills value={modes.value} items={modes.items} onChange={modes.onChange} label={modes.label} newLabel={t('askModes.new')} fill />
+          )}
         </span>
       )}
       {onAttach && (() => {
@@ -3788,6 +3847,10 @@ export function DashDock({ children }: { children: ReactNode }) {
 }
 
 /* The tabs' track on surface/primary (L3's pill group is surface/secondary): it sits on DASH's glow, not a white bar. */
+.barCenter.barCenter {
+  --pills-track: var(--l3-surface-primary);
+}
+
 .barCenter.barCenter [data-appearance='pill-group'] {
   background: var(--l3-surface-primary);
 }
@@ -6774,6 +6837,132 @@ export function ResumeDrafts({ drafts, onOpen, onRemove, onViewAll }: {
 }
 ```
 
+### `src/flows/dash/components/RibbonTabs.module.css`
+
+```css
+/* V11 · Ribbon. The row of labels on the page, over the field's top edge (the field draws its box under this row:
+   Chat.module.css [data-ribbon]). --ribbon-edge is the field's edge colour (light; DASH green while typing). */
+.row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  /* 24 in: the first tab's flare lands on the field's straight top edge, past its rounded corner */
+  padding-inline: var(--l3-spacing-24);
+}
+
+/* The white tab under the picked label: the field's surface and edge (top and sides), reaching 1px down over the
+   field's top edge so the two read as one piece; it glides to the next pick. */
+.bump {
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  border-radius: var(--l3-radius-12) var(--l3-radius-12) 0 0;
+  background: var(--l3-surface-primary);
+  box-shadow:
+    inset 1px 1px 0 var(--ribbon-edge),
+    inset -1px 0 0 var(--ribbon-edge); /* 1px: the field's edge */
+  transition: border-color var(--app-dash-scene) var(--app-dash-scene-easing);
+}
+
+.bump[data-ready='yes'] {
+  transition:
+    left var(--l3-motion-duration-medium) var(--l3-motion-easing-standard),
+    width var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+/* The two flares where the tab meets the field (as L3's ribbon tab): a quarter circle each side — clear inside, the
+   1px edge on the curve, white outside — so the white widens into the field. */
+.bump::before {
+  --ring: transparent calc(var(--l3-radius-12) - 1.5px), var(--ribbon-edge) calc(var(--l3-radius-12) - 1px) var(--l3-radius-12), var(--l3-surface-primary) calc(var(--l3-radius-12) + 0.5px);
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: calc(1px - var(--l3-radius-12));
+  right: calc(1px - var(--l3-radius-12));
+  height: var(--l3-radius-12);
+  background:
+    radial-gradient(circle at 0 0, var(--ring)) left bottom / var(--l3-radius-12) var(--l3-radius-12) no-repeat,
+    radial-gradient(circle at 100% 0, var(--ring)) right bottom / var(--l3-radius-12) var(--l3-radius-12) no-repeat;
+}
+
+/* L3's ribbon row and tabs go see-through: only the sliding white tab is drawn. */
+.tabs.tabs {
+  position: relative;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tabs.tabs [role='tab'][role='tab'] {
+  --tab-surface: transparent;
+  --tab-border: transparent;
+  --tab-content: var(--l3-content-secondary);
+  box-shadow: none;
+  transition: color var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+.tabs.tabs [role='tab'][role='tab']::before {
+  content: none;
+}
+
+.tabs.tabs [role='tab'][role='tab'][aria-selected='true'] {
+  --tab-content: var(--l3-content-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bump[data-ready='yes'],
+  .tabs [role='tab'] {
+    transition: none;
+  }
+}
+```
+
+### `src/flows/dash/components/RibbonTabs.tsx`
+
+```tsx
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { Tabs } from '@l3/components/Tabs'
+import styles from './RibbonTabs.module.css'
+
+/**
+ * V11 · Ribbon: Rule · Indicator · Strategy as folder tabs growing out of the top of the field. The labels sit on the
+ * page; under the picked one the field's white swells up into a tab (same edge, curved flares where it meets the
+ * field) and slides to the next pick (250 ms), like the field's material stretching. Built on L3 Tabs (ribbon,
+ * keyboard and a11y); the white tab is drawn here so it can glide.
+ */
+export function RibbonTabs({ value, items, onChange, label }: {
+  value: string
+  items: { value: string; label: string; iconLeft?: ReactNode }[]
+  onChange: (value: string) => void
+  label: string
+}) {
+  const row = useRef<HTMLSpanElement>(null)
+  const bump = useRef<HTMLSpanElement>(null)
+  const first = useRef(true)
+  useLayoutEffect(() => {
+    const picked = row.current?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')
+    const el = bump.current
+    if (!picked || !el) return
+    // Within the row (the bump's box): the tab's place in the L3 tab list + the list's place in the row (layout px, so
+    // the preview's scaled phone doesn't skew it).
+    const list = picked.offsetParent as HTMLElement | null
+    el.style.left = `${picked.offsetLeft + (list && list !== row.current ? list.offsetLeft : 0)}px`
+    el.style.width = `${picked.offsetWidth}px`
+    // No slide for the first placement; it switches on a frame later so the first pick already glides.
+    if (first.current) {
+      first.current = false
+      requestAnimationFrame(() => { el.dataset.ready = 'yes' })
+    }
+  }, [value, items.map((i) => `${i.value}${i.iconLeft ? '+' : ''}`).join('|')])
+  return (
+    <span ref={row} className={styles.row}>
+      <span ref={bump} className={styles.bump} aria-hidden="true" />
+      <Tabs aria-label={label} appearance="ribbon" size="md" items={items} value={value} onChange={onChange} className={styles.tabs} />
+    </span>
+  )
+}
+```
+
 ### `src/flows/dash/components/RuleCard.module.css`
 
 ```css
@@ -7387,8 +7576,20 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
 ```tsx
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import { Badge } from '@l3/components/Badge'
+import { Icon } from '@l3/components/Icon'
 import { Tabs } from '@l3/components/Tabs'
+import { msFunction, msMonitoring, msRule } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
 import styles from './SlidingPills.module.css'
+
+/** Setting "Pill icons": each kind's icon before its name (the same marks as V5 · Cards' cards). */
+const KIND_ICONS: Record<string, string> = { rule: msRule, indicator: msMonitoring, strategy: msFunction }
+
+/** The kind switcher's icon for a value while the setting "Pill icons" is on (also used by V11's ribbon tabs). */
+export function usePillIcon() {
+  const on = useFlowOption('dash', 'pillIcons', 'off') === 'on'
+  return (value: string) => (on && KIND_ICONS[value] ? <Icon icon={KIND_ICONS[value]} size={16} /> : undefined)
+}
 
 /**
  * The field's "what to build" pill group (L3 Tabs, pill-group · toggle · md) with a sliding black thumb: the picked
@@ -7404,6 +7605,7 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
   /** Full width, the pills sharing it equally (Chat input "Pills above"). */
   fill?: boolean
 }) {
+  const icons = useFlowOption('dash', 'pillIcons', 'off') === 'on'
   const track = useRef<HTMLSpanElement>(null)
   const thumb = useRef<HTMLSpanElement>(null)
   const first = useRef(true)
@@ -7411,13 +7613,20 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
     const picked = track.current?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')
     const el = thumb.current
     if (!picked || !el) return
-    // The first placement doesn't animate; every change after does (CSS transition on left / width).
-    el.dataset.ready = first.current ? '' : 'yes'
     el.style.left = `${picked.offsetLeft}px`
     el.style.width = `${picked.offsetWidth}px`
-    first.current = false
-  }, [value, fill, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
-  const withBadges = items.map(({ isNew, ...item }) => (isNew ? { ...item, badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : item))
+    // The first placement doesn't animate; the slide (CSS transition on left / width) switches on a frame later, so
+    // even the very first pick glides — turning it on in the same frame as a move made that move jump.
+    if (first.current) {
+      first.current = false
+      requestAnimationFrame(() => { el.dataset.ready = 'yes' })
+    }
+  }, [value, fill, icons, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
+  const withBadges = items.map(({ isNew, ...item }) => ({
+    ...item,
+    ...(icons && KIND_ICONS[item.value] ? { iconLeft: <Icon icon={KIND_ICONS[item.value]} size={16} /> } : {}),
+    ...(isNew ? { badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : {}),
+  }))
   return (
     <span ref={track} className={styles.track} data-fill={fill || undefined}>
       <span ref={thumb} className={styles.thumb} data-raised="strong" aria-hidden="true" />
@@ -7723,6 +7932,14 @@ export type DashVersionInfo = {
   /** V8 · Tabs: Rule · Indicator · Strategy as tabs in the middle of the top bar (not in the field); the whole home
    *  body follows the pick. The field is the plain floating one. */
   topKinds?: boolean
+  /** V9 · Switch (with field 'above'): the Rule · Indicator · Strategy toggle takes the field's whole top row; the +,
+   *  the text and Send make the row under it. */
+  switchFullTop?: boolean
+  /** V10 · Heading: the Rule · Indicator · Strategy pills right under the page's question, not in the field. */
+  pillsUnderTitle?: boolean
+  /** V11 · Ribbon (with field 'above' + switchFullTop): the kinds as L3 ribbon (folder) tabs, the field's top row on a
+   *  grey strip — the picked tab is white and opens into the field. */
+  ribbonTabs?: boolean
 }
 
 // The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
@@ -7738,10 +7955,13 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '6', label: 'Old · One home, Create cards', hidden: true, field: 'switch' },
   { value: '7', label: 'V3 · Dock', field: 'switch', dock: true, glowRise: 'dock', firstSuggestions: true },
   { value: '8', label: 'V4 · Floating', field: 'switch', firstMessageFocus: true },
-  { value: '9', label: 'V5 · Cards', field: 'switch', dock: true, glowRise: 'cards', firstMessageWash: 'rise' },
+  { value: '9', label: 'V5 · Cards', field: 'switch', dock: true, glowRise: 'cards', firstMessageWash: 'rise', firstSuggestions: true },
   { value: '10', label: 'V6 · Creations', field: 'switch', firstMessageFocus: true, firstCard: true },
   { value: '11', label: 'V7 · Pills', field: 'plain', dock: true, glowRise: 'dock', createPills: true, firstSuggestions: true },
   { value: '12', label: 'V8 · Tabs', field: 'plain', topKinds: true },
+  { value: '13', label: 'V9 · Switch', field: 'above', switchFullTop: true, firstSuggestions: true },
+  { value: '14', label: 'V10 · Heading', field: 'switch', pillsUnderTitle: true, firstSuggestions: true },
+  { value: '15', label: 'V11 · Ribbon', field: 'above', switchFullTop: true, ribbonTabs: true, firstSuggestions: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -8982,6 +9202,10 @@ export const dash: Flow = {
     { id: 'homeCreateStyle', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Create cards', values: [{ value: 'button', label: 'Button' }, { value: 'outline', label: 'Outline' }], default: 'button' },
     // Every version, returning user · drafts to resume: Show (two sample drafts) or Hide (default; none — the centre-stage layout).
     { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', picker: 'toggle', values: [{ value: 'hide', label: 'Hide' }, { value: 'show', label: 'Show' }], default: 'hide' },
+    // Every version: an icon in each Rule · Indicator · Strategy pill (off by default).
+    { id: 'pillIcons', group: 'Home', icon: msRule, label: 'Pill icons', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
+    // V9 · Switch: the Rule · Indicator · Strategy toggle inside the field (top row) or just above it, outside.
+    { id: 'switchOutside', showIf: { dashVersion: ['13'] }, group: 'Home', icon: msViewAgenda, label: 'Switch outside', picker: 'toggle', values: [{ value: 'off', label: 'Inside' }, { value: 'on', label: 'Outside' }], default: 'off' },
     // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
     { id: 'pastChats', group: 'Home', icon: msChat, label: 'Has past chats', picker: 'toggle', values: [{ value: 'none', label: 'Empty' }, { value: 'some', label: 'With chats' }], default: 'some' },
     // V5, for testing: hide one section.
@@ -9654,7 +9878,7 @@ import { defaultDashVersion, useDashUser, useDashVersion } from '../components/d
 import { RuleScene, type RuleChatProps } from './RuleChat'
 import { DeleteChatSheet } from '../sheets/ChatSheets'
 import { ChatMenu } from '../components/ChatMenu'
-import { Tabs } from '@l3/components/Tabs'
+import { SlidingPills } from '../components/SlidingPills'
 import { setHomeKind, useHomeKind } from '../components/homeKind'
 import type { Mode } from '../components/askModes'
 import { PastChatsSheet } from './PastChats'
@@ -9758,11 +9982,10 @@ export function DashAI(props: DashAIProps) {
   // one ☰ on the right (Past chats, Your creations) so the tabs sit centred between back and it.
   const homeKind = useHomeKind()
   const kindTabs = dashVersion.topKinds && props.scene === 'landing' && returning ? (
-    <Tabs
-      aria-label={t('askModes.label')}
-      appearance="pill-group"
-      behavior="toggle"
-      size="sm"
+    // The same sliding pills as the field's: the black thumb glides to the pick, never flips.
+    <SlidingPills
+      label={t('askModes.label')}
+      newLabel={t('askModes.new')}
       items={(['rule', 'indicator', 'strategy'] as const).map((value) => ({ value, label: t(`askModes.${value}`) }))}
       value={homeKind}
       onChange={(v) => setHomeKind(v as Mode)}
@@ -10388,6 +10611,10 @@ export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator
 }
 
 /* The cards: one sideways row, 16 in from both edges, square, white on DASH's glow. */
+.cards[hidden] {
+  display: none; /* the field active: suggestions instead */
+}
+
 .cards {
   display: flex;
   gap: var(--l3-spacing-08);
@@ -10541,6 +10768,7 @@ import { msChevronRight, msFunction, msMonitoring, msRule } from '@l3/icons/mate
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { useAskModes } from '../components/askModes'
 import { ChatInput } from '../components/Chat'
+import { FirstAsk } from '../components/FirstAsk'
 import { DashDock } from '../components/DashDock'
 import { useDashUser, type CreationKind } from '../components/dashVersion'
 import { openHistoryOn } from '../components/historyFilter'
@@ -10668,8 +10896,15 @@ export function HomeV9Scene({ returning, onManage, onPastChats, onOpenRule, onOp
 
       <DashDock>
         <div className={styles.dock}>
+          {/* The field active: the cards make way for suggestions for the picked pill (once something is typed, ones
+              that finish it), as in the other versions. */}
+          {typing && (
+            <Inset paddingInline="16">
+              <FirstAsk kind="home" mode={askModes?.mode} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} onKind={(k) => askModes?.modes.onChange(k)} />
+            </Inset>
+          )}
           {/* Square cards, one per kind, sideways; just above the field. */}
-          <div ref={cardsRow} className={styles.cards} role="list" aria-label={t('home9.cardsLabel')}>
+          <div ref={cardsRow} className={styles.cards} role="list" aria-label={t('home9.cardsLabel')} hidden={typing || undefined}>
             {/* Not made yet first (the invite leads); what they've made moves to the back. Stable within each group. */}
             {[...KINDS].sort((a, b) => Number(made[a.kind]) - Number(made[b.kind])).map(({ kind, icon }) => (
               <button key={kind} type="button" role="listitem" className={styles.card} data-create={!made[kind] || undefined} onClick={() => open(kind)}>
@@ -12172,6 +12407,11 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   background: var(--l3-surface-secondary);
   color: var(--l3-content-primary);
 }
+
+/* V9 · Switch, "Switch outside": the toggle just above the field, full width, 8 over it. */
+.switchOutside {
+  margin-bottom: var(--l3-spacing-08);
+}
 ```
 
 ### `src/flows/dash/screens/ReturningV2.tsx`
@@ -12198,6 +12438,7 @@ import { useAskModes } from '../components/askModes'
 import { useDashUser, useDashVersion } from '../components/dashVersion'
 import { FirstAsk } from '../components/FirstAsk'
 import { CreatePills } from '../components/CreatePills'
+import { SlidingPills } from '../components/SlidingPills'
 import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { DashDock } from '../components/DashDock'
 import { t } from '../copy'
@@ -12308,6 +12549,11 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   const hidden = useFlowOption('dash', 'homeHide', 'none')
   // V4 · the Create cards under Ai creations: indicator and rule; strategy only when the setting "Strategy card" is on.
   const strategyCard = useFlowOption('dash', 'homeStrategyCard', 'hide') === 'show'
+  // V9 · Switch, setting "Switch outside": the Rule · Indicator · Strategy toggle just above the field, outside it.
+  const switchOutsidePick = useFlowOption('dash', 'switchOutside', 'off')
+  const switchOutside = !!dashVersion.switchFullTop && switchOutsidePick === 'on'
+  // V10 · Heading: the pills under the page's question instead of in the field.
+  const pillsUnderTitle = !!dashVersion.pillsUnderTitle
   const createStyle = useFlowOption('dash', 'homeCreateStyle', 'button')
   // Only kinds not made yet are promoted: a rule made → no Create rule card (its numbers are in Ai creations).
   const createCards = [
@@ -12441,6 +12687,10 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                 <p className={styles.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
                 <h1 className={styles.centreTitle}>{t('home.title')}</h1>
               </Stack>
+              {/* V10 · Heading: what to build sits right under the question (the field below has no pills). */}
+              {pillsUnderTitle && askModes && (
+                <SlidingPills value={askModes.modes.value} items={askModes.modes.items} onChange={askModes.modes.onChange} label={askModes.modes.label} newLabel={t('askModes.new')} />
+              )}
             </Stack>
 
             {/* The sections, 32 apart (the header sits 48 above them). On landing they appear one after another, after
@@ -12600,13 +12850,18 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
           {dashVersion.createPills && !(typing && kb.field.value.trim()) && (
             <CreatePills onCreate={(k) => { kb.field.onChange(t(`home3.start.${k}`)); kb.field.onFocus() }} />
           )}
+          {switchOutside && askModes && (
+            <div className={styles.switchOutside}>
+              <SlidingPills value={askModes.modes.value} items={askModes.modes.items} onChange={askModes.modes.onChange} label={askModes.modes.label} newLabel={t('askModes.new')} fill />
+            </div>
+          )}
           <ChatInput
             firstMessage
             // "Pills" version: one row — the text across, then the + beside Send.
             inline={!!dashVersion.createPills}
             {...kb.field}
             onSend={kb.sending(askModes?.send ?? ask)}
-            modes={askModes?.modes}
+            modes={switchOutside || pillsUnderTitle ? undefined : askModes?.modes}
             placeholder={askModes?.placeholder}
             rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }} // The + (Pine Script upload) is always there, whatever is picked — a script always becomes an indicator.
             onAttach={() => setPineSheet(true)} />
@@ -13390,6 +13645,12 @@ export const homeScenes: Record<string, HomeScenes> = {
   '11': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   // V8 · Tabs (returning user): the kind tabs in the top bar, the body follows them, the plain floating field.
   '12': { newUser: Landing, returning: HomeTabsScene, newUserNoField: true },
+  // V9 · Switch: the returning home with the full-width Rule · Indicator · Strategy toggle on top inside the field.
+  '13': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V10 · Heading: the kind pills right under "How can I help you trade better?", the field without pills.
+  '14': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V11 · Ribbon: the kinds as ribbon tabs on top of the field (the picked one opens into it).
+  '15': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
