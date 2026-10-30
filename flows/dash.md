@@ -233,6 +233,8 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — **V12 · Center and V13 · Center pills** (ids '16', '17'; new and returning users; `screens/HomeCenter`): a landing page like desktop AI chats. The field sits on the screen's centre line (an empty slot in the page; the field itself stays in the DASH dock and is lifted there), the orb and "How can I help you trade better?" stack up from its top, **Your creations** hangs from its bottom (no Create card; the heading "Your creations ›" opens them all). Tap the field: the rest steps away and the field glides straight down to its place over the keyboard (frame by frame from where it is, so the keyboard moving under it can't drag it); back the same way. The field's edge is the green → lime → yellow gradient, turning (`edgeTurn`). V13 has Rule · Indicator · Strategy inside the field (text on top; pills, + and Send under it); the section below follows the pick — that kind's creations, or **Suggestions** (the "Try" cards) when nothing of it is made yet.
+  - **Chats:** once the first message is sent the field drops its pills and becomes one line (text, then + and Send) — no accidental kind switch mid-chat (`useChatKind` returns none; V11's ribbon still sinks its tabs first).
 - 2026-10-30 — **V11 · Ribbon as one union** (Figma "Union" 6850:44252): the field and the picked tab are ONE SVG shape behind the form (`components/RibbonTabs`, path built from the measured tab) — white, a 1px inside edge in a green → lime → yellow gradient (50%, full while typing) that turns slowly (4 s a turn), low shadow. The picked tab slides and stretches to a new pick; the other kinds are white tabs with a light edge drawn under it (the picked one is always on top). Coming in, the tabs rise out of the field one by one; once a conversation starts (`useChatKind` → `sunk`) they sink back and the row closes, leaving + · text · Send. Local tokens `--app-dash-union-edge-1/2/3`, `--app-dash-union-shadow`. The rule chat's field now has the + (Pine Script upload) like the indicator chat and the homes.
 - 2026-10-30 — **New versions V9–V11, pills, suggestions.**
   - **V9 · Switch** (id '13'): the floating field with a full-width Rule · Indicator · Strategy toggle as its top row and + · text · Send under it (`switchFullTop`); setting **Switch outside** puts the toggle just above the field instead.
@@ -329,7 +331,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -2875,6 +2877,34 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
   margin: 0 calc(-1 * var(--l3-spacing-08));
 }
 
+/* V12 · Center: the edge is a gradient (as V11's union: green → lime → yellow) turning slowly round the field — a
+   conic border (white padding-box over the turning gradient border-box). */
+@property --dash-edge-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes dash-edge-turn {
+  to {
+    --dash-edge-angle: 360deg;
+  }
+}
+
+.input[data-edge-turn] {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--l3-surface-primary), var(--l3-surface-primary)) padding-box,
+    conic-gradient(from var(--dash-edge-angle), var(--app-dash-union-edge-1), var(--app-dash-union-edge-2), var(--app-dash-union-edge-3), var(--app-dash-union-edge-1)) border-box;
+  animation: dash-edge-turn 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input[data-edge-turn] {
+    animation: none;
+  }
+}
+
 /* The + right beside Send (with the switch, or the one-row field): 12 between them (the row's 4 gap + 8). */
 .input[data-modes] .attachWrap,
 .input[data-inline] .attachWrap {
@@ -3126,6 +3156,7 @@ export function ChatInput({ top, inline = false, firstMessage = false, onSend, v
       data-pills-top={modes?.display === 'above' || undefined}
       data-pills-full={(modes?.display === 'above' && dashVersion.switchFullTop) || undefined}
       data-ribbon={(modes?.display === 'above' && dashVersion.ribbonTabs) || undefined}
+      data-edge-turn={dashVersion.edgeTurn || undefined}
       data-top={top ? '' : undefined}
       data-inline={inline || undefined}
       data-dock={dock || undefined}
@@ -8046,11 +8077,15 @@ export function useAskModes({ onRules, onIndicator, guess, newKind }: { onRules?
  * highlight. Plain field (a version with the Previous field) → none.
  */
 export function useChatKind(kind: Mode, switcher?: { onChange: (kind: Mode) => void } | null) {
-  const field = useDashVersion().field
+  const version = useDashVersion()
+  const field = version.field
   // The highlighted pill: this chat's kind, or what was picked during the conversation.
   const [picked, setPicked] = useState<Mode>(kind)
   useEffect(() => setPicked(kind), [kind])
   if (field === 'plain') return null
+  // Once the conversation has started (no switcher) the pills go — the field turns into a plain one-line box, so a
+  // stray tap can't switch kinds mid-chat. V11's ribbon keeps them a moment to sink back into the field.
+  if (!switcher && !version.ribbonTabs) return null
   return {
     value: picked,
     label: t('askModes.label'),
@@ -8125,6 +8160,8 @@ export type DashVersionInfo = {
   /** V11 · Ribbon (with field 'above' + switchFullTop): the kinds as L3 ribbon (folder) tabs, the field's top row on a
    *  grey strip — the picked tab is white and opens into the field. */
   ribbonTabs?: boolean
+  /** V12 · Center: the field's edge is the green → lime → yellow gradient, turning slowly round it. */
+  edgeTurn?: boolean
 }
 
 // The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
@@ -8147,6 +8184,8 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '13', label: 'V9 · Switch', field: 'above', switchFullTop: true, firstSuggestions: true },
   { value: '14', label: 'V10 · Heading', field: 'switch', pillsUnderTitle: true, firstSuggestions: true },
   { value: '15', label: 'V11 · Ribbon', field: 'above', switchFullTop: true, ribbonTabs: true, firstSuggestions: true },
+  { value: '16', label: 'V12 · Center', field: 'plain', firstSuggestions: true, edgeTurn: true },
+  { value: '17', label: 'V13 · Center pills', field: 'switch', firstSuggestions: true, edgeTurn: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -9170,6 +9209,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home8.start.rule": "Start a rule",
   "home8.start.indicator": "Start an indicator",
   "home8.start.strategy": "Start a strategy",
+  "home12.suggestions": "Suggestions",
   "home3.start.rule": "Build a rule that ",
   "home3.start.indicator": "Build an indicator that ",
   "home3.start.strategy": "Build a strategy that ",
@@ -10230,6 +10270,404 @@ export function DashAI(props: DashAIProps) {
         </SceneSwap>
       </DockHost.Provider>
     </DashScreen>
+  )
+}
+```
+
+### `src/flows/dash/screens/HomeCenter.module.css`
+
+```css
+/* DASH V12 · Center. */
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* The page's content box: its height is held (from code) while the keyboard is up. */
+.pageBox {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+/* As much room on top as the dock takes at the bottom (set from code), so the halves centre on the whole screen. */
+.dockRoom {
+  flex: none;
+}
+
+/* The halves around the field's slot — equal, so the slot (the field) sits on the screen's centre line. Above: the
+   orb and heading at its bottom, 24 over the field. Below: Your creations at its top, 32 under it. */
+.above,
+.below {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  transition:
+    opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.above {
+  justify-content: flex-end;
+  padding-bottom: var(--l3-spacing-24);
+}
+
+.below {
+  justify-content: flex-start;
+  padding-top: var(--l3-spacing-32);
+}
+
+/* The field active: both fade and lift away. */
+.above[data-hidden],
+.below[data-hidden] {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--l3-spacing-12)));
+  pointer-events: none;
+}
+
+.heading {
+  text-align: center;
+}
+
+/* A small heading (Heading/20), like desktop AI chats. */
+.title {
+  margin: 0;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-20);
+}
+
+/* Where the field sits while idle (it's lifted here from the dock): the field's height. */
+.slot {
+  flex: none;
+}
+
+/* Your creations under the field: full width (the row bleeds to the screen edges, as on the other homes). */
+.creations {
+  align-self: stretch;
+}
+
+/* The section heading is the link to all of them: "Your creations ›" (no separate View all). */
+.headingLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* The field: moved from code (HomeCenter: it glides between the centre and the bottom). */
+.dock {
+  position: relative; /* the field's offsets are measured from here */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .above,
+  .below {
+    transition: none;
+  }
+}
+```
+
+### `src/flows/dash/screens/HomeCenter.tsx`
+
+```tsx
+import { useLayoutEffect, useRef, useState } from 'react'
+import { Icon } from '@l3/components/Icon'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { msArrowForward, msChevronRight, msLightbulb } from '@l3/icons/material'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
+import { DashOrb } from '../../../shared/ui/dash/DashOrb'
+import { ChatInput } from '../components/Chat'
+import { DashDock } from '../components/DashDock'
+import { FirstAsk } from '../components/FirstAsk'
+import { useAskModes } from '../components/askModes'
+import { openHistoryOn } from '../components/historyFilter'
+import { useHomeKeyboard } from '../components/homeKeyboard'
+import { usePineUpload } from '../components/pineUpload'
+import { t } from '../copy'
+import { dashRules, firstName, homeTriggers, savedIndicators, type SavedRule } from '../data'
+import { useDashUser } from '../components/dashVersion'
+import { CreationDetailsSheet } from '../sheets/RuleSheets'
+import type { ReturningProps } from './Returning'
+// The header text and the orb nudge are the other homes'.
+import cards from './ReturningV2.module.css'
+import styles from './HomeCenter.module.css'
+
+/** The field gliding between the centre and the bottom (ms). */
+const MOVE_MS = 300
+const ease = (t: number) => 1 - Math.pow(1 - t, 3)
+
+/** Suggestions when nothing of the picked kind is made yet (V13): the "Try" examples of the other homes. */
+const EXAMPLES = {
+  rule: ['home3.ex.rule1', 'home3.ex.rule2', 'home3.ex.rule3'],
+  indicator: ['home3.ex.indicator1', 'home3.ex.indicator2', 'home3.ex.indicator3'],
+  strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
+} as const
+
+/** Your creations under the field: this many cards, then View all. */
+const MAX_CREATIONS = 3
+
+/**
+ * DASH V12 · Center — a landing page like desktop AI chats (new and returning users alike). The chat field sits on the
+ * screen's centre line, the DASH orb and a short heading over it, Your creations under it (as on the other homes). Tap the field (or a
+ * suggestion): the heading and suggestions step away and the field slides down to its usual place at the bottom,
+ * where it works like any chat field (suggestions over it, the keyboard under it). The field always lives in the DASH
+ * dock (so it carries on into the chat); idle, it's lifted to a slot in the centred column.
+ */
+export function HomeCenterScene({ returning, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
+  const kb = useHomeKeyboard({ typing, onTyping })
+  const pine = usePineUpload(onIndicator)
+  // Your creations (as on the other homes): rules that stepped in today, indicators, then the other rules.
+  const has = useDashUser(returning).made
+  const creations: { item: SavedRule; kind: 'rule' | 'indicator' }[] = [
+    ...dashRules.filter((r) => homeTriggers[r.id]).map((item) => ({ item, kind: 'rule' as const })),
+    ...savedIndicators.map((item) => ({ item, kind: 'indicator' as const })),
+    ...dashRules.filter((r) => !homeTriggers[r.id]).map((item) => ({ item, kind: 'rule' as const })),
+  ].filter((c) => has[c.kind])
+  const [details, setDetails] = useState<{ item: SavedRule; kind: 'rule' | 'indicator' } | null>(null)
+  const [onMap, setOnMap] = useState<Record<string, boolean>>({})
+  const isOn = (item: SavedRule) => onMap[item.id] ?? item.on
+  const card = (item: SavedRule, k: 'rule' | 'indicator') => {
+    const triggered = homeTriggers[item.id] ?? 0
+    const on = isOn(item)
+    const status = k === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
+    const lit = k === 'rule' ? on && triggered > 0 : on
+    return (
+      <button key={item.id} type="button" role="listitem" className={cards.item} onClick={(e) => { e.stopPropagation(); setDetails({ item, kind: k }) }}>
+        <span className={cards.itemTop}>
+          <span className={cards.itemStatus}>{t(`home.kind.${k}`)} · <span data-on={lit || undefined}>{status}</span></span>
+          <Icon icon={msChevronRight} size={16} />
+        </span>
+        <span className={cards.itemTitle}>{item.title}</span>
+      </button>
+    )
+  }
+  const slot = useRef<HTMLDivElement>(null)
+  const field = useRef<HTMLDivElement>(null)
+  // Idle: how far the field is lifted from the dock to the centred slot (layout px), and the slot's height.
+  const [lift, setLift] = useState(0)
+  const [slotH, setSlotH] = useState(0)
+  // The dock keeps its (now empty) room at the bottom: the same room on top, so the field centres on the whole screen.
+  const [dockH, setDockH] = useState(0)
+  const shownLift = useRef(0)
+  const scroll = useRef<HTMLDivElement>(null)
+  // The page's height while idle (the scroll area's): held while the keyboard is up.
+  const [pageH, setPageH] = useState(0)
+  const anchor = useRef<HTMLDivElement>(null)
+
+  // The field renders into the DASH dock (a portal), which can arrive after this scene and is re-created when the
+  // scene finishes entering: track the element itself, so everything below restarts on the live one.
+  const [fieldEl, setFieldEl] = useState<HTMLDivElement | null>(null)
+  const ready = fieldEl
+
+  // The slot is always the field's height (and the room on top the dock's), whatever changes it — a version with
+  // pills makes it taller, the text grows it.
+  useLayoutEffect(() => {
+    const f = field.current
+    const form = f?.querySelector('form')
+    if (!f || !form) return
+    const size = () => { setSlotH(form.offsetHeight); setDockH(f.offsetHeight) }
+    size()
+    const watch = new ResizeObserver(size)
+    watch.observe(form)
+    watch.observe(f)
+    return () => watch.disconnect()
+  }, [ready])
+
+  // The field's screen position is driven here, frame by frame: idle it sits on the centred slot; active it rests at
+  // the dock's place (over the keyboard). Going between them it glides straight from where it is to where it's going
+  // — measured live, so the keyboard opening or closing under it (which moves the dock) can't drag it along.
+  const first = useRef(true)
+  useLayoutEffect(() => {
+    const sl = slot.current
+    const f = field.current
+    const form = f?.querySelector('form')
+    if (!sl || !f || !form) return
+    const scale = () => { const h = form.getBoundingClientRect().height; return form.offsetHeight ? h / form.offsetHeight : 1 }
+    // Where the field would sit with no lift (screen px): an anchor just above it + its offset inside.
+    const natural = () => {
+      let inField = 0
+      for (let n: HTMLElement | null = form; n && n !== f; n = n.offsetParent as HTMLElement | null) inField += n.offsetTop
+      return (anchor.current?.getBoundingClientRect().bottom ?? 0) + inField * scale()
+    }
+    const target = () => (typing ? natural() : sl.getBoundingClientRect().top)
+    // The idle page height (the scroll area's), read only when nothing is moving: the first placement and later
+    // resizes while idle — not while the keyboard opens or closes (the slot must hold still for the glide).
+    const holdPage = () => {
+      if (typing || !scroll.current) return
+      const cs = getComputedStyle(scroll.current)
+      setPageH(scroll.current.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom))
+    }
+    const apply = (screenTop: number) => {
+      setSlotH(form.offsetHeight)
+      setDockH(f.offsetHeight)
+
+      const next = (screenTop - natural()) / scale()
+      if (Math.abs(next - shownLift.current) < 0.25) return
+      shownLift.current = next
+      setLift(next)
+    }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const from = form.getBoundingClientRect().top
+    const start = performance.now()
+    const firstPlacement = first.current
+    const glide = firstPlacement || reduce ? 0 : MOVE_MS
+    first.current = false
+    if (firstPlacement) holdPage()
+    let frame = 0
+    // Glide for MOVE_MS, then keep it on its place for a moment longer (the page and keyboard settle), then on resize.
+    const settleUntil = start + Math.max(glide, 1000)
+    const loop = (now: number) => {
+      const t = glide ? Math.min(1, (now - start) / glide) : 1
+      const to = target()
+      if (firstPlacement) holdPage() // the page is still settling into its entrance
+      apply(from + (to - from) * ease(t))
+      if (now < settleUntil) frame = requestAnimationFrame(loop)
+    }
+    // Placed right away (a first placement has no glide; a background tab may not run frames at all), then per frame.
+    loop(performance.now())
+    const watch = new ResizeObserver(() => {
+      if (performance.now() < settleUntil) return // the glide itself (keyboard moving) — the loop handles it
+      holdPage()
+      apply(target())
+    })
+    const scene = sl.closest('[data-dash]')
+    if (scene) watch.observe(scene)
+    watch.observe(f)
+    watch.observe(sl) // the slot resized (a taller field) moves its top: line the field up again
+    return () => {
+      cancelAnimationFrame(frame)
+      watch.disconnect()
+    }
+  }, [typing, ready])
+
+  // Send: what was typed decides the chat — charts → indicators, anything else → rules.
+  const ask = (text: string) => (/indicator|chart|ema|supertrend|rsi|macd|vwap|candle/i.test(text) ? onIndicator?.() : onRules?.())
+  const start = (text: string) => { kb.field.onChange(text); kb.field.onFocus() }
+  // V13 · Center pills: Rule · Indicator · Strategy inside the field (text on top; the pills, + and Send under it) —
+  // the pick sets the placeholder and where Send goes. V12's plain field: none (null).
+  const askModes = useAskModes({ onRules, onIndicator, guess: ask })
+  // The creations under the field: all kinds (V12) or the picked pill's kind (V13; strategies: none yet → no section).
+  const picked = askModes?.mode
+  const shownCreations = picked ? creations.filter((c) => c.kind === picked) : creations
+  const heading = t('home2.creations')
+  // Nothing of the picked kind made yet (strategies, for now): suggestions instead — the "Try" cards of the other homes.
+  const suggestions = picked && shownCreations.length === 0 ? EXAMPLES[picked] : null
+  const openAll = () => {
+    if (picked === 'rule' || picked === 'indicator') openHistoryOn(picked === 'rule' ? 'rules' : 'indicators')
+    onManage?.()
+  }
+
+  return (
+    <div className={cards.scene}>
+      <div ref={scroll} className={cards.scroll} onClick={kb.close}>
+        {/* Kept at its idle height while the keyboard is up, so the slot (the field's centre line) never moves. */}
+        <Inset paddingInline="16" className={styles.page}>
+          <div className={styles.pageBox} style={{ height: pageH || undefined }}>
+          <div className={styles.dockRoom} style={{ height: dockH }} aria-hidden="true" />
+          {/* The field's slot is the screen's centre line: two equal halves around it — the orb and heading stack up
+              from its top, the suggestions hang from its bottom. Both step away while the field is active. */}
+          <div className={styles.above} data-hidden={typing || undefined}>
+            <Stack gap="16" align="center">
+              <span className={cards.orbNudge}><DashOrb size="md" /></span>
+              <Stack gap="04" className={styles.heading}>
+                <p className={cards.centreGreeting}>{t('home.greeting', { name: firstName })}</p>
+                <h1 className={styles.title}>{t('home.title')}</h1>
+              </Stack>
+            </Stack>
+          </div>
+          <div ref={slot} className={styles.slot} style={{ height: slotH }} aria-hidden="true" />
+          {/* Below: Your creations — up to three, then the View all card. The heading itself opens them all
+              ("Your creations ›"). With pills in the field (V13) it follows the pick: that kind's cards — or, nothing
+              of that kind made yet, Suggestions (the "Try" cards; a tap types it in). */}
+          <div className={styles.below} data-hidden={typing || undefined}>
+            {suggestions && (
+              <Stack as="section" gap="12" aria-label={t('home12.suggestions')} className={styles.creations}>
+                <SectionHeader title={t('home12.suggestions')} headingLevel={2} />
+                <div className={cards.row} role="list">
+                  {suggestions.map((key) => (
+                    <button key={key} type="button" role="listitem" className={cards.item} onClick={(e) => { e.stopPropagation(); start(t(key)) }}>
+                      <span className={cards.itemTop}>
+                        <span className={cards.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
+                        <Icon icon={msChevronRight} size={16} />
+                      </span>
+                      <span className={cards.itemTitle}>{t(key)}</span>
+                    </button>
+                  ))}
+                </div>
+              </Stack>
+            )}
+            {shownCreations.length > 0 && (
+              <Stack as="section" gap="12" aria-label={heading} className={styles.creations}>
+                <SectionHeader
+                  headingLevel={2}
+                  title={
+                    <button type="button" className={styles.headingLink} onClick={(e) => { e.stopPropagation(); openAll() }}>
+                      {heading}
+                      <Icon icon={msChevronRight} size={16} />
+                    </button>
+                  }
+                />
+                <div className={cards.row} role="list">
+                  {shownCreations.slice(0, MAX_CREATIONS).map(({ item, kind }) => card(item, kind))}
+                  <button type="button" role="listitem" aria-label={t('home2.viewAll')} className={`${cards.item} ${cards.viewAllCard}`} onClick={(e) => { e.stopPropagation(); openAll() }}>
+                    <span className={cards.viewAllIcon}><Icon icon={msArrowForward} size={20} /></span>
+                    <span className={`${cards.itemTitle} ${cards.viewAllLabel}`} aria-hidden="true">{t('home2.viewAll')}</span>
+                  </button>
+                </div>
+              </Stack>
+            )}
+          </div>
+          </div>
+        </Inset>
+      </div>
+
+      {details && (
+        <CreationDetailsSheet
+          item={details.item}
+          kind={details.kind}
+          on={isOn(details.item)}
+          onToggle={(on) => setOnMap((m) => ({ ...m, [details.item.id]: on }))}
+          onClose={() => setDetails(null)}
+          onEdit={() => {
+            const k = details.kind
+            setDetails(null)
+            if (k === 'rule') onOpenRule?.()
+            else onOpenIndicator?.()
+          }}
+          onDelete={() => setDetails(null)}
+        />
+      )}
+
+      <DashDock>
+        {/* Idle: lifted to the centred slot; active: slides down to the dock's place over the keyboard. */}
+        <div ref={anchor} aria-hidden="true" />
+        <div ref={(el) => { field.current = el; setFieldEl(el) }} className={styles.dock} style={{ transform: lift ? `translateY(${lift}px)` : undefined }}>
+          <Inset paddingInline="16" paddingBlock="16">
+            {typing && <FirstAsk kind="home" mode={askModes?.mode} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} onKind={(k) => askModes?.modes.onChange(k)} />}
+            <ChatInput
+              {...kb.field}
+              firstMessage
+              onSend={kb.sending(askModes ? (text: string) => (askModes.mode === 'strategy' ? onStrategy?.() : askModes.send(text)) : ask)}
+              modes={askModes?.modes}
+              placeholder={askModes?.placeholder}
+              rotatingPlaceholder={askModes ? undefined : { prefix: t('home.createPrefix'), words: [t('home.word.indicator'), t('home.word.rule'), t('home.word.strategy')] }}
+              onAttach={pine.onAttach}
+            />
+            {pine.ui}
+          </Inset>
+        </div>
+        {kb.keyboard}
+      </DashDock>
+    </div>
   )
 }
 ```
@@ -11514,6 +11952,8 @@ export function IndicatorScene({ step, onStep, request: initialRequest, onSend, 
             firstMessage={empty}
             key="input"
             modes={chatKind ?? undefined}
+            // The conversation going (no pills): one line — the text, then + and Send on the right.
+            inline={!empty && !chatKind}
             value={draft}
             onChange={setDraft}
             inputRef={input}
@@ -13594,7 +14034,7 @@ export function RuleScene({ step, request: initialRequest = maxDailyLoss.title, 
         <Inset paddingInline="16" paddingBlock="16">
           {firstSuggest && <FirstAsk kind={strategy ? 'strategy' : 'rule'} text={draft} onPick={setDraft} />}
           {/* + (Pine Script upload) on the left, as on the homes and the indicator chat: a script becomes an indicator. */}
-          <ChatInput onAttach={pine.onAttach} firstMessage={empty} modes={chatKind ?? undefined} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
+          <ChatInput onAttach={pine.onAttach} firstMessage={empty} modes={chatKind ?? undefined} inline={!empty && !chatKind} value={draft} onChange={setDraft} typing={typingNow} onFocus={empty ? () => onTyping?.(true) : undefined} autoFocus={typingNow} onSend={empty ? send : () => {}} placeholder={empty ? (strategy ? t('askModes.placeholder.strategy') : t('input.describeRule')) : hasCard ? t('input.changeRule') : undefined} />
           {pine.ui}
         </Inset>
       </div>
@@ -13799,6 +14239,7 @@ import { LandingScene } from './Landing'
 import { type ReturningProps } from './Returning'
 import { ReturningV2Scene } from './ReturningV2'
 import { HomeTabsScene } from './HomeTabs'
+import { HomeCenterScene } from './HomeCenter'
 
 /**
  * Each DASH version's homes (setting "DASH version"; the list, labels and chat input are in components/dashVersion.ts,
@@ -13840,6 +14281,10 @@ export const homeScenes: Record<string, HomeScenes> = {
   '14': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   // V11 · Ribbon: the kinds as ribbon tabs on top of the field (the picked one opens into it).
   '15': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V12 · Center: a landing page — orb, heading and the field in the middle, suggestions under it (both users).
+  '16': { newUser: HomeCenterScene, returning: HomeCenterScene },
+  // V13 · Center pills: V12 with Rule · Indicator · Strategy inside the field (text on top; pills, + and Send under it).
+  '17': { newUser: HomeCenterScene, returning: HomeCenterScene },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
