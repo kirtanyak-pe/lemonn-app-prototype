@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — V14 / V15: the row under the pills is only the picked kind — its creations, or (nothing made, e.g. Strategy) the Create card then the "Try" suggestions (a tap types it in). V15's orb is 48 and sits 24 above the heading.
 - 2026-10-31 — Setting **Big pills** (every version, A/B): the Rule · Indicator · Strategy pills 8 taller (32 → 40), fully round. V15: the small orb sits 4 right of centre and is still (its animation paused).
 - 2026-10-31 — **V14 · Clean and V15 · Clean still** (ids '18', '19'; from V10 · Heading, after senior feedback — a calmer middle):
   - The top bar reads **DASH AI** with a small **BETA** tag (L3 Tag, neutral tertiary), centred (`DashBar center`); no orb or greeting in the middle, no "Your creations" header (View all is the last card); the cards sit 24 under the full-width pills.
@@ -13225,10 +13226,14 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   white-space: nowrap;
 }
 
-/* V15 · Clean still: the small orb, 4 right of centre so it reads centred, and paused (no animation in it). */
+/* V15 · Clean still: the small orb (48), 4 right of centre so it reads centred, and paused (no animation in it). */
 .stillOrb {
   display: inline-flex;
   translate: var(--l3-spacing-04) 0;
+}
+
+.stillOrb.stillOrb [data-size] {
+  --orb-box: var(--l3-size-48);
 }
 
 .stillOrb * {
@@ -13411,6 +13416,12 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
   // …in a short sequence: the cards on show slide down and fade one after another, then the row takes the new order
   // (back at its start) and the new first cards rise in from below, one after another. Fast: ≈ 0.45 s in all.
   const [shown, setShown] = useState(picked)
+  // V14 / V15 (DASH AI bar): the row is only the picked kind — its creations, or suggestions when there are none. Others:
+  // every creation, the picked kind first.
+  const onlyPicked = !!dashVersion.barTitle
+  const rowCreations = onlyPicked
+    ? creations.filter((c) => c.kind === shown)
+    : [...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown))
   const visibleCards = (row: HTMLElement) =>
     [...row.querySelectorAll<HTMLElement>('[data-key]')].filter((el) => el.offsetLeft - row.scrollLeft < row.clientWidth)
   useEffect(() => {
@@ -13519,7 +13530,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
               {/* V14 · Clean: a heading over the pills that follows the pick — "Make a rule that" + a flipping example. */}
               {dashVersion.barTitle && askModes && (dashVersion.stillHeading ? (
                 // V15 · Clean still: a small orb over one still line — what DASH does for the picked kind.
-                <Stack gap="12" align="center">
+                <Stack gap="24" align="center">
                   {/* 4 to the right (the ring sits left of the art's box) and still — no motion, so it doesn't pull focus */}
                   <span className={styles.stillOrb}><DashOrb size="compact" /></span>
                   <h1 className={styles.stillTitle}>{t(`home14.lead.${askModes.mode}`)}</h1>
@@ -13600,7 +13611,7 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
             ) : (
               <>
               {/* Nothing made yet (a new user on V6): no creations section, only the Create cards. */}
-              {creations.length > 0 && (
+              {(creations.length > 0 || onlyPicked) && (
               <Stack as="section" gap="12" aria-label={t(version4 ? 'home4.creations' : 'home2.creations')}>
                 {/* The heading carries the top bar's Your creations icon (widgets), so the two read as the same place. L3 gap:
                     SectionHeader has no icon slot — the icon goes in the title. */}
@@ -13620,14 +13631,24 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                   )}
                   {/* At most three creations here (the picked kind first), then a "View all" card to the full page (with
                       "N more" when some are left out), so the row doesn't scroll on and on. */}
-                  {[...creations].sort((a, b) => Number(b.kind === shown) - Number(a.kind === shown)).slice(0, HOME_CREATIONS).map(({ item, kind: k }) => card(item, k, true))}
-                  {(
+                  {rowCreations.slice(0, HOME_CREATIONS).map(({ item, kind: k }) => card(item, k, true))}
+                  {/* V14 / V15: nothing of the picked kind made yet → suggestions to try (a tap types it in), not other kinds. */}
+                  {onlyPicked && rowCreations.length === 0 && shown && EXAMPLES[shown].map((key) => (
+                    <button key={key} type="button" role="listitem" className={styles.item} onClick={() => { kb.field.onChange(t(key)); kb.field.onFocus() }}>
+                      <span className={styles.itemTop}>
+                        <span className={styles.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
+                        <Icon icon={msChevronRight} size={16} />
+                      </span>
+                      <span className={styles.itemTitle}>{t(key)}</span>
+                    </button>
+                  ))}
+                  {rowCreations.length > 0 && (
                     // As tall as the other cards, never taller: it shows what fits — the arrow, then "View all", then
                     // "N more" (CSS container queries). The name is on the button, so the arrow alone still reads.
                     <button data-key="view-all" type="button" role="listitem" aria-label={t('home2.viewAll')} className={`${styles.item} ${styles.viewAllCard}`} onClick={() => onManage?.()}>
                       <span className={styles.viewAllIcon}><Icon icon={msArrowForward} size={20} /></span>
                       <span className={`${styles.itemTitle} ${styles.viewAllLabel}`} aria-hidden="true">{t('home2.viewAll')}</span>
-                      {creations.length > HOME_CREATIONS && <span className={`${styles.itemMeta} ${styles.viewAllMore}`} aria-hidden="true">{t('home2.viewAllMore', { count: creations.length - HOME_CREATIONS })}</span>}
+                      {rowCreations.length > HOME_CREATIONS && <span className={`${styles.itemMeta} ${styles.viewAllMore}`} aria-hidden="true">{t('home2.viewAllMore', { count: rowCreations.length - HOME_CREATIONS })}</span>}
                     </button>
                   )}
                 </div>
