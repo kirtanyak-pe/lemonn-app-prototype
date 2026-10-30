@@ -11137,7 +11137,12 @@ export function PastChatsSheet({ onClose, onOpen, onDelete, removed = [] }: {
     fit()
     const watch = new ResizeObserver(fit)
     watch.observe(root)
-    return () => watch.disconnect()
+    // L3's sheet host keeps the same surface when the next sheet (e.g. Delete this chat?) takes over: hand it back
+    // without a height, so that sheet hugs its content.
+    return () => {
+      watch.disconnect()
+      surface.style.height = ''
+    }
   }, [body, tall])
   // Scrolling the list, a wheel or a swipe up inside the sheet: tall.
   useEffect(() => {
