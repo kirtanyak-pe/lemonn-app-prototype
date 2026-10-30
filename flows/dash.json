@@ -400,6 +400,8 @@
     "src/flows/dash/components/DashDock.tsx",
     "src/flows/dash/components/DashScreen.module.css",
     "src/flows/dash/components/DashScreen.tsx",
+    "src/flows/dash/components/ExplainCreateCard.module.css",
+    "src/flows/dash/components/ExplainCreateCard.tsx",
     "src/flows/dash/components/FirstAsk.module.css",
     "src/flows/dash/components/FirstAsk.tsx",
     "src/flows/dash/components/FlipHeading.module.css",
