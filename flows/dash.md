@@ -10,33 +10,33 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `dash-03`, `stocks-01`, `dash-14`, `dash-30`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
-| `dash-28` | DASH home · returning user | — | `dash-03`, `stocks-01`, `dash-14`, `dash-30`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too. |
-| `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-30`, `dash-04` | Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules. |
-| `dash-26` | Rules · typing | [6494:30768](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6494-30768) | `dash-02`, `dash-14`, `dash-30`, `dash-04` | Figma “DASH AI - better layout” 3.1 (file 9r61YQp7QQZAQovDyz8hLF): the input tapped — heading and examples fold away, the orb stays centred, the input turns green, the keyboard rises and the background ends above it (300 ms). Tap the body to go back. |
-| `dash-04` | Thinking | [5612:40517](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517) | `dash-02`, `dash-14`, `dash-30`, `dash-05` | Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies). |
-| `dash-05` | DASH asks the limit | [5612:40650](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650) | `dash-02`, `dash-14`, `dash-30`, `dash-06` | The question card takes the input’s place. Any answer (or one typed) builds the preview. |
-| `dash-06` | Rule preview | [5612:40816](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40816) | `dash-02`, `dash-14`, `dash-30`, `dash-05`, `dash-07` | The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question. |
-| `dash-07` | Ready · would have saved | [5612:40971](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40971) | `dash-02`, `dash-14`, `dash-30`, `dash-10`, `dash-05`, `dash-13` | Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more. |
-| `dash-08` | Weak · would have cost profit | [5612:41698](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41698) | `dash-02`, `dash-14`, `dash-30`, `dash-11`, `dash-13`, `dash-05` | Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it. |
-| `dash-09` | Ready · no backtest data | [5612:41530](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41530) | `dash-02`, `dash-14`, `dash-30`, `dash-12`, `dash-05`, `dash-13` | Not enough trading history to test: a neutral strip. |
+| `dash-02` | DASH landing | [5612:81961](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-81961) | `dash-03`, `stocks-01`, `dash-14`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules. |
+| `dash-28` | DASH home · returning user | — | `dash-03`, `stocks-01`, `dash-14`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too. |
+| `dash-03` | Rules · what to set | [5612:40261](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261) | `dash-02`, `dash-14`, `dash-04` | Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules. |
+| `dash-26` | Rules · typing | [6494:30768](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6494-30768) | `dash-02`, `dash-14`, `dash-04` | Figma “DASH AI - better layout” 3.1 (file 9r61YQp7QQZAQovDyz8hLF): the input tapped — heading and examples fold away, the orb stays centred, the input turns green, the keyboard rises and the background ends above it (300 ms). Tap the body to go back. |
+| `dash-04` | Thinking | [5612:40517](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517) | `dash-02`, `dash-14`, `dash-05` | Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies). |
+| `dash-05` | DASH asks the limit | [5612:40650](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650) | `dash-02`, `dash-14`, `dash-06` | The question card takes the input’s place. Any answer (or one typed) builds the preview. |
+| `dash-06` | Rule preview | [5612:40816](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40816) | `dash-02`, `dash-14`, `dash-05`, `dash-07` | The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question. |
+| `dash-07` | Ready · would have saved | [5612:40971](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40971) | `dash-02`, `dash-14`, `dash-10`, `dash-05`, `dash-13` | Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more. |
+| `dash-08` | Weak · would have cost profit | [5612:41698](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41698) | `dash-02`, `dash-14`, `dash-11`, `dash-13`, `dash-05` | Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it. |
+| `dash-09` | Ready · no backtest data | [5612:41530](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41530) | `dash-02`, `dash-14`, `dash-12`, `dash-05`, `dash-13` | Not enough trading history to test: a neutral strip. |
 | `dash-10` | Read more · saved | [5612:41133](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41133) | `dash-07` |  |
 | `dash-11` | Read more · cost | [5612:41268](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41268) | `dash-08` | Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both. |
 | `dash-12` | Read more · no data | [5612:41402](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41402) | `dash-09` |  |
 | `dash-13` | Rule created | [5612:41875](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-41875) | `dash-29`, `dash-14` | Over the ready screen it was saved from (Figma shows an older card behind it). |
-| `dash-29` | Rule saved · chat | — | `dash-02`, `dash-14`, `dash-30`, `dash-10` | Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more). |
+| `dash-29` | Rule saved · chat | — | `dash-02`, `dash-14`, `dash-10` | Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more). |
 | `dash-14` | Active rules | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24`, `dash-06` | Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule. |
 | `dash-15` | Delete rule? | [5612:42250](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42250) | `dash-02`, `dash-14`, `dash-16` | Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it). |
 | `dash-16` | Rule deleted | [5612:42455](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42455) | `dash-02`, `dash-17` | The list behind already has 3 rules. |
 | `dash-17` | Active rules · after delete | [5612:42076](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076) | `dash-02`, `dash-15`, `dash-03`, `dash-20`, `fno-07`, `dash-24`, `dash-06` | Not a Figma frame: the list once the sheet closes (3 rules). |
-| `dash-30` | Past chats | — | `dash-02` | From the history button in the DASH top bar (left of Your creations). Every chat with DASH, newest first, by day; drafts say so. A row opens its chat (rule → the rule preview, indicator → the ready indicator). |
-| `dash-20` | Indicator · what to show | — | `dash-14`, `dash-30`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
-| `dash-21` | Indicator · which chart | — | `dash-14`, `dash-30`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds) |
-| `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-30`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | …and the timeframe. (only for “…on Nifty 50”.) |
-| `dash-23` | Indicator · building | — | `dash-14`, `dash-30`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
-| `dash-24` | Indicator · ready | — | `dash-14`, `dash-30`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification. |
-| `dash-25` | Indicator · saved | — | `dash-14`, `dash-30`, `dash-02`, `fno-06` | Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators. |
-| `dash-27` | Indicator · saved sheet | — | `dash-14`, `dash-30`, `dash-02`, `fno-06`, `dash-25` | Save indicator opens this over the chat (both versions) — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators. |
+| `dash-30` | Past chats | — | `dash-03`, `stocks-01`, `dash-14`, `dash-20`, `dash-06`, `dash-24`, `fno-07` | A tall bottom sheet over DASH (here over the home): from the history button in the top bar, View all on Pick up where you left off, or a chat’s ⋮ → Past chats. Every chat by day, newest first; a row closes the sheet and opens its chat (rule → the rule preview, indicator → the ready indicator). |
+| `dash-20` | Indicator · what to show | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it. |
+| `dash-21` | Indicator · which chart | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds) |
+| `dash-22` | Indicator · which timeframe | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | …and the timeframe. (only for “…on Nifty 50”.) |
+| `dash-23` | Indicator · building | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype). |
+| `dash-24` | Indicator · ready | — | `dash-14`, `dash-02`, `dash-21`, `dash-22`, `dash-23`, `dash-24`, `dash-25`, `dash-27` | Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification. |
+| `dash-25` | Indicator · saved | — | `dash-14`, `dash-02`, `fno-06` | Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators. |
+| `dash-27` | Indicator · saved sheet | — | `dash-14`, `dash-02`, `fno-06`, `dash-25` | Save indicator opens this over the chat (both versions) — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators. |
 
 ## Spec (README.md)
 
@@ -81,7 +81,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/dash · machine
 | `dash-23` | Indicator · building | — | The indicator preview builds in the pinned card |
 | `dash-24` | Indicator · ready | — | Preview with Modify and Save indicator |
 | `dash-25` | Indicator · saved | — | The preview card closes; DASH confirms it was saved and offers View indicator |
-| `dash-30` | Past chats | — | Every chat with DASH by day (Today / Yesterday / Earlier), newest first: title + when (drafts: green “Draft · Edited …”); no kind — a chat can make mixed things; a row opens its chat |
+| `dash-30` | Past chats (sheet) | — | A bottom sheet over DASH: opens at half the screen, grows tall when the list is scrolled / swiped up. Every chat by day, newest first: title + when (drafts: green “Draft · Edited …”); no kind — a chat can make mixed things. Tap a row → its chat; hold → Delete this chat → confirmation. Setting “Past chats: Empty” → L3 empty state |
 
 ### Navigation
 
@@ -93,10 +93,11 @@ dash-07/08/09 rule description ─▶ dash-10/11/12 (Okay ─▶ back) · Yes, s
 dash-08 Yes, improve my rule ─▶ dash-05
 dash-13 View Rules ─▶ dash-14 · Cancel ─▶ back to the chat
 dash-14 Delete ─▶ dash-15 ─Yes─▶ dash-16 ─Okay─▶ dash-17 · No ─▶ dash-14 · Create New ─▶ dash-03
-home / empty chat top bar: history ─▶ dash-30 Past chats · Your creations ─▶ dash-14
+home / empty chat top bar: history ─▶ Past chats sheet (dash-30) · Your creations ─▶ dash-14
+Past chats sheet: a row ─▶ its chat · hold a row ─▶ Delete this chat ─▶ Delete this chat? ─Yes─▶ back to the sheet, row gone
 a started chat's top bar: ⋮ ─▶ dropdown: Past chats ─▶ dash-30 · Your creations ─▶ dash-14 · Delete this chat ─▶ Delete this chat? ─Yes─▶ home
 home Pick up where you left off: a card ─▶ its chat · View all ─▶ dash-30 · (compact card) hold ─▶ Delete this draft?
-dash-30 a row ─▶ its chat (rule ─▶ dash-06, indicator ─▶ dash-24)
+
 dash-02 Create Custom Indicator ─▶ dash-20 ─prompt─▶ dash-21 ─chart─▶ dash-22 ─timeframe─▶ dash-23 ─built─▶ dash-24
 dash-24 Modify ─▶ DASH asks for a manual change ─send─▶ same preview + Modify / Save indicator · Save indicator ─▶ dash-25
 dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH indicator in Your indicators)
@@ -237,6 +238,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — **History page: one design.** History V2 (Created with DASH, tabbed) · card V3 (status + name, switch) · details V3 (Status row with its switch) are now the only design; the settings History version / Card version / Card icons / Details version are gone. The older versions (the Trading rules list, cards V1 / V2, details V1 / V2) are archived in `archive/dash-history-versions/` (outside `src/`, with a README of where each one was). The + and Send are 12 apart wherever they sit side by side, and the + is one outline button in every field (white, 1px border/intense; green only while the Pine Script tip points at it).
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
+- 2026-10-30 — **Past chats is a sheet.** The history button, View all on drafts and the chat ⋮ open Past chats as a bottom sheet over DASH (dash-30 = the home with it open): half the screen at first, tall once the list is scrolled or swiped up. Hold a row → a small Delete this chat menu → the confirmation sheet → back to the list. New setting **Past chats**: With chats / Empty (L3 empty state; no drafts on the home either). Long press is one hook (`components/longPress`) shared with the compact resume card. Prototype floating buttons: 24 disc in a 48 touch area, never overlapping.
 - 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card (“N more” when some are left out) that opens the full page (`HOME_CREATIONS` in ReturningV2).
 - 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary; the compact card's green line reads “Draft · Edited 2 hr ago”. Past chats rows: no kind icon or Rule / Indicator word (a chat can make mixed things) — the title and when; drafts show the same green “Draft · Edited …”. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
 - 2026-10-30 — **Top bar: Past chats + Your creations.** The bar's right action (everything made with DASH) gets its own icon (widgets, was history; label “Your creations”), and a history button left of it opens **Past chats** (dash-30, `screens/PastChats`): every chat with DASH by day (Today / Yesterday / Earlier), newest first — the kind's icon in an L3 Avatar, the title, “Rule · 9:20 am” (drafts: “Draft, not saved”), ›; a row opens its chat. Data: `pastChats` in data.ts. Rows: the L3 card row on surface/primary with only its 1px edge (no drop shadow). The home's “Your creations” heading carries the same widgets icon. “Pick up where you left off” has View all → Past chats. The compact resume card's title is one line (… when longer) and its history avatar has no edge.
@@ -2938,6 +2940,7 @@ export function BuildOption({ icon, title, description, onClick }: BuildOptionPr
 
 /* DASH V7 · Pills: the dock is solid (surface/primary, not see-through) and lifts off the page with a low shadow. */
 .input[data-inline][data-dock] {
+  padding-bottom: calc(var(--l3-spacing-16) + var(--os-inset-bottom, 0px)); /* 16 under the row (the dock's 12 + 4) */
   background: var(--l3-surface-primary);
   box-shadow: var(--l3-shadow-elevation-low);
 }
@@ -6692,7 +6695,7 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
 ### `src/flows/dash/components/ResumeDrafts.tsx`
 
 ```tsx
-import { useEffect, useId, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Avatar } from '@l3/components/Avatar'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
@@ -6706,59 +6709,33 @@ import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { t } from '../copy'
 import { homeDrafts, type HomeDraft } from '../data'
+import { useLongPress } from './longPress'
 import styles from './ResumeDrafts.module.css'
 
 /** Prototype setting "Resume chats" (every DASH version, returning user): Show → the sample drafts, Hide (default) → none. */
 export function useResumeDrafts() {
-  const shown = useFlowOption('dash', 'resumeChats', 'hide') === 'show'
+  const resume = useFlowOption('dash', 'resumeChats', 'hide')
+  // No past chats at all (setting "Past chats: Empty") → no drafts either.
+  const history = useFlowOption('dash', 'pastChats', 'some')
+  const shown = resume === 'show' && history !== 'none'
   const [drafts, setDrafts] = useState<HomeDraft[]>(shown ? homeDrafts : [])
   useEffect(() => setDrafts(shown ? homeDrafts : []), [shown])
   return [drafts, setDrafts] as const
 }
-
-/** How long a press must be held to ask to delete a compact card. */
-const HOLD_MS = 500
 
 /**
  * Compact resume card (like a creation card): the history avatar, then the green "Draft · Edited …" line over the title, and ›.
  * A tap opens the draft's chat; press and hold (or right-click) asks to delete it.
  */
 function CompactDraft({ draft, onOpen, onHold }: { draft: HomeDraft; onOpen: () => void; onHold: () => void }) {
-  const timer = useRef<number | undefined>(undefined)
-  const start = useRef<{ x: number; y: number } | null>(null)
-  // A hold ends with a click too; that one mustn't open the chat.
-  const held = useRef(false)
-  const cancel = () => {
-    window.clearTimeout(timer.current)
-    start.current = null
-  }
-  const down = (e: ReactPointerEvent) => {
-    held.current = false
-    start.current = { x: e.clientX, y: e.clientY }
-    timer.current = window.setTimeout(() => {
-      held.current = true
-      start.current = null
-      navigator.vibrate?.(10)
-      onHold()
-    }, HOLD_MS)
-  }
-  // Moving the finger (swiping the row) isn't a hold.
-  const move = (e: ReactPointerEvent) => {
-    if (start.current && Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > 8) cancel()
-  }
+  const press = useLongPress({ onHold, onTap: onOpen })
   return (
     <button
       type="button"
       role="listitem"
       className={styles.compact}
       aria-label={t('home2.resumeHold', { name: draft.title, edited: draft.edited })}
-      onPointerDown={down}
-      onPointerMove={move}
-      onPointerUp={cancel}
-      onPointerLeave={cancel}
-      onPointerCancel={cancel}
-      onContextMenu={(e) => { e.preventDefault(); cancel(); held.current = true; onHold() }}
-      onClick={() => { if (held.current) { held.current = false; return } onOpen() }}
+      {...press}
     >
       <Avatar size={40} icon={<Icon icon={msHistory} size={20} />} className={styles.compactAvatar} />
       <span className={styles.compactText}>
@@ -8042,6 +8019,49 @@ export function useHomeKeyboard({ typing = false, onTyping }: { typing?: boolean
 }
 ```
 
+### `src/flows/dash/components/longPress.ts`
+
+```ts
+import { useRef, type MouseEvent, type PointerEvent } from 'react'
+
+/** How long a press must be held to count as a long press. */
+export const HOLD_MS = 500
+
+/**
+ * Press and hold (0.5 s, or right-click on a laptop) → `onHold`; a plain tap → `onTap`. Moving the finger (swiping a
+ * row) cancels the hold, and the click that ends a hold doesn't count as a tap. Spread the result on the pressable.
+ */
+export function useLongPress({ onHold, onTap }: { onHold: () => void; onTap?: () => void }) {
+  const timer = useRef<number | undefined>(undefined)
+  const start = useRef<{ x: number; y: number } | null>(null)
+  const held = useRef(false)
+  const cancel = () => {
+    window.clearTimeout(timer.current)
+    start.current = null
+  }
+  return {
+    onPointerDown: (e: PointerEvent) => {
+      held.current = false
+      start.current = { x: e.clientX, y: e.clientY }
+      timer.current = window.setTimeout(() => {
+        held.current = true
+        start.current = null
+        navigator.vibrate?.(10)
+        onHold()
+      }, HOLD_MS)
+    },
+    onPointerMove: (e: PointerEvent) => {
+      if (start.current && Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > 8) cancel()
+    },
+    onPointerUp: cancel,
+    onPointerLeave: cancel,
+    onPointerCancel: cancel,
+    onContextMenu: (e: MouseEvent) => { e.preventDefault(); cancel(); held.current = true; onHold() },
+    onClick: () => { if (held.current) { held.current = false; return } onTap?.() },
+  }
+}
+```
+
 ### `src/flows/dash/components/pendingFile.ts`
 
 ```ts
@@ -8372,6 +8392,9 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "pastChats.today": "Today",
   "pastChats.yesterday": "Yesterday",
   "pastChats.earlier": "Earlier",
+  "pastChats.emptyTitle": "No chats yet",
+  "pastChats.emptyText": "Your conversations with DASH show up here, so you can pick any of them up again.",
+  "pastChats.emptyAction": "Start a chat",
   "landing.greeting": "Hi {name}!",
   "landing.title": "Let me know what you would like to do today?",
   "landing.choose": "Choose what to build",
@@ -8929,7 +8952,6 @@ import type { Flow } from '../types'
 import { switchKind } from './components/pendingMessage'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
 import { ActiveRules } from './screens/ActiveRules'
-import { PastChats } from './screens/PastChats'
 import { DashAI } from './screens/DashAI'
 import { dashVersions, defaultDashVersion } from './components/dashVersion'
 import type { IndicatorStep } from './screens/IndicatorChat'
@@ -8968,6 +8990,8 @@ export const dash: Flow = {
     { id: 'homeCreateStyle', showIf: { dashVersion: ['6'] }, group: 'Home', icon: msLayers, label: 'Create cards', values: [{ value: 'button', label: 'Button' }, { value: 'outline', label: 'Outline' }], default: 'button' },
     // Every version, returning user · drafts to resume: Show (two sample drafts) or Hide (default; none — the centre-stage layout).
     { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', values: [{ value: 'show', label: 'Show' }, { value: 'hide', label: 'Hide' }], default: 'hide' },
+    // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
+    { id: 'pastChats', group: 'Home', icon: msChat, label: 'Past chats', values: [{ value: 'some', label: 'With chats' }, { value: 'none', label: 'Empty' }], default: 'some' },
     // Resume chats · the card: Compact (history avatar, green "Edited …", title, ›; hold to delete) or Big (Continue + ✕).
     { id: 'resumeCard', showIf: { user: ['returning'], resumeChats: ['show'] }, group: 'Home', icon: msPlayCircle, label: 'Resume card', values: [{ value: 'compact', label: 'Compact' }, { value: 'big', label: 'Big' }], default: 'compact' },
     // V5, for testing: hide one section.
@@ -8986,37 +9010,37 @@ export const dash: Flow = {
   ],
   screens: [
     // ---- Entry
-    { id: 'dash-02', group: 'dash', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <DashAI scene="landing" onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
-    { id: 'dash-28', group: 'dash', section: 'entry', name: 'DASH home · returning user', figma: '', note: 'For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too.', render: (go) => <DashAI scene="landing" returning onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-02', group: 'dash', section: 'entry', name: 'DASH landing', figma: '5612:81961', note: 'From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Back returns home. Set Trading Rules opens the rules chat; Create Custom Strategy is another flow (not designed yet). ☰ opens your rules.', render: (go) => <DashAI scene="landing" onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-28', group: 'dash', section: 'entry', name: 'DASH home · returning user', figma: '', note: 'For someone who has used DASH before (live app: rules only — here rules, indicators and strategies). No explaining again: their work first — Created with DASH (count · Manage), a sideways row of their latest indicators and rules with kind and status (tap: carry on in its chat), suggestions from what they have, and the field to ask or change anything. The prototype setting “DASH home” shows this on the landing too.', render: (go) => <DashAI scene="landing" returning onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
     // ---- Create a rule
-    { id: 'dash-03', group: 'dash', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules.', render: (go) => <DashAI scene="rules" step="empty" onSwitchKind={(k) => go(k === 'indicator' ? 'dash-20' : 'dash-03')} onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onSend={() => go('dash-04')} /> },
-    { id: 'dash-26', group: 'dash', section: 'create', name: 'Rules · typing', figma: '6494:30768', note: 'Figma “DASH AI - better layout” 3.1 (file 9r61YQp7QQZAQovDyz8hLF): the input tapped — heading and examples fold away, the orb stays centred, the input turns green, the keyboard rises and the background ends above it (300 ms). Tap the body to go back.', render: (go) => <DashAI scene="rules" step="empty" typing onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onSend={() => go('dash-04')} /> },
-    { id: 'dash-04', group: 'dash', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <DashAI scene="rules" step="thinking" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onThought={() => go('dash-05')} /> },
-    { id: 'dash-05', group: 'dash', section: 'create', name: 'DASH asks the limit', figma: '5612:40650', note: 'The question card takes the input’s place. Any answer (or one typed) builds the preview.', render: (go) => <DashAI scene="rules" step="question" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onAnswer={() => go('dash-06')} /> },
-    { id: 'dash-06', group: 'dash', section: 'create', name: 'Rule preview', figma: '5612:40816', note: 'The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question.', render: (go) => <DashAI scene="rules" step="preview" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onRefine={() => go('dash-05')} onProceed={() => go('dash-07')} /> },
+    { id: 'dash-03', group: 'dash', section: 'create', name: 'Rules · what to set', figma: '5612:40261', note: 'Figma “DASH AI - better layout” 2 (6494:30374): the chat’s empty state — the same screen as the landing and the conversation; the body pushes in from the landing while the background and the bar stay. Example rows drift sideways. A chip (or typing + Send) sends the message: it flies up into the chat as the greeting and examples fade away. History opens your rules.', render: (go) => <DashAI scene="rules" step="empty" onSwitchKind={(k) => go(k === 'indicator' ? 'dash-20' : 'dash-03')} onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onSend={() => go('dash-04')} /> },
+    { id: 'dash-26', group: 'dash', section: 'create', name: 'Rules · typing', figma: '6494:30768', note: 'Figma “DASH AI - better layout” 3.1 (file 9r61YQp7QQZAQovDyz8hLF): the input tapped — heading and examples fold away, the orb stays centred, the input turns green, the keyboard rises and the background ends above it (300 ms). Tap the body to go back.', render: (go) => <DashAI scene="rules" step="empty" typing onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onSend={() => go('dash-04')} /> },
+    { id: 'dash-04', group: 'dash', section: 'create', name: 'Thinking', figma: '5612:40517', note: 'Moves on by itself after 1.6 s in the prototype (the real app: when DASH replies).', render: (go) => <DashAI scene="rules" step="thinking" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onThought={() => go('dash-05')} /> },
+    { id: 'dash-05', group: 'dash', section: 'create', name: 'DASH asks the limit', figma: '5612:40650', note: 'The question card takes the input’s place. Any answer (or one typed) builds the preview.', render: (go) => <DashAI scene="rules" step="question" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onAnswer={() => go('dash-06')} /> },
+    { id: 'dash-06', group: 'dash', section: 'create', name: 'Rule preview', figma: '5612:40816', note: 'The draft is pinned in the top bar’s bottom slot. Proceed runs the backtest; refine goes back to the question.', render: (go) => <DashAI scene="rules" step="preview" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onRefine={() => go('dash-05')} onProceed={() => go('dash-07')} /> },
     // ---- Rule ready (3 backtest results)
-    { id: 'dash-07', group: 'dash', section: 'result', name: 'Ready · would have saved', figma: '5612:40971', note: 'Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more.', render: (go) => <DashAI scene="rules" step="saved" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onReadMore={() => go('dash-10')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
-    { id: 'dash-08', group: 'dash', section: 'result', name: 'Weak · would have cost profit', figma: '5612:41698', note: 'Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it.', render: (go) => <DashAI scene="rules" step="cost" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onReadMore={() => go('dash-11')} onSave={() => go('dash-13')} onImprove={() => go('dash-05')} /> },
-    { id: 'dash-09', group: 'dash', section: 'result', name: 'Ready · no backtest data', figma: '5612:41530', note: 'Not enough trading history to test: a neutral strip.', render: (go) => <DashAI scene="rules" step="none" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onReadMore={() => go('dash-12')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
+    { id: 'dash-07', group: 'dash', section: 'result', name: 'Ready · would have saved', figma: '5612:40971', note: 'Backtest: would have saved ₹18,400 in 3 months (green strip). The description opens Read more.', render: (go) => <DashAI scene="rules" step="saved" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onReadMore={() => go('dash-10')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
+    { id: 'dash-08', group: 'dash', section: 'result', name: 'Weak · would have cost profit', figma: '5612:41698', note: 'Backtest: the rule would have cut ₹22,390 of profit — red glow and strip; DASH suggests improving it.', render: (go) => <DashAI scene="rules" step="cost" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onReadMore={() => go('dash-11')} onSave={() => go('dash-13')} onImprove={() => go('dash-05')} /> },
+    { id: 'dash-09', group: 'dash', section: 'result', name: 'Ready · no backtest data', figma: '5612:41530', note: 'Not enough trading history to test: a neutral strip.', render: (go) => <DashAI scene="rules" step="none" onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onReadMore={() => go('dash-12')} onRefine={() => go('dash-05')} onSave={() => go('dash-13')} /> },
     { id: 'dash-10', group: 'dash', section: 'result', name: 'Read more · saved', figma: '5612:41133', render: (go) => <DashAI scene="rules" step="saved" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.saved} onClose={() => go('dash-07')} />} /> },
     { id: 'dash-11', group: 'dash', section: 'result', name: 'Read more · cost', figma: '5612:41268', note: 'Figma says ₹22,300 here and ₹22,390 on the card — one number (₹22,390) used for both.', render: (go) => <DashAI scene="rules" step="cost" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.cost} onClose={() => go('dash-08')} />} /> },
     { id: 'dash-12', group: 'dash', section: 'result', name: 'Read more · no data', figma: '5612:41402', render: (go) => <DashAI scene="rules" step="none" sheet={<ReadMoreSheet rule={maxDailyLoss} backtest={backtests.none} onClose={() => go('dash-09')} />} /> },
     { id: 'dash-13', group: 'dash', section: 'result', name: 'Rule created', figma: '5612:41875', note: 'Over the ready screen it was saved from (Figma shows an older card behind it).', render: (go) => <DashAI scene="rules" step="saved" created sheet={<RuleCreatedSheet rule={maxDailyLoss} onCancel={() => go('dash-29')} onViewRules={() => go('dash-14')} />} /> },
-    { id: 'dash-29', group: 'dash', section: 'result', name: 'Rule saved · chat', figma: '', note: 'Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more).', render: (go) => <DashAI scene="rules" step="saved" created onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onReadMore={() => go('dash-10')} onViewRules={() => go('dash-14')} /> },
+    { id: 'dash-29', group: 'dash', section: 'result', name: 'Rule saved · chat', figma: '', note: 'Close on “Your rule is created”: back in the chat, which now knows the rule is saved — DASH says so and offers View rules (no “Yes, save it” any more).', render: (go) => <DashAI scene="rules" step="saved" created onBack={() => go('dash-02')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onReadMore={() => go('dash-10')} onViewRules={() => go('dash-14')} /> },
     // ---- Your rules
     { id: 'dash-14', section: 'rules', name: 'Active rules', figma: '5612:42076', note: 'Switches turn a rule on / off in place. Delete asks first; Create New starts a new rule.', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} onEditRule={() => go('dash-06')} /> },
     { id: 'dash-15', section: 'rules', name: 'Delete rule?', figma: '5612:42250', note: 'Over the current Active rules (Figma shows an older list with Active / Paused tabs behind it).', render: (go) => <ActiveRules rules={activeRules} onBack={() => go('dash-02')} sheet={<DeleteRuleSheet rule={maxDailyLossRule} onNo={() => go('dash-14')} onYes={() => go('dash-16')} />} /> },
     { id: 'dash-16', section: 'rules', name: 'Rule deleted', figma: '5612:42455', note: 'The list behind already has 3 rules.', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} sheet={<RuleDeletedSheet onOkay={() => go('dash-17')} />} /> },
     { id: 'dash-17', section: 'rules', name: 'Active rules · after delete', figma: '5612:42076', note: 'Not a Figma frame: the list once the sheet closes (3 rules).', render: (go) => <ActiveRules rules={rulesAfterDelete} onBack={() => go('dash-02')} onDelete={() => go('dash-15')} onCreate={() => go('dash-03')} onCreateIndicator={() => go('dash-20')} onAddToChart={() => go('fno-07')} onEditIndicator={() => go('dash-24')} onEditRule={() => go('dash-06')} /> },
     // ---- Custom indicator (wireframe "AI Indicator") — ONE chat screen in different states (group 'indicator')
-    { id: 'dash-30', section: 'history', name: 'Past chats', figma: '', note: 'From the history button in the DASH top bar (left of Your creations). Every chat with DASH, newest first, by day; drafts say so. A row opens its chat (rule → the rule preview, indicator → the ready indicator).', render: (go) => <PastChats onBack={() => go('dash-02')} onOpen={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} /> },
-    { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onSwitchKind={(k) => go(k === 'indicator' ? 'dash-20' : 'dash-03')} onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
-    { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
-    { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe. (only for “…on Nifty 50”.)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
-    { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
-    { id: 'dash-24', group: 'dash', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
-    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} /> },
-    { id: 'dash-27', group: 'dash', section: 'indicator', name: 'Indicator · saved sheet', figma: '', note: 'Save indicator opens this over the chat (both versions) — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.', render: (go) => <DashAI scene="indicator" step="saved" onYourRules={() => go('dash-14')} onPastChats={() => go('dash-30')} onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} sheet={<IndicatorSavedSheet draft={supertrendEma} onDone={() => go('dash-25')} onView={() => go('fno-06')} />} /> },
+    { id: 'dash-30', section: 'history', name: 'Past chats', figma: '', note: 'A tall bottom sheet over DASH (here over the home): from the history button in the top bar, View all on Pick up where you left off, or a chat’s ⋮ → Past chats. Every chat by day, newest first; a row closes the sheet and opens its chat (rule → the rule preview, indicator → the ready indicator).', group: 'dash', render: (go) => <DashAI scene="landing" pastChatsOpen onStrategy={() => { switchKind('strategy'); go('dash-03') }} onBack={() => go('stocks-01')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onRules={() => go('dash-03')} onIndicator={() => go('dash-20')} onOpenRule={() => go('dash-06')} onOpenIndicator={() => go('dash-24')} onAddToChart={() => go('fno-07')} /> },
+    { id: 'dash-20', group: 'dash', section: 'indicator', name: 'Indicator · what to show', figma: '', note: 'Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.', render: (go) => <DashAI scene="indicator" onSwitchKind={(k) => go(k === 'indicator' ? 'dash-20' : 'dash-03')} onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} step="empty" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-21', group: 'dash', section: 'indicator', name: 'Indicator · which chart', figma: '', note: 'DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} step="chart" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-22', group: 'dash', section: 'indicator', name: 'Indicator · which timeframe', figma: '', note: '…and the timeframe. (only for “…on Nifty 50”.)', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} step="timeframe" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-23', group: 'dash', section: 'indicator', name: 'Indicator · building', figma: '', note: 'Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} step="building" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-24', group: 'dash', section: 'indicator', name: 'Indicator · ready', figma: '', note: 'Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} step="ready" onBack={() => go('dash-02')} onSend={() => go('dash-21')} onChart={() => go('dash-22')} onTimeframe={() => go('dash-23')} onBuilt={() => go('dash-24')} onSaved={() => go('dash-25')} onSaveSheet={() => go('dash-27')} onStep={(st) => go(indicatorStep[st])} /> },
+    { id: 'dash-25', group: 'dash', section: 'indicator', name: 'Indicator · saved', figma: '', note: 'Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.', render: (go) => <DashAI scene="indicator" onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} step="saved" onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} /> },
+    { id: 'dash-27', group: 'dash', section: 'indicator', name: 'Indicator · saved sheet', figma: '', note: 'Save indicator opens this over the chat (both versions) — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.', render: (go) => <DashAI scene="indicator" step="saved" onYourRules={() => go('dash-14')} onOpenPastChat={(kind) => go(kind === 'indicator' ? 'dash-24' : 'dash-06')} onBack={() => go('dash-02')} onViewIndicator={() => go('fno-06')} sheet={<IndicatorSavedSheet draft={supertrendEma} onDone={() => go('dash-25')} onView={() => go('fno-06')} />} /> },
   ],
 }
 ```
@@ -9640,13 +9664,17 @@ import { defaultDashVersion, useDashUser, useDashVersion } from '../components/d
 import { RuleScene, type RuleChatProps } from './RuleChat'
 import { DeleteChatSheet } from '../sheets/ChatSheets'
 import { ChatMenu } from '../components/ChatMenu'
+import { PastChatsSheet } from './PastChats'
+import type { PastChat } from '../data'
 
 type Common = {
   onBack?: () => void
   /** The top bar's right action: everything they made with DASH (rules, indicators, strategies). */
   onYourRules?: () => void
-  /** The top bar's history button (left of it): their past chats with DASH. */
-  onPastChats?: () => void
+  /** Past chats (the tall sheet: history button, View all on drafts, ⋮ → Past chats): a row opens that chat. */
+  onOpenPastChat?: (kind: PastChat['kind']) => void
+  /** Open with the Past chats sheet up (dash-30). */
+  pastChatsOpen?: boolean
   /** A sheet over the screen (read more, rule created). */
   sheet?: ReactNode
   /** Open with the keyboard up (Figma "3.1 Manual typing"). */
@@ -9672,7 +9700,7 @@ const order = { landing: 0, rules: 1, indicator: 1 } as const
  * Every DASH screen in the prototype renders this one component (flow group 'dash'), so it stays mounted between them.
  */
 export function DashAI(props: DashAIProps) {
-  const { scene, onBack, onYourRules, onPastChats, sheet } = props
+  const { scene, onBack, onYourRules, onOpenPastChat, sheet } = props
   /** Prototype settings "DASH version" (which homes, components/dashVersion.ts + screens/homes.tsx) and "User" (new /
    *  returning; a screen may force it with the `returning` prop, e.g. dash-28). */
   const forcedReturning = 'returning' in props ? props.returning : undefined
@@ -9698,8 +9726,12 @@ export function DashAI(props: DashAIProps) {
     watch.observe(dockHost, { childList: true })
     return () => watch.disconnect()
   }, [dockHost])
-  // Delete this chat? (from a started chat's ⋮ dropdown).
-  const [chatSheet, setChatSheet] = useState<'delete' | null>(null)
+  // DASH's own sheets: Past chats (tall, from the history button / View all / ⋮) and Delete this chat? (⋮).
+  const [chatSheet, setChatSheet] = useState<'history' | 'delete' | null>(props.pastChatsOpen ? 'history' : null)
+  const onPastChats = () => setChatSheet('history')
+  // A past chat being deleted from the Past chats sheet (its row's hold menu), and the ones deleted this visit.
+  const [deleting, setDeleting] = useState<PastChat | null>(null)
+  const [removed, setRemoved] = useState<string[]>([])
   const [lastScene, setLastScene] = useState(scene)
   const [move, setMove] = useState<SceneMove>('push')
   if (lastScene !== scene) {
@@ -9754,11 +9786,26 @@ export function DashAI(props: DashAIProps) {
       bottom={<div ref={setDockHost} className={styles.dockHost} />}
       // Right of the bar — on the home and an empty chat: past chats (history), then what they've made. Once a chat has
       // started (a message sent, or a past chat opened): one ⋮ dropdown with those two and Delete this chat.
-      top={<DashBar onBack={onBack} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={() => onPastChats?.()} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
+      top={<DashBar onBack={onBack} actions={inChat ? <ChatMenu onPastChats={onPastChats} onCreations={onYourRules} onDelete={() => setChatSheet('delete')} /> : <><ActionbarAction icon={msHistory} label={t('landing.pastChats')} onClick={onPastChats} /><ActionbarAction icon={msWidgets} label={t('landing.menu')} onClick={() => onYourRules?.()} /></>} />}
       sheet={
-        chatSheet === 'delete' ? (
+        chatSheet === 'history' ? (
+          <PastChatsSheet
+            removed={removed}
+            onClose={() => setChatSheet(null)}
+            onOpen={(kind) => { setChatSheet(null); onOpenPastChat?.(kind) }}
+            onDelete={(chat) => { setDeleting(chat); setChatSheet('delete') }}
+          />
+        ) : chatSheet === 'delete' ? (
           // Prototype: deleting goes back to the home (with or without the creation — the sample data stays).
-          <DeleteChatSheet onClose={() => setChatSheet(null)} onDelete={() => { setChatSheet(null); onBack?.() }} />
+          deleting ? (
+            // From Past chats: the chat leaves the list and the sheet goes back to it.
+            <DeleteChatSheet
+              onClose={() => { setDeleting(null); setChatSheet('history') }}
+              onDelete={() => { setRemoved((r) => [...r, deleting.id]); setDeleting(null); setChatSheet('history') }}
+            />
+          ) : (
+            <DeleteChatSheet onClose={() => setChatSheet(null)} onDelete={() => { setChatSheet(null); onBack?.() }} />
+          )
         ) : sheet
       }
     >
@@ -10955,7 +11002,24 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 ### `src/flows/dash/screens/PastChats.module.css`
 
 ```css
-/* A past chat: the L3 card row with only its 1px light edge (no drop shadow), on surface/primary. */
+/* The sheet's height is set from code (half the screen, then tall); it animates between the two. */
+.sheet.sheet {
+  transition: height var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet.sheet {
+    transition: none;
+  }
+}
+
+/* No chats yet: the empty state, centred, with room around it. */
+.empty {
+  display: grid;
+  place-items: center;
+  padding-block: var(--l3-spacing-24);
+}
+
 .row.row.row.row { /* beats L3's tappable card rule (.cell[data-variant][data-interactive]) */
   background-color: var(--l3-surface-primary);
   box-shadow: inset 0 0 0 1px var(--l3-border-light); /* 1px: the card's edge */
@@ -10965,61 +11029,186 @@ export function LandingScene({ onRules, onIndicator, onStrategy }: LandingProps)
 .draft {
   color: var(--l3-content-accent-success-default);
 }
+
+/* A row and its hold menu. The row can't be text-selected or call up the phone's own menu (the hold is ours). */
+.rowWrap {
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* The hold menu: a small raised surface on the row's right, just under its middle (like the chat ⋮ dropdown). */
+.rowMenu {
+  position: absolute;
+  top: 50%;
+  right: var(--l3-spacing-08);
+  z-index: 2; /* over the next rows; stacking order isn't a design token */
+  padding: var(--l3-spacing-04);
+  border: 1px solid var(--l3-border-light); /* 1px: the menu's edge */
+  border-radius: var(--l3-radius-16);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-high);
+  transform-origin: top right;
+  animation: row-menu-in var(--l3-motion-duration-short) var(--l3-motion-easing-decelerate);
+}
+
+.rowMenu > * {
+  border-radius: var(--l3-radius-12);
+  white-space: nowrap;
+}
+
+.danger.danger {
+  color: var(--l3-content-accent-error-default);
+}
+
+@keyframes row-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowMenu {
+    animation: none;
+  }
+}
 ```
 
 ### `src/flows/dash/screens/PastChats.tsx`
 
 ```tsx
-import { Actionbar } from '@l3/components/Actionbar'
+import { useEffect, useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { EmptyState } from '@l3/components/EmptyState'
 import { Icon } from '@l3/components/Icon'
-import { Inset } from '@l3/components/Inset'
 import { ListCell } from '@l3/components/ListCell'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
-import { msChevronRight } from '@l3/icons/material'
-import { Screen } from '../../../shared/ui/Screen'
+import { msChevronRight, msDelete } from '@l3/icons/material'
+import { useFlowOption } from '../../../shared/prototype'
+import { Sheet } from '../../../shared/ui/Sheet'
 import { t } from '../copy'
 import { pastChats, type PastChat } from '../data'
+import { useLongPress } from '../components/longPress'
 import styles from './PastChats.module.css'
 
 const DAYS: PastChat['day'][] = ['today', 'yesterday', 'earlier']
 
 /**
- * Past chats — from the history button in DASH's top bar: every chat with DASH, so one that's no longer on the home
- * (not a draft, or a draft removed from "Pick up where you left off") can still be opened. Plain screen (L3 Actionbar,
- * no DASH background), grouped by day, newest first. A row: the title, when it was ("9:20 am"; a draft: the green
+ * Past chats — a bottom sheet over DASH (opens at half the screen, grows tall when the list is scrolled or swiped up) (the history button, View all on Pick up where you left off, or the chat
+ * ⋮ → Past chats), so it's quick to dip in and out. Every chat with DASH, so one that's no longer on the home can still
+ * be opened. Grouped by day, newest first. A row: the title, when it was ("9:20 am"; a draft: the green
  * "Draft · Edited 2 hr ago"), ›. No kind or kind icon — one chat can create rules, indicators and strategies alike.
- * A tap opens its chat.
+ * A tap closes the sheet and opens that chat. Setting "Past chats: Empty" shows the empty state.
  */
-export function PastChats({ onBack, onOpen }: { onBack?: () => void; onOpen?: (kind: PastChat['kind']) => void }) {
+export function PastChatsSheet({ onClose, onOpen, onDelete, removed = [] }: {
+  onClose: () => void
+  onOpen?: (kind: PastChat['kind']) => void
+  /** A row's hold → Delete this chat (the confirmation sheet). */
+  onDelete?: (chat: PastChat) => void
+  /** Chats deleted in this visit (prototype). */
+  removed?: string[]
+}) {
+  const headingId = useId()
+  // Setting "Past chats": With chats / Empty (the empty state).
+  const empty = useFlowOption('dash', 'pastChats', 'some') === 'none'
+  const chats = empty ? [] : pastChats.filter((c) => !removed.includes(c.id))
+  // The row whose hold menu is open.
+  const [menuFor, setMenuFor] = useState<string | null>(null)
+  useEffect(() => {
+    if (!menuFor) return
+    const close = (e: PointerEvent) => { if (!(e.target as Element).closest?.('[data-row-menu]')) setMenuFor(null) }
+    document.addEventListener('pointerdown', close)
+    return () => document.removeEventListener('pointerdown', close)
+  }, [menuFor])
+  // Opens at half the screen; grows to the tall sheet (L3's max: the screen less 48) once the list is scrolled or
+  // swiped up. The sheet's height lives on L3's surface; this measures the screen it sits in.
+  // A callback ref: the sheet's content is drawn by the screen's sheet host after this renders.
+  const [body, setBody] = useState<HTMLDivElement | null>(null)
+  const [tall, setTall] = useState(false)
+  useEffect(() => {
+    const surface = body?.closest<HTMLElement>('[data-placement]')
+    const root = surface?.parentElement?.parentElement
+    if (!surface || !root) return
+    const fit = () => { surface.style.height = `${tall ? root.clientHeight - 48 : root.clientHeight / 2}px` }
+    fit()
+    const watch = new ResizeObserver(fit)
+    watch.observe(root)
+    return () => watch.disconnect()
+  }, [body, tall])
+  // Scrolling the list, a wheel or a swipe up inside the sheet: tall.
+  useEffect(() => {
+    const scroller = body?.closest<HTMLElement>('[data-sheet-content]')
+    if (!scroller || tall) return
+    let startY = 0
+    const grow = () => setTall(true)
+    const onTouchStart = (e: TouchEvent) => { startY = e.touches[0].clientY }
+    const onTouchMove = (e: TouchEvent) => { if (startY - e.touches[0].clientY > 8) grow() }
+    const onWheel = (e: WheelEvent) => { if (e.deltaY > 0) grow() }
+    scroller.addEventListener('scroll', grow, { passive: true })
+    scroller.addEventListener('wheel', onWheel, { passive: true })
+    scroller.addEventListener('touchstart', onTouchStart, { passive: true })
+    scroller.addEventListener('touchmove', onTouchMove, { passive: true })
+    return () => {
+      scroller.removeEventListener('scroll', grow)
+      scroller.removeEventListener('wheel', onWheel)
+      scroller.removeEventListener('touchstart', onTouchStart)
+      scroller.removeEventListener('touchmove', onTouchMove)
+    }
+  }, [body, tall])
   return (
-    <Screen top={<Actionbar title={t('pastChats.title')} onBack={onBack} />}>
-      <Inset paddingInline="16" paddingBlock="16">
-        <Stack gap="24">
-          {DAYS.filter((day) => pastChats.some((c) => c.day === day)).map((day) => (
-            <Stack as="section" gap="08" key={day} aria-label={t(`pastChats.${day}`)}>
-              <SectionHeader title={t(`pastChats.${day}`)} headingLevel={2} />
-              <Stack gap="08">
-                {pastChats.filter((c) => c.day === day).map((c) => (
-                  <ListCell
-                    key={c.id}
-                    as="button"
-                    variant="card"
-                    className={styles.row}
-                    label={c.title}
-                    // No kind: one chat can create several things of any kind. A draft: the green "Draft · Edited …"
-                    // (as on the home's resume card); a saved chat: when it was.
-                    description={!c.saved ? <span className={styles.draft}>{t('home2.draftEdited', { edited: c.edited ?? c.time })}</span> : c.time}
-                    iconRight={<Icon icon={msChevronRight} />}
-                    onClick={() => onOpen?.(c.kind)}
-                  />
-                ))}
+    <Sheet labelledBy={headingId} onClose={onClose} className={styles.sheet} header={<BottomSheetHeader headingId={headingId} heading={t('pastChats.title')} />}>
+      <div ref={setBody}>
+        {chats.length === 0 ? (
+          // Nothing yet: the L3 empty state (its default illustration) and a way to start.
+          <div className={styles.empty}>
+            <EmptyState headingLevel={3} title={t('pastChats.emptyTitle')} description={t('pastChats.emptyText')} action={<Button size="sm" onClick={onClose}>{t('pastChats.emptyAction')}</Button>} />
+          </div>
+        ) : (
+          <Stack gap="24">
+            {DAYS.filter((day) => chats.some((c) => c.day === day)).map((day) => (
+              <Stack as="section" gap="08" key={day} aria-label={t(`pastChats.${day}`)}>
+                <SectionHeader title={t(`pastChats.${day}`)} headingLevel={3} />
+                <Stack gap="08">
+                  {chats.filter((c) => c.day === day).map((c) => (
+                    <PastChatRow key={c.id} chat={c} menuOpen={menuFor === c.id} onOpen={() => onOpen?.(c.kind)} onHold={() => setMenuFor(c.id)} onDelete={() => { setMenuFor(null); onDelete?.(c) }} />
+                  ))}
+                </Stack>
               </Stack>
-            </Stack>
-          ))}
-        </Stack>
-      </Inset>
-    </Screen>
+            ))}
+          </Stack>
+        )}
+      </div>
+    </Sheet>
+  )
+}
+
+/**
+ * A past chat: the title, when (a draft: the green "Draft · Edited …"), ›. Tap opens it; press and hold (or right-click)
+ * opens a small menu on the row with Delete this chat, which then asks in the confirmation sheet.
+ */
+function PastChatRow({ chat, menuOpen, onOpen, onHold, onDelete }: { chat: PastChat; menuOpen: boolean; onOpen: () => void; onHold: () => void; onDelete: () => void }) {
+  const { onClick, ...hold } = useLongPress({ onHold, onTap: onOpen })
+  return (
+    <div className={styles.rowWrap} {...hold}>
+      <ListCell
+        as="button"
+        variant="card"
+        className={styles.row}
+        label={chat.title}
+        description={!chat.saved ? <span className={styles.draft}>{t('home2.draftEdited', { edited: chat.edited ?? chat.time })}</span> : chat.time}
+        iconRight={<Icon icon={msChevronRight} />}
+        onClick={onClick}
+      />
+      {menuOpen && (
+        <div className={styles.rowMenu} data-row-menu="" role="group" aria-label={chat.title}>
+          <ListCell as="button" size="sm" className={styles.danger} iconLeft={<Icon icon={msDelete} />} label={t('chatMenu.delete')} onClick={onDelete} />
+        </div>
+      )}
+    </div>
   )
 }
 ```
