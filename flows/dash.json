@@ -21,6 +21,7 @@
         "dash-03",
         "stocks-01",
         "dash-14",
+        "dash-30",
         "dash-20",
         "dash-06",
         "dash-24",
@@ -37,6 +38,7 @@
         "dash-03",
         "stocks-01",
         "dash-14",
+        "dash-30",
         "dash-20",
         "dash-06",
         "dash-24",
@@ -52,6 +54,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-04"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40261"
@@ -64,6 +67,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-04"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6494-30768"
@@ -76,6 +80,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-05"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40517"
@@ -88,6 +93,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-06"
       ],
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-40650"
@@ -100,6 +106,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-05",
         "dash-07"
       ],
@@ -113,6 +120,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-10",
         "dash-05",
         "dash-13"
@@ -127,6 +135,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-11",
         "dash-13",
         "dash-05"
@@ -141,6 +150,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-12",
         "dash-05",
         "dash-13"
@@ -196,6 +206,7 @@
       "goesTo": [
         "dash-02",
         "dash-14",
+        "dash-30",
         "dash-10"
       ],
       "figmaUrl": ""
@@ -256,12 +267,23 @@
       "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=5612-42076"
     },
     {
+      "id": "dash-30",
+      "name": "Past chats",
+      "figma": "",
+      "note": "From the history button in the DASH top bar (left of Your creations). Every chat with DASH, newest first, by day; drafts say so. A row opens its chat (rule → the rule preview, indicator → the ready indicator).",
+      "goesTo": [
+        "dash-02"
+      ],
+      "figmaUrl": ""
+    },
+    {
       "id": "dash-20",
       "name": "Indicator · what to show",
       "figma": "",
       "note": "Third option on the DASH landing. Empty chat: example prompts; a chip or typed text flies up and DASH reads it.",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "dash-21",
         "dash-22",
@@ -279,6 +301,7 @@
       "note": "DASH asks only what the prompt didn’t say: the chart… (only for “…on 15-min candles”; then it builds)",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "dash-21",
         "dash-22",
@@ -296,6 +319,7 @@
       "note": "…and the timeframe. (only for “…on Nifty 50”.)",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "dash-21",
         "dash-22",
@@ -313,6 +337,7 @@
       "note": "Version 1: the card pins above the chat; Version 2: it builds inside the chat, under DASH’s message (the “any 15-min chart” example comes straight here). It builds live: a wave, then candles with the lines drawing in, the parts as chips, three steps ticking (~3.3 s in the prototype).",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "dash-21",
         "dash-22",
@@ -330,6 +355,7 @@
       "note": "Preview has Modify (manual changes in chat) and Save indicator. The illustrative chart remains unchanged after a modification.",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "dash-21",
         "dash-22",
@@ -347,6 +373,7 @@
       "note": "Version 1: the preview card is removed. Version 2: the card stays in the chat, tagged Saved. DASH confirms the indicator is saved and View indicator opens Scalper’s active Indicators sheet with the new indicator in Your indicators.",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "fno-06"
       ],
@@ -359,6 +386,7 @@
       "note": "Save indicator opens this over the chat (both versions) — the tick bursts, “Your indicator is ready to use”, a summary of it. Done closes it (the chat is saved); View indicator opens Scalper’s Indicators sheet with it under Your indicators.",
       "goesTo": [
         "dash-14",
+        "dash-30",
         "dash-02",
         "fno-06",
         "dash-25"
@@ -444,6 +472,8 @@
     "src/flows/dash/screens/IndicatorChat.tsx",
     "src/flows/dash/screens/Landing.module.css",
     "src/flows/dash/screens/Landing.tsx",
+    "src/flows/dash/screens/PastChats.module.css",
+    "src/flows/dash/screens/PastChats.tsx",
     "src/flows/dash/screens/Returning.module.css",
     "src/flows/dash/screens/Returning.tsx",
     "src/flows/dash/screens/ReturningV2.module.css",
