@@ -233,6 +233,9 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-30 — **V18 · Create explained is the default** DASH version (was V7 · Pills); every other version stays in the dropdown.
+- 2026-10-30 — **V19 · Greeting** (id '23', new and returning users alike; `screens/HomeGreeting`): "Hey Rohan," and a big line on top ("Let's turn your trading ideas into something real today"), three small Create cards right under it (`BuildOption compact`: a pill that hugs its text, round 32 solid green icon with a white glyph, dashed border/intense edge), the plain chat field at the bottom ("Ask DASH anything"). A card types "Create a rule that " into the field, keyboard up; while typing the greeting and cards fade and the suggestions (FirstAsk) stack over the field. On landing the cards grow in from nothing (scale 0 → 1 from the left, no overshoot, 400ms each), the first at once, each next when the one above is halfway (`--app-dash-greet-*`). An earlier "shine border" landing animation is archived in `BuildOption.module.css` (`.shine`).
+- 2026-10-30 — Preview: a setting can float beside the phone mockup on chosen screens (`FlowOption.floatOn`, optional `floatValues`), centred on the phone. DASH version floats on `dash-02` and `stocks-01` with V18 and V19 as stacked chips (L3 Tabs, pill), the picked one black.
 - 2026-10-30 — **V17 · Heading explained** (id '21'): V15 with a quiet line under the heading saying what the picked kind is ("A rule is a limit you set on your trading. DASH holds you to it.").
 - 2026-10-30 — **V18 · Create explained** (id '22'): V15 whose dashed Create card says what the picked kind is ("A rule is a limit DASH keeps for you"), rising in when the kind changes, over "+ Create rule"; the dashed outline slowly travels round it (`--app-dash-march-duration`); a tap still starts one. The card is 32 narrower than a creation card, 16 between the line and "+ Create rule" (`components/ExplainCreateCard`).
 - 2026-10-30 — V15–V18: the heading is one greeting for every kind, "What do you want to create today?" (V14 keeps its flipping per-kind lines). V15's pills are 48 tall.
@@ -349,7 +352,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · V16 Explained (id 20) · V17 Heading explained (id 21) · V18 Create explained (id 22) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V18 · Create explained, id 22 (new user: Landing, big cards; returning: Returning home V2 — still orb and greeting, Rule · Indicator · Strategy pills, the Create card saying what the picked kind is) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V7 Pills (id 11) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · V16 Explained (id 20) · V17 Heading explained (id 21) · V19 Greeting (id 23) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -2019,6 +2022,152 @@ LD�"o"�F� h �#�6�5��L�&$�EIJ��uq;?�ѽ%:J��
   color: var(--l3-content-primary);
 }
 
+/* V19 · Greeting: compact — a pill that hugs its text (never wider than the screen; 12 left, 20 right, no chevron), a
+   round 32 solid green icon with a white 20 glyph. White in both themes (L3's inverted content turns black in dark).
+   A dashed edge (border/intense). On landing each card grows in from nothing (scale 0 → 1, from its left end, easing
+   out, never past full size), each starting when the one above is halfway (--app-dash-greet-step). (`scale`, not `transform`: L3's press scale keeps working.) */
+.option.compact {
+  position: relative;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  padding-block: var(--l3-spacing-08);
+  padding-inline: var(--l3-spacing-12) var(--l3-spacing-20);
+  border: 1px dashed var(--l3-border-intense); /* 1px: the dashed edge */
+  border-radius: var(--l3-radius-full); /* a full pill */
+  box-shadow: none; /* the dashed edge instead of the green ring */
+  transform-origin: left center;
+  animation: greet-pop var(--app-dash-greet-pop) var(--l3-motion-easing-decelerate) var(--greet-delay) both; /* no overshoot */
+}
+
+.option.compact { --greet-delay: var(--app-dash-greet-start); }
+.option.compact:nth-child(2) { --greet-delay: calc(var(--app-dash-greet-start) + var(--app-dash-greet-step)); }
+.option.compact:nth-child(3) { --greet-delay: calc(var(--app-dash-greet-start) + 2 * var(--app-dash-greet-step)); }
+
+@keyframes greet-pop {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option.compact {
+    animation: none;
+  }
+}
+
+/* ---- Archived 2026-10-30: the landing "shine border" (add the `shine` class to a compact card to bring it back) ----
+   The glow (none at rest): the DASH green on the left, the lime on the right; the dashed edge hides while it runs. */
+.option.compact.shine {
+  border-color: var(--greet-dash);
+  box-shadow:
+    calc(-1 * var(--l3-spacing-04)) var(--l3-spacing-02) var(--l3-spacing-16) color-mix(in srgb, var(--app-dash-union-edge-1) var(--greet-glow), transparent),
+    var(--l3-spacing-04) var(--l3-spacing-02) var(--l3-spacing-16) color-mix(in srgb, var(--app-dash-union-edge-3) var(--greet-glow), transparent);
+  animation: greet-glow var(--app-dash-greet-sweep) var(--l3-motion-easing-standard) var(--greet-delay) both;
+}
+
+/* The shine: a ring (masked to the outer edge), empty at rest. On landing a "shine border" runs once round
+   it: one bright streak (DASH green → lime → yellow) with a fading tail, one lap (--app-dash-greet-sweep), 2 thick;
+   over the lap's second half it fades and thins to nothing. */
+.option.compact.shine::before {
+  position: absolute;
+  inset: -1px; /* 1px: on the dashed border, not inside it */
+  padding: var(--greet-rim); /* the streak's thickness: 0 at rest, 2 while it runs */
+  border-radius: inherit;
+  background:
+    conic-gradient(
+      from var(--greet-angle),
+      transparent 0deg 150deg,
+      color-mix(in srgb, var(--app-dash-union-edge-1) calc(20% * var(--greet-on)), transparent) 220deg,
+      color-mix(in srgb, var(--app-dash-union-edge-1) calc(100% * var(--greet-on)), transparent) 290deg,
+      color-mix(in srgb, var(--app-dash-union-edge-3) calc(100% * var(--greet-on)), transparent) 335deg,
+      color-mix(in srgb, var(--app-dash-union-edge-2) calc(100% * var(--greet-on)), transparent) 360deg
+    );
+  content: '';
+  pointer-events: none;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); /* #000: mask alpha, not a colour */
+  animation: greet-edge var(--app-dash-greet-sweep) var(--l3-motion-easing-standard) var(--greet-delay) both;
+}
+
+@property --greet-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* 1 = the streak shows, 0 = none (the dashed edge alone) */
+@property --greet-on {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --greet-rim {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px; /* none at rest (the dashed edge shows) */
+}
+
+@property --greet-dash {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --greet-glow {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@keyframes greet-edge {
+  0% { --greet-angle: 0deg; --greet-on: 0; --greet-rim: 0px; }
+  12% { --greet-on: 1; --greet-rim: var(--l3-spacing-02); }
+  50% { --greet-on: 1; --greet-rim: var(--l3-spacing-02); }
+  /* the second half: the streak melts away — it fades and its rim thins to nothing as it finishes the lap */
+  100% { --greet-angle: 360deg; --greet-on: 0; --greet-rim: 0px; }
+}
+
+@keyframes greet-glow {
+  0% { --greet-glow: 0%; --greet-dash: var(--l3-border-intense); }
+  12% { --greet-dash: transparent; }
+  40% { --greet-glow: 50%; }
+  /* the dashed edge comes back as the streak melts (a cross-fade, no snap) */
+  55% { --greet-dash: transparent; }
+  100% { --greet-glow: 0%; --greet-dash: var(--l3-border-intense); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option.compact,
+  .option.compact.shine::before {
+    animation: none;
+  }
+
+  .option.compact {
+    --greet-dash: var(--l3-border-intense);
+  }
+}
+
+/* ---- end of the archived shine ---- */
+
+.option.compact .tile {
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  border-radius: var(--l3-radius-full); /* a round icon */
+  background: var(--l3-surface-accent-success-default);
+  color: var(--l3-base-neutral-white-base);
+}
+
+.option.compact .description {
+  margin-top: var(--l3-spacing-02);
+}
+
+.option.compact .glyph.glyph {
+  width: var(--l3-size-20);
+  height: var(--l3-size-20);
+}
+
 /* DASH: hover and press tint the card with the DASH orb green at 10% instead of L3's grey state layer (designer's call,
    2026-10-23). The card keeps its press scale. */
 @media (hover: hover) {
@@ -2048,24 +2197,27 @@ type BuildOptionProps = {
   title: string
   description: string
   onClick?: () => void
+  /** V19 · Greeting: a smaller card that hugs its text (40 tile, no chevron), as a row under the heading. */
+  compact?: boolean
 }
 
 /**
  * "Choose what to build" on the DASH landing: one option per L3 clickable Card — an icon tile, the name, one line on
  * what it does, a chevron. DASH style on the card: its edge in the DASH green at 50% (Figma: lime 1px stroke).
  */
-export function BuildOption({ icon, title, description, onClick }: BuildOptionProps) {
+export function BuildOption({ icon, title, description, onClick, compact = false }: BuildOptionProps) {
   return (
-    <Card onClick={onClick} className={styles.option}>
+    <Card onClick={onClick} className={compact ? `${styles.option} ${styles.compact}` : styles.option}>
       <Stack direction="horizontal" align="center" gap="12">
         <span className={styles.tile} aria-hidden="true">
           <Icon icon={icon} size={24} className={styles.glyph} />
         </span>
-        <Stack gap="04" className={styles.text}>
+        {/* compact (V19): the name and its line 2 apart (L3 Stack has no 2 step: the line's own top margin) */}
+        <Stack gap={compact ? '00' : '04'} className={styles.text}>
           <span className={styles.title}>{title}</span>
           <span className={styles.description}>{description}</span>
         </Stack>
-        <Icon icon={msChevronRight} size={24} className={styles.chevron} />
+        {!compact && <Icon icon={msChevronRight} size={24} className={styles.chevron} />}
       </Stack>
     </Card>
   )
@@ -4320,8 +4472,9 @@ const words = (s: string) => s.toLowerCase().replace(/[^a-z0-9₹%\s]/g, ' ').sp
  * comes from the opening words (Create typed them), the chat's kind, or — on the home — whichever match best.
  */
 function LiveAsk({ kind, text, onPick }: { kind: FirstAskKind; text: string; onPick: (text: string) => void }) {
-  // The opening words a Create typed ("Build an Ai rule that", or the row's "Build a rule that"): they set the kind.
-  const openings = (k: CreationKind) => [t(`home9.start.${k}`), t(`home3.start.${k}`)].map((o) => o.trim())
+  // The opening words a Create typed ("Build an Ai rule that", the row's "Build a rule that", V19's "Create a rule
+  // that"): they set the kind.
+  const openings = (k: CreationKind) => [t(`home9.start.${k}`), t(`home3.start.${k}`), t(`home19.start.${k}`)].map((o) => o.trim())
   const opening = KINDS.flatMap((k) => openings(k).map((o) => ({ k, o }))).find(({ o }) => text.toLowerCase().startsWith(o.toLowerCase()))
   const started = opening?.k
   const kinds = started ? [started] : kind === 'home' ? KINDS : [kind]
@@ -8536,11 +8689,12 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '20', label: 'V16 · Explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillSubLabels: true },
   { value: '21', label: 'V17 · Heading explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillLabel14: true, headingExplainer: true },
   { value: '22', label: 'V18 · Create explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillLabel14: true, createExplainer: true },
+  { value: '23', label: 'V19 · Greeting', field: 'plain', barTitle: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
-/** The setting's default: V7 · Pills (since 2026-10-30; V2 · Pills before it was archived). */
-export const defaultDashVersion = '11'
+/** The setting's default: V18 · Create explained (since 2026-10-30; V7 · Pills before it, V2 · Pills before that). */
+export const defaultDashVersion = '22'
 
 export const dashVersionInfo = (value: string) => dashVersions.find((v) => v.value === value) ?? dashVersions.find((v) => v.value === defaultDashVersion)!
 
@@ -9164,6 +9318,19 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home14.lead.indicator": "Tell me what you watch, I’ll chart it",
   "home14.lead.strategy": "Tell me your idea, I’ll build and test it",
   "home15.greeting": "What do you want to create today?",
+  "home19.greeting": "Hey {name},",
+  "home19.title": "Let’s turn your trading ideas into something real today",
+  "home19.cards": "Create with DASH",
+  "home19.ruleTitle": "Create a rule",
+  "home19.ruleDescription": "Set a limit, DASH holds you to it",
+  "home19.indicatorTitle": "Create an indicator",
+  "home19.indicatorDescription": "Describe a signal, DASH charts it",
+  "home19.strategyTitle": "Create a strategy",
+  "home19.strategyDescription": "Say when to buy and sell, DASH tests it",
+  "home19.placeholder": "Ask DASH anything",
+  "home19.start.rule": "Create a rule that ",
+  "home19.start.indicator": "Create an indicator that ",
+  "home19.start.strategy": "Create a strategy that ",
   "home14.rule1": "“Stop me after 3 losses”",
   "home14.rule2": "“Don’t let me lose over ₹5,000 a day”",
   "home14.rule3": "“Don’t let me trade after 3 PM”",
@@ -9787,7 +9954,10 @@ export const dash: Flow = {
   options: [
     // DASH version (dropdown — there will be many): the whole home experience, homes + chat input style. The list is in
     // components/dashVersion.ts (+ its homes in screens/homes.tsx). Hidden ones (Combined) stay in the code, off the panel.
-    { id: 'dashVersion', group: 'Home', icon: msHome, label: 'DASH version', picker: 'dropdown', values: dashVersions.filter((v) => !v.hidden).map(({ value, label }) => ({ value, label })), default: defaultDashVersion },
+    { id: 'dashVersion', group: 'Home', icon: msHome, label: 'DASH version', picker: 'dropdown', values: dashVersions.filter((v) => !v.hidden).map(({ value, label }) => ({ value, label })), default: defaultDashVersion,
+      // Beside the phone on the DASH home and the Stocks home (where DASH opens from), to switch quickly between the
+      // latest two (V18 · Create explained, V19 · Greeting); the panel keeps every version.
+      floatOn: ['dash-02', 'stocks-01'], floatValues: ['22', '23'] },
     // Who is using DASH — every version reads it (useDashUser) and adapts its cards.
     { id: 'user', group: 'Home', icon: msPerson, label: 'New user', picker: 'toggle', values: [{ value: 'returning', label: 'Returning user' }, { value: 'new', label: 'New user' }], default: 'returning' },
     // A returning user: what they've made so far. A made kind shows its numbers / cards; the others are promoted.
@@ -11325,6 +11495,139 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
         </Inset>
       </div>
       {kb.keyboard}
+      </DashDock>
+    </div>
+  )
+}
+```
+
+### `src/flows/dash/screens/HomeGreeting.module.css`
+
+```css
+/* V19 · Greeting: the greeting on top, the Create cards under it, the field at the bottom; scrolls if the screen is short. */
+.scene {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: var(--l3-spacing-24) var(--l3-spacing-08);
+}
+
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.body {
+  flex: 1;
+  min-height: min-content;
+}
+
+.body {
+  transition: opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.body[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.greeting {
+  margin: 0;
+  font: var(--l3-text-label-16);
+  color: var(--l3-content-secondary);
+}
+
+.title {
+  margin: 0;
+  font: var(--l3-text-heading-24);
+  color: var(--l3-content-primary);
+  text-wrap: balance;
+}
+
+.dock {
+  flex: none;
+}
+```
+
+### `src/flows/dash/screens/HomeGreeting.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
+import { msAssignmentAdd, msFunction, msMonitoring } from '@l3/icons/material'
+import { BuildOption } from '../components/BuildOption'
+import { ChatInput } from '../components/Chat'
+import { DashDock } from '../components/DashDock'
+import type { CreationKind } from '../components/dashVersion'
+import { FirstAsk } from '../components/FirstAsk'
+import { useHomeKeyboard } from '../components/homeKeyboard'
+import { usePineUpload } from '../components/pineUpload'
+import { t } from '../copy'
+import { firstName } from '../data'
+import type { ReturningProps } from './Returning'
+import styles from './HomeGreeting.module.css'
+
+/**
+ * DASH V19 · Greeting — one simple home for new and returning users: a personal greeting on top ("Hey Kirtanya," and
+ * a big line under it), three small Create cards right under it (icon, name, one line, DASH green edge; each hugs its
+ * text), the chat field at the bottom. A card types its opening words into the field ("Create a rule that "), keyboard
+ * up; while the first message is typed the greeting and cards step away and suggestions stack over the field (FirstAsk).
+ */
+export function HomeGreetingScene({ onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
+  const kb = useHomeKeyboard({ typing, onTyping })
+  const pine = usePineUpload(onIndicator)
+  // The field (prototype): the kind a card started goes to its chat; otherwise a request about charts goes to the
+  // indicator chat, anything else to rules.
+  const [kind, setKind] = useState<CreationKind | undefined>()
+  const ask = (text: string) => {
+    const k = kind && text.startsWith(t(`home19.start.${kind}`).trim()) ? kind : /indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? 'indicator' : 'rule'
+    return k === 'indicator' ? onIndicator?.() : k === 'strategy' ? onStrategy?.() : onRules?.()
+  }
+  // A card: its opening words go into the field ("Create a rule that "), keyboard up — the suggestions take over.
+  const start = (k: CreationKind) => {
+    setKind(k)
+    kb.field.onChange(t(`home19.start.${k}`))
+    kb.field.onFocus()
+  }
+  return (
+    <div className={styles.scene}>
+      <div className={styles.scroll} onClick={kb.close}>
+        <Inset paddingInline="16" className={styles.page}>
+          {/* Typing: the greeting and the cards step away (the field and its suggestions take over). */}
+          <Stack gap="32" className={styles.body} data-hidden={typing || undefined}>
+            <Stack as="header" gap="08">
+              <p className={styles.greeting}>{t('home19.greeting', { name: firstName })}</p>
+              <h1 className={styles.title}>{t('home19.title')}</h1>
+            </Stack>
+            <Stack as="section" gap="12" align="start" aria-label={t('home19.cards')}>
+              <BuildOption icon={msAssignmentAdd} title={t('home19.ruleTitle')} description={t('home19.ruleDescription')} onClick={() => start('rule')} compact />
+              <BuildOption icon={msMonitoring} title={t('home19.indicatorTitle')} description={t('home19.indicatorDescription')} onClick={() => start('indicator')} compact />
+              <BuildOption icon={msFunction} title={t('home19.strategyTitle')} description={t('home19.strategyDescription')} onClick={() => start('strategy')} compact />
+            </Stack>
+          </Stack>
+        </Inset>
+      </div>
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
+        <div className={styles.dock}>
+          <Inset paddingInline="16" paddingBlock="16">
+            {typing && <FirstAsk kind="home" mode={kind} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} />}
+            <ChatInput firstMessage {...kb.field} onSend={kb.sending(ask)} placeholder={t('home19.placeholder')} onAttach={pine.onAttach} />
+            {pine.ui}
+          </Inset>
+        </div>
+        {kb.keyboard}
       </DashDock>
     </div>
   )
@@ -14737,6 +15040,7 @@ import { type ReturningProps } from './Returning'
 import { ReturningV2Scene } from './ReturningV2'
 import { HomeTabsScene } from './HomeTabs'
 import { HomeCenterScene } from './HomeCenter'
+import { HomeGreetingScene } from './HomeGreeting'
 
 /**
  * Each DASH version's homes (setting "DASH version"; the list, labels and chat input are in components/dashVersion.ts,
@@ -14792,6 +15096,8 @@ export const homeScenes: Record<string, HomeScenes> = {
   '21': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   // V18 · Create explained: V15 whose Create card flips through what the picked kind is (still a Create button).
   '22': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V19 · Greeting: "Hey Kirtanya," and a big line on top, the three Create cards at the bottom, the field under them.
+  '23': { newUser: HomeGreetingScene, returning: HomeGreetingScene },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```

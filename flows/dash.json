@@ -467,6 +467,8 @@
     "src/flows/dash/screens/HomeCenter.tsx",
     "src/flows/dash/screens/HomeCombined.module.css",
     "src/flows/dash/screens/HomeCombined.tsx",
+    "src/flows/dash/screens/HomeGreeting.module.css",
+    "src/flows/dash/screens/HomeGreeting.tsx",
     "src/flows/dash/screens/HomeTabs.module.css",
     "src/flows/dash/screens/HomeTabs.tsx",
     "src/flows/dash/screens/HomeV9.module.css",
