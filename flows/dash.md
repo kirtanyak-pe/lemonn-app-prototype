@@ -239,7 +239,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 - 2026-10-29 — The chat field grows with its text, like other chat boxes: a text area, one line → up to three, then it scrolls inside (CSS `max-height: 3lh`; ChatInput sets the height). Enter sends, Shift + Enter makes a new line. In the one-row field (V7 · Pills) the + and Send stay at the bottom, beside the last line.
 - 2026-10-29 — **Glass settings** (group Glass, sliders): Glass opacity 0–100% (step 5, default 80) and Glass blur 0–40px (default 16) drive every see-through surface — V5 · Cards' cards, V6 · Creations' card and the see-through docks (the dock blurs only when the blur isn't the default). Set on the DASH frame as `--dash-glass-alpha` / `--dash-glass-blur`. The preview's phone screen is now also clipped with a rounded clip-path, so blurred glass can't paint square corners past the screen's round ones (a Chrome quirk). App L3 copy moved to Button 1.9.2.
 - 2026-10-30 — DASH top bar: action buttons are always round (`.bar` in DashScreen.module.css sets `--btn-radius` to full; L3's small Tertiary is radius 8). L3 gap: Actionbar actions have no round option.
-- 2026-10-30 — V5 · Cards: the title is “How can I help you today?” (Heading/24, one line) and the time-of-day greeting (“Good morning, Rohan”) is gone.
+- 2026-10-30 — V5 · Cards: the title is “How can I help you today?” (Heading/24, one line); the time-of-day greeting (“Good morning, Rohan”) shows above it only when there's nothing to resume (Resume chats off, or no drafts).
 - 2026-10-30 — **Past chats is a sheet.** The history button, View all on drafts and the chat ⋮ open Past chats as a bottom sheet over DASH (dash-30 = the home with it open): half the screen at first, tall once the list is scrolled or swiped up. Hold a row → a small Delete this chat menu → the confirmation sheet → back to the list. New setting **Past chats**: With chats / Empty (L3 empty state; no drafts on the home either). Long press is one hook (`components/longPress`) shared with the compact resume card. Prototype floating buttons: 24 disc in a 48 touch area, never overlapping.
 - 2026-10-30 — **Your creations: three cards, then View all.** The home's creations row shows at most 3 (picked kind first), then a narrow “View all” card (“N more” when some are left out) that opens the full page (`HOME_CREATIONS` in ReturningV2).
 - 2026-10-30 — **Chat menu + Delete chat; drafts only upfront.** Once a chat has started the top bar's history + creations become one ⋮ dropdown (Past chats · Your creations · Delete this chat). Delete this chat confirms with a checkbox "Also delete what this chat created" (off by default; covers every creation of the chat, any kind). Pick up where you left off now comes from `pastChats` with `saved: false` only — saved chats never show upfront. Resume and Past chats avatar icons in content/primary; the compact card's green line reads “Draft · Edited 2 hr ago”. Past chats rows: no kind icon or Rule / Indicator word (a chat can make mixed things) — the title and when; drafts show the same green “Draft · Edited …”. The ⋮ no longer shows L3's pressed (dark) edge while its dropdown is open; app-wide, focus rings show only for keyboard navigation (`src/global.css`: `:focus:not(:focus-visible)`).
@@ -8726,6 +8726,9 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "firstAsk.strategy.2": "Scalp the 5-min EMA cross",
   "firstAsk.strategy.3": "Buy the dip after a 3% fall",
   "firstAsk.strategy.4": "Exit at 2% profit or 1% loss",
+  "home9.greeting.morning": "Good morning, {name}",
+  "home9.greeting.afternoon": "Good afternoon, {name}",
+  "home9.greeting.evening": "Good evening, {name}",
   "home9.title": "How can I help you today?",
   "home9.cardsLabel": "What DASH builds",
   "home9.name.rule": "Ai rules",
@@ -10125,6 +10128,12 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
   pointer-events: none;
 }
 
+.greeting {
+  margin: 0;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-heading-16);
+}
+
 .title {
   margin: 0;
   color: var(--l3-content-primary);
@@ -10296,9 +10305,15 @@ import { useHomeKeyboard } from '../components/homeKeyboard'
 import { usePineUpload } from '../components/pineUpload'
 import { ResumeDrafts, useResumeDrafts } from '../components/ResumeDrafts'
 import { t } from '../copy'
-import { dashRules, savedIndicators } from '../data'
+import { dashRules, firstName, savedIndicators } from '../data'
 import type { ReturningProps } from './Returning'
 import styles from './HomeV9.module.css'
+
+/** The greeting by the time of day. */
+const partOfDay = () => {
+  const h = new Date().getHours()
+  return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'
+}
 
 const KINDS: { kind: CreationKind; icon: typeof msRule }[] = [
   { kind: 'rule', icon: msRule },
@@ -10388,13 +10403,17 @@ export function HomeV9Scene({ returning, onManage, onPastChats, onOpenRule, onOp
     <div className={styles.scene}>
       <div className={styles.scroll} onClick={kb.close}>
         <Inset paddingInline="16" className={styles.page}>
-          {/* Top: the orb, then the title (left-aligned; no time-of-day greeting). */}
+          {/* Top: the orb, then the greeting (no drafts only) and the title, left-aligned. */}
           {/* Typing: the header steps away (the field, the cards and the glow take over). */}
           {/* Resume chats (setting, off by default): the drafts under the title, stepping away with it. */}
           <Stack gap="32" className={styles.header} data-hidden={typing || undefined}>
             <Stack gap="16">
               <DashOrb size="md" />
-              <h1 className={styles.title}>{t('home9.title')}</h1>
+              {/* The time-of-day greeting only while there's nothing to resume (Resume chats off, or no drafts). */}
+              <Stack gap="04">
+                {drafts.length === 0 && <p className={styles.greeting}>{t(`home9.greeting.${partOfDay()}`, { name: firstName })}</p>}
+                <h1 className={styles.title}>{t('home9.title')}</h1>
+              </Stack>
             </Stack>
             <ResumeDrafts drafts={drafts} onViewAll={onPastChats} onOpen={(kind) => (kind === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
           </Stack>
