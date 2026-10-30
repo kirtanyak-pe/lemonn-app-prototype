@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — **V16 · Explained** (id '20'): V15 with a small explainer line inside each kind pill — "Limits your trades" · "Chart signals" · "When to buy & sell" (L3 Tab `subLabel`, set to Label/10); pills 44 (`--app-dash-pill-explained`), names in capitals, no 4 ring round the pills, a count (Pill counts) on the name's line. New settings group **Pills**: **Pill height** (0 = the version's own, 24–64) and **Pill corner radius** (0–32; the pills, the thumb and the track share it).
 - 2026-10-31 — V14 / V15: the row under the pills is only the picked kind — its creations, or (nothing made, e.g. Strategy) the Create card then the "Try" suggestions (a tap types it in). V15's orb is 48 and sits 24 above the heading; the heading sits 32 above the pills.
 - 2026-10-31 — Setting **Big pills** (every version, A/B): the Rule · Indicator · Strategy pills 8 taller (32 → 40), fully round. V15: the small orb sits 4 right of centre and is still (its animation paused).
 - 2026-10-31 — **V14 · Clean and V15 · Clean still** (ids '18', '19'; from V10 · Heading, after senior feedback — a calmer middle):
@@ -342,7 +343,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V7 · Pills, id 11 (new user: Landing, big cards; returning: Returning home V2 with the Create pills over the dock) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · V16 Explained (id 20) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -7872,6 +7873,76 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
   border-radius: var(--l3-radius-full);
 }
 
+/* V16 · Explained: room for the second line — pills 44 tall, the sub-label Label/10 (L3's is 8: too small to read). */
+.track[data-explained] .tabs.tabs [role='tab'][role='tab'][role='tab'] {
+  --tab-height: var(--app-dash-pill-explained);
+  --tab-padding-block: var(--l3-spacing-04);
+}
+
+/* …and no 4 ring round the pills (the track's padding): they fill the track, the thumb its full height. */
+.track[data-explained] .tabs.tabs {
+  padding: 0;
+}
+
+.track[data-explained] .thumb {
+  top: 0;
+  bottom: 0;
+}
+
+/* …the count (setting "Pill counts") on the name's line, the explainer under both (L3 puts the badge after the
+   two-line label, which reads oddly): the tab's parts wrap — name + count centred on top, the explainer a full line. */
+.track[data-explained] [role='tab'][role='tab'] {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  column-gap: var(--l3-spacing-04);
+  row-gap: 0;
+}
+
+.track[data-explained] [role='tab'] > [class*='_label_'] {
+  display: contents;
+}
+
+/* …the names in capitals (a little tracking so the caps breathe). */
+.track[data-explained] [role='tab'] [class*='_labelText_'] {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.track[data-explained] [role='tab'] [class*='_subLabel_'] {
+  order: 1;
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.track[data-explained] [role='tab'] [class*='subLabel'] {
+  font: var(--l3-text-label-10);
+  opacity: var(--l3-opacity-80); /* quieter than the name */
+}
+
+/* Settings "Pill height" / "Pill corner radius": the track, the thumb and every pill share one radius; a set height
+   overrides the version's own (the tabs' height; the thumb spans it). */
+.track,
+.track .thumb {
+  border-radius: var(--pill-radius, var(--l3-radius-full));
+}
+
+.track .tabs.tabs [role='tab'][role='tab'][role='tab'][role='tab'] {
+  --tab-radius: var(--pill-radius, var(--l3-radius-full));
+  border-radius: var(--pill-radius, var(--l3-radius-full));
+}
+
+.track .tabs.tabs {
+  border-radius: var(--pill-radius, var(--l3-radius-full));
+}
+
+.track[data-height] .tabs.tabs [role='tab'][role='tab'][role='tab'] {
+  --tab-height: var(--pill-height);
+  height: var(--pill-height);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .thumb[data-ready='yes'],
   .tabs [role='tab'] {
@@ -7894,14 +7965,15 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
 ### `src/flows/dash/components/SlidingPills.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { Badge } from '@l3/components/Badge'
 import { Icon } from '@l3/components/Icon'
 import { Tabs } from '@l3/components/Tabs'
 import { msFunction, msMonitoring, msRule } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { dashRules, savedIndicators } from '../data'
-import { useDashUser } from './dashVersion'
+import { useDashUser, useDashVersion } from './dashVersion'
+import { t } from '../copy'
 import styles from './SlidingPills.module.css'
 
 /** Setting "Pill icons": each kind's icon before its name (the same marks as V5 · Cards' cards). */
@@ -7946,6 +8018,15 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
   const icons = useFlowOption('dash', 'pillIcons', 'off') === 'on'
   // Setting "Big pills" (A/B): the pills 8 taller (40), still fully round.
   const big = useFlowOption('dash', 'pillBig', 'off') === 'on'
+  // Settings "Pill height" (0 = this version's own) and "Pill corner radius" (pills, thumb and track alike).
+  const height = Number(useFlowOption('dash', 'pillHeight', '0'))
+  const radius = Number(useFlowOption('dash', 'pillRadius', '32'))
+  const shape = {
+    ...(height >= 24 ? { '--pill-height': `${height}px` } : {}),
+    '--pill-radius': `${radius}px`,
+  } as CSSProperties
+  // V16 · Explained: a small second line in each kind pill — what it is.
+  const explained = !!useDashVersion().pillSubLabels
   // The thumb re-measures when counts come or go (they change the pills' widths).
   const countsOn = useFlowOption('dash', 'pillCounts', 'off') === 'on'
   const track = useRef<HTMLSpanElement>(null)
@@ -7963,16 +8044,17 @@ export function SlidingPills({ value, items, onChange, label, newLabel, fill = f
       first.current = false
       requestAnimationFrame(() => { el.dataset.ready = 'yes' })
     }
-  }, [value, fill, icons, countsOn, big, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
+  }, [value, fill, icons, countsOn, big, explained, height, items.map((i) => i.value).join('|')]) // also when the pills themselves change (3 → 1 once a chat starts)
   const count = usePillCount()
   const withBadges = items.map(({ isNew, ...item }) => ({
     ...item,
     ...(icons && KIND_ICONS[item.value] ? { iconLeft: <Icon icon={KIND_ICONS[item.value]} size={16} /> } : {}),
+    ...(explained && KIND_ICONS[item.value] ? { subLabel: t(`pillSub.${item.value as 'rule' | 'indicator' | 'strategy'}`) } : {}),
     // A New dot wins over a count; a count only on the unpicked pills (setting "Pill counts").
     ...(isNew ? { badge: <Badge dot color="discover" label={newLabel} /> as ReactNode } : count(item.value, item.value === value) ? { badge: count(item.value, item.value === value) } : {}),
   }))
   return (
-    <span ref={track} className={styles.track} data-fill={fill || undefined} data-big={big || undefined}>
+    <span ref={track} className={styles.track} data-fill={fill || undefined} data-big={big || undefined} data-explained={explained || undefined} data-height={height >= 24 || undefined} style={shape}>
       <span ref={thumb} className={styles.thumb} data-raised="strong" aria-hidden="true" />
       <Tabs aria-label={label} appearance="pill-group" behavior="toggle" size="md" width={fill ? 'fill' : 'hug'} items={withBadges} value={value} onChange={onChange} className={styles.tabs} />
     </span>
@@ -8297,6 +8379,8 @@ export type DashVersionInfo = {
   /** V15 · Clean (still): as V14, but the heading stays put — a small DASH orb over "Tell me a habit, I'll make it a
    *  rule" (follows the pick), no flipping examples. */
   stillHeading?: boolean
+  /** V16 · Explained (V15 + this): a small second line inside each kind pill saying what it is ("Limits your trades"). */
+  pillSubLabels?: boolean
 }
 
 // The dropdown numbers the shown versions in order (V1–V6); `value` stays the original id (picks are saved under it,
@@ -8323,6 +8407,7 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '17', label: 'V13 · Center pills', field: 'switch', firstSuggestions: true, edgeTurn: true },
   { value: '18', label: 'V14 · Clean', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true },
   { value: '19', label: 'V15 · Clean still', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true },
+  { value: '20', label: 'V16 · Explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillSubLabels: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -8944,6 +9029,9 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
 {
   "landing.menu": "Your creations",
   "landing.barTitle": "DASH AI",
+  "pillSub.rule": "Limits your trades",
+  "pillSub.indicator": "Chart signals",
+  "pillSub.strategy": "When to buy & sell",
   "home14.lead.rule": "Tell me a habit, I’ll make it a rule",
   "home14.lead.indicator": "Tell me what you watch, I’ll chart it",
   "home14.lead.strategy": "Tell me your idea, I’ll build and test it",
@@ -9581,6 +9669,10 @@ export const dash: Flow = {
     { id: 'pillCounts', group: 'Home', icon: msLabel, label: 'Pill counts', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
     // Every version (A/B): the Rule · Indicator · Strategy pills 8 taller (40), fully round.
     { id: 'pillBig', group: 'Home', icon: msViewAgenda, label: 'Big pills', picker: 'toggle', values: [{ value: 'off', label: 'Off' }, { value: 'on', label: 'On' }], default: 'off' },
+    // Every version (experiments): the kind pills' height (0 = the version's own) and corner radius — the pills, the
+    // thumb and the track share the radius.
+    { id: 'pillHeight', group: 'Pills', icon: msViewAgenda, label: 'Pill height', picker: 'slider', range: { min: 0, max: 64, step: 2, unit: 'px' }, values: [], default: '0' },
+    { id: 'pillRadius', group: 'Pills', icon: msViewAgenda, label: 'Pill corner radius', picker: 'slider', range: { min: 0, max: 32, step: 1, unit: 'px' }, values: [], default: '32' },
     // V9 · Switch: the Rule · Indicator · Strategy toggle inside the field (top row) or just above it, outside.
     { id: 'switchOutside', showIf: { dashVersion: ['13'] }, group: 'Home', icon: msViewAgenda, label: 'Switch outside', picker: 'toggle', values: [{ value: 'off', label: 'Inside' }, { value: 'on', label: 'Outside' }], default: 'off' },
     // Past chats sheet: With chats (the sample history) or Empty (the empty state; no drafts on the home either).
@@ -14531,6 +14623,8 @@ export const homeScenes: Record<string, HomeScenes> = {
   '18': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   // V15 · Clean still: V14 with a small orb over a still heading ("Tell me a habit, I'll make it a rule").
   '19': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
+  // V16 · Explained: V15 with a small line inside each kind pill saying what it is.
+  '20': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
