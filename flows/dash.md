@@ -233,6 +233,7 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — V8 · Tabs: nothing of the tab's kind made yet (Strategy, for now) → the "Try" suggestion cards follow the Create card in the row (a tap types it in).
 - 2026-10-31 — Fix: V12 / V13 · Center don't scroll — the page fits the screen exactly (the held page height less the dock's room) and its scroll is locked, so nothing slides past the centred field.
 - 2026-10-31 — Setting **Pill counts** (every version, A/B; off by default): a tiny neutral count on each unpicked Rule · Indicator · Strategy pill / ribbon tab — how many of that kind are made (none → no tag; `usePillCount` in SlidingPills). **V10 · Heading:** the pills under the question are full width (three equal). **V8 · Tabs:** one row only — "Your creations": "+ Create <kind>" (follows the top tab) then that kind's cards; the "Start a …" row with the Try examples is gone.
 - 2026-10-31 — Fix: V8 · Tabs' top-bar pills — the picked one's black thumb was hidden under a leftover white fill on the pill list; the white track now comes only from `--pills-track`.
@@ -11013,7 +11014,7 @@ import { Inset } from '@l3/components/Inset'
 import { raised } from '@l3/components/Raised'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
-import { msAdd, msChevronRight } from '@l3/icons/material'
+import { msAdd, msChevronRight, msLightbulb } from '@l3/icons/material'
 import { DashOrb } from '../../../shared/ui/dash/DashOrb'
 import { ChatInput } from '../components/Chat'
 import { DashDock } from '../components/DashDock'
@@ -11032,6 +11033,13 @@ import type { ReturningProps } from './Returning'
 import cards from './ReturningV2.module.css'
 import styles from './HomeTabs.module.css'
 
+/** Nothing of the tab's kind made yet: these to try, after the Create card (the "Try" cards of the other homes). */
+const EXAMPLES = {
+  rule: ['home3.ex.rule1', 'home3.ex.rule2', 'home3.ex.rule3'],
+  indicator: ['home3.ex.indicator1', 'home3.ex.indicator2', 'home3.ex.indicator3'],
+  strategy: ['home3.ex.strategy1', 'home3.ex.strategy2', 'home3.ex.strategy3'],
+} as const
+
 /** Made ones shown before View all. */
 const MAX_MADE = 3
 
@@ -11042,7 +11050,8 @@ const MAX_MADE = 3
  * 1. the header, centred: the DASH orb, "Hey Rohan," and a question for that kind;
  * 2. Pick up where you left off — that kind's drafts only (setting "Resume chats");
  * 3. Your creations — one row: "+ Create <kind>" (follows the tab; types the opening words), then what's been made
- *    of that kind (3, then View all → history on that tab); a card opens its details sheet;
+ *    of that kind (3, then View all → history on that tab); a card opens its details sheet. Nothing of that kind made
+ *    yet (strategies, for now): "Try" suggestion cards after the Create card (a tap types it in);
  * 5. the plain floating field (no pills): its placeholder and where Send goes follow the tab; + uploads a Pine Script.
  *    Active (typing): the body steps away and suggestions for the tab show over the field (FirstAsk), as in V7.
  */
@@ -11118,6 +11127,16 @@ export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator
                   <span className={cards.itemTitle}>{t(`home3.create.${kind}`)}</span>
                 </button>
                 {kind !== 'strategy' && items.slice(0, MAX_MADE).map((item) => card(item, kind))}
+                {/* Nothing of this kind made yet (strategies, for now): suggestions to try — a tap types it in. */}
+                {(kind === 'strategy' || items.length === 0) && EXAMPLES[kind].map((key) => (
+                  <button key={key} type="button" role="listitem" className={cards.item} onClick={() => start(t(key))}>
+                    <span className={cards.itemTop}>
+                      <span className={cards.tryLabel}><Icon icon={msLightbulb} size={12} />{t('home3.try')}</span>
+                      <Icon icon={msChevronRight} size={16} />
+                    </span>
+                    <span className={cards.itemTitle}>{t(key)}</span>
+                  </button>
+                ))}
               </div>
             </Stack>
           </Stack>
