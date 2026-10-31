@@ -233,6 +233,9 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-10-31 — **V20 · Tiles** (id '24', new and returning users alike; `screens/HomeTiles`): "How can I help you trade today?" (centred), three Create tiles in a sideways row that runs past the screen's edge (V19's card as a tile: dashed outline, round solid green icon, "Create a rule · Set a limit, DASH holds you to it"; 152 wide, `--app-dash-v20-tile`), Your creations as on V3 · Dock (sideways row of the three most active, details sheet, View all card), the chat field at the bottom; the content is centred on the page. A tile types "Create a … that " with suggestions over the field (the rest fades). On entry the question, each tile and Your creations rise in, 200ms apart. In the floating switcher with V18 and V19.
+- 2026-10-31 — V19 · Greeting: the cards rise in from below (the scale pop is archived as `.pop`), with V18's dashed outline (6 on 4 off, still; `BuildOption` compact draws it). A fourth card **Your creations** ("10 made with DASH so far", light green icon) opens the creations page, once something is made.
+- 2026-10-31 — V18 · Create explained: the Create card plays a light inner glow once as it appears (the DASH gradient turning round inside its edge, 12 deep, fading; `--app-dash-explain-glow`), then is static. Creation cards read kind + › / status / name. The Create card is never shorter than a creation card (`--app-dash-v18-card`), so the centred page doesn't shift between kinds. View all from a one-kind row (V14–V18) opens the creations page on that kind's tab.
 - 2026-10-30 — **V18 · Create explained is the default** DASH version (was V7 · Pills); every other version stays in the dropdown.
 - 2026-10-30 — **V19 · Greeting** (id '23', new and returning users alike; `screens/HomeGreeting`): "Hey Rohan," and a big line on top ("Let's turn your trading ideas into something real today"), three small Create cards right under it (`BuildOption compact`: a pill that hugs its text, round 32 solid green icon with a white glyph, dashed border/intense edge), the plain chat field at the bottom ("Ask DASH anything"). A card types "Create a rule that " into the field, keyboard up; while typing the greeting and cards fade and the suggestions (FirstAsk) stack over the field. On landing the cards grow in from nothing (scale 0 → 1 from the left, no overshoot, 400ms each), the first at once, each next when the one above is halfway (`--app-dash-greet-*`). An earlier "shine border" landing animation is archived in `BuildOption.module.css` (`.shine`).
 - 2026-10-30 — Preview: a setting can float beside the phone mockup on chosen screens (`FlowOption.floatOn`, optional `floatValues`), centred on the phone. DASH version floats on `dash-02` and `stocks-01` with V18 and V19 as stacked chips (L3 Tabs, pill), the picked one black.
@@ -352,7 +355,7 @@ the product team tells you otherwise; the other values are experiments.
 
 | Setting | Build (default) | Other values (don't build unless asked) |
 |---|---|---|
-| DASH version | V18 · Create explained, id 22 (new user: Landing, big cards; returning: Returning home V2 — still orb and greeting, Rule · Indicator · Strategy pills, the Create card saying what the picked kind is) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V7 Pills (id 11) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · V16 Explained (id 20) · V17 Heading explained (id 21) · V19 Greeting (id 23) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
+| DASH version | V18 · Create explained, id 22 (new user: Landing, big cards; returning: Returning home V2 — still orb and greeting, Rule · Indicator · Strategy pills, the Create card saying what the picked kind is) | V3 Dock (id 7) · V4 Floating (id 8) · V5 Cards (id 9) · V6 Creations (id 10) · V7 Pills (id 11) · V8 Tabs (id 12, returning user: kind tabs in the top bar) · V9 Switch (id 13) · V10 Heading (id 14) · V11 Ribbon (id 15) · V12 Center (id 16) · V13 Center pills (id 17) · V14 Clean (id 18) · V15 Clean still (id 19) · V16 Explained (id 20) · V17 Heading explained (id 21) · V19 Greeting (id 23) · V20 Tiles (id 24) · (archived: V1 Classic, id 1 · V2 Pills, id 2) |
 | User | Both states: New user and Returning user (the app knows which) | — |
 | Made so far | Build every case: Rules / Indicators / Both — a made kind shows its cards, the others are promoted | — |
 | Resume chats | Hide | Show |
@@ -2024,8 +2027,9 @@ LD�"o"�F� h �#�6�5��L�&$�EIJ��uq;?�ѽ%:J��
 
 /* V19 · Greeting: compact — a pill that hugs its text (never wider than the screen; 12 left, 20 right, no chevron), a
    round 32 solid green icon with a white 20 glyph. White in both themes (L3's inverted content turns black in dark).
-   A dashed edge (border/intense). On landing each card grows in from nothing (scale 0 → 1, from its left end, easing
-   out, never past full size), each starting when the one above is halfway (--app-dash-greet-step). (`scale`, not `transform`: L3's press scale keeps working.) */
+   V18's dashed outline (see .outline). On landing each card rises in from below (24 down, faded → in place, easing out),
+   each starting when the one above is halfway (--app-dash-greet-step). (`translate`, not `transform`: L3's press scale
+   keeps working.) */
 .option.compact {
   position: relative;
   align-self: flex-start;
@@ -2033,16 +2037,49 @@ LD�"o"�F� h �#�6�5��L�&$�EIJ��uq;?�ѽ%:J��
   max-width: 100%;
   padding-block: var(--l3-spacing-08);
   padding-inline: var(--l3-spacing-12) var(--l3-spacing-20);
-  border: 1px dashed var(--l3-border-intense); /* 1px: the dashed edge */
+  height: var(--l3-size-56); /* fixed, so the outline's round ends can match it */
   border-radius: var(--l3-radius-full); /* a full pill */
-  box-shadow: none; /* the dashed edge instead of the green ring */
-  transform-origin: left center;
-  animation: greet-pop var(--app-dash-greet-pop) var(--l3-motion-easing-decelerate) var(--greet-delay) both; /* no overshoot */
+  box-shadow: none; /* the dashed outline instead of the green ring */
+  animation: greet-rise var(--app-dash-greet-pop) var(--l3-motion-easing-decelerate) var(--greet-delay) both;
+}
+
+/* The outline: V18's Create card edge — 1px, border/intense, 6 on 4 off (longer dashes than a CSS dashed border), still. */
+.outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.outline rect {
+  width: calc(100% - 1px); /* the 1px stroke sits on the half-pixel inside each edge */
+  height: calc(100% - 1px);
+  rx: calc(var(--l3-size-56) / 2 - 0.5px); /* round ends: half the card's height, less the half-pixel inset */
+  fill: none;
+  stroke: var(--l3-border-intense);
+  stroke-width: 1px;
+  stroke-dasharray: 6 4;
 }
 
 .option.compact { --greet-delay: var(--app-dash-greet-start); }
 .option.compact:nth-child(2) { --greet-delay: calc(var(--app-dash-greet-start) + var(--app-dash-greet-step)); }
 .option.compact:nth-child(3) { --greet-delay: calc(var(--app-dash-greet-start) + 2 * var(--app-dash-greet-step)); }
+.option.compact:nth-child(4) { --greet-delay: calc(var(--app-dash-greet-start) + 3 * var(--app-dash-greet-step)); }
+
+@keyframes greet-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--l3-spacing-24);
+  }
+}
+
+/* Archived 2026-10-30: the cards grew in from nothing (scale 0 → 1 from the left end). Add the `pop` class to a compact
+   card to bring it back. */
+.option.compact.pop {
+  transform-origin: left center;
+  animation-name: greet-pop;
+}
 
 @keyframes greet-pop {
   from {
@@ -2159,6 +2196,12 @@ LD�"o"�F� h �#�6�5��L�&$�EIJ��uq;?�ѽ%:J��
   color: var(--l3-base-neutral-white-base);
 }
 
+/* tone 'light': the landing's light green tile (--app-dash-tile) with the glyph in success green — a place to go. */
+.option.compact.light .tile {
+  background: var(--app-dash-tile);
+  color: var(--l3-content-accent-success-default);
+}
+
 .option.compact .description {
   margin-top: var(--l3-spacing-02);
 }
@@ -2199,15 +2242,19 @@ type BuildOptionProps = {
   onClick?: () => void
   /** V19 · Greeting: a smaller card that hugs its text (40 tile, no chevron), as a row under the heading. */
   compact?: boolean
+  /** compact (V19): 'light' — the icon on a light green tile in green (for a place to go, not something to create). */
+  tone?: 'solid' | 'light'
 }
 
 /**
  * "Choose what to build" on the DASH landing: one option per L3 clickable Card — an icon tile, the name, one line on
  * what it does, a chevron. DASH style on the card: its edge in the DASH green at 50% (Figma: lime 1px stroke).
  */
-export function BuildOption({ icon, title, description, onClick, compact = false }: BuildOptionProps) {
+export function BuildOption({ icon, title, description, onClick, compact = false, tone = 'solid' }: BuildOptionProps) {
   return (
-    <Card onClick={onClick} className={compact ? `${styles.option} ${styles.compact}` : styles.option}>
+    <Card onClick={onClick} className={compact ? `${styles.option} ${styles.compact}${tone === 'light' ? ` ${styles.light}` : ''}` : styles.option}>
+      {/* compact (V19): V18's dashed outline (1px, 6 on 4 off, border/intense) — still, no animation */}
+      {compact && <svg className={styles.outline} aria-hidden="true"><rect x="0.5" y="0.5" /></svg>}
       <Stack direction="horizontal" align="center" gap="12">
         <span className={styles.tile} aria-hidden="true">
           <Icon icon={icon} size={24} className={styles.glyph} />
@@ -4179,6 +4226,63 @@ const GLOW_SLOW_RATE = 0.5
   }
 }
 
+/* The inner glow: the DASH green → lime → yellow gradient, blurred, turning once round inside the card's edge (soft, 40%;
+   it emerges from the border, spreads in a little and draws back — the middle stays clear) while it fades in and out — once, as the card appears; then nothing (static card). */
+.glowClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  /* A frame along the edges, --explain-glow-reach deep (it grows in from the border and back): the middle stays clear
+     so the text reads. #000: mask alpha, not a colour. */
+  mask:
+    linear-gradient(to right, #000, transparent var(--explain-glow-reach), transparent calc(100% - var(--explain-glow-reach)), #000),
+    linear-gradient(to bottom, #000, transparent var(--explain-glow-reach), transparent calc(100% - var(--explain-glow-reach)), #000);
+  animation: explain-glow-reach var(--app-dash-explain-glow) var(--l3-motion-easing-standard) both;
+}
+
+@property --explain-glow-reach {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* The glow starts at the border and spreads inward (12 deep), then draws back into it. */
+@keyframes explain-glow-reach {
+  0% { --explain-glow-reach: 0px; }
+  45% { --explain-glow-reach: var(--l3-spacing-12); }
+  100% { --explain-glow-reach: 0px; }
+}
+
+.glow {
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(from var(--explain-glow-angle), var(--app-dash-union-edge-1), var(--app-dash-union-edge-2), var(--app-dash-union-edge-3), var(--app-dash-union-edge-1));
+  filter: blur(var(--l3-spacing-16));
+  opacity: 0;
+  animation: explain-glow var(--app-dash-explain-glow) var(--l3-motion-easing-standard) both;
+}
+
+@property --explain-glow-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes explain-glow {
+  0% { --explain-glow-angle: 0deg; opacity: 0; }
+  15% { opacity: var(--l3-opacity-40); }
+  65% { opacity: var(--l3-opacity-40); }
+  100% { --explain-glow-angle: 360deg; opacity: 0; }
+}
+
+/* The text and the + sit over the glow. */
+.line,
+.action {
+  position: relative;
+}
+
 /* The explainer: one short line (two at most on a narrow screen), Label/14, content/primary; it rises in. */
 .line {
   display: -webkit-box;
@@ -4222,7 +4326,9 @@ const GLOW_SLOW_RATE = 0.5
 
 @media (prefers-reduced-motion: reduce) {
   .outline rect,
-  .line {
+  .line,
+  .glow,
+  .glowClip {
     animation: none;
   }
 }
@@ -4241,11 +4347,15 @@ import styles from './ExplainCreateCard.module.css'
 /**
  * V18 · Create explained: the dashed "Create rule" card, but it says what a rule is — one short line ("A rule is a
  * limit DASH keeps for you") that rises in when the picked kind changes, over the + and "Create rule". The whole card
- * is still the Create button (a tap types the opening words in, keyboard up).
+ * is still the Create button (a tap types the opening words in, keyboard up). As it appears, an inner glow turns round
+ * once inside its edge and fades away.
  */
 export function ExplainCreateCard({ kind, className, onClick }: { kind: Mode; className?: string; onClick: () => void }) {
   return (
     <button type="button" role="listitem" data-key={`create-${kind}`} className={className} onClick={onClick}>
+      {/* An inner glow — the DASH gradient turning round inside the edge — plays once as the card appears (on landing
+          and each time the picked kind changes: the card is keyed by it), then fades: the card is static again. */}
+      <span className={styles.glowClip} aria-hidden="true"><span className={styles.glow} /></span>
       <svg className={styles.outline} aria-hidden="true"><rect x="0.5" y="0.5" width="100%" height="100%" rx="11" /></svg>
       <span key={kind} className={styles.line}>{t(`home18.about.${kind}`)}</span>
       <span className={styles.action}>
@@ -8690,6 +8800,7 @@ export const dashVersions: DashVersionInfo[] = [
   { value: '21', label: 'V17 · Heading explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillLabel14: true, headingExplainer: true },
   { value: '22', label: 'V18 · Create explained', field: 'switch', pillsUnderTitle: true, firstSuggestions: true, barTitle: true, stillHeading: true, pillLabel14: true, createExplainer: true },
   { value: '23', label: 'V19 · Greeting', field: 'plain', barTitle: true },
+  { value: '24', label: 'V20 · Tiles', field: 'plain', barTitle: true },
   { value: 'combined', label: 'Combined', hidden: true, field: 'switch' },
 ]
 
@@ -9328,6 +9439,9 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home19.strategyTitle": "Create a strategy",
   "home19.strategyDescription": "Say when to buy and sell, DASH tests it",
   "home19.placeholder": "Ask DASH anything",
+  "home20.title": "How can I help you trade today?",
+  "home19.creationsTitle": "Your creations",
+  "home19.creationsDescription": "{count} made with DASH so far",
   "home19.start.rule": "Create a rule that ",
   "home19.start.indicator": "Create an indicator that ",
   "home19.start.strategy": "Create a strategy that ",
@@ -9956,8 +10070,8 @@ export const dash: Flow = {
     // components/dashVersion.ts (+ its homes in screens/homes.tsx). Hidden ones (Combined) stay in the code, off the panel.
     { id: 'dashVersion', group: 'Home', icon: msHome, label: 'DASH version', picker: 'dropdown', values: dashVersions.filter((v) => !v.hidden).map(({ value, label }) => ({ value, label })), default: defaultDashVersion,
       // Beside the phone on the DASH home and the Stocks home (where DASH opens from), to switch quickly between the
-      // latest two (V18 · Create explained, V19 · Greeting); the panel keeps every version.
-      floatOn: ['dash-02', 'stocks-01'], floatValues: ['22', '23'] },
+      // latest ones (V18 · Create explained, V19 · Greeting, V20 · Tiles); the panel keeps every version.
+      floatOn: ['dash-02', 'stocks-01'], floatValues: ['22', '23', '24'] },
     // Who is using DASH — every version reads it (useDashUser) and adapts its cards.
     { id: 'user', group: 'Home', icon: msPerson, label: 'New user', picker: 'toggle', values: [{ value: 'returning', label: 'Returning user' }, { value: 'new', label: 'New user' }], default: 'returning' },
     // A returning user: what they've made so far. A made kind shows its numbers / cards; the others are promoted.
@@ -11565,27 +11679,31 @@ export function HomeCombinedScene({ returning, onManage, onRules, onIndicator, t
 import { useState } from 'react'
 import { Inset } from '@l3/components/Inset'
 import { Stack } from '@l3/components/Stack'
-import { msAssignmentAdd, msFunction, msMonitoring } from '@l3/icons/material'
+import { msAssignmentAdd, msFunction, msMonitoring, msWidgets } from '@l3/icons/material'
 import { BuildOption } from '../components/BuildOption'
 import { ChatInput } from '../components/Chat'
 import { DashDock } from '../components/DashDock'
-import type { CreationKind } from '../components/dashVersion'
+import { useDashUser, type CreationKind } from '../components/dashVersion'
 import { FirstAsk } from '../components/FirstAsk'
 import { useHomeKeyboard } from '../components/homeKeyboard'
 import { usePineUpload } from '../components/pineUpload'
 import { t } from '../copy'
-import { firstName } from '../data'
+import { dashRules, firstName, savedIndicators } from '../data'
 import type { ReturningProps } from './Returning'
 import styles from './HomeGreeting.module.css'
 
 /**
  * DASH V19 · Greeting — one simple home for new and returning users: a personal greeting on top ("Hey Kirtanya," and
  * a big line under it), three small Create cards right under it (icon, name, one line, DASH green edge; each hugs its
- * text), the chat field at the bottom. A card types its opening words into the field ("Create a rule that "), keyboard
+ * text) — and a fourth, Your creations (light icon; to the creations page) once something is made — the chat field at
+ * the bottom. A card types its opening words into the field ("Create a rule that "), keyboard
  * up; while the first message is typed the greeting and cards step away and suggestions stack over the field (FirstAsk).
  */
-export function HomeGreetingScene({ onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
+export function HomeGreetingScene({ returning, onManage, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   const kb = useHomeKeyboard({ typing, onTyping })
+  // Your creations (a fourth card, once something is made): how many, by what this person has made.
+  const made = useDashUser(returning).made
+  const creationsCount = (made.rule ? dashRules.length : 0) + (made.indicator ? savedIndicators.length : 0)
   const pine = usePineUpload(onIndicator)
   // The field (prototype): the kind a card started goes to its chat; otherwise a request about charts goes to the
   // indicator chat, anything else to rules.
@@ -11614,6 +11732,10 @@ export function HomeGreetingScene({ onRules, onIndicator, onStrategy, typing, on
               <BuildOption icon={msAssignmentAdd} title={t('home19.ruleTitle')} description={t('home19.ruleDescription')} onClick={() => start('rule')} compact />
               <BuildOption icon={msMonitoring} title={t('home19.indicatorTitle')} description={t('home19.indicatorDescription')} onClick={() => start('indicator')} compact />
               <BuildOption icon={msFunction} title={t('home19.strategyTitle')} description={t('home19.strategyDescription')} onClick={() => start('strategy')} compact />
+              {/* Your creations: a place to go (the Created with DASH page), so its icon is light, not solid green. */}
+              {creationsCount > 0 && (
+                <BuildOption icon={msWidgets} title={t('home19.creationsTitle')} description={t('home19.creationsDescription', { count: creationsCount })} onClick={onManage} compact tone="light" />
+              )}
             </Stack>
           </Stack>
         </Inset>
@@ -11846,6 +11968,294 @@ export function HomeTabsScene({ returning, onManage, onOpenRule, onOpenIndicator
                 move the top bar's tab); once something is typed, ones that finish it. */}
             {typing && <FirstAsk kind="home" mode={kind} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} onKind={(k) => setHomeKind(k)} />}
             <ChatInput {...kb.field} firstMessage onSend={kb.sending(send)} placeholder={t(`askModes.placeholder.${kind}`)} onAttach={pine.onAttach} />
+            {pine.ui}
+          </Inset>
+        </div>
+        {kb.keyboard}
+      </DashDock>
+    </div>
+  )
+}
+```
+
+### `src/flows/dash/screens/HomeTiles.module.css`
+
+```css
+/* V20 · Tiles: the question, the Create tiles and Your creations centred on the page, the field at the bottom; scrolls. */
+.scene {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: var(--l3-spacing-24) var(--l3-spacing-16);
+}
+
+/* The content, centred up and down in the room it has (auto margins: it starts at the top once it doesn't fit). */
+.page {
+  flex: none;
+  margin-block: auto;
+}
+
+.body {
+  transition: opacity var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
+}
+
+.body[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.title {
+  margin: 0;
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-24);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* A Create tile: V19's Create card as a tile — white, a dashed outline (1px, border/intense, 6 on 4 off, still), a
+   round 32 solid green icon with a white glyph, then its name (Heading/14) and line (Description/12). */
+.tile.tile {
+  position: relative;
+  flex: none;
+  width: var(--app-dash-v20-tile);
+  scroll-snap-align: start;
+  border-radius: var(--l3-radius-16);
+  box-shadow: none; /* the dashed outline instead of the card's edge */
+  text-align: start;
+}
+
+.tileOutline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tileOutline rect {
+  width: calc(100% - 1px); /* the 1px stroke sits on the half-pixel inside each edge */
+  height: calc(100% - 1px);
+  rx: calc(var(--l3-radius-16) - 0.5px); /* the card's corners, less the half-pixel inset */
+  fill: none;
+  stroke: var(--l3-border-intense);
+  stroke-width: 1px;
+  stroke-dasharray: 6 4;
+}
+
+.tileIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--l3-size-32);
+  height: var(--l3-size-32);
+  border-radius: var(--l3-radius-full);
+  background: var(--l3-surface-accent-success-default);
+  color: var(--l3-base-neutral-white-base); /* white in both themes */
+}
+
+.tileName {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-14);
+}
+
+.tileAbout {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+}
+
+/* Entry: each piece rises in from 24 below, fading in (easing out), when the one before is halfway — the question,
+   the three tiles, then Your creations. (`translate`, not `transform`: L3's card press scale keeps working.) */
+.enter {
+  --enter-i: 0;
+  animation: tiles-enter var(--app-dash-greet-pop) var(--l3-motion-easing-decelerate) calc(var(--enter-i) * var(--app-dash-greet-step)) both;
+}
+
+.tile:nth-child(1) { --enter-i: 1; }
+.tile:nth-child(2) { --enter-i: 2; }
+.tile:nth-child(3) { --enter-i: 3; }
+.creations { --enter-i: 4; }
+
+@keyframes tiles-enter {
+  from {
+    opacity: 0;
+    translate: 0 var(--l3-spacing-24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
+}
+
+.dock {
+  flex: none;
+}
+```
+
+### `src/flows/dash/screens/HomeTiles.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Card } from '@l3/components/Card'
+import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { msArrowForward, msAssignmentAdd, msChevronRight, msFunction, msMonitoring, msWidgets } from '@l3/icons/material'
+import { ChatInput } from '../components/Chat'
+import { DashDock } from '../components/DashDock'
+import { FirstAsk } from '../components/FirstAsk'
+import { useDashUser, type CreationKind } from '../components/dashVersion'
+import { useHomeKeyboard } from '../components/homeKeyboard'
+import { usePineUpload } from '../components/pineUpload'
+import { t } from '../copy'
+import { dashRules, homeTriggers, savedIndicators, type SavedRule } from '../data'
+import { CreationDetailsSheet } from '../sheets/RuleSheets'
+import type { ReturningProps } from './Returning'
+// Your creations' row and cards are V3 · Dock's (the returning home's).
+import cards from './ReturningV2.module.css'
+import styles from './HomeTiles.module.css'
+
+const KINDS: { kind: CreationKind; icon: string }[] = [
+  { kind: 'rule', icon: msAssignmentAdd },
+  { kind: 'indicator', icon: msMonitoring },
+  { kind: 'strategy', icon: msFunction },
+]
+/** Your creations: this many cards, then View all. */
+const MAX_CREATIONS = 3
+
+/**
+ * DASH V20 · Tiles — a home like an AI app's (new and returning users alike): the question on top, three Create tiles
+ * side by side (Rule · Indicator · Strategy: icon, name, what it is), Your creations
+ * (V3 · Dock's sideways row: the three most active, then View all → the creations page) and the chat field at the bottom. A tile types its opening words
+ * into the field ("Create a rule that "), keyboard up; while the first message is typed everything above steps away
+ * and suggestions stack over the field (FirstAsk). A new user (nothing made) sees only the tiles. On entry the page rises
+ * in piece by piece: the question, each tile, then Your creations — each starting when the one before is halfway.
+ */
+export function HomeTilesScene({ returning, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
+  const kb = useHomeKeyboard({ typing, onTyping })
+  const pine = usePineUpload(onIndicator)
+  const made = useDashUser(returning).made
+  const [kind, setKind] = useState<CreationKind | undefined>()
+  const ask = (text: string) => {
+    const k = kind && text.startsWith(t(`home19.start.${kind}`).trim()) ? kind : /indicator|chart|ema|supertrend|rsi|macd|average|candle/i.test(text) ? 'indicator' : 'rule'
+    return k === 'indicator' ? onIndicator?.() : k === 'strategy' ? onStrategy?.() : onRules?.()
+  }
+  const start = (k: CreationKind) => {
+    setKind(k)
+    kb.field.onChange(t(`home19.start.${k}`))
+    kb.field.onFocus()
+  }
+
+  const rules = made.rule ? dashRules : []
+  const indicators = made.indicator ? savedIndicators : []
+  // Your creations, most active first: rules that stepped in today, indicators, then the other rules.
+  const creations: { item: SavedRule; kind: 'rule' | 'indicator' }[] = [
+    ...rules.filter((r) => homeTriggers[r.id]).map((item) => ({ item, kind: 'rule' as const })),
+    ...indicators.map((item) => ({ item, kind: 'indicator' as const })),
+    ...rules.filter((r) => !homeTriggers[r.id]).map((item) => ({ item, kind: 'rule' as const })),
+  ]
+  // A card opens its details sheet (on / off there; the cards follow).
+  const [details, setDetails] = useState<{ item: SavedRule; kind: 'rule' | 'indicator' } | null>(null)
+  const [onMap, setOnMap] = useState<Record<string, boolean>>({})
+  const isOn = (item: SavedRule) => onMap[item.id] ?? item.on
+  const status = (item: SavedRule, k: 'rule' | 'indicator') => {
+    const triggered = homeTriggers[item.id] ?? 0
+    if (k === 'indicator') return isOn(item) ? t('cards.onChart') : t('details.notOnChart')
+    return !isOn(item) ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')
+  }
+
+  return (
+    <div className={styles.scene}>
+      <div className={styles.scroll} onClick={kb.close}>
+        {/* Centred on the page (between the top bar and the field); scrolls from the top when it's taller. */}
+        <Inset paddingInline="16" className={styles.page}>
+          {/* Typing: everything here steps away (the field and its suggestions take over). */}
+          <Stack gap="32" className={styles.body} data-hidden={typing || undefined}>
+            {/* the question 32 above the tiles */}
+            <Stack gap="32">
+              <h1 className={`${styles.title} ${styles.enter}`}>{t('home20.title')}</h1>
+              {/* One sideways row, edge to edge (V3 · Dock's row): wider tiles, the third peeking past the screen's edge. */}
+              <div className={cards.row}>
+                {KINDS.map(({ kind: k, icon }) => (
+                  // V19's Create card as a tile: the dashed outline, the round solid green icon (white glyph), its name and line.
+                  <Card key={k} onClick={() => start(k)} className={`${styles.tile} ${styles.enter}`} aria-label={t(`home19.${k}Title`)}>
+                    <svg className={styles.tileOutline} aria-hidden="true"><rect x="0.5" y="0.5" /></svg>
+                    <Stack gap="12">
+                      <span className={styles.tileIcon} aria-hidden="true"><Icon icon={icon} size={20} /></span>
+                      <Stack gap="04">
+                        <span className={styles.tileName}>{t(`home19.${k}Title`)}</span>
+                        <span className={styles.tileAbout}>{t(`home19.${k}Description`)}</span>
+                      </Stack>
+                    </Stack>
+                  </Card>
+                ))}
+              </div>
+            </Stack>
+
+            {creations.length > 0 && (
+              // Your creations as on V3 · Dock (the returning home): the header with its widgets icon and View all, then
+              // one sideways row of small cards (kind · what it did today, the name, ›; a tap opens its details), then a
+              // View all card. No Create card here (the tiles above create).
+              <Stack as="section" gap="12" aria-label={t('home2.creations')} className={`${styles.creations} ${styles.enter}`}>
+                <SectionHeader title={<span className={cards.creationsTitle}><Icon icon={msWidgets} size={16} />{t('home2.creations')}</span>} headingLevel={2} action={{ type: 'view-all', onClick: () => onManage?.() }} />
+                <div className={cards.row} role="list">
+                  {creations.slice(0, MAX_CREATIONS).map(({ item, kind: k }) => {
+                    const on = isOn(item)
+                    const lit = k === 'rule' ? on && (homeTriggers[item.id] ?? 0) > 0 : on
+                    return (
+                      <button key={item.id} type="button" role="listitem" className={cards.item} onClick={(e) => { e.stopPropagation(); setDetails({ item, kind: k }) }}>
+                        <span className={cards.itemTop}>
+                          <span className={cards.itemStatus}>{t(`home.kind.${k}`)} · <span data-on={lit || undefined}>{status(item, k)}</span></span>
+                          <Icon icon={msChevronRight} size={16} />
+                        </span>
+                        <span className={cards.itemTitle}>{item.title}</span>
+                      </button>
+                    )
+                  })}
+                  <button type="button" role="listitem" aria-label={t('home2.viewAll')} className={`${cards.item} ${cards.viewAllCard}`} onClick={(e) => { e.stopPropagation(); onManage?.() }}>
+                    <span className={cards.viewAllIcon}><Icon icon={msArrowForward} size={20} /></span>
+                    <span className={`${cards.itemTitle} ${cards.viewAllLabel}`} aria-hidden="true">{t('home2.viewAll')}</span>
+                    {creations.length > MAX_CREATIONS && <span className={`${cards.itemMeta} ${cards.viewAllMore}`} aria-hidden="true">{t('home2.viewAllMore', { count: creations.length - MAX_CREATIONS })}</span>}
+                  </button>
+                </div>
+              </Stack>
+            )}
+          </Stack>
+        </Inset>
+      </div>
+      {details && (
+        <CreationDetailsSheet
+          item={details.item}
+          kind={details.kind}
+          on={isOn(details.item)}
+          onToggle={(on) => setOnMap((m) => ({ ...m, [details.item.id]: on }))}
+          onClose={() => setDetails(null)}
+          onEdit={() => {
+            const k = details.kind
+            setDetails(null)
+            if (k === 'rule') onOpenRule?.()
+            else onOpenIndicator?.()
+          }}
+          onDelete={() => setDetails(null)}
+        />
+      )}
+      {/* The field (and keyboard) go to the DASH screen's fixed input place, so they stay put across scenes. */}
+      <DashDock>
+        <div className={styles.dock}>
+          <Inset paddingInline="16" paddingBlock="16">
+            {typing && <FirstAsk kind="home" mode={kind} text={kb.field.value} onPick={(text) => kb.field.onChange(text)} />}
+            <ChatInput firstMessage {...kb.field} onSend={kb.sending(ask)} placeholder={t('home19.placeholder')} onAttach={pine.onAttach} />
             {pine.ui}
           </Inset>
         </div>
@@ -13462,6 +13872,11 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
   color: var(--l3-content-accent-success-default);
 }
 
+/* V18: the name under the kind and status lines, 4 below them (8 in all, with the card's 4 gap). */
+.itemTitleBelow {
+  margin-top: var(--l3-spacing-04);
+}
+
 .itemTitle {
   display: -webkit-box;
   overflow: hidden;
@@ -13769,6 +14184,9 @@ export function ReturningScene({ onManage, onOpenRule, onOpenIndicator, onRules,
 /* V18 · Create explained: the Create card 32 narrower than a creation card. */
 .explainCard.explainCard {
   width: calc(62% - var(--l3-spacing-32));
+  /* never shorter than a creation card with a two-line name: the row keeps one height whatever kind is picked (the
+     page is centred, so a shorter row on Strategy moved everything) */
+  min-height: var(--app-dash-v18-card);
   gap: var(--l3-spacing-16); /* the explainer and "+ Create rule" 16 apart */
   justify-content: space-between;
 }
@@ -13848,6 +14266,8 @@ const EXAMPLES = {
 
 /** Your creations on the home: at most this many cards, then the View all card. */
 const HOME_CREATIONS = 3
+/** View all from a one-kind row (V14–V18): the creations page's tab for that kind. */
+const HISTORY_TAB = { rule: 'rules', indicator: 'indicators', strategy: 'strategies' } as const
 
 export function ReturningV2Scene({ version3 = false, version4 = false, returning, onManage, onPastChats, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps & {
   /** Returning home V3: every kind always has a place (an invite card until one is made) and the newest kind is marked New. */
@@ -13871,6 +14291,19 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
     const on = isOn(item)
     const status = k === 'rule' ? (!on ? t('cards.paused') : triggered ? t('home2.triggered', { count: triggered }) : t('home2.notTriggered')) : on ? t('cards.onChart') : t('details.notOnChart')
     const lit = k === 'rule' ? on && triggered > 0 : on
+    // V18 · Create explained: the kind and › on the first line, what it did today on the second, then the name.
+    if (dashVersion.createExplainer) {
+      return (
+        <button key={item.id} data-key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
+          <span className={styles.itemTop}>
+            <span className={styles.itemStatus}>{t(`home.kind.${k}`)}</span>
+            <Icon icon={msChevronRight} size={16} />
+          </span>
+          <span className={styles.itemStatus}><span data-on={lit || undefined}>{status}</span></span>
+          <span className={`${styles.itemTitle} ${styles.itemTitleBelow}`}>{item.title}</span>
+        </button>
+      )
+    }
     return (
       <button key={item.id} data-key={item.id} type="button" role="listitem" className={styles.item} onClick={() => setDetails({ item, kind: k })}>
         <span className={styles.itemTop}>
@@ -14201,9 +14634,10 @@ export function ReturningV2Scene({ version3 = false, version4 = false, returning
                     </button>
                   ))}
                   {rowCreations.length > 0 && (
+                    // V14–V18 (the row is one kind): View all opens the creations page on that kind's tab.
                     // As tall as the other cards, never taller: it shows what fits — the arrow, then "View all", then
                     // "N more" (CSS container queries). The name is on the button, so the arrow alone still reads.
-                    <button data-key="view-all" type="button" role="listitem" aria-label={t('home2.viewAll')} className={`${styles.item} ${styles.viewAllCard}`} onClick={() => onManage?.()}>
+                    <button data-key="view-all" type="button" role="listitem" aria-label={t('home2.viewAll')} className={`${styles.item} ${styles.viewAllCard}`} onClick={() => { if (onlyPicked && shown) openHistoryOn(HISTORY_TAB[shown]); onManage?.() }}>
                       <span className={styles.viewAllIcon}><Icon icon={msArrowForward} size={20} /></span>
                       <span className={`${styles.itemTitle} ${styles.viewAllLabel}`} aria-hidden="true">{t('home2.viewAll')}</span>
                       {rowCreations.length > HOME_CREATIONS && <span className={`${styles.itemMeta} ${styles.viewAllMore}`} aria-hidden="true">{t('home2.viewAllMore', { count: rowCreations.length - HOME_CREATIONS })}</span>}
@@ -15041,6 +15475,7 @@ import { ReturningV2Scene } from './ReturningV2'
 import { HomeTabsScene } from './HomeTabs'
 import { HomeCenterScene } from './HomeCenter'
 import { HomeGreetingScene } from './HomeGreeting'
+import { HomeTilesScene } from './HomeTiles'
 
 /**
  * Each DASH version's homes (setting "DASH version"; the list, labels and chat input are in components/dashVersion.ts,
@@ -15098,6 +15533,8 @@ export const homeScenes: Record<string, HomeScenes> = {
   '22': { newUser: Landing, returning: ReturningV2, newUserNoField: true },
   // V19 · Greeting: "Hey Kirtanya," and a big line on top, the three Create cards at the bottom, the field under them.
   '23': { newUser: HomeGreetingScene, returning: HomeGreetingScene },
+  // V20 · Tiles: the question, three Create tiles, Your creations, the field at the bottom.
+  '24': { newUser: HomeTilesScene, returning: HomeTilesScene },
   combined: { newUser: HomeCombinedScene, returning: HomeCombinedScene },
 }
 ```
