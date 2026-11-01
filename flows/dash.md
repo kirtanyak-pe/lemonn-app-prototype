@@ -6938,7 +6938,7 @@ export function SceneSwap({ sceneKey, move, children }: { sceneKey: string; move
 ### `src/flows/dash/components/SlidingPills.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { Badge } from '@l3/components/Badge'
 import { Tabs } from '@l3/components/Tabs'
 import { dashRules, savedIndicators } from '../data'
@@ -6982,12 +6982,18 @@ export function SlidingPills({ value, items, onChange, label, fill = false }: {
   const track = useRef<HTMLSpanElement>(null)
   const thumb = useRef<HTMLSpanElement>(null)
   const first = useRef(true)
-  useLayoutEffect(() => {
+  // Puts the thumb exactly under the picked pill.
+  const place = () => {
     const picked = track.current?.querySelector<HTMLElement>('[role=tab][aria-selected=true]')
     const el = thumb.current
-    if (!picked || !el) return
+    if (!picked || !el) return null
     el.style.left = `${picked.offsetLeft}px`
     el.style.width = `${picked.offsetWidth}px`
+    return el
+  }
+  useLayoutEffect(() => {
+    const el = place()
+    if (!el) return
     // The first placement doesn't animate; the slide (CSS transition on left / width) switches on a frame later, so
     // even the very first pick glides — turning it on in the same frame as a move made that move jump.
     if (first.current) {
@@ -6996,6 +7002,20 @@ export function SlidingPills({ value, items, onChange, label, fill = false }: {
     }
     // also when the pills themselves change, or a count comes or goes (it changes a pill's width)
   }, [value, fill, withCounts.map((i) => `${i.value}${'badge' in i ? '#' : ''}`).join('|')])
+  // The pills change width with the screen (full width: they share it): the thumb follows at once, without the slide.
+  useEffect(() => {
+    const box = track.current
+    if (!box) return
+    const observer = new ResizeObserver(() => {
+      const el = thumb.current
+      if (!el || first.current) return
+      delete el.dataset.ready
+      place()
+      requestAnimationFrame(() => { el.dataset.ready = 'yes' })
+    })
+    observer.observe(box)
+    return () => observer.disconnect()
+  }, [])
   return (
     <span ref={track} className={styles.track} data-fill={fill || undefined}>
       <span ref={thumb} className={styles.thumb} data-raised="strong" aria-hidden="true" />
@@ -10111,6 +10131,7 @@ function PastChatRow({ chat, menuOpen, onOpen, onHold, onDelete }: { chat: PastC
   justify-content: space-between;
   gap: var(--l3-spacing-16); /* what the kind is ↔ "+ Create rule" */
   width: calc(62% - var(--l3-spacing-32));
+  min-width: var(--app-dash-create-card-min);
   min-height: var(--app-dash-create-card);
   border-color: transparent;
 }
