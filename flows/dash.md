@@ -103,8 +103,9 @@ Every other home version that was tried is in `archive/dash-home-versions/` (not
   4. **Pick up where you left off** (`ResumeDrafts`) — only when they have unsaved chats; under the row. No View all:
      every chat is in Past chats (the history button in the top bar).
   5. The field (“Describe a rule…”, follows the pill). Typing folds 1–4 away and shows live suggestions (`FirstAsk`).
-- Prototype settings: **User** (new / returning) · **Made so far** (rules / indicators / both) · **Resume chats**
-  (show / hide) · **Has past chats** (with chats / empty — empty also means no drafts).
+- Prototype settings: **User** (new / returning) · **Made so far** (rules / indicators / both) · **Has past chats**
+  (one switch, **off by default**: off = the Past chats empty state and no drafts on the home; on = the sample history
+  and "Pick up where you left off").
 
 ### Navigation
 
@@ -139,9 +140,11 @@ dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH 
   footer line ("Stepped in **3 times** this month"), `strong` the bold part.
 - `PastChat { id, kind: 'rule' | 'indicator', title, day, time, saved, edited? }` — chat history (Past chats, dash-30).
   `saved` = the rule / indicator the chat built was saved. Newest first.
-- **Pick up where you left off** (home, setting "Resume chats") = `pastChats` where `saved === false` only
+- **Pick up where you left off** (home, setting "Has past chats") = `pastChats` where `saved === false` only
   (`homeDrafts` is derived from them). A chat whose creation was saved is **never** shown upfront: the creation is in
-  Your creations and the chat stays in Past chats. No unsaved chats → no section.
+  Your creations and the chat stays in Past chats. No unsaved chats → no section. **✕** at the right of its header
+  (Ghost Small, icon only) closes the whole section for the rest of the user's session (app: until the app restarts;
+  prototype: sessionStorage `dash:resume-closed`). The drafts stay in Past chats.
 - First name for greetings comes from the app's user (`Rohan` — fictional; Figma's "Samaira" isn't used).
 
 ### Components
@@ -207,6 +210,7 @@ dash-25 View indicator ─▶ fno-06 Scalper (Indicators sheet open, saved DASH 
 - An **AI accent family** (DASH green `#50c83e`, glow lime / yellow / green) — local tokens `--app-dash-*`.
 - No **menu / dropdown** component — the chat's ⋮ dropdown is L3 ListCell rows on a raised surface (`components/ChatMenu`, local token `--app-dash-menu-width`).
 - SectionHeader: no **icon** slot before the title (“Your creations” puts the icon in the title).
+- SectionHeader: no **close (✕)** action — "Pick up where you left off" puts an L3 Ghost Small icon button beside it.
 - ListCell: a tappable card has no **flat** option (no drop shadow) — Past chats overrides it locally.
 - Actionbar: no **see-through** option for decorative backgrounds (`DashBar` clears its surface and hairline).
 - **Chat** components: chat input, message, quick-reply chip, prompt chip, question card.
@@ -258,6 +262,10 @@ screen (needs the mascot artwork), and the live landing's active-rules carousel.
 
 ### Changelog
 
+- 2026-11-01 — **Past chats: one setting, off by default; ✕ on Pick up where you left off.** "Resume chats" and "Has
+  past chats" were two switches for the same thing: now only **Has past chats** (default off). The resume section's
+  header has a ✕ on the right that hides the section for the session (switching the setting on again brings it back
+  in the prototype). L3 gap: SectionHeader has no close action, so the ✕ is an L3 Ghost Small icon button beside it.
 - 2026-11-01 — **Final for dev: V18 only.** The DASH version setting and every other home are gone (archived in
   `archive/dash-home-versions/`, snapshot of `2ef504d`, with a table of which files each version used). Two homes:
   new user = the landing, returning user = `screens/ReturningHome` (was `ReturningV2` + the V18 flags). Pill counts are
@@ -6080,7 +6088,13 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
 ### `src/flows/dash/components/ResumeDrafts.module.css`
 
 ```css
-/* DASH homes · Pick up where you left off (setting "Resume chats"): moved here from ReturningV2 so every version shows it. */
+/* DASH home · Pick up where you left off (setting "Has past chats"). */
+
+/* The header row: the section header takes the width, ✕ (Ghost Small, icon only) at the end. */
+.header {
+  flex: 1;
+  min-width: 0;
+}
 
 /* Pick up where you left off: one card per draft, side by side and swiped (snapping), edge to edge; one draft fills
    the width. Each card: the DASH green edge, ✕ at the top right, Continue hugging its label. */
@@ -6196,7 +6210,7 @@ export function QuestionCard({ question, selected: initial, onAnswer, onClose }:
 ### `src/flows/dash/components/ResumeDrafts.tsx`
 
 ```tsx
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Avatar } from '@l3/components/Avatar'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
@@ -6204,7 +6218,7 @@ import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Icon } from '@l3/components/Icon'
 import { SectionHeader } from '@l3/components/SectionHeader'
 import { Stack } from '@l3/components/Stack'
-import { msChevronRight, msDelete, msHistory } from '@l3/icons/material'
+import { msChevronRight, msClose, msDelete, msHistory } from '@l3/icons/material'
 import { useFlowOption } from '../../../shared/prototype'
 import { Sheet } from '../../../shared/ui/Sheet'
 import { t } from '../copy'
@@ -6212,15 +6226,42 @@ import { homeDrafts, type HomeDraft } from '../data'
 import { useLongPress } from './longPress'
 import styles from './ResumeDrafts.module.css'
 
-/** Prototype setting "Resume chats" (returning user): Show (default) → the sample drafts, Hide → none. */
+/** Closed with ✕ on its header: the section stays away for the rest of the session (sessionStorage). */
+const CLOSED_KEY = 'dash:resume-closed'
+
+function readClosed() {
+  try { return sessionStorage.getItem(CLOSED_KEY) === 'yes' } catch { return false }
+}
+
+function writeClosed(closed: boolean) {
+  try {
+    if (closed) sessionStorage.setItem(CLOSED_KEY, 'yes')
+    else sessionStorage.removeItem(CLOSED_KEY)
+  } catch { /* private mode: closed for this page only */ }
+}
+
+/**
+ * Prototype setting "Has past chats" (default off): With chats → the sample drafts, Empty → none. Closing the section
+ * hides them for the session; switching the setting on again brings them back (so the state can be shown again).
+ */
 export function useResumeDrafts() {
-  const resume = useFlowOption('dash', 'resumeChats', 'show')
-  // No past chats at all (setting "Past chats: Empty") → no drafts either.
-  const history = useFlowOption('dash', 'pastChats', 'some')
-  const shown = resume === 'show' && history !== 'none'
+  const shown = useFlowOption('dash', 'pastChats', 'none') !== 'none'
+  const [closed, setClosed] = useState(readClosed)
   const [drafts, setDrafts] = useState<HomeDraft[]>(shown ? homeDrafts : [])
-  useEffect(() => setDrafts(shown ? homeDrafts : []), [shown])
-  return [drafts, setDrafts] as const
+  const wasShown = useRef(shown)
+  useEffect(() => {
+    if (shown && !wasShown.current) {
+      writeClosed(false)
+      setClosed(false)
+    }
+    wasShown.current = shown
+    setDrafts(shown ? homeDrafts : [])
+  }, [shown])
+  const close = () => {
+    writeClosed(true)
+    setClosed(true)
+  }
+  return [closed ? [] : drafts, setDrafts, close] as const
 }
 
 /**
@@ -6250,20 +6291,26 @@ function CompactDraft({ draft, onOpen, onHold }: { draft: HomeDraft; onOpen: () 
 /**
  * Pick up where you left off: chats left before saving (rare, so only when there are some) — one card each, swiped
  * sideways when there are two or more: the compact card (the big Continue + ✕ card is archived in
- * archive/dash-resume-card-big). A tap opens the draft's chat; press and hold removes one (a sheet asks first).
+ * archive/dash-resume-card-big). A tap opens the draft's chat; press and hold removes one (a sheet asks first). ✕ on
+ * the header closes the whole section for the session.
  */
-export function ResumeDrafts({ drafts, onOpen, onRemove }: {
+export function ResumeDrafts({ drafts, onOpen, onRemove, onClose }: {
   drafts: HomeDraft[]
-  /** View all: every past chat (the Past chats page). */
+  /** A draft's card: carry on in its chat. */
   onOpen: (kind: HomeDraft['kind']) => void
   onRemove: (id: string) => void
+  /** ✕ on the header: hide the section for the rest of the session. */
+  onClose: () => void
 }) {
   const [removing, setRemoving] = useState<HomeDraft | null>(null)
   const sheetId = useId()
   if (drafts.length === 0) return null
   return (
     <Stack as="section" gap="12" aria-label={t('home.resume')}>
-      <SectionHeader title={t('home.resume')} headingLevel={2} />
+      <Stack direction="horizontal" align="center" gap="08">
+        <SectionHeader title={t('home.resume')} headingLevel={2} className={styles.header} />
+        <Button variant="ghost" size="sm" iconLeft={<Icon icon={msClose} />} aria-label={t('home.resumeClose')} onClick={onClose} />
+      </Stack>
       <div className={styles.drafts} data-single={drafts.length === 1 || undefined} role="list">
         {drafts.map((d) => <CompactDraft key={d.id} draft={d} onOpen={() => onOpen(d.kind)} onHold={() => setRemoving(d)} />)}
       </div>
@@ -8020,6 +8067,7 @@ export function useStickToBottom(scroller: RefObject<HTMLElement | null>, turn: 
   "home.kind.rule": "Rule",
   "home.kind.strategy": "Strategy",
   "home.resume": "Pick up where you left off",
+  "home.resumeClose": "Close Pick up where you left off",
   "home.draftEdited": "Draft · {edited}",
   "home.resumeHold": "{name}. {edited}. Opens the chat; press and hold to delete",
   "pineExport.title": "Export your Pine Script",
@@ -8307,7 +8355,7 @@ export const homeTriggers: Record<string, number> = { 'day-pnl-gate': 2, 'expiry
 ### `src/flows/dash/index.tsx`
 
 ```tsx
-import { msPerson, msChat, msPlayCircle, msRule } from '@l3/icons/material'
+import { msPerson, msChat, msRule } from '@l3/icons/material'
 import type { Flow } from '../types'
 import { switchKind } from './components/pendingMessage'
 import { activeRules, backtests, maxDailyLoss, rulesAfterDelete } from './data'
@@ -8333,17 +8381,17 @@ export const dash: Flow = {
   title: 'DASH Ai · Trading rules',
   description: 'Describe a trading habit; DASH builds it into a rule, backtests it, saves it. Your active rules, on / off, delete.',
   figmaFile: 'nLs24dTJdPz9A5pu3AWMbe',
-  // Prototype settings: who is using DASH (new → the landing, returning → their home), what they've made, drafts to
-  // resume, and whether Past chats has any history.
+  // Prototype settings: who is using DASH (new → the landing, returning → their home), what they've made, and whether
+  // they have past chats.
   options: [
     // Who is using DASH (useDashUser): a new user gets the landing (dash-02), a returning one their home (dash-28).
     { id: 'user', group: 'Home', icon: msPerson, label: 'New user', picker: 'toggle', values: [{ value: 'returning', label: 'Returning user' }, { value: 'new', label: 'New user' }], default: 'returning' },
     // A returning user: what they've made so far. A made kind shows its cards; the others show examples to try.
     { id: 'made', showIf: { user: ['returning'] }, group: 'Home', icon: msRule, label: 'Made so far', values: [{ value: 'rules', label: 'Rules' }, { value: 'indicators', label: 'Indicators' }, { value: 'both', label: 'Both' }], default: 'both' },
-    // A returning user · drafts to resume ("Pick up where you left off", under the creations): Show (two sample drafts) or Hide (none).
-    { id: 'resumeChats', showIf: { user: ['returning'] }, group: 'Home', icon: msPlayCircle, label: 'Resume chats', picker: 'toggle', values: [{ value: 'hide', label: 'Hide' }, { value: 'show', label: 'Show' }], default: 'show' },
-    // Past chats sheet (the history button): With chats (the sample history) or Empty (the empty state; no drafts on the home either).
-    { id: 'pastChats', group: 'Home', icon: msChat, label: 'Has past chats', picker: 'toggle', values: [{ value: 'none', label: 'Empty' }, { value: 'some', label: 'With chats' }], default: 'some' },
+    // Past chats (one setting, default off): On → the Past chats sheet (history button) has the sample history and a
+    // returning user's home shows "Pick up where you left off" (two drafts, closable with ✕ for the session). Off → the
+    // sheet's empty state and no drafts on the home.
+    { id: 'pastChats', group: 'Home', icon: msChat, label: 'Has past chats', picker: 'toggle', values: [{ value: 'none', label: 'Empty' }, { value: 'some', label: 'With chats' }], default: 'none' },
   ],
   sections: [
     { id: 'entry', title: 'Entry' },
@@ -9860,7 +9908,7 @@ export function PastChatsSheet({ onClose, onOpen, onDelete, removed = [] }: {
 }) {
   const headingId = useId()
   // Setting "Past chats": With chats / Empty (the empty state).
-  const empty = useFlowOption('dash', 'pastChats', 'some') === 'none'
+  const empty = useFlowOption('dash', 'pastChats', 'none') === 'none'
   const chats = empty ? [] : pastChats.filter((c) => !removed.includes(c.id))
   // The row whose hold menu is open.
   const [menuFor, setMenuFor] = useState<string | null>(null)
@@ -10341,14 +10389,14 @@ const HISTORY_TAB = { rule: 'rules', indicator: 'indicators', strategy: 'strateg
  * 3. one row for the picked kind: the dashed Create card that says what the kind is (ExplainCreateCard — a tap types
  *    the opening words into the field), up to three of their creations (status + name; a tap opens its details sheet),
  *    then View all (the creations page, on that kind's tab). Nothing made of that kind → three examples to try;
- * 4. Pick up where you left off — chats left before saving, only when there are some (setting "Resume chats");
+ * 4. Pick up where you left off — chats left before saving, only when there are some (setting "Has past chats"; ✕ closes it for the session);
  * 5. the field at the bottom; while the first message is typed the body folds away and suggestions stack above it.
  * Status (triggered today, on a chart) is sample data.
  */
 export function ReturningHomeScene({ returning, onManage, onOpenRule, onOpenIndicator, onRules, onIndicator, onStrategy, typing, onTyping }: ReturningProps) {
   // The drawn keyboard (as in the chats): the field types on it; a tap on the page or Send puts it away.
   const kb = useHomeKeyboard({ typing, onTyping })
-  const [drafts, setDrafts] = useResumeDrafts()
+  const [drafts, setDrafts, closeDrafts] = useResumeDrafts()
   /** On / off as changed from a details sheet (cards follow it). */
   const [onMap, setOnMap] = useState<Record<string, boolean>>({})
   const isOn = (item: SavedRule) => onMap[item.id] ?? item.on
@@ -10497,7 +10545,7 @@ export function ReturningHomeScene({ returning, onManage, onOpenRule, onOpenIndi
 
                   {/* 4 · Pick up where you left off: only when there are drafts. Every past chat is in the top bar's
                       history, so this section has no View all. */}
-                  <ResumeDrafts drafts={drafts} onOpen={(kind) => (kind === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} />
+                  <ResumeDrafts drafts={drafts} onOpen={(kind) => (kind === 'indicator' ? onOpenIndicator : onOpenRule)?.()} onRemove={(id) => setDrafts((list) => list.filter((d) => d.id !== id))} onClose={closeDrafts} />
                 </Stack>
               </div>
             </div>
