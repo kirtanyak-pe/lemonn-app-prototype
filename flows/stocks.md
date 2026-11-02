@@ -18889,13 +18889,14 @@ import styles from './Diwali.module.css'
  * - `diwaliAvatar`: the profile initials on Stocks / F&O home flip to a diya twice, then stay as initials.
  */
 export const DIWALI_OPTIONS = {
-  splash: { id: 'diwaliSplash', off: 'off', on: 'on' },
-  avatar: { id: 'diwaliAvatar', off: 'off', on: 'on' },
+  splash: { id: 'diwaliSplash', off: 'off', on: 'on', default: 'on' },
+  avatar: { id: 'diwaliAvatar', off: 'off', on: 'on', default: 'on' },
 } as const
 
 export const useDiwali = (which: keyof typeof DIWALI_OPTIONS) => {
   const option = DIWALI_OPTIONS[which]
-  return useFlowOption('app', option.id, option.off) === option.on
+  // The same default as App settings (src/flows/index.ts): the stored value is keyed by it.
+  return useFlowOption('app', option.id, option.default) === option.on
 }
 
 /** A clay diya: the bowl with three dots on its rim and a flame that flickers. Fills its box (48 × 40 artwork). */
