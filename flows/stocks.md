@@ -204,6 +204,7 @@ stock page in the `jojo` branch, adapted to Indian stocks (NSE / BSE, ₹, circu
 
 ### Changelog
 
+- 2026-11-02 — Diwali, final: the Garland splash and the Diwali search bar are what ship (both on by default; settings are now two switches). The Lanterns splash and the profile avatar's diya flip are archived (`src/shared/ui/archive/`). Spec for developers: `docs/DIWALI.md`.
 - 2026-11-02 — **Splash** (`stocks-17`): the launch splash as a page, listed before Home.
 - 2026-11-02 — Diwali (App settings → Diwali, on by default for now): a Diwali splash, and the home's profile avatar flips to a diya twice (`src/shared/ui/Diwali`).
 - 2026-11-02 — Diwali splash: a quiet night scene in L3 dark with "Happy Diwali" in gold, in two versions (Lanterns / Garland); the avatar's diya is now a lotus diya.
@@ -1661,7 +1662,7 @@ function Financials({ page }: { page: StockPageData }) {
 import { Icon } from '@l3/components/Icon'
 import { msAccountBalanceWallet, msSearch } from '@l3/icons/material'
 import { t } from '../copy'
-import { DiwaliSearchFace, useDiyaFlip } from '../../../shared/ui/Diwali'
+import { DiwaliSearchFace, useDiwaliSearch } from '../../../shared/ui/Diwali'
 import styles from './TopBar.module.css'
 
 type TopBarProps = {
@@ -1682,16 +1683,16 @@ type TopBarProps = {
  * The bar sits on the summary area's grey; the pill and the wallet are on surface/default.
  */
 export function TopBar({ initials, onProfile, onSearch, onWallet, scrolled = false }: TopBarProps) {
-  // Diwali (App settings → Diwali → Diya flip): the initials, or the search pill's icon and label, flip to a diya twice
-  // when Home shows.
-  const diwali = useDiyaFlip('stocks', initials)
+  // Diwali (App settings → Diwali → Diwali search bar): the search pill's icon and label turn into the diya and "Happy
+  // Green Diwali" twice when Home shows (docs/DIWALI.md).
+  const diwali = useDiwaliSearch()
   return (
     <header className={styles.bar} data-scrolled={scrolled || undefined}>
-      <button type="button" {...diwali.profile.flip} className={[styles.profile, diwali.profile.flip.className].filter(Boolean).join(' ')} aria-label={t('top.profile')} onClick={onProfile}>
-        {diwali.profile.face}
+      <button type="button" className={styles.profile} aria-label={t('top.profile')} onClick={onProfile}>
+        {initials}
       </button>
-      <button type="button" className={[styles.search, diwali.search.className].filter(Boolean).join(' ')} data-turning={diwali.search.turning} onClick={onSearch}>
-        {diwali.search.diya ? (
+      <button type="button" className={[styles.search, diwali.className].filter(Boolean).join(' ')} data-turning={diwali.turning} onClick={onSearch}>
+        {diwali.diya ? (
           <DiwaliSearchFace labelClassName={styles.placeholder} />
         ) : (
           <>
@@ -18749,7 +18750,7 @@ export function useSystemKeyboard() {
 ### `src/shared/ui/Diwali.module.css`
 
 ```css
-/* Diwali art (src/shared/ui/Diwali): fine gold line work, softly lit lanterns, small marigolds, the lotus diya —
+/* Diwali art (src/shared/ui/Diwali): fine gold line work, small marigolds, the lotus diya —
    local tokens --app-diwali-* (L3 has no festive palette). */
 
 .diya,
@@ -18768,22 +18769,6 @@ export function useSystemKeyboard() {
 
 .goldFill {
   fill: var(--app-diwali-gold);
-}
-
-/* A lantern: warm glass with a gold outline, lit from inside, a soft halo around it. */
-.lanternGlass {
-  fill: rgb(from var(--app-diwali-flame) r g b / 0.16);
-  stroke: var(--app-diwali-gold);
-  stroke-width: 1;
-}
-
-.lanternLight {
-  fill: var(--app-diwali-flame-core);
-  opacity: 0.55;
-}
-
-.haloStop {
-  stop-color: var(--app-diwali-flame-core);
 }
 
 /* The lotus diya: magenta-hearted orange petals, a purple bowl painted in gold, a gold rim with the oil, a layered
@@ -18891,28 +18876,8 @@ export function useSystemKeyboard() {
   fill: var(--app-diwali-marigold-core);
 }
 
-/* The splash's entrance (all of it inside the splash's 2 s — timings in local tokens --app-splash-*): the lanterns come
-   down one after another and settle, then light up; the garland's string draws across from the left and its drops and
-   flowers pop on in turn. `--i` (inline) is each part's place in the order. */
-.lowerIn {
-  transform-box: fill-box;
-  animation: lowerIn var(--app-splash-in) var(--app-splash-ease-settle) both;
-  animation-delay: calc(var(--app-splash-art-at) + var(--i) * var(--app-splash-stagger) * 2);
-}
-
-@keyframes lowerIn {
-  from { translate: 0 -100%; }
-}
-
-.lightUp {
-  animation: lightUp var(--app-splash-in) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-lights-at);
-}
-
-@keyframes lightUp {
-  from { opacity: 0; }
-}
-
+/* The splash's entrance (inside the splash's 1.5 s — timings in local tokens --app-splash-*): the garland's string draws
+   across from the left and its drops and flowers pop on in turn. `--i` (inline) is each part's place in the order. */
 .drawIn {
   stroke-dasharray: 1;
   animation: drawIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
@@ -18961,42 +18926,8 @@ export function useSystemKeyboard() {
   60% { transform: scale(1.04, 0.96) rotate(1.5deg); }
 }
 
-/* The lanterns sway a little from where they hang (transform-origin set inline at the string). */
-.sway {
-  animation: sway var(--app-diwali-sway) ease-in-out infinite;
-}
-
-@keyframes sway {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-}
-
-/* The profile avatar's flip: it narrows to nothing (half a turn), the face swaps, it widens back. The class is tripled
-   to win over the flow's button styles (which set their own transition), keeping the press scale. */
-.flip.flip.flip {
-  transition:
-    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
-    scale var(--app-diwali-flip-half) var(--l3-motion-easing-standard),
-    background-color var(--app-diwali-flip-half) linear;
-}
-
-.flip.flip.flip[data-turning] {
-  scale: 0 1;
-}
-
-/* While it's the diya: a warm lamp-lit disc in place of the indigo one (doubled class: beats the flow's own styles). */
-.flip.flip.flip[data-diya] {
-  background: var(--app-diwali-lamp);
-  box-shadow: inset 0 0 0 1px var(--app-diwali-petal);
-}
-
-.avatarDiya {
-  width: 88%;
-  height: auto;
-}
-
-/* The search pill's flip: the pill stays put; its content (icon + label) narrows top to bottom to nothing, swaps to the
-   diya and "Happy Green Diwali", and opens back. Doubled class: beats the flow's own button styles. */
+/* The search pill's change: the pill stays put; its content (icon + label) slides out and the diya and "Happy Green
+   Diwali" slide in (and back). Doubled class: beats the flow's own button styles. */
 .searchFlip.searchFlip {
   position: relative;
 }
@@ -19132,9 +19063,6 @@ export function useSystemKeyboard() {
   .flame,
   .glowPulse,
   .spark,
-  .sway,
-  .lowerIn,
-  .lightUp,
   .drawIn,
   .popIn {
     animation: none;
@@ -19152,10 +19080,6 @@ export function useSystemKeyboard() {
   .sparklerSpark {
     animation: none;
   }
-
-  .flip.flip.flip {
-    transition-duration: 1ms;
-  }
 }
 ```
 
@@ -19171,55 +19095,18 @@ import styles from './Diwali.module.css'
 const t = makeCopy('shared', copy)
 
 /**
- * Diwali touches (temporary, festival only) — each one switched on in the prototype's App settings → Diwali:
- * - `diwaliSplash`: the launch splash becomes a quiet night scene with lanterns or a garland and the wish (src/shared/ui/Splash).
- * - `diwaliFlip`: on Stocks / F&O home, the profile initials — or the search pill's icon and label — flip to a diya
- *   (and "Happy Green Diwali") twice, then stay as they were.
+ * Diwali touches (temporary, festival only) — each one a switch in the prototype's App settings → Diwali, both on by
+ * default (the spec for developers: docs/DIWALI.md):
+ * - `diwaliSplash`: the launch splash becomes a quiet night scene — a marigold garland, twinkling lights and the wish
+ *   (src/shared/ui/Splash).
+ * - `diwaliFlip`: on Stocks / F&O home, the search pill's icon and label turn into the lotus diya and "Happy Green
+ *   Diwali" (with a sparkler round the pill) twice, then go back.
+ * Archived versions (the Lanterns splash, the profile avatar flip): src/shared/ui/archive/DiwaliArchive.tsx.
  */
 export const DIWALI_OPTIONS = {
   splash: { id: 'diwaliSplash', off: 'off', on: 'on', default: 'on' },
+  search: { id: 'diwaliFlip', off: 'off', on: 'search', default: 'search' },
 } as const
-
-/**
- * What flips to the diya on Stocks / F&O home (App settings → Diwali → Diya flip):
- * - profile: the profile avatar turns (a card flip) into the lotus diya.
- * - search: the search pill stays put; only its content flips (top to bottom) — the search icon becomes the diya and
- *   "Search stocks" becomes "Happy Green Diwali".
- */
-export const DIWALI_FLIP = {
-  id: 'diwaliFlip',
-  values: [
-    { value: 'off', label: 'Off' },
-    { value: 'profile', label: 'Profile' },
-    { value: 'search', label: 'Search bar' },
-  ],
-  default: 'search',
-} as const
-export type DiwaliFlip = (typeof DIWALI_FLIP.values)[number]['value']
-
-/**
- * The Diwali splash's versions (App settings → Diwali → Splash version, shown while the Diwali splash is on). Both are
- * the same quiet night scene — the wish under the logo in L3 type, a few twinkling lights — with one piece of art at the
- * top:
- * - lanterns: three fine-line lanterns hanging at different heights, softly glowing.
- * - garland: one thin gold string of small marigolds with tiny drops between them.
- */
-export const DIWALI_SPLASH_VERSIONS = {
-  id: 'diwaliSplashVersion',
-  values: [
-    { value: 'lanterns', label: 'Lanterns' },
-    { value: 'garland', label: 'Garland' },
-  ],
-  default: 'lanterns',
-} as const
-export type DiwaliSplashVersion = (typeof DIWALI_SPLASH_VERSIONS.values)[number]['value']
-
-/** Which splash to show: 'off' (the regular one) or the Diwali version picked. */
-export const useDiwaliSplash = (): 'off' | DiwaliSplashVersion => {
-  const on = useDiwali('splash')
-  const version = useFlowOption('app', DIWALI_SPLASH_VERSIONS.id, DIWALI_SPLASH_VERSIONS.default) as DiwaliSplashVersion
-  return on ? version : 'off'
-}
 
 export const useDiwali = (which: keyof typeof DIWALI_OPTIONS) => {
   const option = DIWALI_OPTIONS[which]
@@ -19315,66 +19202,13 @@ export function Diya({ className }: { className?: string }) {
   )
 }
 
-// Hanging lanterns (392 × 280 artwork, pinned to the top edge): where each hangs, how far its string drops, its scale.
-const HANGING = [
-  { x: 64, drop: 112, scale: 1.05 },
-  { x: 268, drop: 64, scale: 0.85 },
-  { x: 326, drop: 176, scale: 1.25 },
-]
-
-/** One fine-line lantern, its top at (0, 0): gold caps, a glass body lit from inside, three ribs, a small tassel. */
-function HangingLantern({ glow }: { glow: string }) {
-  return (
-    <>
-      <circle className={styles.lightUp} cx="0" cy="24" r="26" fill={`url(#${glow})`} />
-      <circle className={styles.hairline} cx="0" cy="2" r="2" />
-      <path className={styles.goldFill} d="M-5 4H5L9 10H-9Z" />
-      <path className={styles.lanternGlass} d="M-9 10C-15 18 -15 30 -9 38H9C15 30 15 18 9 10Z" />
-      <ellipse className={[styles.lanternLight, styles.lightUp].join(' ')} cx="0" cy="24" rx="5" ry="8" />
-      <path className={styles.hairline} d="M-4 10.5Q-7 24 -4 37.5M4 10.5Q7 24 4 37.5" />
-      <path className={styles.goldFill} d="M-9 38H9L5 43H-5Z" />
-      <path className={styles.hairline} d="M0 43V50" />
-      <path className={styles.goldFill} d="M0 49.5C1.6 52 2 54.5 0 57C-2 54.5 -1.6 52 0 49.5Z" />
-    </>
-  )
-}
-
-/**
- * The Lanterns splash's art: three lanterns hanging from the top at different heights, swaying a little. On the way in
- * they come down one after another, then light up.
- */
-export function Lanterns({ className }: { className?: string }) {
-  const glow = useId()
-  return (
-    <svg className={[styles.art, className].filter(Boolean).join(' ')} viewBox="0 0 392 280" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
-      <defs>
-        <radialGradient id={glow}>
-          <stop offset="0" className={styles.haloStop} stopOpacity="0.32" />
-          <stop offset="1" className={styles.haloStop} stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      {HANGING.map(({ x, drop, scale }, i) => (
-        // Comes down from above the top edge (one after another), then sways from where it hangs.
-        <g key={x} className={styles.lowerIn} style={{ '--i': i } as CSSProperties}>
-          <g className={styles.sway} style={{ transformOrigin: `${x}px 0px`, animationDelay: `${i * -1.3}s` }}>
-            <path className={styles.hairline} d={`M${x} 0V${drop}`} />
-            <g transform={`translate(${x} ${drop}) scale(${scale})`}>
-              <HangingLantern glow={glow} />
-            </g>
-          </g>
-        </g>
-      ))}
-    </svg>
-  )
-}
-
 // The garland's string: a gentle dip across the top, P0 (0, 4) → P1 (196, 92) → P2 (392, 4) (a quadratic curve).
 const garlandAt = (t: number) => ({ x: 392 * t, y: 4 + 176 * t * (1 - t) })
 const GARLAND_FLOWERS = Array.from({ length: 9 }, (_, i) => ({ ...garlandAt(0.1 + i * 0.1), tone: i % 2 }))
 const GARLAND_DROPS = Array.from({ length: 8 }, (_, i) => ({ ...garlandAt(0.15 + i * 0.1), long: i % 2 === 0 }))
 const PETAL_RING = Array.from({ length: 8 }, (_, i) => (i * Math.PI * 2) / 8)
 
-/** The Garland splash's art: one thin gold string of small two-tone marigolds, a tiny gold drop between each. */
+/** The Diwali splash's art: one thin gold string of small two-tone marigolds, a tiny gold drop between each. */
 export function Garland({ className }: { className?: string }) {
   return (
     <svg className={[styles.art, className].filter(Boolean).join(' ')} viewBox="0 0 392 120" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
@@ -19415,15 +19249,9 @@ export function Sparkles({ className }: { className?: string }) {
   )
 }
 
-// The diya flip's timeline (ms from the home showing, or from the splash starting to leave): the initials / search content
-// turn into the diya, hold, turn back — twice. The search pill's Diwali face (with its sparkler) holds 3 s each time.
+// The search pill's timeline (ms from the home showing, or from the splash starting to leave): its content goes out
+// (FLIP_HALF_MS), the Diwali face comes in and holds 3 s, the regular content comes back — twice.
 const FLIP_HALF_MS = 160
-const PROFILE_FLIPS = [
-  { at: 1000, to: 'diya' },
-  { at: 2800, to: 'regular' },
-  { at: 3600, to: 'diya' },
-  { at: 5400, to: 'regular' },
-] as const
 const SEARCH_FLIPS = [
   { at: 1000, to: 'diya' },
   { at: 4000, to: 'regular' },
@@ -19431,7 +19259,7 @@ const SEARCH_FLIPS = [
   { at: 7800, to: 'regular' },
 ] as const
 
-/** Whether a splash covers the home: the flips wait until it starts leaving, however long it stays, so none is hidden. */
+/** Whether a splash covers the home: the search pill's change waits until it starts leaving, however long it stays, so none is hidden. */
 let splashUp = false
 const splashListeners = new Set<() => void>()
 /** The splash calls this as it shows (true) and as it starts leaving (false) (src/shared/ui/Splash). */
@@ -19441,28 +19269,25 @@ export function setSplashUp(up: boolean) {
 }
 
 /**
- * The Diwali diya flip on a home's top bar (App settings → Diwali → Diya flip): the initials — or the search pill's icon
- * and label — turn into the diya and back, twice, then stay. It plays each time the home shows. `home` names the home
- * ('stocks', 'fno').
- * - Profile: spread `profile.flip` onto the profile button (className + data attributes) and render `profile.face`.
- * - Search: add `search.className` and `search.turning` (as `data-turning`) to the search pill and, while
- *   `search.diya`, render <DiwaliSearchFace /> in place of its icon and label. Only the pill's content changes: it
- *   fades and slides up out, and the new content slides up and fades in (icon first, then the label).
+ * The Diwali search pill on a home's top bar (App settings → Diwali → Diwali search bar): the pill stays put; its icon
+ * and label fade and slide up out, the diya and "Happy Green Diwali" slide up and fade in (icon first, then the label),
+ * hold 3 s and go back the same way — twice, each time the home shows, starting 1 s after the splash starts leaving.
+ * Add `className` and `turning` (as `data-turning`) to the search pill and, while `diya`, render <DiwaliSearchFace />
+ * in place of its icon and label.
  */
-export function useDiyaFlip(home: string, initials: string) {
-  const target = useFlowOption('app', DIWALI_FLIP.id, DIWALI_FLIP.default) as DiwaliFlip
+export function useDiwaliSearch() {
+  const on = useDiwali('search')
   const [face, setFace] = useState<'regular' | 'diya'>('regular')
   const [turning, setTurning] = useState(false)
-  // The search content has changed once: from then on new content slides in (not on the home's first paint).
+  // The content has changed once: from then on new content slides in (not on the home's first paint).
   const [swapped, setSwapped] = useState(false)
 
   useEffect(() => {
-    if (target === 'off') return
+    if (!on) return
     const timers: number[] = []
     const play = () => {
       splashListeners.delete(play)
-      const flips = target === 'search' ? SEARCH_FLIPS : PROFILE_FLIPS
-      flips.forEach(({ at, to }) => timers.push(
+      SEARCH_FLIPS.forEach(({ at, to }) => timers.push(
         window.setTimeout(() => setTurning(true), at),
         window.setTimeout(() => { setFace(to); setTurning(false); setSwapped(true) }, at + FLIP_HALF_MS),
       ))
@@ -19476,21 +19301,12 @@ export function useDiyaFlip(home: string, initials: string) {
       setTurning(false)
       setSwapped(false)
     }
-  }, [target, home])
+  }, [on])
 
-  const profileDiya = target === 'profile' && face === 'diya'
   return {
-    profile: {
-      flip: target === 'profile'
-        ? { className: styles.flip, 'data-turning': turning || undefined, 'data-diya': profileDiya || undefined }
-        : { className: '' },
-      face: profileDiya ? <Diya className={styles.avatarDiya} /> : initials,
-    },
-    search: {
-      className: target === 'search' ? [styles.searchFlip, swapped && styles.searchSwapped].filter(Boolean).join(' ') : '',
-      turning: (target === 'search' && turning) || undefined,
-      diya: target === 'search' && face === 'diya',
-    },
+    className: on ? [styles.searchFlip, swapped && styles.searchSwapped].filter(Boolean).join(' ') : '',
+    turning: (on && turning) || undefined,
+    diya: on && face === 'diya',
   }
 }
 
@@ -19993,7 +19809,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 }
 
 /* Diwali: a quiet night scene (the splash takes L3's dark theme) — a faint dusk from the top, a soft warm glow behind
-   the logo, a few twinkling lights, the lanterns or garland at the top edge, the wish rising in under the logo.
+   the logo, a few twinkling lights, the garland at the top edge, the wish rising in under the logo.
    Its entrance (local tokens --app-splash-*) is over before the splash fades: the glow swells in with the art, the
    logo rises, the lights come on, the wish's two lines rise in, a gold shine crosses "Happy Diwali". */
 .splash[data-diwali] {
@@ -20112,7 +19928,7 @@ import { Stack } from '@l3/components/Stack'
 import { useTheme } from '@l3/theme'
 import { makeCopy } from '../copy'
 import copy from './copy.json'
-import { Garland, Lanterns, Sparkles, setSplashUp, useDiwaliSplash } from './Diwali'
+import { Garland, Sparkles, setSplashUp, useDiwali } from './Diwali'
 import styles from './Splash.module.css'
 
 const t = makeCopy('shared', copy)
@@ -20163,8 +19979,8 @@ function useSplashState(show: boolean, held = false) {
 }
 
 /**
- * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali versions
- * (App settings → Diwali) are a quiet night scene in L3's dark theme, in either app theme: hanging lanterns or a marigold
+ * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali splash
+ * (App settings → Diwali, on by default) is a quiet night scene in L3's dark theme, in either app theme: a marigold
  * garland at the top, a soft warm glow, a few twinkling lights, and the wish under the logo with "Happy Diwali" in gold.
  */
 function SplashCover({ state, onHold, onLeave, onGone }: {
@@ -20173,7 +19989,7 @@ function SplashCover({ state, onHold, onLeave, onGone }: {
   onLeave: () => void
   onGone: () => void
 }) {
-  const diwali = useDiwaliSplash()
+  const diwali = useDiwali('splash')
   const { product } = useTheme()
   // Prototype only (not app behaviour — leave out of the build): to look at the splash, hovering (mouse) holds it, a
   // tap / click pins it, and a second tap lets it fade.
@@ -20185,24 +20001,23 @@ function SplashCover({ state, onHold, onLeave, onGone }: {
       type="button"
       className={styles.splash}
       data-state={state}
-      data-diwali={diwali === 'off' ? undefined : diwali}
+      data-diwali={diwali || undefined}
       // Diwali is a night scene: the splash always takes L3's dark theme (the logo's name turns light with it).
-      data-product={diwali === 'off' ? undefined : product}
-      data-mode={diwali === 'off' ? undefined : 'dark'}
-      data-system-bars={diwali === 'off' ? undefined : 'dark'}
-      aria-label={diwali === 'off' ? t('splash.label') : `${t('splash.label')}. ${t('splash.diwali')}`}
+      data-product={diwali ? product : undefined}
+      data-mode={diwali ? 'dark' : undefined}
+      data-system-bars={diwali ? 'dark' : undefined}
+      aria-label={diwali ? `${t('splash.label')}. ${t('splash.diwali')}` : t('splash.label')}
       onClick={() => (pinned ? onLeave() : setPinned(true))}
       onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHovered(true) }}
       onPointerLeave={(e) => { if (e.pointerType === 'mouse') setHovered(false) }}
       onTransitionEnd={(e) => { if (e.target === e.currentTarget) onGone() }}
     >
-      {diwali !== 'off' && <Sparkles className={styles.sparkles} />}
-      {diwali === 'lanterns' && <Lanterns className={styles.art} />}
-      {diwali === 'garland' && <Garland className={styles.art} />}
+      {diwali && <Sparkles className={styles.sparkles} />}
+      {diwali && <Garland className={styles.art} />}
       <Stack align="center" className={styles.centre}>
         <BrandLogo brand="lemonn" variant="full" size={48} decorative className={styles.logo} />
         {/* Hangs under the logo, so the logo stays where the regular splash has it. */}
-        {diwali !== 'off' && (
+        {diwali && (
           <Stack gap="08" align="center" className={styles.wish}>
             <p className={styles.wishLead}>{t('splash.diwaliLead')}</p>
             <p className={styles.headline} data-text={t('splash.diwaliHeadline')}>{t('splash.diwaliHeadline')}</p>
