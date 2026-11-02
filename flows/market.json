@@ -18,7 +18,8 @@
       "figma": "",
       "note": "The filter bar shows \"Apply filters\" until something is applied.",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -28,7 +29,8 @@
       "figma": "",
       "note": "Same layout — only the list changes.",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -38,7 +40,8 @@
       "figma": "",
       "note": "",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -48,7 +51,8 @@
       "figma": "",
       "note": "",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -58,7 +62,8 @@
       "figma": "",
       "note": "Side tabs on the left (grey rail, the open one connected to the pane); only the open group on the right. Opens on Sort by.",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -68,7 +73,8 @@
       "figma": "",
       "note": "Indices open — Nifty 500 picked (one choice); its side tab shows 1. Each option says how many stocks it gives.",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -78,7 +84,8 @@
       "figma": "",
       "note": "Sectors open — Banking and IT picked (any number); sort and index picked too. Sectors with no stocks in Nifty 500 are off.",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     },
@@ -88,7 +95,8 @@
       "figma": "",
       "note": "One removable chip per pick; the filter button gets a dot.",
       "goesTo": [
-        "search-24"
+        "search-24",
+        "stocks-09"
       ],
       "figmaUrl": ""
     }
@@ -121,6 +129,7 @@
     "src/shared/copy.ts",
     "src/shared/data/format.ts",
     "src/shared/data/market.ts",
+    "src/shared/data/openStock.ts",
     "src/shared/prototype.ts",
     "src/shared/ui/MainNav.tsx",
     "src/shared/ui/Screen.module.css",

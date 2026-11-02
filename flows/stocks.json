@@ -13,11 +13,22 @@
   },
   "screens": [
     {
+      "id": "stocks-17",
+      "name": "Splash",
+      "figma": "",
+      "note": "The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page.",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
       "id": "stocks-01",
       "name": "Home",
       "figma": "",
       "note": "Top of the page: search, indices, holdings, products, shortcuts.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -30,6 +41,7 @@
       "figma": "",
       "note": "Same page, scrolled.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -42,6 +54,7 @@
       "figma": "",
       "note": "The \"Top losers\" chip picked.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -54,6 +67,7 @@
       "figma": "",
       "note": "Same page, scrolled: managed strategies, then the announcement.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -66,6 +80,7 @@
       "figma": "",
       "note": "Same page, scrolled.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -78,6 +93,7 @@
       "figma": "",
       "note": "Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -90,6 +106,7 @@
       "figma": "",
       "note": "The end of the page: the disclosure, four lines and Read More.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
@@ -102,9 +119,90 @@
       "figma": "5612:44075",
       "note": "First visit after DASH launches: an L3 coach mark on the DASH pill (Figma \"Intro\" in DASH AI main flow). Got it! or the pill opens DASH.",
       "goesTo": [
+        "stocks-09",
         "search-01",
         "profile-01",
         "dash-02"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-09",
+      "name": "Stock · Overview",
+      "figma": "",
+      "note": "Rebuilt from the live app (ADB, 2026-11-02). The top part follows the US stock page: change over the chart range, NSE / BSE switch, line chart, ranges.",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-10",
+      "name": "Stock · depth & about",
+      "figma": "",
+      "note": "Scrolled: the Actionbar shows symbol + price, the tabs stick under it. About Company opened (Read more).",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-11",
+      "name": "Stock · shareholding & financials",
+      "figma": "",
+      "note": "Quarter chips change the bars; Quarterly ⇅ switches the Financials to yearly; Revenue / Profit / Networth.",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-12",
+      "name": "Stock · Events",
+      "figma": "",
+      "note": "Events by year, latest first; Filters on the first year; View more lists older years.",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-13",
+      "name": "Stock · event details",
+      "figma": "",
+      "note": "A tapped event: period and release date.",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-14",
+      "name": "Stock · event filters",
+      "figma": "",
+      "note": "Choose filter: one checkbox per event type, Done applies.",
+      "goesTo": [
+        "stocks-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-15",
+      "name": "Performance (ⓘ)",
+      "figma": "",
+      "note": "Daily Performance ⓘ: what each number means.",
+      "goesTo": [
+        "stocks-09"
+      ],
+      "figmaUrl": ""
+    },
+    {
+      "id": "stocks-16",
+      "name": "Glossary · Fundamentals (ⓘ)",
+      "figma": "",
+      "note": "Fundamentals ⓘ: what each ratio means.",
+      "goesTo": [
+        "stocks-09"
       ],
       "figmaUrl": ""
     }
@@ -117,14 +215,20 @@
     "src/flows/stocks/components/Ideas.tsx",
     "src/flows/stocks/components/Invest.tsx",
     "src/flows/stocks/components/Overview.tsx",
+    "src/flows/stocks/components/StockEvents.tsx",
+    "src/flows/stocks/components/StockOverview.tsx",
     "src/flows/stocks/components/TopBar.module.css",
     "src/flows/stocks/components/TopBar.tsx",
     "src/flows/stocks/copy.json",
     "src/flows/stocks/copy.ts",
     "src/flows/stocks/data.ts",
     "src/flows/stocks/index.tsx",
+    "src/flows/stocks/screens/Glossary.tsx",
     "src/flows/stocks/screens/Home.module.css",
-    "src/flows/stocks/screens/Home.tsx"
+    "src/flows/stocks/screens/Home.tsx",
+    "src/flows/stocks/screens/StockPage.module.css",
+    "src/flows/stocks/screens/StockPage.tsx",
+    "src/flows/stocks/sheets/EventSheets.tsx"
   ],
   "shared": [
     "src/shared/assets/logos/asahiindia.png",
@@ -142,9 +246,12 @@
     "src/shared/data/format.ts",
     "src/shared/data/market-snapshot.json",
     "src/shared/data/market.ts",
+    "src/shared/data/openStock.ts",
     "src/shared/data/portfolio.ts",
     "src/shared/data/user.ts",
     "src/shared/prototype.ts",
+    "src/shared/ui/Diwali.module.css",
+    "src/shared/ui/Diwali.tsx",
     "src/shared/ui/MainNav.tsx",
     "src/shared/ui/Rail.module.css",
     "src/shared/ui/Rail.tsx",
@@ -152,6 +259,9 @@
     "src/shared/ui/Screen.tsx",
     "src/shared/ui/Sheet.module.css",
     "src/shared/ui/Sheet.tsx",
+    "src/shared/ui/Splash.module.css",
+    "src/shared/ui/Splash.tsx",
+    "src/shared/ui/copy.json",
     "src/shared/ui/dash/DashEntry.module.css",
     "src/shared/ui/dash/DashEntry.tsx",
     "src/shared/ui/dash/DashOrb.module.css",

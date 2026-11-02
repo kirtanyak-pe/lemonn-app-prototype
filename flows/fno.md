@@ -10,6 +10,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
+| `fno-34` | Splash | — | `fno-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Plays when the app opens or reloads on F&O home (src/shared/ui/Splash); not on a link to an inner page. |
 | `fno-01` | Equity home | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — | From the main F&O tab. Home returns to Stocks; DASH, Search, Profile and Wallet open their existing flows. Selectors, chart metrics, filters, sorting and watchlist creation work locally. Destinations outside this frame open an explanatory sheet. |
 | `fno-02` | Home · watchlists & Smart Options | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — | The same long screen, scrolled to watchlists. |
 | `fno-03` | Home · Futures Heatmap | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
@@ -59,6 +60,7 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 
 | Id | What it shows | Figma |
 |---|---|---|
+| fno-34 | Splash: the launch splash (`src/shared/ui/Splash`), the Lemonn logo centred. Shown for 2 s, then it fades into fno-01 (a tap skips ahead); plays whenever the app opens or reloads on F&O home | — |
 | fno-01 | Equity home, top | 11569:41100 |
 | fno-02 | The same page, at Watchlists / Smart Options | 11569:41100 |
 | fno-03 | The same page, at Futures Heatmap | 11569:41100 |
@@ -241,6 +243,8 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
+- 2026-11-02 — Splash (fno-34): the launch splash as a page, listed first.
+- 2026-11-02 — Diwali (App settings → Diwali, on by default for now): a Diwali splash, and the home's profile avatar flips to a diya twice (`src/shared/ui/Diwali`).
 - 2026-10-29 — Commodity options order pad (fno-25 … 31) from Figma 8671:18433; asset page and Gold Summary Buy / Sell open it.
 - 2026-10-29 — Illiquid explainer simplified (small header, three icon points like the Pine Script sheet) and shared: opens from the chain's ⓘ and from every ILLIQUID tag.
 - 2026-10-29 — Buy / Sell sheet from Gold Summary cards (fno-23) with the illiquid state (fno-24: tag on the card and in the sheet, Buy / Sell disabled).
@@ -1877,6 +1881,7 @@ export function FnoNav({ onHome, onDestination, onChain, onScalper }: { onHome: 
 import { Icon } from '@l3/components/Icon'
 import { msAccountBalanceWallet, msSearch } from '@l3/icons/material'
 import { DashEntry } from '../../../shared/ui/dash/DashEntry'
+import { useDiyaFlip } from '../../../shared/ui/Diwali'
 import { t } from '../copy'
 import styles from './Header.module.css'
 
@@ -1891,8 +1896,10 @@ type HeaderProps = {
 
 /** F&O's local instance of the Stocks home header: profile, search, DASH and wallet. */
 export function Header({ initials, scrolled = false, onProfile, onSearch, onWallet, onDash }: HeaderProps) {
+  // Diwali (App settings → Diwali avatar): the initials flip to a diya twice when F&O home shows.
+  const avatar = useDiyaFlip('fno', initials)
   return <header className={styles.bar} data-scrolled={scrolled || undefined}>
-    <button type="button" className={styles.profile} aria-label={t('top.profile')} onClick={onProfile}>{initials}</button>
+    <button type="button" {...avatar.flip} className={[styles.profile, avatar.flip.className].join(' ')} aria-label={t('top.profile')} onClick={onProfile}>{avatar.face}</button>
     <button type="button" className={styles.search} onClick={onSearch}><Icon icon={msSearch} size={20} /><span className={styles.placeholder}>{t('top.search')}</span></button>
     <DashEntry label={t('top.dash')} ariaLabel={t('top.dash')} onClick={onDash} />
     <button type="button" className={styles.wallet} aria-label={t('top.wallet')} onClick={onWallet}><Icon icon={msAccountBalanceWallet} size={20} /></button>
@@ -2819,6 +2826,7 @@ import { OptionChain } from './option-chain/screens/OptionChain'
 import { OrderPad } from './order-pad/screens/OrderPad'
 import type { Segment } from './strategies/data'
 import { Scalper } from './screens/Scalper'
+import { SplashScreen } from '../../shared/ui/Splash'
 
 /**
  * Each product tab is its own screen, all in group 'home': one page in different states, so a tab switch keeps the
@@ -2836,6 +2844,7 @@ export const fno: Flow = {
   description: 'Equity F&O home: P&L, indices, chart metrics, watchlists, Smart Options, Futures Heatmap and Smart Futures.',
   figmaFile: 'nLs24dTJdPz9A5pu3AWMbe',
   screens: [
+    { id: 'fno-34', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Plays when the app opens or reloads on F&O home (src/shared/ui/Splash); not on a link to an inner page.', render: (go) => <SplashScreen onDone={() => go('fno-01')} home={home(go)} /> },
     { id: 'fno-01', group: 'home', name: 'Equity home', figma: '11569:41100', tab: true, note: 'From the main F&O tab. Home returns to Stocks; DASH, Search, Profile and Wallet open their existing flows. Selectors, chart metrics, filters, sorting and watchlist creation work locally. Destinations outside this frame open an explanatory sheet.', render: (go) => home(go) },
     { id: 'fno-02', group: 'home', name: 'Home · watchlists & Smart Options', figma: '11569:41100', tab: true, note: 'The same long screen, scrolled to watchlists.', render: (go) => home(go, 'watchlists') },
     { id: 'fno-03', group: 'home', name: 'Home · Futures Heatmap', figma: '11569:41100', tab: true, render: (go) => home(go, 'heatmap') },
@@ -5136,6 +5145,236 @@ export function useSystemKeyboard() {
 }
 ```
 
+### `src/shared/ui/Diwali.module.css`
+
+```css
+/* Diwali art (src/shared/ui/Diwali): thin honey line work, marigold petals, a tangerine flame — local tokens
+   --app-diwali-* (L3 has no festive palette). */
+
+.diya,
+.toran {
+  display: block;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: var(--app-diwali-line);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.dot {
+  fill: var(--app-diwali-line);
+}
+
+.petals {
+  fill: var(--app-diwali-petal);
+  stroke: var(--app-diwali-line);
+  stroke-width: 1;
+}
+
+.bowl,
+.lanternBody,
+.lanternCap {
+  fill: var(--app-diwali-petal);
+  stroke: var(--app-diwali-line);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.lanternBody {
+  fill: var(--app-diwali-lamp);
+}
+
+
+.flameOuter {
+  fill: var(--app-diwali-flame);
+}
+
+.flameInner {
+  fill: var(--app-diwali-flame-core);
+}
+
+/* The flame breathes from its base. */
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flicker var(--app-diwali-flicker) ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  30% { transform: scale(0.94, 1.06) rotate(-2deg); }
+  60% { transform: scale(1.04, 0.96) rotate(1.5deg); }
+}
+
+/* The lanterns sway a little from where they hang (transform-origin set inline at the string). */
+.lantern {
+  animation: sway var(--app-diwali-sway) ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* The profile avatar's flip: it narrows to nothing (half a turn), the face swaps, it widens back. The class is tripled
+   to win over the flow's button styles (which set their own transition), keeping the press scale. */
+.flip.flip.flip {
+  transition:
+    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    scale var(--app-diwali-flip-half) var(--l3-motion-easing-standard),
+    background-color var(--app-diwali-flip-half) linear;
+}
+
+.flip.flip.flip[data-turning] {
+  scale: 0 1;
+}
+
+/* While it's the diya: a warm lamp-lit disc in place of the indigo one (doubled class: beats the flow's own styles). */
+.flip.flip.flip[data-diya] {
+  background: var(--app-diwali-lamp);
+  box-shadow: inset 0 0 0 1px var(--app-diwali-petal);
+}
+
+.avatarDiya {
+  width: 70%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flame,
+  .lantern {
+    animation: none;
+  }
+
+  .flip.flip.flip {
+    transition-duration: 1ms;
+  }
+}
+```
+
+### `src/shared/ui/Diwali.tsx`
+
+```tsx
+import { useEffect, useState } from 'react'
+import { useFlowOption } from '../prototype'
+import styles from './Diwali.module.css'
+
+/**
+ * Diwali touches (temporary, festival only) — each one switched on in the prototype's App settings → Diwali:
+ * - `diwaliSplash`: the launch splash gets a marigold toran, a diya and the wish (src/shared/ui/Splash).
+ * - `diwaliAvatar`: the profile initials on Stocks / F&O home flip to a diya twice, then stay as initials.
+ */
+export const DIWALI_OPTIONS = {
+  splash: { id: 'diwaliSplash', off: 'off', on: 'on' },
+  avatar: { id: 'diwaliAvatar', off: 'off', on: 'on' },
+} as const
+
+export const useDiwali = (which: keyof typeof DIWALI_OPTIONS) => {
+  const option = DIWALI_OPTIONS[which]
+  return useFlowOption('app', option.id, option.off) === option.on
+}
+
+/** A clay diya: the bowl with three dots on its rim and a flame that flickers. Fills its box (48 × 40 artwork). */
+export function Diya({ className }: { className?: string }) {
+  return (
+    <svg className={[styles.diya, className].filter(Boolean).join(' ')} viewBox="0 0 48 40" aria-hidden="true">
+      <g className={styles.flame}>
+        <path className={styles.flameOuter} d="M24 3C28 9.5 30.5 13.5 30.5 18C30.5 22 27.6 24.5 24 24.5C20.4 24.5 17.5 22 17.5 18C17.5 13.5 20 9.5 24 3Z" />
+        <path className={styles.flameInner} d="M24 11C25.9 14 27 16.2 27 18.6C27 20.6 25.7 21.8 24 21.8C22.3 21.8 21 20.6 21 18.6C21 16.2 22.1 14 24 11Z" />
+      </g>
+      <path className={styles.bowl} d="M3.5 24.5H44.5C42.5 33.5 34.5 38.5 24 38.5C13.5 38.5 5.5 33.5 3.5 24.5Z" />
+      <circle className={styles.dot} cx="14" cy="30" r="1.3" />
+      <circle className={styles.dot} cx="24" cy="32" r="1.3" />
+      <circle className={styles.dot} cx="34" cy="30" r="1.3" />
+    </svg>
+  )
+}
+
+// The toran's string: a gentle dip across the top, P0 (0, 6) → P1 (196, 46) → P2 (392, 6) (a quadratic curve).
+const stringAt = (t: number) => ({ x: 392 * t, y: 6 + 80 * t * (1 - t) })
+const FLOWERS = Array.from({ length: 11 }, (_, i) => stringAt(0.05 + i * 0.09))
+const LANTERNS = [0.16, 0.84].map(stringAt)
+
+/** A marigold toran across the top with two small lanterns hanging from it (they sway a little). */
+export function Toran({ className }: { className?: string }) {
+  return (
+    <svg className={[styles.toran, className].filter(Boolean).join(' ')} viewBox="0 0 392 96" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+      <path className={styles.line} d="M0 6Q196 46 392 6" />
+      {LANTERNS.map((p, i) => (
+        <g key={i} className={styles.lantern} style={{ transformOrigin: `${p.x}px ${p.y}px`, animationDelay: `${i * -1.4}s` }}>
+          <path className={styles.line} d={`M${p.x} ${p.y}V${p.y + 34}`} />
+          <path className={styles.lanternCap} d={`M${p.x - 6} ${p.y + 38}L${p.x} ${p.y + 33}L${p.x + 6} ${p.y + 38}Z`} />
+          <rect className={styles.lanternBody} x={p.x - 7} y={p.y + 38} width="14" height="18" rx="4" />
+          <path className={styles.flameOuter} d={`M${p.x} ${p.y + 42}C${p.x + 2.2} ${p.y + 45.5} ${p.x + 2.4} ${p.y + 48.5} ${p.x} ${p.y + 50.5}C${p.x - 2.4} ${p.y + 48.5} ${p.x - 2.2} ${p.y + 45.5} ${p.x} ${p.y + 42}Z`} />
+          <path className={styles.line} d={`M${p.x} ${p.y + 56}V${p.y + 64}`} />
+          <circle className={styles.dot} cx={p.x} cy={p.y + 65.5} r="1.5" />
+        </g>
+      ))}
+      {FLOWERS.map((p, i) => (
+        <g key={i}>
+          <circle className={styles.petals} cx={p.x} cy={p.y} r="5" />
+          <circle className={styles.dot} cx={p.x} cy={p.y} r="1.6" />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+// The avatar flip's timeline (ms from the home showing): the initials turn into the diya, hold, turn back — twice.
+const FLIP_HALF_MS = 160
+const FLIPS = [
+  { at: 1000, to: 'diya' },
+  { at: 2800, to: 'initials' },
+  { at: 3600, to: 'diya' },
+  { at: 5400, to: 'initials' },
+] as const
+
+/** Homes (by key) whose avatar has already flipped this visit: it plays once per page load, not on every tab switch. */
+const flipped = new Set<string>()
+
+/** When a splash covering the home is gone (ms, Date.now()): the flips wait for it, so the first one isn't hidden. */
+let splashGoneAt = 0
+/** The splash calls this as it starts showing (src/shared/ui/Splash). */
+export const holdFlipsFor = (ms: number) => { splashGoneAt = Date.now() + ms }
+
+/**
+ * The profile avatar's Diwali flip: with `diwaliAvatar` on, the initials turn (a card flip, half then half) into a
+ * diya and back, twice, then stay. Spread `flip` onto the profile button (className + data attributes) and render
+ * `face`. `home` names the home ('stocks', 'fno') so each plays once per visit.
+ */
+export function useDiyaFlip(home: string, initials: string) {
+  const on = useDiwali('avatar')
+  const [face, setFace] = useState<'initials' | 'diya'>('initials')
+  const [turning, setTurning] = useState(false)
+
+  useEffect(() => {
+    if (!on || flipped.has(home)) return
+    flipped.add(home)
+    let finished = false
+    const wait = Math.max(0, splashGoneAt - Date.now())
+    const timers = FLIPS.flatMap(({ at, to }, i) => [
+      window.setTimeout(() => setTurning(true), wait + at),
+      window.setTimeout(() => { setFace(to); setTurning(false); finished = i === FLIPS.length - 1 }, wait + at + FLIP_HALF_MS),
+    ])
+    return () => {
+      timers.forEach(window.clearTimeout)
+      // Left before the flips ended (or React's dev double-mount): play again next time.
+      if (!finished) flipped.delete(home)
+      setFace('initials')
+      setTurning(false)
+    }
+  }, [on, home])
+
+  return {
+    flip: { className: styles.flip, 'data-turning': turning || undefined, 'data-diya': face === 'diya' || undefined },
+    face: face === 'diya' ? <Diya className={styles.avatarDiya} /> : initials,
+  }
+}
+```
+
 ### `src/shared/ui/IlliquidSheet.module.css`
 
 ```css
@@ -5498,6 +5737,197 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
       )}
     </SheetHostContext.Provider>
   )
+}
+```
+
+### `src/shared/ui/Splash.module.css`
+
+```css
+/* The launch splash: covers the app (above sheets and toasts) — the Lemonn logo centred on the page surface. */
+.splash {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-layer-splash);
+  display: grid;
+  place-items: center;
+  background: var(--l3-surface-default);
+  /* A button (a tap skips ahead): no button chrome. */
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+
+.splash[data-state='leaving'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Diwali: a soft warm glow behind the logo, the toran hanging from the top edge, the wish rising in under the logo. */
+.splash[data-diwali] {
+  background:
+    radial-gradient(circle at 50% 50%, var(--app-diwali-glow), transparent 60%),
+    var(--l3-surface-default);
+}
+
+.toran {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+}
+
+.diya {
+  width: var(--l3-size-48);
+  height: auto;
+}
+
+.wishText {
+  max-width: 24ch;
+  margin: 0;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-14);
+  text-align: center;
+}
+
+.centre {
+  position: relative;
+}
+
+.wish {
+  position: absolute;
+  top: calc(100% + var(--l3-spacing-32));
+  left: 50%;
+  width: max-content;
+  translate: -50% 0;
+  animation: wishIn var(--l3-motion-duration-long) var(--l3-motion-easing-standard) both;
+  animation-delay: var(--l3-motion-duration-medium);
+}
+
+@keyframes wishIn {
+  from { opacity: 0; translate: -50% var(--l3-spacing-08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wish {
+    animation: none;
+  }
+
+  .splash {
+    transition-duration: 1ms;
+  }
+}
+```
+
+### `src/shared/ui/Splash.tsx`
+
+```tsx
+import { useEffect, useState, type ReactNode } from 'react'
+import { BrandLogo } from '@l3/components/BrandLogo'
+import { Stack } from '@l3/components/Stack'
+import { makeCopy } from '../copy'
+import copy from './copy.json'
+import { Diya, Toran, holdFlipsFor, useDiwali } from './Diwali'
+import styles from './Splash.module.css'
+
+const t = makeCopy('shared', copy)
+
+/** The screens a launch can land on that open with the splash: the two home pages (Stocks, F&O). */
+export const SPLASH_SCREENS = ['stocks-01', 'fno-01']
+/** How long the logo stays before the splash fades away. */
+export const SPLASH_MS = 2000
+
+/**
+ * Show the splash when the app launches (opens or reloads) onto a home page. A launch straight into an inner page (a
+ * shared link to an L2 / L3 screen) skips it; so does every later move to a home page inside the app.
+ */
+export function shouldShowSplash(landing: string) {
+  return SPLASH_SCREENS.includes(landing)
+}
+
+/** Longest the fade may take before the splash is removed anyway (a background tab never ends its transition). */
+const FADE_FALLBACK_MS = 600
+
+/** The splash's own timing: shown for 2 s ('shown'), then fading ('leaving'), then gone ('done'). A tap skips ahead. */
+function useSplashState(show: boolean) {
+  const [state, setState] = useState<'shown' | 'leaving' | 'done'>(() => {
+    if (show) holdFlipsFor(SPLASH_MS + FADE_FALLBACK_MS) // the home's Diwali avatar flip starts once the splash is gone
+    return show ? 'shown' : 'done'
+  })
+  useEffect(() => {
+    if (state === 'done') return
+    const t = window.setTimeout(() => setState(state === 'shown' ? 'leaving' : 'done'), state === 'shown' ? SPLASH_MS : FADE_FALLBACK_MS)
+    return () => window.clearTimeout(t)
+  }, [state])
+  return [state, setState] as const
+}
+
+/**
+ * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali version
+ * (App settings → Diwali splash) adds a marigold toran across the top, a warm glow, and a diya with the wish under the
+ * logo.
+ */
+function SplashCover({ state, onLeave, onGone }: { state: 'shown' | 'leaving'; onLeave: () => void; onGone: () => void }) {
+  const diwali = useDiwali('splash')
+  return (
+    <button
+      type="button"
+      className={styles.splash}
+      data-state={state}
+      data-diwali={diwali || undefined}
+      aria-label={diwali ? `${t('splash.label')}. ${t('splash.diwali')}` : t('splash.label')}
+      onClick={onLeave}
+      onTransitionEnd={(e) => { if (e.target === e.currentTarget) onGone() }}
+    >
+      {diwali && <Toran className={styles.toran} />}
+      <Stack align="center" className={styles.centre}>
+        <BrandLogo brand="lemonn" variant="full" size={48} decorative />
+        {/* Hangs under the logo, so the logo stays where the regular splash has it. */}
+        {diwali && (
+          <Stack gap="12" align="center" className={styles.wish}>
+            <Diya className={styles.diya} />
+            <p className={styles.wishText}>{t('splash.diwali')}</p>
+          </Stack>
+        )}
+      </Stack>
+    </button>
+  )
+}
+
+/**
+ * The launch splash: the Lemonn logo in the middle of a plain screen for 2 seconds, then it fades and the home page
+ * underneath shows. It covers the app (not the phone's status bar). Every launch onto a home page, reloads included.
+ */
+export function Splash({ landing }: { landing: string }) {
+  const [state, setState] = useSplashState(shouldShowSplash(landing))
+  if (state === 'done') return null
+  return <SplashCover state={state} onLeave={() => setState('leaving')} onGone={() => setState('done')} />
+}
+
+/**
+ * The splash as a page of its own (the Stocks and F&O flows list it before their home): it plays like the launch
+ * splash — 2 s, then it fades over `home` (drawn underneath) and `onDone` moves to the home screen itself.
+ */
+export function SplashScreen({ home, onDone }: { home: ReactNode; onDone: () => void }) {
+  const [state, setState] = useSplashState(true)
+  useEffect(() => {
+    if (state === 'done') onDone()
+  }, [state]) // once, when the splash is gone (onDone is a new function every render)
+  return (
+    <>
+      {home}
+      {state !== 'done' && <SplashCover state={state} onLeave={() => setState('leaving')} onGone={() => setState('done')} />}
+    </>
+  )
+}
+```
+
+### `src/shared/ui/copy.json`
+
+```json
+{
+  "splash.label": "Lemonn",
+  "splash.diwali": "Team Lemonn wishes every trader a Happy Diwali"
 }
 ```
 

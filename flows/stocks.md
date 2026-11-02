@@ -10,14 +10,23 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machi
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `stocks-01` | Home | — | `search-01`, `profile-01`, `dash-02` | Top of the page: search, indices, holdings, products, shortcuts. |
-| `stocks-02` | Home · top movers & watchlists | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
-| `stocks-03` | Home · top losers | — | `search-01`, `profile-01`, `dash-02` | The "Top losers" chip picked. |
-| `stocks-04` | Home · Smart Invest | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled: managed strategies, then the announcement. |
-| `stocks-05` | Home · sectors & highlights | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
-| `stocks-06` | Home · highlights & idea baskets | — | `search-01`, `profile-01`, `dash-02` | Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.) |
-| `stocks-07` | Home · idea baskets & disclosure | — | `search-01`, `profile-01`, `dash-02` | The end of the page: the disclosure, four lines and Read More. |
-| `stocks-08` | Home · DASH coach mark | [5612:44075]() | `search-01`, `profile-01`, `dash-02` | First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH. |
+| `stocks-17` | Splash | — | `stocks-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page. |
+| `stocks-01` | Home | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Top of the page: search, indices, holdings, products, shortcuts. |
+| `stocks-02` | Home · top movers & watchlists | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
+| `stocks-03` | Home · top losers | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | The "Top losers" chip picked. |
+| `stocks-04` | Home · Smart Invest | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled: managed strategies, then the announcement. |
+| `stocks-05` | Home · sectors & highlights | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
+| `stocks-06` | Home · highlights & idea baskets | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.) |
+| `stocks-07` | Home · idea baskets & disclosure | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | The end of the page: the disclosure, four lines and Read More. |
+| `stocks-08` | Home · DASH coach mark | [5612:44075]() | `stocks-09`, `search-01`, `profile-01`, `dash-02` | First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH. |
+| `stocks-09` | Stock · Overview | — | `stocks-01` | Rebuilt from the live app (ADB, 2026-11-02). The top part follows the US stock page: change over the chart range, NSE / BSE switch, line chart, ranges. |
+| `stocks-10` | Stock · depth & about | — | `stocks-01` | Scrolled: the Actionbar shows symbol + price, the tabs stick under it. About Company opened (Read more). |
+| `stocks-11` | Stock · shareholding & financials | — | `stocks-01` | Quarter chips change the bars; Quarterly ⇅ switches the Financials to yearly; Revenue / Profit / Networth. |
+| `stocks-12` | Stock · Events | — | `stocks-01` | Events by year, latest first; Filters on the first year; View more lists older years. |
+| `stocks-13` | Stock · event details | — | `stocks-01` | A tapped event: period and release date. |
+| `stocks-14` | Stock · event filters | — | `stocks-01` | Choose filter: one checkbox per event type, Done applies. |
+| `stocks-15` | Performance (ⓘ) | — | `stocks-09` | Daily Performance ⓘ: what each number means. |
+| `stocks-16` | Glossary · Fundamentals (ⓘ) | — | `stocks-09` | Fundamentals ⓘ: what each ratio means. |
 
 ## Spec (README.md)
 
@@ -28,10 +37,10 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machi
 - **Prototype:** https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · one screen: `#/stocks-01`
 - **Source:** screenshots of the live app's Stocks tab (dark theme), shared 2026-10-17 — there's no Figma for it yet.
   Rebuilt in L3.
-- **Status:** 🟨 Home done (re-matched to the live app over ADB, 2026-10-22); search is its own flow (`search`), opened from the top bar (stock page and lists come next) · 2026-10-19
+- **Status:** 🟨 Home done (re-matched to the live app over ADB, 2026-10-22); stock page done (from the live app over ADB, 2026-11-02); search is its own flow (`search`), opened from the top bar (lists come next) · 2026-11-02
 - **Entry:** the app's home: after login (returning user), after account setup ("Explore stocks first"), after the
-  first deposit ("Start investing"); the Stocks tab of the main navbar. **Exit:** everything on the page opens its
-  own screen (not built yet).
+  first deposit ("Start investing"); the Stocks tab of the main navbar. **Exit:** a top-mover card or a Market row
+  opens the stock page (`stocks-09`); everything else opens its own screen (not built yet).
 
 ### Screens
 
@@ -39,6 +48,7 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 | Id | Screen | What it shows / when |
 |---|---|---|
+| `stocks-17` | Splash | The launch splash (`src/shared/ui/Splash`): the Lemonn logo centred. Shown for 2 s, then it fades into Home (a tap skips ahead); plays whenever the app opens or reloads on Home |
 | `stocks-01` | Home | Top bar (search, wallet, profile) · index strip · current holdings · product cards · Do more with Lemonn |
 | `stocks-02` | Home · top movers & watchlists | Top movers (chips + two rows of stock cards) · watchlists |
 | `stocks-03` | Home · top losers | The "Top losers" chip picked |
@@ -47,6 +57,14 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 | `stocks-06` | Home · highlights & idea baskets | Highlights (Mutual Funds, F&O) · Invest in Ideas |
 | `stocks-08` | Home · DASH coach mark | First visit after DASH launches: "DASH AI" coach mark on the DASH pill (Figma 5612:44075) |
 | `stocks-07` | Home · idea baskets & disclosure | Invest in ideas (baskets) · the broker's regulatory line |
+| `stocks-09` | Stock · Overview | The stock (asset) page, top: name, price, change, chart, ranges, Overview tab |
+| `stocks-10` | Stock · depth & about | Scrolled to Market Depth; About Company opened (Read less) |
+| `stocks-11` | Stock · shareholding & financials | Scrolled to Shareholding Pattern and Financials |
+| `stocks-12` | Stock · Events | The Events tab: corporate events by year |
+| `stocks-13` | Stock · event details | Sheet over Events: one event's period, terms and date |
+| `stocks-14` | Stock · event filters | Sheet over Events: "Choose filter", the five event types |
+| `stocks-15` | Performance (ⓘ) | Glossary page from Daily Performance's ⓘ |
+| `stocks-16` | Glossary · Fundamentals (ⓘ) | Glossary page from Fundamentals' ⓘ |
 
 ### Page structure (top to bottom)
 
@@ -73,6 +91,34 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
    - **Disclosure:** the broker's registration line, four lines, then "Read More" opens it in place.
 4. **Main navbar:** Stocks (selected) · Market · Portfolio · Mutual Fund · F&O.
 
+### Stock page (`stocks-09` … `16`)
+
+The page for one stock (the asset page), opened from a top-mover card (Home) or a stock row (Market). Rebuilt from
+the live app over ADB on 2026-11-02 (Bharat Electronics; there's no Figma for it yet). The top part follows the US
+stock page in the `jojo` branch, adapted to Indian stocks (NSE / BSE, ₹, circuits, CMOTS data).
+
+1. **Top bar** (L2): back · watchlist star (Tertiary Small, toggles). Once the name scrolls under the bar, the bar
+   shows the symbol + price + day change; once the Overview / Events tabs reach the bar, they stick in its bottom slot.
+2. **Header:** name · price · change (% and ₹) over the chart's range — today's change from the previous close on 1D,
+   from the first point of the line on other ranges · the logo (Avatar 48).
+3. **Tags + controls:** sector and cap size (Large ≥ ₹1,00,000 Cr, Mid ≥ ₹30,000 Cr, else Small) · the advanced
+   (TradingView) chart button · the exchange switch (NSE ↔ BSE: price changes).
+4. **Chart:** line, red when down / green when up, price axis on the right · ranges 1D 1W 1M 1Y 3Y 5Y.
+5. **Tabs:** Overview · Events (underline, full width).
+6. **Overview:** Boost SIP card · **Daily Performance** (ⓘ → Performance glossary): 1D Low / High, a range bar with
+   the last traded price, then Open, Prev. Close, Mkt. Cap, Volume, Upper and Lower Circuit · **Fundamentals**
+   (ⓘ → Glossary): PE, Industry PE, ROE TTM, Dividend Yield, PBV · **Market Depth:** five bids and five asks with
+   quantities, and their totals · **About Company:** five lines, Read more opens the rest in place (Read less) ·
+   **Shareholding Pattern:** quarter chips; Promoters, Retail, Foreign and Domestic Institutions as bars with % ·
+   **Financials:** Quarterly ↔ Yearly switcher; Revenue / Profit / Networth chips; five bars with ₹ Cr values · the
+   data source line (CMOTS).
+7. **Events:** one grey box per year, latest first — a date box, the event (Quarterly Result, Annual Result,
+   Dividend, Bonus, Split) and its release date or terms. Two years show, then **View more**. **Filters** (on the
+   first year) opens "Choose filter": a checkbox per type, Done (disabled when none is ticked); the link then reads
+   "Filters (n)". Nothing left → an empty state with Filters. A tap on an event opens its details sheet.
+8. **Dock:** SIP (secondary, icon) · Buy (brand) · Sell (secondary).
+9. **Glossary pages** (`stocks-15`, `16`): a title bar with back, then each term and a plain-language line.
+
 ### Data
 
 - `src/shared/data/companies.ts` — the company catalogue (56 NSE stocks: profile, design-system logo, market data from
@@ -89,6 +135,13 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 - `data.ts` — `products`, `shortcuts` (with badge count / text), `topMovers(list)` (three lists, from the catalogue), `strategies`,
   `announcement`, `sectors`, `highlights`, `tradeIdeas`, `ideaBaskets`, `disclosure`. Each is one API section.
 - API: one home call (sections in order, each optional) + live prices for the index strip and the stock cards.
+- **Stock page:** `stockPage(symbol)` in `data.ts` → `StockPageData` (= one stock-details call). Real from the
+  snapshot: price, previous close, day low / high, volume, the daily closes (1W, 1M lines). **Samples / derived:**
+  open, BSE price (one tick under NSE), market cap (snapshot price × sample share count), circuits (±20 %),
+  fundamentals, market depth, shareholding, financials, the 12 events and the 1D / 1Y / 3Y / 5Y lines
+  (`priceSeries`: a seeded random walk from the start value to today's price). Which stock is open:
+  `src/shared/data/openStock.ts` (`openStock(symbol)` before going to `stocks-09`; `useOpenStock()` reads it; BEL by
+  default).
 
 ### Components (L3 → any platform)
 
@@ -120,6 +173,18 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 ### Differences from the live app
 
+**Stock page:**
+- Section titles are L3 SectionHeaders (the live app underlines them in lime); the ⓘ is SectionHeader's info button.
+- Day range: the L3 range ProgressBar instead of the live app's gradient bar with a bolt marker.
+- Filters is the first year's SectionHeader action (live: a filter link with an icon, same place).
+- Filter sheet: checkboxes trail the label (L3 ListCell + Checkbox); live puts them first.
+- Glossary text is rewritten for stocks — the live app's Performance page talks about derivatives (lots, open
+  interest, lot size), which don't apply to a stock.
+- Boost SIP, SIP, Buy, Sell and the TradingView button don't go anywhere yet (those flows aren't in the prototype).
+- Sample numbers (see Data) — the phone was a real account and live market; the layout matches.
+
+**Home:**
+
 - **Top bar:** the live app puts the profile avatar on the left of the search field. The L3 Actionbar has no leading
   avatar, so Profile is the second action on the right, and the search field is L3's search mode.
 - **Sections:** same order and content, rebuilt with L3 cards, tags and buttons; the grey summary area and the
@@ -135,8 +200,18 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 - **Rail / carousel:** no sideways-scrolling row in L3 — `Rail` (src/shared/ui) stands in.
 - **Actionbar leading avatar** (profile on the left of the search field).
 - **Illustrations** for shortcuts, highlights and campaigns — `Spot` slots stand in.
+- **Bar chart:** L3 Chart has line / candles only — Financials' bars are drawn in `StockOverview.tsx`.
+- **Chart height:** L3 Chart has no height prop — `--app-size-stock-chart` (local token) sizes it.
+- **Date box** (day + month tile) and **a ListCell with a large leading tile:** ListCell's left slot takes a
+  16 / 24 icon or an Avatar only — event rows are plain buttons laid out with Stack.
 
 ### Changelog
+
+- 2026-11-02 — **Splash** (`stocks-17`): the launch splash as a page, listed before Home.
+- 2026-11-02 — Diwali (App settings → Diwali, on by default for now): a Diwali splash, and the home's profile avatar flips to a diya twice (`src/shared/ui/Diwali`).
+- 2026-11-02 — **Stock page** (`stocks-09` … `16`), from the live app over ADB: Overview (Daily Performance,
+  Fundamentals, Market Depth, About, Shareholding, Financials), Events (filters, details sheet, View more), the two ⓘ
+  glossary pages; compact top bar and sticky tabs on scroll; NSE / BSE and chart ranges. Top-mover cards open it.
 
 - 2026-11-01 — Do more with Lemonn: heading removed; the four shortcuts start the feed on their own. Shortcut cards have no top padding and a rounded (12) hover; the count / "New" still sits over the icon (the card no longer clips).
 - 2026-10-23 — the six Under ₹100 stocks (IDEA, YESBANK, SOUTHBANK, SUZLON, NHPC, IRFC) show their real logos — added
@@ -1202,6 +1277,293 @@ export function ProductCards({ onProduct }: { onProduct?: (id: string) => void }
 }
 ```
 
+### `src/flows/stocks/components/StockEvents.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Button } from '@l3/components/Button'
+import { EmptyState } from '@l3/components/EmptyState'
+import { Icon } from '@l3/components/Icon'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { msKeyboardArrowDown } from '@l3/icons/material'
+import { t } from '../copy'
+import { EVENT_TYPES, type CorporateEvent, type EventType } from '../data'
+import styles from '../screens/StockPage.module.css'
+
+/** How many years show before "View more". */
+const YEARS_SHOWN = 2
+
+const month = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleString('en-IN', { month: 'short' })
+const day = (iso: string) => String(Number(iso.slice(8, 10)))
+
+/** What the second line of an event says: a result's release date, a dividend's / bonus's / split's terms. */
+export function eventLine(e: CorporateEvent) {
+  return e.type === 'quarterly' || e.type === 'annual' ? t('events.release') : e.detail ?? t('events.exDate')
+}
+
+type Props = {
+  events: CorporateEvent[]
+  /** The event types shown (the filter sheet changes them). */
+  shown: EventType[]
+  onFilters: () => void
+  onEvent: (event: CorporateEvent) => void
+  /** Board: every year listed. */
+  expanded?: boolean
+}
+
+/**
+ * The Events tab: corporate events by year, latest first — a date box, the event and its release date / terms. A tap
+ * opens the event's details. Filters (on the first year's header) picks the event types; View more lists older years.
+ */
+export function StockEvents({ events, shown, onFilters, onEvent, expanded = false }: Props) {
+  const [more, setMore] = useState(expanded)
+  const visible = events.filter((e) => shown.includes(e.type))
+  const years = [...new Set(visible.map((e) => e.date.slice(0, 4)))]
+  const listed = more ? years : years.slice(0, YEARS_SHOWN)
+  const filtersLabel = shown.length === EVENT_TYPES.length ? t('events.filters') : `${t('events.filters')} (${shown.length})`
+
+  if (!years.length) {
+    return (
+      <Stack gap="16">
+        <SectionHeader title={String(new Date().getFullYear())} action={{ type: 'view-all', label: filtersLabel, onClick: onFilters }} />
+        <EmptyState title={t('events.empty')} description={t('events.emptyBody')} action={<Button variant="secondary" size="sm" onClick={onFilters}>{t('events.filters')}</Button>} />
+      </Stack>
+    )
+  }
+
+  return (
+    <Stack gap="24">
+      {listed.map((year, i) => (
+        <Stack key={year} as="section" gap="16" aria-label={year}>
+          <SectionHeader title={year} action={i === 0 ? { type: 'view-all', label: filtersLabel, onClick: onFilters } : undefined} />
+          <ul className={[styles.panel, styles.eventList].join(' ')}>
+            {visible.filter((e) => e.date.startsWith(year)).map((e) => (
+              <li key={e.id}>
+                {/* L3 gap: ListCell's left slot takes a 16 / 24 icon or an Avatar, not a 48 date box — a plain row. */}
+                <button type="button" className={styles.eventRow} onClick={() => onEvent(e)}>
+                  <Stack direction="horizontal" gap="12" align="center">
+                    <span className={styles.dateBox} aria-hidden="true"><b>{day(e.date)}</b>{month(e.date)}</span>
+                    <Stack gap="00" className={styles.grow}>
+                      <span className={styles.eventTitle}>{t(`events.type.${e.type}`)}</span>
+                      <span className={styles.eventLine}>{eventLine(e)}</span>
+                    </Stack>
+                  </Stack>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Stack>
+      ))}
+      {!more && years.length > YEARS_SHOWN && (
+        <Button variant="tertiary" size="lg" fullWidth iconRight={<Icon icon={msKeyboardArrowDown} size={20} />} onClick={() => setMore(true)}>{t('events.viewMore')}</Button>
+      )}
+      <p className={styles.source}>{t('stock.source')}</p>
+    </Stack>
+  )
+}
+```
+
+### `src/flows/stocks/components/StockOverview.tsx`
+
+```tsx
+import { useState } from 'react'
+import { Icon } from '@l3/components/Icon'
+import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { ListCell } from '@l3/components/ListCell'
+import { ProgressBar } from '@l3/components/ProgressBar'
+import { SectionHeader } from '@l3/components/SectionHeader'
+import { Stack } from '@l3/components/Stack'
+import { Tabs } from '@l3/components/Tabs'
+import { msBoltFill, msChevronRight, msEventRepeat } from '@l3/icons/material'
+import { inr } from '../../../shared/data/format'
+import { t } from '../copy'
+import type { FinancialMetric, FinancialPeriod, StockPageData } from '../data'
+import styles from '../screens/StockPage.module.css'
+
+const num = (n: number, decimals = 2) => n.toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+
+type Props = {
+  page: StockPageData
+  /** The last traded price on the exchange picked. */
+  price: number
+  /** Board: About Company opened. */
+  aboutOpen?: boolean
+  /** ⓘ on Daily Performance / Fundamentals: the glossary page. */
+  onGlossary: (kind: 'performance' | 'fundamentals') => void
+}
+
+/**
+ * The Overview tab, top to bottom: Boost SIP, Daily Performance, Fundamentals, Market Depth, About Company,
+ * Shareholding Pattern, Financials, then the data source line.
+ */
+export function StockOverview({ page, price, aboutOpen = false, onGlossary }: Props) {
+  return (
+    <Stack gap="32">
+      {/* No SIP flow in the prototype yet: the card doesn't go anywhere. */}
+      <ListCell
+        variant="card"
+        as="button"
+        iconLeft={<span className={styles.boostIcon}><Icon icon={msEventRepeat} size={24} /></span>}
+        label={t('stock.boostTitle')}
+        description={t('stock.boostBody')}
+        iconRight={<Icon icon={msChevronRight} size={24} />}
+        onClick={() => {}}
+      />
+      <DailyPerformance page={page} price={price} onInfo={() => onGlossary('performance')} />
+      <Fundamentals page={page} onInfo={() => onGlossary('fundamentals')} />
+      <div data-part="depth"><MarketDepth page={page} /></div>
+      <About page={page} initiallyOpen={aboutOpen} />
+      <div data-part="shareholding"><ShareholdingPattern page={page} /></div>
+      <Financials page={page} />
+      <p className={styles.source}>{t('stock.source')}</p>
+    </Stack>
+  )
+}
+
+function DailyPerformance({ page, price, onInfo }: { page: StockPageData; price: number; onInfo: () => void }) {
+  const low = Math.min(page.dayLow, price)
+  const high = Math.max(page.dayHigh, price)
+  const at = ((price - low) / Math.max(0.01, high - low)) * 100
+  const stat = (value: string, label: string) => <Stack gap="04"><p className={styles.statValue}>{value}</p><p className={styles.statLabel}>{label}</p></Stack>
+  return (
+    <Stack as="section" gap="16" aria-label={t('stock.daily')}>
+      <SectionHeader title={t('stock.daily')} onInfo={onInfo} infoLabel={t('stock.dailyInfo')} />
+      <div className={styles.panel}>
+        <Stack direction="horizontal" justify="between">
+          <Stack gap="04"><p className={styles.statLabel}>{t('stock.dayLow')}</p><p className={styles.statValue}>{num(low)}</p></Stack>
+          <Stack gap="04" align="end"><p className={styles.statLabel}>{t('stock.dayHigh')}</p><p className={styles.statValue}>{num(high)}</p></Stack>
+        </Stack>
+        <ProgressBar type="range" size="md" value={at} label={t('stock.dayRange')} valueText={inr(price)} />
+        <p className={styles.ltp}><Icon icon={msBoltFill} size={12} /> {t('stock.ltp')} <strong>{inr(price)}</strong></p>
+      </div>
+      <div className={[styles.panel, styles.statGrid].join(' ')}>
+        {stat(num(page.open), t('stock.open'))}
+        {stat(num(page.prevClose), t('stock.prevClose'))}
+        {stat(t('stock.crore', { value: num(page.marketCapCr, 1) }), t('stock.marketCap'))}
+        {stat(num(page.volume, 0), t('stock.volume'))}
+        {stat(num(page.upperCircuit), t('stock.upperCircuit'))}
+        {stat(num(page.lowerCircuit), t('stock.lowerCircuit'))}
+      </div>
+    </Stack>
+  )
+}
+
+function Fundamentals({ page, onInfo }: { page: StockPageData; onInfo: () => void }) {
+  const f = page.fundamentals
+  return (
+    <Stack as="section" gap="16" aria-label={t('stock.fundamentals')}>
+      <SectionHeader title={t('stock.fundamentals')} onInfo={onInfo} infoLabel={t('stock.fundamentalsInfo')} />
+      <div className={styles.panel}>
+        <KeyValueList aria-label={t('stock.fundamentals')} className={styles.ruled}>
+          <KeyValueRow label={t('stock.pe')} value={num(f.pe)} />
+          <KeyValueRow label={t('stock.industryPe')} value={num(f.industryPe)} />
+          <KeyValueRow label={t('stock.roe')} value={`${num(f.roe)}%`} />
+          <KeyValueRow label={t('stock.dividendYield')} value={`${num(f.dividendYield)}%`} />
+          <KeyValueRow label={t('stock.pbv')} value={num(f.pbv)} />
+        </KeyValueList>
+      </div>
+    </Stack>
+  )
+}
+
+function MarketDepth({ page }: { page: StockPageData }) {
+  const sides = [
+    { side: 'bid', title: t('stock.bid'), rows: page.depth.bids, tone: styles.up },
+    { side: 'ask', title: t('stock.ask'), rows: page.depth.asks, tone: styles.down },
+  ] as const
+  return (
+    <Stack as="section" gap="16" aria-label={t('stock.depth')}>
+      <SectionHeader title={t('stock.depth')} />
+      <div className={[styles.panel, styles.depth].join(' ')}>
+        {sides.map(({ side, title, rows, tone }) => (
+          <table key={side} className={styles.depthSide}>
+            <thead><tr><th>{title}</th><th>{t('stock.qty')}</th></tr></thead>
+            <tbody>{rows.map((r) => <tr key={r.price}><td>{num(r.price)}</td><td className={tone}>{num(r.qty, 0)}</td></tr>)}</tbody>
+            <tfoot><tr><td>{t('stock.total')}</td><td className={tone}>{num(rows.reduce((s, r) => s + r.qty, 0), 0)}</td></tr></tfoot>
+          </table>
+        ))}
+      </div>
+    </Stack>
+  )
+}
+
+function About({ page, initiallyOpen }: { page: StockPageData; initiallyOpen: boolean }) {
+  const [open, setOpen] = useState(initiallyOpen)
+  return (
+    <Stack as="section" gap="16" aria-label={t('stock.about')}>
+      <SectionHeader title={t('stock.about')} />
+      <div className={styles.panel}>
+        <div className={styles.about} data-open={open || undefined}>
+          {(open ? page.about : page.about.slice(0, 1)).map((p) => <p key={p}>{p}</p>)}
+        </div>
+        <button type="button" className={styles.link} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? t('stock.readLess') : t('stock.readMore')}</button>
+      </div>
+    </Stack>
+  )
+}
+
+function ShareholdingPattern({ page }: { page: StockPageData }) {
+  const [quarter, setQuarter] = useState(page.shareholding[0].quarter)
+  const q = page.shareholding.find((s) => s.quarter === quarter) ?? page.shareholding[0]
+  const groups = [
+    [t('stock.promoters'), q.promoters],
+    [t('stock.retail'), q.retail],
+    [t('stock.foreign'), q.foreign],
+    [t('stock.domestic'), q.domestic],
+  ] as const
+  return (
+    <Stack as="section" gap="16" aria-label={t('stock.shareholding')}>
+      <SectionHeader title={t('stock.shareholding')} />
+      <div className={styles.panel}>
+        <Tabs appearance="pill" emphasis="primary" size="sm" behavior="filter" aria-label={t('stock.quarter')} value={quarter} onChange={setQuarter}
+          items={page.shareholding.map((s) => ({ value: s.quarter, label: s.quarter }))} />
+        <Stack gap="16">
+          {groups.map(([label, pct]) => (
+            <Stack key={label} gap="08">
+              <p className={styles.holder}>{label}</p>
+              <Stack direction="horizontal" gap="12" align="center">
+                <ProgressBar className={styles.grow} size="md" value={pct} label={label} valueText={`${num(pct)}%`} />
+                <span className={styles.pct}>{num(pct)}%</span>
+              </Stack>
+            </Stack>
+          ))}
+        </Stack>
+      </div>
+    </Stack>
+  )
+}
+
+function Financials({ page }: { page: StockPageData }) {
+  const [period, setPeriod] = useState<FinancialPeriod>('quarterly')
+  const [metric, setMetric] = useState<FinancialMetric>('revenue')
+  const bars = page.financials[period]
+  const max = Math.max(...bars.map((b) => b[metric]))
+  const metricLabel = t(`stock.${metric}`)
+  return (
+    <Stack as="section" gap="16" aria-label={t('stock.financials')}>
+      <SectionHeader title={t('stock.financials')} action={{ type: 'switcher', label: period === 'quarterly' ? t('stock.quarterly') : t('stock.yearly'), 'aria-label': t('stock.period'), onClick: () => setPeriod(period === 'quarterly' ? 'yearly' : 'quarterly') }} />
+      <div className={styles.panel}>
+        <Tabs appearance="pill" emphasis="primary" size="sm" behavior="filter" aria-label={t('stock.metric')} value={metric} onChange={(v) => setMetric(v as FinancialMetric)}
+          items={(['revenue', 'profit', 'networth'] as const).map((m) => ({ value: m, label: t(`stock.${m}`) }))} />
+        <div className={styles.bars} role="img" aria-label={`${t('stock.barsLabel', { metric: metricLabel, from: bars[0].label, to: bars[bars.length - 1].label })}: ${bars.map((b) => `${b.label} ₹${num(b[metric], 0)} Cr`).join(', ')}`}>
+          {bars.map((b) => (
+            <div key={b.label} className={styles.barCol}>
+              <span className={styles.barTrack}>
+                <span className={styles.bar} style={{ height: `${(b[metric] / max) * 100}%` }}>
+                  <span className={styles.barValue}>{t('stock.crore', { value: num(b[metric], 0) }).replace(' ', '')}</span>
+                </span>
+              </span>
+              <span className={styles.barLabel}>{b.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Stack>
+  )
+}
+```
+
 ### `src/flows/stocks/components/TopBar.module.css`
 
 ```css
@@ -1302,6 +1664,7 @@ import { CoachMark } from '@l3/components/Tooltip'
 import { msAccountBalanceWallet, msSearch } from '@l3/icons/material'
 import { DashEntry } from '../../../shared/ui/dash/DashEntry'
 import { t } from '../copy'
+import { useDiyaFlip } from '../../../shared/ui/Diwali'
 import styles from './TopBar.module.css'
 
 type TopBarProps = {
@@ -1328,10 +1691,12 @@ type TopBarProps = {
  */
 export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIntro = false, onDashIntroDone, scrolled = false }: TopBarProps) {
   const dash = <DashEntry label={t('top.dash')} ariaLabel={t('top.dashLabel')} onClick={onDash} />
+  // Diwali (App settings → Diwali avatar): the initials flip to a diya twice when Home shows.
+  const avatar = useDiyaFlip('stocks', initials)
   return (
     <header className={styles.bar} data-scrolled={scrolled || undefined}>
-      <button type="button" className={styles.profile} aria-label={t('top.profile')} onClick={onProfile}>
-        {initials}
+      <button type="button" {...avatar.flip} className={[styles.profile, avatar.flip.className].join(' ')} aria-label={t('top.profile')} onClick={onProfile}>
+        {avatar.face}
       </button>
       <button type="button" className={styles.search} onClick={onSearch}>
         <Icon icon={msSearch} size={20} />
@@ -1405,7 +1770,111 @@ export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIn
   "top.dashLabel": "Open DASH Ai",
   "dashIntro.heading": "DASH Ai",
   "dashIntro.body": "DASH helps you build your rules and strategies.",
-  "dashIntro.gotIt": "Got it!"
+  "dashIntro.gotIt": "Got it!",
+  "stock.back": "Back",
+  "stock.watchlistAdd": "Add {symbol} to watchlist",
+  "stock.watchlistRemove": "Remove {symbol} from watchlist",
+  "stock.tradingView": "Open the advanced chart",
+  "stock.exchange": "Exchange: {exchange}. Switch exchange",
+  "stock.chart": "{name} price, {range}",
+  "stock.ranges": "Chart range",
+  "stock.tabs": "Stock details",
+  "stock.overview": "Overview",
+  "stock.events": "Events",
+  "stock.change": "{change} over {range}",
+  "stock.sip": "SIP",
+  "stock.buy": "Buy",
+  "stock.sell": "Sell",
+  "stock.trade": "Trade {symbol}",
+  "stock.boostTitle": "Boost your SIP by 2.5x",
+  "stock.boostBody": "Start your Boost SIP",
+  "stock.daily": "Daily Performance",
+  "stock.dailyInfo": "What these numbers mean",
+  "stock.dayLow": "1D Low",
+  "stock.dayHigh": "1D High",
+  "stock.dayRange": "Last traded price within today’s range",
+  "stock.ltp": "Last Traded Price:",
+  "stock.open": "Open",
+  "stock.prevClose": "Prev. Close",
+  "stock.marketCap": "Mkt. Cap",
+  "stock.volume": "Volume",
+  "stock.upperCircuit": "Upper Circuit",
+  "stock.lowerCircuit": "Lower Circuit",
+  "stock.crore": "{value} Cr",
+  "stock.fundamentals": "Fundamentals",
+  "stock.fundamentalsInfo": "What these ratios mean",
+  "stock.pe": "PE",
+  "stock.industryPe": "Industry PE",
+  "stock.roe": "ROE TTM",
+  "stock.dividendYield": "Dividend Yield",
+  "stock.pbv": "PBV",
+  "stock.depth": "Market Depth",
+  "stock.bid": "Bid Price",
+  "stock.ask": "Ask Price",
+  "stock.qty": "Qty",
+  "stock.total": "Total",
+  "stock.about": "About Company",
+  "stock.readMore": "Read more",
+  "stock.readLess": "Read less",
+  "stock.shareholding": "Shareholding Pattern",
+  "stock.quarter": "Quarter",
+  "stock.promoters": "Promoters",
+  "stock.retail": "Retail",
+  "stock.foreign": "Foreign Institutions",
+  "stock.domestic": "Domestic Institutions",
+  "stock.financials": "Financials",
+  "stock.quarterly": "Quarterly",
+  "stock.yearly": "Yearly",
+  "stock.period": "Quarterly or yearly figures",
+  "stock.metric": "Figure",
+  "stock.revenue": "Revenue",
+  "stock.profit": "Profit",
+  "stock.networth": "Networth",
+  "stock.barsLabel": "{metric}, {from} to {to}",
+  "stock.source": "Data powered by CMOTS Infotech · ISO 9001:2015 certified · www.cmots.com",
+  "events.filters": "Filters",
+  "events.filtersActive": "Filters, {count} of {total} on",
+  "events.viewMore": "View more",
+  "events.empty": "No events match these filters",
+  "events.emptyBody": "Turn on more event types to see them.",
+  "events.showAll": "Show all",
+  "events.release": "Release date",
+  "events.exDate": "Ex-date",
+  "events.recordDate": "Record date",
+  "events.type.quarterly": "Quarterly Result",
+  "events.type.annual": "Annual Result",
+  "events.type.dividend": "Dividend",
+  "events.type.bonus": "Bonus",
+  "events.type.split": "Split",
+  "events.period": "Period",
+  "events.details": "Details",
+  "events.filterTitle": "Choose filter",
+  "events.done": "Done",
+  "glossary.performance": "Performance",
+  "glossary.fundamentals": "Fundamentals",
+  "glossary.title": "Glossary",
+  "glossary.open": "Open",
+  "glossary.openBody": "The price of the first trade of the day, when the exchange opens. It can be different from the previous day’s closing price.",
+  "glossary.prevClose": "Prev. Close",
+  "glossary.prevCloseBody": "The stock’s final price on the previous trading day, when the market closed.",
+  "glossary.marketCap": "Mkt. Cap",
+  "glossary.marketCapBody": "Market capitalisation: the value of all the company’s shares — the share price × the number of shares.",
+  "glossary.volume": "Volume",
+  "glossary.volumeBody": "How many shares were traded today, on this exchange.",
+  "glossary.upperCircuit": "Upper Circuit",
+  "glossary.upperCircuitBody": "The highest price the stock may trade at today. When it hits its upper circuit, trading in it is paused for a while.",
+  "glossary.lowerCircuit": "Lower Circuit",
+  "glossary.lowerCircuitBody": "The lowest price the stock may trade at today. When it hits its lower circuit, trading in it is paused for a while.",
+  "glossary.pe": "P/E Ratio",
+  "glossary.peBody": "Price to Earnings: the share price compared with the company’s earnings per share (EPS). It helps tell whether a company is overvalued or undervalued.",
+  "glossary.industryPe": "Industry P/E",
+  "glossary.industryPeBody": "The average P/E ratio of all the stocks in the sector. Different sectors consider different P/E ratios healthy.",
+  "glossary.roe": "ROE",
+  "glossary.roeBody": "Return on Equity: net income divided by shareholders’ equity — how well the company turns its capital into profit.",
+  "glossary.dividendYield": "Dividend Yield",
+  "glossary.dividendYieldBody": "The dividend the company paid per share over the year, as a percentage of its share price.",
+  "glossary.pbv": "P/B Ratio",
+  "glossary.pbvBody": "Price to Book: the share price compared with the book value per share. A value under 1.0 is usually considered good."
 }
 ```
 
@@ -1425,7 +1894,7 @@ export const t = makeCopy('stocks', copy)
 import { msAddChart, msCampaign, msEditNote, msRedeem } from '@l3/icons/material'
 import jioIpoBanner from './assets/announcement-jio-ipo.jpg'
 import { stocks, type Stock } from '../../shared/data/market'
-import { companies, companiesByChange, type Company } from '../../shared/data/companies'
+import { companies, companiesByChange, getCompany, type Company } from '../../shared/data/companies'
 
 /** Stocks home — what the API sends for each section, in page order. Sample values; market data from the live app. */
 
@@ -1531,14 +2000,188 @@ export const ideaBaskets: IdeaBasket[] = [
 
 /** The broker's regulatory line (shared with Profile). */
 export { disclosure } from '../../shared/data/broker'
+
+// ─── The stock page (stocks-09 …) ─────────────────────────────────────────────────────────────────────────────────
+// What the API sends for one stock's page. Price, day range, previous close, volume and 3 months of daily closes are
+// the real snapshot (companies.ts); everything else is sample data in the shape the page needs (marked "sample").
+
+export type Exchange = 'NSE' | 'BSE'
+export type ChartRange = '1D' | '1W' | '1M' | '1Y' | '3Y' | '5Y'
+export const CHART_RANGES: ChartRange[] = ['1D', '1W', '1M', '1Y', '3Y', '5Y']
+
+/** One price level of the order book. */
+export type DepthLevel = { price: number; qty: number }
+/** Shareholding by holder group, % of shares, for one quarter. */
+export type Shareholding = { quarter: string; promoters: number; retail: number; foreign: number; domestic: number }
+export type FinancialMetric = 'revenue' | 'profit' | 'networth'
+export type FinancialPeriod = 'quarterly' | 'yearly'
+/** One bar of the Financials chart: the period's label and the value in ₹ crore. */
+export type FinancialBar = { label: string; revenue: number; profit: number; networth: number }
+
+export type EventType = 'quarterly' | 'annual' | 'dividend' | 'bonus' | 'split'
+export const EVENT_TYPES: EventType[] = ['quarterly', 'annual', 'dividend', 'bonus', 'split']
+/** A corporate event: a results release, dividend, bonus or split. `date` is ISO; `period` e.g. "Q2 FY 25-26". */
+export type CorporateEvent = { id: string; type: EventType; date: string; period?: string; detail?: string }
+
+export type StockPageData = {
+  symbol: string
+  name: string
+  initials: string
+  logoUrl?: string
+  /** Sector and market-cap band, shown as tags under the price. */
+  tags: string[]
+  /** Last traded price per exchange (BSE trades a few paise apart). */
+  price: Record<Exchange, number>
+  prevClose: number
+  open: number
+  dayLow: number
+  dayHigh: number
+  volume: number
+  /** ₹ crore. */
+  marketCapCr: number
+  upperCircuit: number
+  lowerCircuit: number
+  /** Daily closes, oldest first (the snapshot's 3 months). */
+  closes: number[]
+  fundamentals: { pe: number; industryPe: number; roe: number; dividendYield: number; pbv: number }
+  depth: { bids: DepthLevel[]; asks: DepthLevel[] }
+  /** Paragraphs. The first one shows until "Read more". */
+  about: string[]
+  /** Latest quarter first. */
+  shareholding: Shareholding[]
+  financials: Record<FinancialPeriod, FinancialBar[]>
+  /** Latest first. */
+  events: CorporateEvent[]
+}
+
+/** sample: shares outstanding, crore — for the market cap. */
+const SHARES_CR: Record<string, number> = { BEL: 731, RELIANCE: 1353, TCS: 362, HDFCBANK: 765, INFY: 415, SBIN: 892, ITC: 1251, HAL: 67, NTPC: 970, ICICIBANK: 713 }
+/** sample: sector tags (the snapshot has none for most stocks). */
+const SECTOR: Record<string, string> = { BEL: 'Aerospace & Defence', HAL: 'Aerospace & Defence', RELIANCE: 'Oil & Gas', TCS: 'IT Services', INFY: 'IT Services', HDFCBANK: 'Banking', SBIN: 'Banking', ICICIBANK: 'Banking', ITC: 'FMCG', NTPC: 'Power' }
+/** sample: BEL's longer company profile; other stocks build theirs from the catalogue profile. */
+const ABOUT: Record<string, string[]> = {
+  BEL: [
+    'Bharat Electronics Limited is a Navratna public sector company under the Ministry of Defence. It designs and manufactures advanced electronic products for the Indian armed forces — radars, sonars, communication systems, electronic warfare suites and fire-control systems.',
+    'The company was incorporated in 1954 at Bengaluru to meet the specialised electronic needs of the Indian defence services. It has nine manufacturing units across India and R&D centres in Bengaluru and Ghaziabad.',
+    'Beyond defence, BEL builds electronic voting machines, homeland security and smart city systems, satellite components, and medical and railway electronics, and exports to customers in more than 30 countries.',
+  ],
+}
+
+/** A small deterministic wiggle (same numbers every render) for the sample price series. */
+function wiggle(seed: number, i: number) {
+  const x = Math.sin(seed * 12.9898 + i * 78.233) * 43758.5453
+  return x - Math.floor(x) - 0.5
+}
+const round = (n: number) => Math.round(n * 100) / 100
+const seedOf = (s: string) => [...s].reduce((a, c) => a + c.charCodeAt(0), 0)
+
+/** The page for one catalogue stock (falls back to the default stock's numbers when the snapshot has none). */
+export function stockPage(symbol: string): StockPageData {
+  const c = getCompany(symbol) ?? getCompany('BEL')!
+  const m = c.market ?? getCompany('BEL')!.market!
+  const shares = SHARES_CR[c.symbol] ?? 500
+  const marketCapCr = round(m.price * shares)
+  const tick = m.price >= 100 ? 0.05 : 0.01
+  const level = (n: number, side: 1 | -1) => round(m.price + side * tick * (n + 1))
+  const seed = seedOf(c.symbol)
+  const qty = (i: number) => Math.round(400 + Math.abs(wiggle(seed, i)) * 9000)
+  const quarterly: FinancialBar[] = ['Jun 2025', 'Sep 2025', 'Dec 2025', 'Mar 2026', 'Jun 2026'].map((label, i) => {
+    const revenue = Math.round((marketCapCr / 60) * (0.85 + i * 0.06 + wiggle(seed, i) * 0.2))
+    return { label, revenue, profit: Math.round(revenue * (0.18 + wiggle(seed, i + 9) * 0.04)), networth: Math.round((marketCapCr / 14) * (0.9 + i * 0.03)) }
+  })
+  const yearly: FinancialBar[] = ['Mar 2022', 'Mar 2023', 'Mar 2024', 'Mar 2025', 'Mar 2026'].map((label, i) => {
+    const revenue = Math.round((marketCapCr / 15) * (0.62 + i * 0.1 + wiggle(seed, i + 3) * 0.12))
+    return { label, revenue, profit: Math.round(revenue * (0.16 + i * 0.01)), networth: Math.round((marketCapCr / 18) * (0.7 + i * 0.09)) }
+  })
+  const p = c.market ? c : getCompany('BEL')!
+  return {
+    symbol: c.symbol,
+    name: c.name,
+    initials: c.initials,
+    logoUrl: c.logoUrl,
+    tags: [SECTOR[c.symbol] ?? m.sector ?? 'Industrials', marketCapCr >= 100000 ? 'Large Cap' : marketCapCr >= 30000 ? 'Mid Cap' : 'Small Cap'],
+    price: { NSE: m.price, BSE: round(m.price - tick) },
+    prevClose: m.prevClose,
+    // sample: the snapshot has no open price; the day's first trade sits between the previous close and the low/high
+    open: round(Math.min(m.dayHigh, Math.max(m.dayLow, m.prevClose + (m.price - m.prevClose) * 0.15))),
+    dayLow: m.dayLow,
+    dayHigh: m.dayHigh,
+    volume: m.volume ?? 1_67_71_122,
+    marketCapCr,
+    // NSE price bands are ±20% of the previous close for most stocks
+    upperCircuit: round(m.prevClose * 1.2),
+    lowerCircuit: round(m.prevClose * 0.8),
+    closes: m.closes.map((d) => d.close),
+    fundamentals: { pe: round(28 + Math.abs(wiggle(seed, 1)) * 40), industryPe: 46.02, roe: round(8 + Math.abs(wiggle(seed, 2)) * 30), dividendYield: round(Math.abs(wiggle(seed, 3)) * 2), pbv: round(2 + Math.abs(wiggle(seed, 4)) * 12) },
+    depth: {
+      bids: [0, 1, 2, 3, 4].map((i) => ({ price: level(i - 1, -1), qty: qty(i) })),
+      asks: [0, 1, 2, 3, 4].map((i) => ({ price: level(i, 1), qty: qty(i + 5) })),
+    },
+    about: ABOUT[c.symbol] ?? [
+      `${p.about} Founded in ${p.founded} and headquartered in ${p.headquarters}, ${c.name} is listed on the NSE and BSE under the symbol ${c.symbol}.`,
+      `More about the company, its businesses and its results is on ${p.website}.`,
+    ],
+    shareholding: [
+      { quarter: "Sep '26", promoters: 51.14, retail: 12.42, foreign: 17.58, domestic: 18.86 },
+      { quarter: "Jun '26", promoters: 51.14, retail: 12.1, foreign: 17.95, domestic: 18.81 },
+      { quarter: "Mar '26", promoters: 51.14, retail: 11.86, foreign: 18.3, domestic: 18.7 },
+      { quarter: "Dec '25", promoters: 51.14, retail: 11.42, foreign: 18.92, domestic: 18.52 },
+    ],
+    financials: { quarterly, yearly },
+    events: [
+      { id: 'e1', type: 'quarterly', date: '2026-08-13', period: 'Q1 FY 26-27' },
+      { id: 'e2', type: 'dividend', date: '2026-08-01', detail: '₹1.50 per share · Final' },
+      { id: 'e3', type: 'annual', date: '2026-05-28', period: 'FY 25-26' },
+      { id: 'e4', type: 'quarterly', date: '2026-02-13', period: 'Q3 FY 25-26' },
+      { id: 'e5', type: 'quarterly', date: '2025-11-13', period: 'Q2 FY 25-26' },
+      { id: 'e6', type: 'quarterly', date: '2025-08-13', period: 'Q1 FY 25-26' },
+      { id: 'e7', type: 'annual', date: '2025-05-27', period: 'FY 24-25' },
+      { id: 'e8', type: 'quarterly', date: '2025-02-13', period: 'Q3 FY 24-25' },
+      { id: 'e9', type: 'quarterly', date: '2024-11-12', period: 'Q2 FY 24-25' },
+      { id: 'e10', type: 'split', date: '2024-09-20', detail: '₹10 → ₹1 face value' },
+      { id: 'e11', type: 'quarterly', date: '2024-08-12', period: 'Q1 FY 24-25' },
+      { id: 'e12', type: 'bonus', date: '2024-03-18', detail: '2 : 1' },
+    ],
+  }
+}
+
+/**
+ * The chart line for a range, oldest first, ending at `price`. 1W / 1M are the snapshot's real daily closes; 1D is a
+ * sample intraday path from the previous close; 1Y / 3Y / 5Y are sample paths (the snapshot keeps 3 months).
+ */
+export function priceSeries(page: StockPageData, range: ChartRange, price: number): number[] {
+  const seed = seedOf(page.symbol)
+  const closes = [...page.closes.slice(0, -1), price]
+  if (range === '1W') return closes.slice(-6)
+  if (range === '1M') return closes.slice(-22)
+  // A random walk pinned to `from` at the start and the price at the end (a bridge), its biggest swing ≈ `swing`.
+  const walk = (points: number, from: number, swing: number) => {
+    const steps = Array.from({ length: points }, (_, i) => (i === 0 ? 0 : wiggle(seed, i)))
+    const path = steps.map((_, i) => steps.slice(0, i + 1).reduce((a, b) => a + b, 0))
+    const bridge = path.map((v, i) => v - path[points - 1] * (i / (points - 1)))
+    const peak = Math.max(...bridge.map(Math.abs)) || 1
+    return bridge.map((v, i) => round(from + (price - from) * (i / (points - 1)) + (v / peak) * swing * 0.5))
+  }
+  if (range === '1D') return walk(76, page.prevClose, Math.abs(page.dayHigh - page.dayLow))
+  const years = range === '1Y' ? 1 : range === '3Y' ? 3 : 5
+  const start = price / (1 + (0.12 + wiggle(seed, years) * 0.5) * years)
+  return walk(120, start, price * 0.12)
+}
 ```
 
 ### `src/flows/stocks/index.tsx`
 
 ```tsx
-import type { Flow } from '../types'
+import type { Flow, Go } from '../types'
 import { goToTab } from '../../shared/ui/MainNav'
+import { openStock } from '../../shared/data/openStock'
+import { SplashScreen } from '../../shared/ui/Splash'
+import { Glossary } from './screens/Glossary'
 import { Home } from './screens/Home'
+import { StockPage } from './screens/StockPage'
+
+/** Home at the top, as stocks-01 draws it (the splash page fades into it). */
+const home = (go: Go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} />
 
 /**
  * Stocks — the Stocks tab, the app's home after login. Built from the live app's screenshots (shared 2026-10-17,
@@ -1549,16 +2192,72 @@ export const stocks: Flow = {
   title: 'Stocks',
   description: 'The Stocks tab — the home after login: indices, holdings, products, movers, watchlists, ideas.',
   figmaFile: '',
-  screens: [
-    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} /> },
-    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" /> },
-    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" movers="losers" /> },
-    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="invest" /> },
-    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="sectors" /> },
-    { id: 'stocks-06', name: 'Home · highlights & idea baskets', figma: '', note: 'Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="highlights" /> },
-    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page: the disclosure, four lines and Read More.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="more" /> },
-    { id: 'stocks-08', name: 'Home · DASH coach mark', figma: '5612:44075', note: 'First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH.', tab: true, render: (go) => <Home onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} dashIntro onDashIntroDone={() => go('dash-02')} /> },
+  sections: [
+    { id: 'splash', title: 'Splash' },
+    { id: 'home', title: 'Home' },
+    { id: 'stock', title: 'Stock page' },
   ],
+  screens: [
+    { id: 'stocks-17', section: 'splash', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page.', render: (go) => <SplashScreen onDone={() => go('stocks-01')} home={home(go)} /> },
+    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} /> },
+    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" /> },
+    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" movers="losers" /> },
+    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="invest" /> },
+    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="sectors" /> },
+    { id: 'stocks-06', name: 'Home · highlights & idea baskets', figma: '', note: 'Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="highlights" /> },
+    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page: the disclosure, four lines and Read More.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="more" /> },
+    { id: 'stocks-08', name: 'Home · DASH coach mark', figma: '5612:44075', note: 'First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} dashIntro onDashIntroDone={() => go('dash-02')} /> },
+    // The stock page: any stock tapped in the app (Market, Top movers) — the board shows Bharat Electronics.
+    { id: 'stocks-09', section: 'stock', name: 'Stock · Overview', figma: '', badge: 'new', note: 'Rebuilt from the live app (ADB, 2026-11-02). The top part follows the US stock page: change over the chart range, NSE / BSE switch, line chart, ranges.', render: (go) => <StockPage onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
+    { id: 'stocks-10', section: 'stock', name: 'Stock · depth & about', figma: '', badge: 'new', note: 'Scrolled: the Actionbar shows symbol + price, the tabs stick under it. About Company opened (Read more).', render: (go) => <StockPage scrollTo="depth" aboutOpen onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
+    { id: 'stocks-11', section: 'stock', name: 'Stock · shareholding & financials', figma: '', badge: 'new', note: 'Quarter chips change the bars; Quarterly ⇅ switches the Financials to yearly; Revenue / Profit / Networth.', render: (go) => <StockPage scrollTo="shareholding" onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
+    { id: 'stocks-12', section: 'stock', name: 'Stock · Events', figma: '', badge: 'new', note: 'Events by year, latest first; Filters on the first year; View more lists older years.', render: (go) => <StockPage tab="events" onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
+    { id: 'stocks-13', section: 'stock', name: 'Stock · event details', figma: '', badge: 'new', note: 'A tapped event: period and release date.', render: (go) => <StockPage tab="events" sheet="event" onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
+    { id: 'stocks-14', section: 'stock', name: 'Stock · event filters', figma: '', badge: 'new', note: 'Choose filter: one checkbox per event type, Done applies.', render: (go) => <StockPage tab="events" sheet="filter" onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
+    { id: 'stocks-15', section: 'stock', name: 'Performance (ⓘ)', figma: '', badge: 'new', note: 'Daily Performance ⓘ: what each number means.', render: (go) => <Glossary kind="performance" onBack={() => go('stocks-09')} /> },
+    { id: 'stocks-16', section: 'stock', name: 'Glossary · Fundamentals (ⓘ)', figma: '', badge: 'new', note: 'Fundamentals ⓘ: what each ratio means.', render: (go) => <Glossary kind="fundamentals" onBack={() => go('stocks-09')} /> },
+  ],
+}
+```
+
+### `src/flows/stocks/screens/Glossary.tsx`
+
+```tsx
+import { Actionbar } from '@l3/components/Actionbar'
+import { Inset } from '@l3/components/Inset'
+import { Stack } from '@l3/components/Stack'
+import { Screen } from '../../../shared/ui/Screen'
+import { t } from '../copy'
+import styles from './StockPage.module.css'
+
+const TERMS = {
+  performance: ['open', 'prevClose', 'marketCap', 'volume', 'upperCircuit', 'lowerCircuit'],
+  fundamentals: ['pe', 'industryPe', 'roe', 'dividendYield', 'pbv'],
+} as const
+
+/**
+ * stocks-15 / 16 · What the numbers on the stock page mean — opened by the ⓘ on Daily Performance (Performance) and on
+ * Fundamentals (Glossary). One term per row: its name, then a plain-language line.
+ */
+export function Glossary({ kind, onBack }: { kind: keyof typeof TERMS; onBack: () => void }) {
+  const title = kind === 'performance' ? t('glossary.performance') : t('glossary.title')
+  return (
+    <Screen top={<Actionbar title={title} onBack={onBack} backLabel={t('stock.back')} />}>
+      <Inset paddingInline="16" paddingBlock="24">
+        <Stack gap="24">
+          {kind === 'fundamentals' && <h2 className={styles.glossaryGroup}>{t('glossary.fundamentals')}</h2>}
+          <dl className={styles.glossary}>
+            {TERMS[kind].map((term) => (
+              <div key={term}>
+                <dt>{t(`glossary.${term}`)}</dt>
+                <dd>{t(`glossary.${term}Body`)}</dd>
+              </div>
+            ))}
+          </dl>
+        </Stack>
+      </Inset>
+    </Screen>
+  )
 }
 ```
 
@@ -1632,6 +2331,8 @@ export type HomePart = 'top' | 'movers' | 'invest' | 'sectors' | 'highlights' | 
 
 type Props = {
   scrollTo?: HomePart
+  /** A Top movers card opens that stock's page. */
+  onStock?: (symbol: string) => void
   /** Which Top movers list is picked (board state). */
   movers?: MoverList
   /** The main navbar: go to another tab. */
@@ -1655,7 +2356,7 @@ type Props = {
  * products; and on the rounded sheet over it, the feed: shortcuts, top movers, watchlists, Smart Invest (brand tint),
  * an announcement (the campaign's artwork), sectors, highlights, idea baskets and the broker's disclosure.
  */
-export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile, onDash, dashIntro, onDashIntroDone }: Props) {
+export function Home({ scrollTo = 'top', movers, onStock, onTab, onSearch, onProfile, onDash, dashIntro, onDashIntroDone }: Props) {
   const page = useRef<HTMLDivElement>(null)
 
   // Scrolled past the top: the top bar turns surface/primary (TopBar `scrolled`).
@@ -1691,7 +2392,7 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile, onD
         </Stack>
         <Stack gap="32" className={styles.feed}>
           <Shortcuts />
-          <div data-home="movers"><TopMovers initial={movers} /></div>
+          <div data-home="movers"><TopMovers initial={movers} onStock={onStock} /></div>
           <Watchlists />
           <Section paddingBlock="24" className={styles.tinted} data-tint="brand" data-home="invest"><SmartInvest /></Section>
           <Announcement />
@@ -1708,6 +2409,334 @@ export function Home({ scrollTo = 'top', movers, onTab, onSearch, onProfile, onD
 /** "Rohan Mehta" → "RM": the profile's initials. */
 function initials(name: string) {
   return name.split(' ').map((part) => part.charAt(0)).join('').slice(0, 2).toUpperCase()
+}
+```
+
+### `src/flows/stocks/screens/StockPage.module.css`
+
+```css
+/* The stock page (stocks-09 …): flow-only styling on L3 tokens. Panels are the live app's grey info boxes. */
+
+/* No line under the Actionbar until the tabs stick under it (then L3's elevated state brings line + shadow). */
+.topBar:not([data-elevated]) { box-shadow: none; }
+.page { padding-block: var(--l3-spacing-08) var(--l3-spacing-32); }
+.grow { flex: 1; min-width: 0; }
+
+.name { margin: 0; font: var(--l3-text-heading-16); }
+.price { font: var(--l3-text-heading-24); white-space: nowrap; }
+.change { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); font: var(--l3-text-label-14); white-space: nowrap; }
+.up { color: var(--l3-content-accent-indicator-up-default); }
+.down { color: var(--l3-content-accent-indicator-down-default); }
+.compactPrice { display: inline-flex; align-items: center; gap: var(--l3-spacing-04); }
+.chart { height: var(--app-size-stock-chart); }
+
+/* The in-page tabs keep their place while the Actionbar shows the stuck copy. */
+.tabsSlot[data-stuck] { visibility: hidden; }
+
+.sip.sip { flex: none; }
+
+.panel { display: flex; flex-direction: column; gap: var(--l3-spacing-12); padding: var(--l3-spacing-16) var(--l3-spacing-12); border-radius: var(--l3-radius-16); background: var(--l3-surface-secondary); }
+.boostIcon { display: inline-grid; place-items: center; width: var(--l3-size-40); height: var(--l3-size-40); border-radius: var(--l3-radius-full); background: var(--l3-surface-accent-success-light); color: var(--l3-content-accent-success-default); }
+
+.statValue { font: var(--l3-text-heading-12); white-space: nowrap; }
+.statLabel { font: var(--l3-text-label-12); color: var(--l3-content-tertiary); white-space: nowrap; }
+.statGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--l3-spacing-16) var(--l3-spacing-12); }
+.ltp { display: flex; align-items: center; gap: var(--l3-spacing-04); font: var(--l3-text-label-12); color: var(--l3-content-tertiary); }
+.ltp strong { font: var(--l3-text-heading-12); color: var(--l3-content-primary); }
+
+/* Fundamentals: a hairline between rows. */
+.ruled > * + * { border-top: 1px solid var(--l3-border-light); padding-top: var(--l3-spacing-12); }
+
+/* Market depth: bids | asks, a divider between, totals under a rule. */
+.depth { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: var(--l3-spacing-12) 0; }
+.depthSide { width: 100%; border-collapse: collapse; font: var(--l3-text-heading-12); }
+.depthSide + .depthSide { border-left: 1px solid var(--l3-border-light); }
+.depthSide th { font: var(--l3-text-label-12); color: var(--l3-content-secondary); text-align: left; padding: 0 var(--l3-spacing-12) var(--l3-spacing-08); }
+.depthSide td { padding: var(--l3-spacing-08) var(--l3-spacing-12); }
+.depthSide th:last-child, .depthSide td:last-child { text-align: right; }
+.depthSide tfoot td { border-top: 1px solid var(--l3-border-light); padding-top: var(--l3-spacing-16); }
+.depthSide tfoot td:first-child { font: var(--l3-text-label-12); color: var(--l3-content-secondary); }
+
+/* About: the first paragraph clamped to five lines until Read more. */
+.about { display: flex; flex-direction: column; gap: var(--l3-spacing-12); font: var(--l3-text-description-14); color: var(--l3-content-primary); }
+.about:not([data-open]) p { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.link { align-self: flex-start; position: relative; padding: 0; border: 0; background: none; font: var(--l3-text-label-14); color: var(--l3-content-accent-discover-default); cursor: pointer; }
+.link::before { content: ''; position: absolute; inset: calc(-1 * var(--l3-spacing-12)) calc(-1 * var(--l3-spacing-08)); }
+
+/* Shareholding pattern */
+.holder { font: var(--l3-text-label-14); }
+.pct { flex: none; min-width: var(--l3-size-48); font: var(--l3-text-heading-12); text-align: right; }
+
+/* Financials: one bar per period, its value above and the period under it. */
+.bars { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--l3-spacing-08); height: var(--app-size-stock-bars); padding-top: var(--l3-spacing-08); }
+.barCol { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: var(--l3-spacing-04); min-width: 0; }
+/* The bar's height is a share of this track (not of the column, which also holds the period label). */
+.barTrack { display: flex; flex: 1; flex-direction: column; justify-content: flex-end; align-items: center; min-height: 0; padding-top: var(--l3-spacing-20); }
+.bar { position: relative; width: var(--l3-size-24); min-height: var(--l3-size-04); border-radius: var(--l3-radius-04) var(--l3-radius-04) 0 0; background: var(--l3-surface-accent-discover-default); }
+.barValue { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding-bottom: var(--l3-spacing-04); font: var(--l3-text-label-10); color: var(--l3-content-primary); white-space: nowrap; }
+.barLabel { font: var(--l3-text-description-10); color: var(--l3-content-secondary); white-space: nowrap; }
+
+.source { font: var(--l3-text-description-10); color: var(--l3-content-tertiary); text-align: center; }
+
+/* Events: one grey box per year, a hairline between events. */
+.eventList { gap: 0; padding: var(--l3-spacing-04) var(--l3-spacing-04); list-style: none; margin: 0; }
+.eventList li + li { border-top: 1px solid var(--l3-border-light); }
+.dateBox { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: var(--l3-size-48); height: var(--l3-size-48); border: 1px solid var(--l3-border-dark); border-radius: var(--l3-radius-04); background: var(--l3-surface-primary); font: var(--l3-text-label-12); color: var(--l3-content-secondary); }
+.dateBox b { font: var(--l3-text-heading-14); color: var(--l3-content-primary); }
+
+/* Glossary pages */
+.glossaryGroup { margin: 0; font: var(--l3-text-heading-16); color: var(--l3-content-accent-discover-default); }
+.glossary { display: flex; flex-direction: column; gap: var(--l3-spacing-24); margin: 0; }
+.glossary dt { font: var(--l3-text-label-16); color: var(--l3-content-primary); }
+.glossary dd { margin: var(--l3-spacing-04) 0 0; font: var(--l3-text-description-14); color: var(--l3-content-secondary); }
+
+/* Event row: date box + event + its line; the whole row taps (press feedback as L3 rows). */
+.eventRow { display: block; width: 100%; padding: var(--l3-spacing-12) var(--l3-spacing-08); border: 0; border-radius: var(--l3-radius-08); background: none; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.eventRow:hover { background: var(--l3-surface-tertiary); }
+.eventRow:focus-visible { outline: 2px solid var(--l3-content-accent-discover-default); outline-offset: -2px; }
+.eventTitle { font: var(--l3-text-label-14); color: var(--l3-content-primary); }
+.eventLine { font: var(--l3-text-description-12); color: var(--l3-content-secondary); }
+```
+
+### `src/flows/stocks/screens/StockPage.tsx`
+
+```tsx
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Actionbar } from '@l3/components/Actionbar'
+import { Avatar } from '@l3/components/Avatar'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Chart } from '@l3/components/Chart'
+import { Icon } from '@l3/components/Icon'
+import { Inset } from '@l3/components/Inset'
+import { PriceChange } from '@l3/components/PriceChange'
+import { Select } from '@l3/components/Select'
+import { Stack } from '@l3/components/Stack'
+import { Tabs } from '@l3/components/Tabs'
+import { Tag } from '@l3/components/Tag'
+import { msCandlestickChart, msEventRepeat, msStar, msStarFill } from '@l3/icons/material'
+import { useMarketSnapshot } from '../../../shared/data/companies'
+import { inr } from '../../../shared/data/format'
+import { useOpenStock } from '../../../shared/data/openStock'
+import { Screen } from '../../../shared/ui/Screen'
+import { StockEvents } from '../components/StockEvents'
+import { StockOverview } from '../components/StockOverview'
+import { t } from '../copy'
+import { CHART_RANGES, EVENT_TYPES, priceSeries, stockPage, type ChartRange, type CorporateEvent, type EventType, type Exchange } from '../data'
+import { EventFilterSheet, EventSheet } from '../sheets/EventSheets'
+import styles from './StockPage.module.css'
+
+export type StockTab = 'overview' | 'events'
+/** Board frames: open the page scrolled to a part. */
+export type StockPart = 'top' | 'depth' | 'shareholding'
+
+type Props = {
+  tab?: StockTab
+  scrollTo?: StockPart
+  range?: ChartRange
+  exchange?: Exchange
+  /** Board: About Company opened / every year of events listed. */
+  aboutOpen?: boolean
+  eventsExpanded?: boolean
+  /** Board: a sheet open over the Events tab. */
+  sheet?: 'event' | 'filter'
+  onBack: () => void
+  onGlossary: (kind: 'performance' | 'fundamentals') => void
+}
+
+/**
+ * stocks-09 … 14 · The stock (asset) page — rebuilt from the live app over ADB (2026-11-02; no Figma yet), with the top
+ * part shaped like the US stock page: name, price and the change over the chart range, logo; sector and cap tags, the
+ * advanced-chart button and the NSE / BSE switch; the line chart and its ranges; Overview / Events tabs. Once the
+ * header scrolls away the Actionbar shows symbol + price, and the tabs stick under it. SIP · Buy · Sell docked.
+ */
+export function StockPage({ tab: initialTab = 'overview', scrollTo = 'top', range: initialRange = '1D', exchange: initialExchange = 'NSE', aboutOpen, eventsExpanded, sheet: initialSheet, onBack, onGlossary }: Props) {
+  useMarketSnapshot()
+  const page = stockPage(useOpenStock())
+  const [tab, setTab] = useState<StockTab>(initialTab)
+  const [range, setRange] = useState<ChartRange>(initialRange)
+  const [exchange, setExchange] = useState<Exchange>(initialExchange)
+  const [saved, setSaved] = useState(false)
+  const [shown, setShown] = useState<EventType[]>(EVENT_TYPES)
+  const [sheet, setSheet] = useState<{ kind: 'filter' } | { kind: 'event'; event: CorporateEvent } | null>(
+    initialSheet === 'filter' ? { kind: 'filter' } : initialSheet === 'event' ? { kind: 'event', event: page.events[4] } : null,
+  )
+
+  const price = page.price[exchange]
+  const series = priceSeries(page, range, price)
+  // 1D: the day's change from the previous close; other ranges: from the first point of the line.
+  const from = range === '1D' ? page.prevClose : series[0]
+  const change = price - from
+  const changePct = (change / from) * 100
+
+  // Scrolled: the Actionbar shows symbol + price once the name has gone under it; the tabs stick once they reach it.
+  const pageRef = useRef<HTMLDivElement>(null)
+  const nameRef = useRef<HTMLHeadingElement>(null)
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const [compact, setCompact] = useState(false)
+  const [stuck, setStuck] = useState(false)
+  useEffect(() => {
+    const body = pageRef.current?.parentElement
+    if (!body) return
+    const onScroll = () => {
+      const top = body.getBoundingClientRect().top
+      setCompact((nameRef.current?.getBoundingClientRect().bottom ?? 1) <= top)
+      setStuck((tabsRef.current?.getBoundingClientRect().top ?? 1) <= top)
+    }
+    onScroll()
+    body.addEventListener('scroll', onScroll, { passive: true })
+    return () => body.removeEventListener('scroll', onScroll)
+  }, [])
+  useLayoutEffect(() => {
+    const body = pageRef.current?.parentElement
+    const target = pageRef.current?.querySelector(`[data-part="${scrollTo}"]`)
+    if (!body || !target || scrollTo === 'top') return
+    body.scrollTop += target.getBoundingClientRect().top - body.getBoundingClientRect().top - 48
+  }, [scrollTo])
+
+  // Switching tabs while stuck: start the new tab at its top, right under the stuck tabs (past the hidden in-page copy).
+  const pickTab = (next: string) => {
+    setTab(next as StockTab)
+    const body = pageRef.current?.parentElement
+    const tabs = tabsRef.current
+    if (body && tabs && stuck) body.scrollTop += tabs.getBoundingClientRect().bottom - body.getBoundingClientRect().top
+  }
+  const tabs = (
+    <Tabs appearance="underline" width="fill" aria-label={t('stock.tabs')} value={tab} onChange={pickTab}
+      items={[{ value: 'overview', label: t('stock.overview') }, { value: 'events', label: t('stock.events') }]} />
+  )
+
+  const watch = t(saved ? 'stock.watchlistRemove' : 'stock.watchlistAdd', { symbol: page.symbol })
+  const top = (
+    <Actionbar
+      className={styles.topBar}
+      elevated={stuck}
+      onBack={onBack}
+      backLabel={t('stock.back')}
+      title={compact ? page.symbol : undefined}
+      description={compact ? <span className={styles.compactPrice}>{inr(price)} <PriceChange value={changePct} size="sm" arrow /></span> : undefined}
+      actions={<Button variant="tertiary" size="sm" aria-label={watch} aria-pressed={saved} iconLeft={<Icon icon={saved ? msStarFill : msStar} size={20} />} onClick={() => setSaved(!saved)} />}
+      bottom={stuck ? tabs : undefined}
+    />
+  )
+  // No order pad or SIP flow in the prototype yet: the dock's buttons don't go anywhere.
+  const dock = (
+    <ButtonGroup aria-label={t('stock.trade', { symbol: page.symbol })} direction="horizontal">
+      <Button variant="secondary" iconLeft={<Icon icon={msEventRepeat} size={20} />} className={styles.sip} onClick={() => {}}>{t('stock.sip')}</Button>
+      <Button variant="brand" onClick={() => {}}>{t('stock.buy')}</Button>
+      <Button variant="secondary" onClick={() => {}}>{t('stock.sell')}</Button>
+    </ButtonGroup>
+  )
+  const sheetEl = sheet?.kind === 'filter'
+    ? <EventFilterSheet initial={shown} onApply={(types) => { setShown(types); setSheet(null) }} onClose={() => setSheet(null)} />
+    : sheet?.kind === 'event' ? <EventSheet event={sheet.event} onClose={() => setSheet(null)} /> : undefined
+
+  return (
+    <Screen top={top} bottom={dock} sheet={sheetEl}>
+      <Stack ref={pageRef} gap="24" className={styles.page}>
+        <Inset paddingInline="16" paddingBlock="00">
+          <Stack gap="16">
+            <Stack direction="horizontal" gap="12" align="center" justify="between">
+              <Stack gap="04" className={styles.grow}>
+                <h1 ref={nameRef} className={styles.name}>{page.name}</h1>
+                <Stack direction="horizontal" gap="08" align="center" wrap>
+                  <p className={styles.price}>{inr(price)}</p>
+                  <span className={styles.change}>
+                    <PriceChange value={changePct} size="md" arrow />
+                    <span className={change < 0 ? styles.down : styles.up}>({change < 0 ? '−' : '+'}{Math.abs(change).toFixed(2)})</span>
+                  </span>
+                </Stack>
+              </Stack>
+              <Avatar src={page.logoUrl} initials={page.initials} size={48} label={page.name} />
+            </Stack>
+            <Stack direction="horizontal" gap="08" align="center" justify="between">
+              <Stack direction="horizontal" gap="08" wrap>{page.tags.map((tag) => <Tag key={tag} variant="secondary" color="neutral" size="sm">{tag}</Tag>)}</Stack>
+              <Stack direction="horizontal" gap="04" align="center">
+                {/* The advanced (TradingView) chart isn't in the prototype: the button doesn't go anywhere. */}
+                <Button variant="tertiary" size="sm" aria-label={t('stock.tradingView')} iconLeft={<Icon icon={msCandlestickChart} size={20} />} onClick={() => {}} />
+                <Select size="sm" subtle aria-label={t('stock.exchange', { exchange })} onClick={() => setExchange(exchange === 'NSE' ? 'BSE' : 'NSE')}>{exchange}</Select>
+              </Stack>
+            </Stack>
+          </Stack>
+        </Inset>
+        <Stack gap="16">
+          <Inset paddingInline="16" paddingBlock="00">
+            <Chart className={styles.chart} type="line" data={series.map((close) => ({ open: close, high: close, low: close, close }))} trend={change < 0 ? 'down' : 'up'}
+              showVolume={false} showGrid={false} showLastPrice={false} format={(v) => v.toLocaleString('en-IN')} label={t('stock.chart', { name: page.name, range })} />
+          </Inset>
+          <Inset paddingInline="16" paddingBlock="00">
+            <Tabs appearance="pill-group" size="sm" width="fill" aria-label={t('stock.ranges')} value={range} onChange={(v) => setRange(v as ChartRange)}
+              items={CHART_RANGES.map((r) => ({ value: r, label: r }))} />
+          </Inset>
+        </Stack>
+        <Stack gap="24">
+          <div ref={tabsRef} className={styles.tabsSlot} data-stuck={stuck || undefined}>{tabs}</div>
+          <Inset paddingInline="16" paddingBlock="00">
+            {tab === 'overview'
+              ? <StockOverview page={page} price={price} aboutOpen={aboutOpen} onGlossary={onGlossary} />
+              : <StockEvents events={page.events} shown={shown} expanded={eventsExpanded} onFilters={() => setSheet({ kind: 'filter' })} onEvent={(event) => setSheet({ kind: 'event', event })} />}
+          </Inset>
+        </Stack>
+      </Stack>
+    </Screen>
+  )
+}
+```
+
+### `src/flows/stocks/sheets/EventSheets.tsx`
+
+```tsx
+import { useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Checkbox } from '@l3/components/Checkbox'
+import { KeyValueList, KeyValueRow } from '@l3/components/KeyValueList'
+import { ListCell } from '@l3/components/ListCell'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { t } from '../copy'
+import { EVENT_TYPES, type CorporateEvent, type EventType } from '../data'
+
+const longDate = (iso: string) => {
+  const d = new Date(`${iso}T00:00:00`)
+  return `${d.getDate()} ${d.toLocaleString('en-IN', { month: 'short' })} '${String(d.getFullYear()).slice(2)}`
+}
+
+/** stocks-13 · An event's details: what it is, the period it covers and its date (or a dividend's / bonus's terms). */
+export function EventSheet({ event, onClose }: { event: CorporateEvent; onClose: () => void }) {
+  const headingId = useId()
+  const isResult = event.type === 'quarterly' || event.type === 'annual'
+  const heading = t(`events.type.${event.type}`)
+  return (
+    <Sheet labelledBy={headingId} onClose={onClose} header={<BottomSheetHeader headingId={headingId} heading={heading} />}>
+      <KeyValueList aria-label={heading}>
+        {event.period && <KeyValueRow label={t('events.period')} value={event.period} />}
+        {event.detail && <KeyValueRow label={t('events.details')} value={event.detail} />}
+        <KeyValueRow label={isResult ? t('events.release') : t('events.exDate')} value={longDate(event.date)} />
+      </KeyValueList>
+    </Sheet>
+  )
+}
+
+/** stocks-14 · Choose filter: one checkbox per event type (all on at first); Done applies. At least one stays on. */
+export function EventFilterSheet({ initial, onApply, onClose }: { initial: EventType[]; onApply: (types: EventType[]) => void; onClose: () => void }) {
+  const headingId = useId()
+  const [draft, setDraft] = useState<EventType[]>(initial)
+  const toggle = (type: EventType) => setDraft((d) => (d.includes(type) ? d.filter((x) => x !== type) : EVENT_TYPES.filter((x) => x === type || d.includes(x))))
+  return (
+    <Sheet
+      labelledBy={headingId}
+      onClose={onClose}
+      header={<BottomSheetHeader headingId={headingId} heading={t('events.filterTitle')} />}
+      footer={<ButtonGroup aria-label={t('events.filterTitle')} direction="horizontal"><Button variant="brand" disabled={!draft.length} onClick={() => onApply(draft)}>{t('events.done')}</Button></ButtonGroup>}
+    >
+      <div role="group" aria-labelledby={headingId}>
+        {EVENT_TYPES.map((type) => (
+          <ListCell key={type} as="label" size="sm" label={t(`events.type.${type}`)} trailing={<Checkbox checked={draft.includes(type)} onChange={() => toggle(type)} />} />
+        ))}
+      </div>
+    </Sheet>
+  )
 }
 ```
 
@@ -17533,6 +18562,35 @@ export const stocks = {
 } satisfies Record<string, Stock>
 ```
 
+### `src/shared/data/openStock.ts`
+
+```ts
+// Which stock the stock page shows: the one tapped last anywhere in the app (a Market row, a Top movers card …).
+// A flow that lists stocks calls `openStock(symbol)` and then goes to the stock page (stocks-09); the stock page reads
+// it with `useOpenStock()`. Prototype state only — a real app passes the symbol in the route.
+import { useSyncExternalStore } from 'react'
+
+/** What the stock page shows before anything is tapped (and on the board): Bharat Electronics. */
+export const DEFAULT_STOCK = 'BEL'
+
+let current = DEFAULT_STOCK
+const listeners = new Set<() => void>()
+
+/** Remember the tapped stock (NSE symbol) for the stock page. */
+export function openStock(symbol: string) {
+  current = symbol
+  listeners.forEach((l) => l())
+}
+
+/** The NSE symbol of the stock to show. */
+export function useOpenStock(): string {
+  return useSyncExternalStore(
+    (l) => { listeners.add(l); return () => listeners.delete(l) },
+    () => current,
+  )
+}
+```
+
 ### `src/shared/data/portfolio.ts`
 
 ```ts
@@ -17705,6 +18763,236 @@ export function useFlowOptionsChanged(flow: { id: string; options?: { id: string
  */
 export function useSystemKeyboard() {
   return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+}
+```
+
+### `src/shared/ui/Diwali.module.css`
+
+```css
+/* Diwali art (src/shared/ui/Diwali): thin honey line work, marigold petals, a tangerine flame — local tokens
+   --app-diwali-* (L3 has no festive palette). */
+
+.diya,
+.toran {
+  display: block;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: var(--app-diwali-line);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.dot {
+  fill: var(--app-diwali-line);
+}
+
+.petals {
+  fill: var(--app-diwali-petal);
+  stroke: var(--app-diwali-line);
+  stroke-width: 1;
+}
+
+.bowl,
+.lanternBody,
+.lanternCap {
+  fill: var(--app-diwali-petal);
+  stroke: var(--app-diwali-line);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.lanternBody {
+  fill: var(--app-diwali-lamp);
+}
+
+
+.flameOuter {
+  fill: var(--app-diwali-flame);
+}
+
+.flameInner {
+  fill: var(--app-diwali-flame-core);
+}
+
+/* The flame breathes from its base. */
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flicker var(--app-diwali-flicker) ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  30% { transform: scale(0.94, 1.06) rotate(-2deg); }
+  60% { transform: scale(1.04, 0.96) rotate(1.5deg); }
+}
+
+/* The lanterns sway a little from where they hang (transform-origin set inline at the string). */
+.lantern {
+  animation: sway var(--app-diwali-sway) ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* The profile avatar's flip: it narrows to nothing (half a turn), the face swaps, it widens back. The class is tripled
+   to win over the flow's button styles (which set their own transition), keeping the press scale. */
+.flip.flip.flip {
+  transition:
+    transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard),
+    scale var(--app-diwali-flip-half) var(--l3-motion-easing-standard),
+    background-color var(--app-diwali-flip-half) linear;
+}
+
+.flip.flip.flip[data-turning] {
+  scale: 0 1;
+}
+
+/* While it's the diya: a warm lamp-lit disc in place of the indigo one (doubled class: beats the flow's own styles). */
+.flip.flip.flip[data-diya] {
+  background: var(--app-diwali-lamp);
+  box-shadow: inset 0 0 0 1px var(--app-diwali-petal);
+}
+
+.avatarDiya {
+  width: 70%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flame,
+  .lantern {
+    animation: none;
+  }
+
+  .flip.flip.flip {
+    transition-duration: 1ms;
+  }
+}
+```
+
+### `src/shared/ui/Diwali.tsx`
+
+```tsx
+import { useEffect, useState } from 'react'
+import { useFlowOption } from '../prototype'
+import styles from './Diwali.module.css'
+
+/**
+ * Diwali touches (temporary, festival only) — each one switched on in the prototype's App settings → Diwali:
+ * - `diwaliSplash`: the launch splash gets a marigold toran, a diya and the wish (src/shared/ui/Splash).
+ * - `diwaliAvatar`: the profile initials on Stocks / F&O home flip to a diya twice, then stay as initials.
+ */
+export const DIWALI_OPTIONS = {
+  splash: { id: 'diwaliSplash', off: 'off', on: 'on' },
+  avatar: { id: 'diwaliAvatar', off: 'off', on: 'on' },
+} as const
+
+export const useDiwali = (which: keyof typeof DIWALI_OPTIONS) => {
+  const option = DIWALI_OPTIONS[which]
+  return useFlowOption('app', option.id, option.off) === option.on
+}
+
+/** A clay diya: the bowl with three dots on its rim and a flame that flickers. Fills its box (48 × 40 artwork). */
+export function Diya({ className }: { className?: string }) {
+  return (
+    <svg className={[styles.diya, className].filter(Boolean).join(' ')} viewBox="0 0 48 40" aria-hidden="true">
+      <g className={styles.flame}>
+        <path className={styles.flameOuter} d="M24 3C28 9.5 30.5 13.5 30.5 18C30.5 22 27.6 24.5 24 24.5C20.4 24.5 17.5 22 17.5 18C17.5 13.5 20 9.5 24 3Z" />
+        <path className={styles.flameInner} d="M24 11C25.9 14 27 16.2 27 18.6C27 20.6 25.7 21.8 24 21.8C22.3 21.8 21 20.6 21 18.6C21 16.2 22.1 14 24 11Z" />
+      </g>
+      <path className={styles.bowl} d="M3.5 24.5H44.5C42.5 33.5 34.5 38.5 24 38.5C13.5 38.5 5.5 33.5 3.5 24.5Z" />
+      <circle className={styles.dot} cx="14" cy="30" r="1.3" />
+      <circle className={styles.dot} cx="24" cy="32" r="1.3" />
+      <circle className={styles.dot} cx="34" cy="30" r="1.3" />
+    </svg>
+  )
+}
+
+// The toran's string: a gentle dip across the top, P0 (0, 6) → P1 (196, 46) → P2 (392, 6) (a quadratic curve).
+const stringAt = (t: number) => ({ x: 392 * t, y: 6 + 80 * t * (1 - t) })
+const FLOWERS = Array.from({ length: 11 }, (_, i) => stringAt(0.05 + i * 0.09))
+const LANTERNS = [0.16, 0.84].map(stringAt)
+
+/** A marigold toran across the top with two small lanterns hanging from it (they sway a little). */
+export function Toran({ className }: { className?: string }) {
+  return (
+    <svg className={[styles.toran, className].filter(Boolean).join(' ')} viewBox="0 0 392 96" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+      <path className={styles.line} d="M0 6Q196 46 392 6" />
+      {LANTERNS.map((p, i) => (
+        <g key={i} className={styles.lantern} style={{ transformOrigin: `${p.x}px ${p.y}px`, animationDelay: `${i * -1.4}s` }}>
+          <path className={styles.line} d={`M${p.x} ${p.y}V${p.y + 34}`} />
+          <path className={styles.lanternCap} d={`M${p.x - 6} ${p.y + 38}L${p.x} ${p.y + 33}L${p.x + 6} ${p.y + 38}Z`} />
+          <rect className={styles.lanternBody} x={p.x - 7} y={p.y + 38} width="14" height="18" rx="4" />
+          <path className={styles.flameOuter} d={`M${p.x} ${p.y + 42}C${p.x + 2.2} ${p.y + 45.5} ${p.x + 2.4} ${p.y + 48.5} ${p.x} ${p.y + 50.5}C${p.x - 2.4} ${p.y + 48.5} ${p.x - 2.2} ${p.y + 45.5} ${p.x} ${p.y + 42}Z`} />
+          <path className={styles.line} d={`M${p.x} ${p.y + 56}V${p.y + 64}`} />
+          <circle className={styles.dot} cx={p.x} cy={p.y + 65.5} r="1.5" />
+        </g>
+      ))}
+      {FLOWERS.map((p, i) => (
+        <g key={i}>
+          <circle className={styles.petals} cx={p.x} cy={p.y} r="5" />
+          <circle className={styles.dot} cx={p.x} cy={p.y} r="1.6" />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+// The avatar flip's timeline (ms from the home showing): the initials turn into the diya, hold, turn back — twice.
+const FLIP_HALF_MS = 160
+const FLIPS = [
+  { at: 1000, to: 'diya' },
+  { at: 2800, to: 'initials' },
+  { at: 3600, to: 'diya' },
+  { at: 5400, to: 'initials' },
+] as const
+
+/** Homes (by key) whose avatar has already flipped this visit: it plays once per page load, not on every tab switch. */
+const flipped = new Set<string>()
+
+/** When a splash covering the home is gone (ms, Date.now()): the flips wait for it, so the first one isn't hidden. */
+let splashGoneAt = 0
+/** The splash calls this as it starts showing (src/shared/ui/Splash). */
+export const holdFlipsFor = (ms: number) => { splashGoneAt = Date.now() + ms }
+
+/**
+ * The profile avatar's Diwali flip: with `diwaliAvatar` on, the initials turn (a card flip, half then half) into a
+ * diya and back, twice, then stay. Spread `flip` onto the profile button (className + data attributes) and render
+ * `face`. `home` names the home ('stocks', 'fno') so each plays once per visit.
+ */
+export function useDiyaFlip(home: string, initials: string) {
+  const on = useDiwali('avatar')
+  const [face, setFace] = useState<'initials' | 'diya'>('initials')
+  const [turning, setTurning] = useState(false)
+
+  useEffect(() => {
+    if (!on || flipped.has(home)) return
+    flipped.add(home)
+    let finished = false
+    const wait = Math.max(0, splashGoneAt - Date.now())
+    const timers = FLIPS.flatMap(({ at, to }, i) => [
+      window.setTimeout(() => setTurning(true), wait + at),
+      window.setTimeout(() => { setFace(to); setTurning(false); finished = i === FLIPS.length - 1 }, wait + at + FLIP_HALF_MS),
+    ])
+    return () => {
+      timers.forEach(window.clearTimeout)
+      // Left before the flips ended (or React's dev double-mount): play again next time.
+      if (!finished) flipped.delete(home)
+      setFace('initials')
+      setTurning(false)
+    }
+  }, [on, home])
+
+  return {
+    flip: { className: styles.flip, 'data-turning': turning || undefined, 'data-diya': face === 'diya' || undefined },
+    face: face === 'diya' ? <Diya className={styles.avatarDiya} /> : initials,
+  }
 }
 ```
 
@@ -18051,6 +19339,197 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
       )}
     </SheetHostContext.Provider>
   )
+}
+```
+
+### `src/shared/ui/Splash.module.css`
+
+```css
+/* The launch splash: covers the app (above sheets and toasts) — the Lemonn logo centred on the page surface. */
+.splash {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-layer-splash);
+  display: grid;
+  place-items: center;
+  background: var(--l3-surface-default);
+  /* A button (a tap skips ahead): no button chrome. */
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
+}
+
+
+.splash[data-state='leaving'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Diwali: a soft warm glow behind the logo, the toran hanging from the top edge, the wish rising in under the logo. */
+.splash[data-diwali] {
+  background:
+    radial-gradient(circle at 50% 50%, var(--app-diwali-glow), transparent 60%),
+    var(--l3-surface-default);
+}
+
+.toran {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+}
+
+.diya {
+  width: var(--l3-size-48);
+  height: auto;
+}
+
+.wishText {
+  max-width: 24ch;
+  margin: 0;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-14);
+  text-align: center;
+}
+
+.centre {
+  position: relative;
+}
+
+.wish {
+  position: absolute;
+  top: calc(100% + var(--l3-spacing-32));
+  left: 50%;
+  width: max-content;
+  translate: -50% 0;
+  animation: wishIn var(--l3-motion-duration-long) var(--l3-motion-easing-standard) both;
+  animation-delay: var(--l3-motion-duration-medium);
+}
+
+@keyframes wishIn {
+  from { opacity: 0; translate: -50% var(--l3-spacing-08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wish {
+    animation: none;
+  }
+
+  .splash {
+    transition-duration: 1ms;
+  }
+}
+```
+
+### `src/shared/ui/Splash.tsx`
+
+```tsx
+import { useEffect, useState, type ReactNode } from 'react'
+import { BrandLogo } from '@l3/components/BrandLogo'
+import { Stack } from '@l3/components/Stack'
+import { makeCopy } from '../copy'
+import copy from './copy.json'
+import { Diya, Toran, holdFlipsFor, useDiwali } from './Diwali'
+import styles from './Splash.module.css'
+
+const t = makeCopy('shared', copy)
+
+/** The screens a launch can land on that open with the splash: the two home pages (Stocks, F&O). */
+export const SPLASH_SCREENS = ['stocks-01', 'fno-01']
+/** How long the logo stays before the splash fades away. */
+export const SPLASH_MS = 2000
+
+/**
+ * Show the splash when the app launches (opens or reloads) onto a home page. A launch straight into an inner page (a
+ * shared link to an L2 / L3 screen) skips it; so does every later move to a home page inside the app.
+ */
+export function shouldShowSplash(landing: string) {
+  return SPLASH_SCREENS.includes(landing)
+}
+
+/** Longest the fade may take before the splash is removed anyway (a background tab never ends its transition). */
+const FADE_FALLBACK_MS = 600
+
+/** The splash's own timing: shown for 2 s ('shown'), then fading ('leaving'), then gone ('done'). A tap skips ahead. */
+function useSplashState(show: boolean) {
+  const [state, setState] = useState<'shown' | 'leaving' | 'done'>(() => {
+    if (show) holdFlipsFor(SPLASH_MS + FADE_FALLBACK_MS) // the home's Diwali avatar flip starts once the splash is gone
+    return show ? 'shown' : 'done'
+  })
+  useEffect(() => {
+    if (state === 'done') return
+    const t = window.setTimeout(() => setState(state === 'shown' ? 'leaving' : 'done'), state === 'shown' ? SPLASH_MS : FADE_FALLBACK_MS)
+    return () => window.clearTimeout(t)
+  }, [state])
+  return [state, setState] as const
+}
+
+/**
+ * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali version
+ * (App settings → Diwali splash) adds a marigold toran across the top, a warm glow, and a diya with the wish under the
+ * logo.
+ */
+function SplashCover({ state, onLeave, onGone }: { state: 'shown' | 'leaving'; onLeave: () => void; onGone: () => void }) {
+  const diwali = useDiwali('splash')
+  return (
+    <button
+      type="button"
+      className={styles.splash}
+      data-state={state}
+      data-diwali={diwali || undefined}
+      aria-label={diwali ? `${t('splash.label')}. ${t('splash.diwali')}` : t('splash.label')}
+      onClick={onLeave}
+      onTransitionEnd={(e) => { if (e.target === e.currentTarget) onGone() }}
+    >
+      {diwali && <Toran className={styles.toran} />}
+      <Stack align="center" className={styles.centre}>
+        <BrandLogo brand="lemonn" variant="full" size={48} decorative />
+        {/* Hangs under the logo, so the logo stays where the regular splash has it. */}
+        {diwali && (
+          <Stack gap="12" align="center" className={styles.wish}>
+            <Diya className={styles.diya} />
+            <p className={styles.wishText}>{t('splash.diwali')}</p>
+          </Stack>
+        )}
+      </Stack>
+    </button>
+  )
+}
+
+/**
+ * The launch splash: the Lemonn logo in the middle of a plain screen for 2 seconds, then it fades and the home page
+ * underneath shows. It covers the app (not the phone's status bar). Every launch onto a home page, reloads included.
+ */
+export function Splash({ landing }: { landing: string }) {
+  const [state, setState] = useSplashState(shouldShowSplash(landing))
+  if (state === 'done') return null
+  return <SplashCover state={state} onLeave={() => setState('leaving')} onGone={() => setState('done')} />
+}
+
+/**
+ * The splash as a page of its own (the Stocks and F&O flows list it before their home): it plays like the launch
+ * splash — 2 s, then it fades over `home` (drawn underneath) and `onDone` moves to the home screen itself.
+ */
+export function SplashScreen({ home, onDone }: { home: ReactNode; onDone: () => void }) {
+  const [state, setState] = useSplashState(true)
+  useEffect(() => {
+    if (state === 'done') onDone()
+  }, [state]) // once, when the splash is gone (onDone is a new function every render)
+  return (
+    <>
+      {home}
+      {state !== 'done' && <SplashCover state={state} onLeave={() => setState('leaving')} onGone={() => setState('done')} />}
+    </>
+  )
+}
+```
+
+### `src/shared/ui/copy.json`
+
+```json
+{
+  "splash.label": "Lemonn",
+  "splash.diwali": "Team Lemonn wishes every trader a Happy Diwali"
 }
 ```
 

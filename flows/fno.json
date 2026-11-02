@@ -13,6 +13,16 @@
   },
   "screens": [
     {
+      "id": "fno-34",
+      "name": "Splash",
+      "figma": "",
+      "note": "The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Plays when the app opens or reloads on F&O home (src/shared/ui/Splash); not on a link to an inner page.",
+      "goesTo": [
+        "fno-01"
+      ],
+      "figmaUrl": ""
+    },
+    {
       "id": "fno-01",
       "name": "Equity home",
       "figma": "11569:41100",
@@ -393,6 +403,8 @@
     "src/shared/data/format.ts",
     "src/shared/data/user.ts",
     "src/shared/prototype.ts",
+    "src/shared/ui/Diwali.module.css",
+    "src/shared/ui/Diwali.tsx",
     "src/shared/ui/IlliquidSheet.module.css",
     "src/shared/ui/IlliquidSheet.tsx",
     "src/shared/ui/Rail.module.css",
@@ -401,6 +413,9 @@
     "src/shared/ui/Screen.tsx",
     "src/shared/ui/Sheet.module.css",
     "src/shared/ui/Sheet.tsx",
+    "src/shared/ui/Splash.module.css",
+    "src/shared/ui/Splash.tsx",
+    "src/shared/ui/copy.json",
     "src/shared/ui/dash/DashEntry.module.css",
     "src/shared/ui/dash/DashEntry.tsx",
     "src/shared/ui/dash/DashOrb.module.css",
