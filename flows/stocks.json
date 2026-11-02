@@ -30,8 +30,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -43,8 +42,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -56,8 +54,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -69,8 +66,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -82,8 +78,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -95,8 +90,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -108,21 +102,7 @@
       "goesTo": [
         "stocks-09",
         "search-01",
-        "profile-01",
-        "dash-02"
-      ],
-      "figmaUrl": ""
-    },
-    {
-      "id": "stocks-08",
-      "name": "Home · DASH coach mark",
-      "figma": "5612:44075",
-      "note": "First visit after DASH launches: an L3 coach mark on the DASH pill (Figma \"Intro\" in DASH AI main flow). Got it! or the pill opens DASH.",
-      "goesTo": [
-        "stocks-09",
-        "search-01",
-        "profile-01",
-        "dash-02"
+        "profile-01"
       ],
       "figmaUrl": ""
     },
@@ -261,14 +241,6 @@
     "src/shared/ui/Sheet.tsx",
     "src/shared/ui/Splash.module.css",
     "src/shared/ui/Splash.tsx",
-    "src/shared/ui/copy.json",
-    "src/shared/ui/dash/DashEntry.module.css",
-    "src/shared/ui/dash/DashEntry.tsx",
-    "src/shared/ui/dash/DashOrb.module.css",
-    "src/shared/ui/dash/DashOrb.tsx",
-    "src/shared/ui/dash/assets/leaf-back.svg",
-    "src/shared/ui/dash/assets/leaf-front.svg",
-    "src/shared/ui/dash/assets/orb-fill.svg",
-    "src/shared/ui/dash/assets/orb-ring.svg"
+    "src/shared/ui/copy.json"
   ]
 }

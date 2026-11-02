@@ -11,14 +11,13 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machi
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
 | `stocks-17` | Splash | — | `stocks-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page. |
-| `stocks-01` | Home | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Top of the page: search, indices, holdings, products, shortcuts. |
-| `stocks-02` | Home · top movers & watchlists | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
-| `stocks-03` | Home · top losers | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | The "Top losers" chip picked. |
-| `stocks-04` | Home · Smart Invest | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled: managed strategies, then the announcement. |
-| `stocks-05` | Home · sectors & highlights | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled. |
-| `stocks-06` | Home · highlights & idea baskets | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.) |
-| `stocks-07` | Home · idea baskets & disclosure | — | `stocks-09`, `search-01`, `profile-01`, `dash-02` | The end of the page: the disclosure, four lines and Read More. |
-| `stocks-08` | Home · DASH coach mark | [5612:44075]() | `stocks-09`, `search-01`, `profile-01`, `dash-02` | First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH. |
+| `stocks-01` | Home | — | `stocks-09`, `search-01`, `profile-01` | Top of the page: search, indices, holdings, products, shortcuts. |
+| `stocks-02` | Home · top movers & watchlists | — | `stocks-09`, `search-01`, `profile-01` | Same page, scrolled. |
+| `stocks-03` | Home · top losers | — | `stocks-09`, `search-01`, `profile-01` | The "Top losers" chip picked. |
+| `stocks-04` | Home · Smart Invest | — | `stocks-09`, `search-01`, `profile-01` | Same page, scrolled: managed strategies, then the announcement. |
+| `stocks-05` | Home · sectors & highlights | — | `stocks-09`, `search-01`, `profile-01` | Same page, scrolled. |
+| `stocks-06` | Home · highlights & idea baskets | — | `stocks-09`, `search-01`, `profile-01` | Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.) |
+| `stocks-07` | Home · idea baskets & disclosure | — | `stocks-09`, `search-01`, `profile-01` | The end of the page: the disclosure, four lines and Read More. |
 | `stocks-09` | Stock · Overview | — | `stocks-01` | Rebuilt from the live app (ADB, 2026-11-02). The top part follows the US stock page: change over the chart range, NSE / BSE switch, line chart, ranges. |
 | `stocks-10` | Stock · depth & about | — | `stocks-01` | Scrolled: the Actionbar shows symbol + price, the tabs stick under it. About Company opened (Read more). |
 | `stocks-11` | Stock · shareholding & financials | — | `stocks-01` | Quarter chips change the bars; Quarterly ⇅ switches the Financials to yearly; Revenue / Profit / Networth. |
@@ -48,14 +47,13 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 
 | Id | Screen | What it shows / when |
 |---|---|---|
-| `stocks-17` | Splash | The launch splash (`src/shared/ui/Splash`): the Lemonn logo centred. Shown for 2 s, then it fades into Home (a tap skips ahead); plays whenever the app opens or reloads on Home |
+| `stocks-17` | Splash | The launch splash (`src/shared/ui/Splash`): the Lemonn logo centred. The logo rises in; shown for 1.5 s, then it fades into Home; plays whenever the app opens or reloads on Home |
 | `stocks-01` | Home | Top bar (search, wallet, profile) · index strip · current holdings · product cards · Do more with Lemonn |
 | `stocks-02` | Home · top movers & watchlists | Top movers (chips + two rows of stock cards) · watchlists |
 | `stocks-03` | Home · top losers | The "Top losers" chip picked |
 | `stocks-04` | Home · Smart Invest | Strategies on the brand tint · the announcement · sectors |
 | `stocks-05` | Home · sectors & highlights | Sectors · Highlights (Mutual funds, F&O) |
 | `stocks-06` | Home · highlights & idea baskets | Highlights (Mutual Funds, F&O) · Invest in Ideas |
-| `stocks-08` | Home · DASH coach mark | First visit after DASH launches: "DASH AI" coach mark on the DASH pill (Figma 5612:44075) |
 | `stocks-07` | Home · idea baskets & disclosure | Invest in ideas (baskets) · the broker's regulatory line |
 | `stocks-09` | Stock · Overview | The stock (asset) page, top: name, price, change, chart, ranges, Overview tab |
 | `stocks-10` | Stock · depth & about | Scrolled to Market Depth; About Company opened (Read less) |
@@ -69,9 +67,8 @@ One long, scrolling L1 page. The board shows it as frames scrolled to each part,
 ### Page structure (top to bottom)
 
 1. **Top bar (sticky, this screen's own — not the L3 Actionbar):** profile initials (34, opens Profile) · search pill
-   (38, opens Search) · **DASH pill** (opens DASH AI, `dash-02`; Figma "Dash entry point" 11492:7740) · Wallet (38).
-   16 at the sides, 12 between (Figma home with DASH). First visit after DASH launches: an L3 coach mark on the pill
-   (`stocks-08`). Tapping the search field opens Search
+   (38, fills the space between, opens Search) · Wallet (38). 16 at the sides, 12 between. No DASH pill: DASH's entry
+   is on F&O home only (removed here 2026-11-02, so the search pill gets the room). Tapping the search field opens Search
    (`search-01`, the Search flow: Stocks tab, keyboard up); nothing is typed on Home. Back on Search returns here.
 2. **Summary area** (grey, `surface/secondary`):
    - **Index strip** (scrolls sideways): NIFTY 50 / SENSEX / NIFTY BANK — value, day change; each opens its chart.
@@ -209,6 +206,9 @@ stock page in the `jojo` branch, adapted to Indian stocks (NSE / BSE, ₹, circu
 
 - 2026-11-02 — **Splash** (`stocks-17`): the launch splash as a page, listed before Home.
 - 2026-11-02 — Diwali (App settings → Diwali, on by default for now): a Diwali splash, and the home's profile avatar flips to a diya twice (`src/shared/ui/Diwali`).
+- 2026-11-02 — Diwali splash: a quiet night scene in L3 dark with "Happy Diwali" in gold, in two versions (Lanterns / Garland); the avatar's diya is now a lotus diya.
+- 2026-11-02 — The splash lasts 1.5 s (was 2 s) and its logo rises in; the Diwali splash's art, lights and wish come in within it. Diwali *Diya flip*: Off / Profile / Search bar (default) — the search pill's icon and label slide up and fade out, and a diya and "Happy Green Diwali" slide up and fade in (held 3 s, twice, each time the home shows, once the splash starts leaving), with a slow sparkler round its edge whose sparks rise out of the edge and sink back in.
+- 2026-11-02 — No DASH pill on Stocks home (DASH's entry is on F&O home only), so the search pill gets the room; the DASH coach mark screen (`stocks-08`) is gone.
 - 2026-11-02 — **Stock page** (`stocks-09` … `16`), from the live app over ADB: Overview (Daily Performance,
   Fundamentals, Market Depth, About, Shareholding, Financials), Events (filters, details sheet, View more), the two ⓘ
   glossary pages; compact top bar and sticky tabs on scroll; NSE / BSE and chart ranges. Top-mover cards open it.
@@ -1569,9 +1569,8 @@ function Financials({ page }: { page: StockPageData }) {
 ```css
 /*
  * Stocks home top bar. Sizes measured on the live app at 360 dp (2026-10-22): avatar 34, search pill and wallet 38 with
- * a 1px edge, 16 above, 6 below (the summary's own 16 makes the 22 down to the index strip). With the DASH pill the
- * spacing follows Figma's home (DASH AI main flow): 16 at the sides, 12 between; the DASH pill keeps its own Figma
- * size (≈ 32, centred).
+ * a 1px edge, 16 above, 6 below (the summary's own 16 makes the 22 down to the index strip). 16 at the sides, 12
+ * between (Figma's home).
  * The bar takes the summary area's surface/secondary, the pill and the wallet surface/default.
  */
 .bar {
@@ -1660,11 +1659,9 @@ function Financials({ page }: { page: StockPageData }) {
 
 ```tsx
 import { Icon } from '@l3/components/Icon'
-import { CoachMark } from '@l3/components/Tooltip'
 import { msAccountBalanceWallet, msSearch } from '@l3/icons/material'
-import { DashEntry } from '../../../shared/ui/dash/DashEntry'
 import { t } from '../copy'
-import { useDiyaFlip } from '../../../shared/ui/Diwali'
+import { DiwaliSearchFace, useDiyaFlip } from '../../../shared/ui/Diwali'
 import styles from './TopBar.module.css'
 
 type TopBarProps = {
@@ -1674,41 +1671,35 @@ type TopBarProps = {
   /** The search pill is a button: it opens the Search screen, where the typing happens. */
   onSearch?: () => void
   onWallet?: () => void
-  /** The DASH pill opens DASH AI (dash-02). */
-  onDash?: () => void
-  /** First visit after DASH launches: an L3 coach mark points at the pill (Figma "Intro" 5612:44075). */
-  dashIntro?: boolean
-  onDashIntroDone?: () => void
   /** The page is scrolled: the bar turns surface/primary. */
   scrolled?: boolean
 }
 
 /**
  * Stocks home's own top bar, as in the live app (a one-off for this screen — not the L3 Actionbar):
- * profile initials (indigo circle) · a search pill ("Search stocks", opens Search) · the DASH pill (opens DASH AI —
- * Figma "Home page", DASH AI main flow) · the wallet.
+ * profile initials (indigo circle) · a search pill ("Search stocks", opens Search) · the wallet. No DASH pill here (it
+ * lives on F&O home only, 2026-11-02), so the search pill gets the room.
  * The bar sits on the summary area's grey; the pill and the wallet are on surface/default.
  */
-export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIntro = false, onDashIntroDone, scrolled = false }: TopBarProps) {
-  const dash = <DashEntry label={t('top.dash')} ariaLabel={t('top.dashLabel')} onClick={onDash} />
-  // Diwali (App settings → Diwali avatar): the initials flip to a diya twice when Home shows.
-  const avatar = useDiyaFlip('stocks', initials)
+export function TopBar({ initials, onProfile, onSearch, onWallet, scrolled = false }: TopBarProps) {
+  // Diwali (App settings → Diwali → Diya flip): the initials, or the search pill's icon and label, flip to a diya twice
+  // when Home shows.
+  const diwali = useDiyaFlip('stocks', initials)
   return (
     <header className={styles.bar} data-scrolled={scrolled || undefined}>
-      <button type="button" {...avatar.flip} className={[styles.profile, avatar.flip.className].join(' ')} aria-label={t('top.profile')} onClick={onProfile}>
-        {avatar.face}
+      <button type="button" {...diwali.profile.flip} className={[styles.profile, diwali.profile.flip.className].filter(Boolean).join(' ')} aria-label={t('top.profile')} onClick={onProfile}>
+        {diwali.profile.face}
       </button>
-      <button type="button" className={styles.search} onClick={onSearch}>
-        <Icon icon={msSearch} size={20} />
-        <span className={styles.placeholder}>{t('search.placeholder')}</span>
+      <button type="button" className={[styles.search, diwali.search.className].filter(Boolean).join(' ')} data-turning={diwali.search.turning} onClick={onSearch}>
+        {diwali.search.diya ? (
+          <DiwaliSearchFace labelClassName={styles.placeholder} />
+        ) : (
+          <>
+            <Icon icon={msSearch} size={20} />
+            <span className={styles.placeholder}>{t('search.placeholder')}</span>
+          </>
+        )}
       </button>
-      {dashIntro ? (
-        <CoachMark open heading={t('dashIntro.heading')} body={t('dashIntro.body')} nextLabel={t('dashIntro.gotIt')} onNext={() => onDashIntroDone?.()} autoFocus={false}>
-          {dash}
-        </CoachMark>
-      ) : (
-        dash
-      )}
       <button type="button" className={styles.wallet} aria-label={t('top.wallet')} onClick={onWallet}>
         <Icon icon={msAccountBalanceWallet} size={20} />
       </button>
@@ -1766,11 +1757,6 @@ export function TopBar({ initials, onProfile, onSearch, onWallet, onDash, dashIn
   "smartInvest.tagAuto": "Auto Buy & Sell",
   "disclosure.readMore": "Read More",
   "disclosure.readLess": "Read Less",
-  "top.dash": "DASH",
-  "top.dashLabel": "Open DASH Ai",
-  "dashIntro.heading": "DASH Ai",
-  "dashIntro.body": "DASH helps you build your rules and strategies.",
-  "dashIntro.gotIt": "Got it!",
   "stock.back": "Back",
   "stock.watchlistAdd": "Add {symbol} to watchlist",
   "stock.watchlistRemove": "Remove {symbol} from watchlist",
@@ -2181,7 +2167,7 @@ import { Home } from './screens/Home'
 import { StockPage } from './screens/StockPage'
 
 /** Home at the top, as stocks-01 draws it (the splash page fades into it). */
-const home = (go: Go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} />
+const home = (go: Go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} />
 
 /**
  * Stocks — the Stocks tab, the app's home after login. Built from the live app's screenshots (shared 2026-10-17,
@@ -2199,14 +2185,13 @@ export const stocks: Flow = {
   ],
   screens: [
     { id: 'stocks-17', section: 'splash', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page.', render: (go) => <SplashScreen onDone={() => go('stocks-01')} home={home(go)} /> },
-    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} /> },
-    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" /> },
-    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="movers" movers="losers" /> },
-    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="invest" /> },
-    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="sectors" /> },
-    { id: 'stocks-06', name: 'Home · highlights & idea baskets', figma: '', note: 'Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="highlights" /> },
-    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page: the disclosure, four lines and Read More.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} scrollTo="more" /> },
-    { id: 'stocks-08', name: 'Home · DASH coach mark', figma: '5612:44075', note: 'First visit after DASH launches: an L3 coach mark on the DASH pill (Figma "Intro" in DASH AI main flow). Got it! or the pill opens DASH.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} onDash={() => go('dash-02')} dashIntro onDashIntroDone={() => go('dash-02')} /> },
+    { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} /> },
+    { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" /> },
+    { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" movers="losers" /> },
+    { id: 'stocks-04', name: 'Home · Smart Invest', figma: '', note: 'Same page, scrolled: managed strategies, then the announcement.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="invest" /> },
+    { id: 'stocks-05', name: 'Home · sectors & highlights', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="sectors" /> },
+    { id: 'stocks-06', name: 'Home · highlights & idea baskets', figma: '', note: 'Same page, scrolled. (The live app no longer has Trade ideas here — removed 2026-10-22.)', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="highlights" /> },
+    { id: 'stocks-07', name: 'Home · idea baskets & disclosure', figma: '', note: 'The end of the page: the disclosure, four lines and Read More.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="more" /> },
     // The stock page: any stock tapped in the app (Market, Top movers) — the board shows Bharat Electronics.
     { id: 'stocks-09', section: 'stock', name: 'Stock · Overview', figma: '', badge: 'new', note: 'Rebuilt from the live app (ADB, 2026-11-02). The top part follows the US stock page: change over the chart range, NSE / BSE switch, line chart, ranges.', render: (go) => <StockPage onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
     { id: 'stocks-10', section: 'stock', name: 'Stock · depth & about', figma: '', badge: 'new', note: 'Scrolled: the Actionbar shows symbol + price, the tabs stick under it. About Company opened (Read more).', render: (go) => <StockPage scrollTo="depth" aboutOpen onBack={() => go('stocks-01')} onGlossary={(k) => go(k === 'performance' ? 'stocks-15' : 'stocks-16')} /> },
@@ -2341,11 +2326,6 @@ type Props = {
   onSearch?: () => void
   /** The profile icon opens Profile & settings (profile-01). */
   onProfile?: () => void
-  /** The DASH pill in the top bar opens DASH AI. */
-  onDash?: () => void
-  /** First visit after DASH launches: the coach mark on the DASH pill. */
-  dashIntro?: boolean
-  onDashIntroDone?: () => void
 }
 
 /**
@@ -2356,7 +2336,7 @@ type Props = {
  * products; and on the rounded sheet over it, the feed: shortcuts, top movers, watchlists, Smart Invest (brand tint),
  * an announcement (the campaign's artwork), sectors, highlights, idea baskets and the broker's disclosure.
  */
-export function Home({ scrollTo = 'top', movers, onStock, onTab, onSearch, onProfile, onDash, dashIntro, onDashIntroDone }: Props) {
+export function Home({ scrollTo = 'top', movers, onStock, onTab, onSearch, onProfile }: Props) {
   const page = useRef<HTMLDivElement>(null)
 
   // Scrolled past the top: the top bar turns surface/primary (TopBar `scrolled`).
@@ -2381,7 +2361,7 @@ export function Home({ scrollTo = 'top', movers, onStock, onTab, onSearch, onPro
 
   return (
     <Screen
-      top={<TopBar scrolled={scrolled} initials={initials(user.name)} onProfile={onProfile} onSearch={onSearch} onDash={onDash} dashIntro={dashIntro} onDashIntroDone={onDashIntroDone} />}
+      top={<TopBar scrolled={scrolled} initials={initials(user.name)} onProfile={onProfile} onSearch={onSearch} />}
       bottom={<MainNav value="stocks" onChange={onTab} />}
     >
       <Stack ref={page} className={styles.flatCards}>
@@ -18769,45 +18749,126 @@ export function useSystemKeyboard() {
 ### `src/shared/ui/Diwali.module.css`
 
 ```css
-/* Diwali art (src/shared/ui/Diwali): thin honey line work, marigold petals, a tangerine flame — local tokens
-   --app-diwali-* (L3 has no festive palette). */
+/* Diwali art (src/shared/ui/Diwali): fine gold line work, softly lit lanterns, small marigolds, the lotus diya —
+   local tokens --app-diwali-* (L3 has no festive palette). */
 
 .diya,
-.toran {
+.art {
   display: block;
   overflow: visible;
 }
 
-.line {
+/* The splash art's line work: fine gold strings and outlines, small gold caps and drops. */
+.hairline {
   fill: none;
   stroke: var(--app-diwali-line);
-  stroke-width: 1.2;
+  stroke-width: 1;
   stroke-linecap: round;
 }
 
-.dot {
-  fill: var(--app-diwali-line);
+.goldFill {
+  fill: var(--app-diwali-gold);
 }
 
-.petals {
-  fill: var(--app-diwali-petal);
-  stroke: var(--app-diwali-line);
+/* A lantern: warm glass with a gold outline, lit from inside, a soft halo around it. */
+.lanternGlass {
+  fill: rgb(from var(--app-diwali-flame) r g b / 0.16);
+  stroke: var(--app-diwali-gold);
   stroke-width: 1;
 }
 
-.bowl,
-.lanternBody,
-.lanternCap {
-  fill: var(--app-diwali-petal);
-  stroke: var(--app-diwali-line);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
+.lanternLight {
+  fill: var(--app-diwali-flame-core);
+  opacity: 0.55;
 }
 
-.lanternBody {
-  fill: var(--app-diwali-lamp);
+.haloStop {
+  stop-color: var(--app-diwali-flame-core);
 }
 
+/* The lotus diya: magenta-hearted orange petals, a purple bowl painted in gold, a gold rim with the oil, a layered
+   flame (orange → gold → pale → near-white heart) with a warm glow. */
+.petalEdge {
+  fill: var(--app-diwali-petal-edge);
+}
+
+.petalHeart {
+  fill: var(--app-diwali-petal-heart);
+}
+
+.petalVein {
+  fill: none;
+  stroke: var(--app-diwali-petal-vein);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.leafGold {
+  fill: var(--app-diwali-gold);
+}
+
+.leafPink {
+  fill: var(--app-diwali-petal-vein);
+}
+
+.bowl {
+  fill: var(--app-diwali-bowl);
+}
+
+.bowlShade {
+  fill: var(--app-diwali-bowl-shade);
+}
+
+.gold {
+  fill: var(--app-diwali-gold);
+}
+
+.goldLine {
+  fill: none;
+  stroke: var(--app-diwali-gold);
+  stroke-width: 1;
+}
+
+.rim {
+  fill: var(--app-diwali-gold);
+}
+
+.oil {
+  fill: var(--app-diwali-oil);
+}
+
+.oilRipple {
+  fill: none;
+  stroke: var(--app-diwali-gold);
+  stroke-width: 0.8;
+}
+
+.flameMid {
+  fill: var(--app-diwali-flame-mid);
+}
+
+.flameHeart {
+  fill: var(--app-diwali-flame-heart);
+}
+
+.wick {
+  stroke: var(--app-diwali-wick);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.glow {
+  fill: var(--app-diwali-flame-core);
+  opacity: 0.3;
+}
+
+/* The glow breathes with the flame. */
+.glowPulse {
+  transform-box: fill-box;
+  transform-origin: 50% 60%;
+  animation: flicker var(--app-diwali-flicker) ease-in-out infinite;
+}
 
 .flameOuter {
   fill: var(--app-diwali-flame);
@@ -18815,6 +18876,76 @@ export function useSystemKeyboard() {
 
 .flameInner {
   fill: var(--app-diwali-flame-core);
+}
+
+/* The garland's marigolds: orange and gold in turn, a darker centre. */
+.marigoldOrange {
+  fill: var(--app-diwali-petal-edge);
+}
+
+.marigoldGold {
+  fill: var(--app-diwali-gold);
+}
+
+.marigoldCore {
+  fill: var(--app-diwali-marigold-core);
+}
+
+/* The splash's entrance (all of it inside the splash's 2 s — timings in local tokens --app-splash-*): the lanterns come
+   down one after another and settle, then light up; the garland's string draws across from the left and its drops and
+   flowers pop on in turn. `--i` (inline) is each part's place in the order. */
+.lowerIn {
+  transform-box: fill-box;
+  animation: lowerIn var(--app-splash-in) var(--app-splash-ease-settle) both;
+  animation-delay: calc(var(--app-splash-art-at) + var(--i) * var(--app-splash-stagger) * 2);
+}
+
+@keyframes lowerIn {
+  from { translate: 0 -100%; }
+}
+
+.lightUp {
+  animation: lightUp var(--app-splash-in) var(--l3-motion-easing-standard) both;
+  animation-delay: var(--app-splash-lights-at);
+}
+
+@keyframes lightUp {
+  from { opacity: 0; }
+}
+
+.drawIn {
+  stroke-dasharray: 1;
+  animation: drawIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
+  animation-delay: var(--app-splash-art-at);
+}
+
+@keyframes drawIn {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.popIn {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: popIn var(--l3-motion-duration-long) var(--app-splash-ease-settle) both;
+  animation-delay: calc(var(--app-splash-art-at) + var(--app-splash-stagger) * 2 + var(--i) * var(--app-splash-stagger));
+}
+
+@keyframes popIn {
+  from { opacity: 0; scale: 0; }
+}
+
+/* The night splash's lights twinkle, each on its own beat (delay set inline). */
+.spark {
+  fill: var(--app-diwali-spark);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle var(--app-diwali-twinkle) ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; scale: 0.7; }
+  50% { opacity: 1; scale: 1.2; }
 }
 
 /* The flame breathes from its base. */
@@ -18831,13 +18962,13 @@ export function useSystemKeyboard() {
 }
 
 /* The lanterns sway a little from where they hang (transform-origin set inline at the string). */
-.lantern {
+.sway {
   animation: sway var(--app-diwali-sway) ease-in-out infinite;
 }
 
 @keyframes sway {
-  0%, 100% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
 }
 
 /* The profile avatar's flip: it narrows to nothing (half a turn), the face swaps, it widens back. The class is tripled
@@ -18860,13 +18991,165 @@ export function useSystemKeyboard() {
 }
 
 .avatarDiya {
-  width: 70%;
+  width: 88%;
   height: auto;
+}
+
+/* The search pill's flip: the pill stays put; its content (icon + label) narrows top to bottom to nothing, swaps to the
+   diya and "Happy Green Diwali", and opens back. Doubled class: beats the flow's own button styles. */
+.searchFlip.searchFlip {
+  position: relative;
+}
+
+.searchFlip.searchFlip > :not(.sparkler) {
+  transition:
+    opacity var(--app-diwali-flip-half) var(--l3-motion-easing-accelerate),
+    translate var(--app-diwali-flip-half) var(--l3-motion-easing-accelerate);
+}
+
+/* Out: the icon and label fade as they slide up. */
+.searchFlip.searchFlip[data-turning] > :not(.sparkler) {
+  opacity: 0;
+  translate: 0 calc(-1 * var(--l3-spacing-04));
+}
+
+/* In (after a change): the new icon, then the label, slide up from below as they fade in. */
+.searchSwapped.searchSwapped > :not(.sparkler) {
+  animation: searchContentIn var(--l3-motion-duration-medium) var(--l3-motion-easing-decelerate) both;
+}
+
+.searchSwapped.searchSwapped > :not(.sparkler):nth-child(2) {
+  animation-delay: var(--app-diwali-search-stagger);
+}
+
+@keyframes searchContentIn {
+  from {
+    opacity: 0;
+    translate: 0 var(--l3-spacing-04);
+  }
+}
+
+/* The sparkler round the pill's edge while it says Happy Green Diwali (laid over the pill, sparks spill outside it). */
+.sparkler {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  animation: sparklerIn var(--l3-motion-duration-medium) var(--l3-motion-easing-standard) both;
+}
+
+@keyframes sparklerIn {
+  from { opacity: 0; }
+}
+
+.sparklerEdge,
+.sparklerTrailFar,
+.sparklerTrailNear,
+.sparklerHead {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.sparklerEdge {
+  stroke: var(--app-diwali-sparkler-edge);
+  stroke-width: 1;
+}
+
+.sparklerTrailFar {
+  stroke: var(--app-diwali-sparkler-trail);
+  stroke-width: 1.5;
+}
+
+.sparklerTrailNear {
+  stroke: var(--app-diwali-sparkler-near);
+  stroke-width: 1.5;
+}
+
+.sparklerHead {
+  stroke: var(--app-diwali-sparkler-head);
+  stroke-width: 2.5;
+}
+
+.sparklerGlow {
+  fill: var(--app-diwali-sparkler-glow);
+  filter: blur(var(--l3-spacing-02));
+}
+
+/* A spark: flies off the head (to --to, set inline), shrinking and fading; each on its own beat, over and over. */
+.sparklerSpark {
+  fill: var(--app-diwali-sparkler-spark);
+  animation: sparkFly var(--app-diwali-spark-fly) var(--l3-motion-easing-standard) infinite both;
+}
+
+.sparklerSpark:nth-child(odd) {
+  fill: var(--app-diwali-sparkler-spark-alt);
+}
+
+/* Out of the edge, a twinkle at the top, back into the edge. */
+@keyframes sparkFly {
+  0% { translate: 0 0; opacity: 0; scale: 0.2; }
+  30% { opacity: 1; scale: 1; }
+  50% { translate: var(--to); opacity: 0.5; }
+  60% { opacity: 1; }
+  100% { translate: 0 0; opacity: 0; scale: 0.2; }
+}
+
+/* The wish too long for its pill slides along once to show its end (SlidingLabel), then rests. */
+.wishText {
+  display: inline-block;
+}
+
+.wishSliding.wishSliding {
+  text-overflow: clip;
+}
+
+.wishSliding .wishText {
+  animation: wishSlide var(--app-diwali-wish-slide) var(--l3-motion-easing-standard) var(--l3-motion-duration-medium) both;
+}
+
+@keyframes wishSlide {
+  0%,
+  20% {
+    translate: 0 0;
+  }
+
+  80%,
+  100% {
+    translate: var(--slide) 0;
+  }
+}
+
+/* The diya in the search icon's place: a touch taller than the 20 icon (its petals spread wide). */
+.searchDiya {
+  flex: none;
+  width: auto;
+  height: var(--l3-icon-size-24);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .flame,
-  .lantern {
+  .glowPulse,
+  .spark,
+  .sway,
+  .lowerIn,
+  .lightUp,
+  .drawIn,
+  .popIn {
+    animation: none;
+  }
+
+  .searchFlip.searchFlip > :not(.sparkler) {
+    transition-duration: 1ms;
+  }
+
+  .searchSwapped.searchSwapped > :not(.sparkler) {
+    animation: none;
+  }
+
+  .sparkler,
+  .sparklerSpark {
     animation: none;
   }
 
@@ -18879,19 +19162,64 @@ export function useSystemKeyboard() {
 ### `src/shared/ui/Diwali.tsx`
 
 ```tsx
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { makeCopy } from '../copy'
 import { useFlowOption } from '../prototype'
+import copy from './copy.json'
 import styles from './Diwali.module.css'
+
+const t = makeCopy('shared', copy)
 
 /**
  * Diwali touches (temporary, festival only) — each one switched on in the prototype's App settings → Diwali:
- * - `diwaliSplash`: the launch splash gets a marigold toran, a diya and the wish (src/shared/ui/Splash).
- * - `diwaliAvatar`: the profile initials on Stocks / F&O home flip to a diya twice, then stay as initials.
+ * - `diwaliSplash`: the launch splash becomes a quiet night scene with lanterns or a garland and the wish (src/shared/ui/Splash).
+ * - `diwaliFlip`: on Stocks / F&O home, the profile initials — or the search pill's icon and label — flip to a diya
+ *   (and "Happy Green Diwali") twice, then stay as they were.
  */
 export const DIWALI_OPTIONS = {
   splash: { id: 'diwaliSplash', off: 'off', on: 'on', default: 'on' },
-  avatar: { id: 'diwaliAvatar', off: 'off', on: 'on', default: 'on' },
 } as const
+
+/**
+ * What flips to the diya on Stocks / F&O home (App settings → Diwali → Diya flip):
+ * - profile: the profile avatar turns (a card flip) into the lotus diya.
+ * - search: the search pill stays put; only its content flips (top to bottom) — the search icon becomes the diya and
+ *   "Search stocks" becomes "Happy Green Diwali".
+ */
+export const DIWALI_FLIP = {
+  id: 'diwaliFlip',
+  values: [
+    { value: 'off', label: 'Off' },
+    { value: 'profile', label: 'Profile' },
+    { value: 'search', label: 'Search bar' },
+  ],
+  default: 'search',
+} as const
+export type DiwaliFlip = (typeof DIWALI_FLIP.values)[number]['value']
+
+/**
+ * The Diwali splash's versions (App settings → Diwali → Splash version, shown while the Diwali splash is on). Both are
+ * the same quiet night scene — the wish under the logo in L3 type, a few twinkling lights — with one piece of art at the
+ * top:
+ * - lanterns: three fine-line lanterns hanging at different heights, softly glowing.
+ * - garland: one thin gold string of small marigolds with tiny drops between them.
+ */
+export const DIWALI_SPLASH_VERSIONS = {
+  id: 'diwaliSplashVersion',
+  values: [
+    { value: 'lanterns', label: 'Lanterns' },
+    { value: 'garland', label: 'Garland' },
+  ],
+  default: 'lanterns',
+} as const
+export type DiwaliSplashVersion = (typeof DIWALI_SPLASH_VERSIONS.values)[number]['value']
+
+/** Which splash to show: 'off' (the regular one) or the Diwali version picked. */
+export const useDiwaliSplash = (): 'off' | DiwaliSplashVersion => {
+  const on = useDiwali('splash')
+  const version = useFlowOption('app', DIWALI_SPLASH_VERSIONS.id, DIWALI_SPLASH_VERSIONS.default) as DiwaliSplashVersion
+  return on ? version : 'off'
+}
 
 export const useDiwali = (which: keyof typeof DIWALI_OPTIONS) => {
   const option = DIWALI_OPTIONS[which]
@@ -18899,101 +19227,388 @@ export const useDiwali = (which: keyof typeof DIWALI_OPTIONS) => {
   return useFlowOption('app', option.id, option.default) === option.on
 }
 
-/** A clay diya: the bowl with three dots on its rim and a flame that flickers. Fills its box (48 × 40 artwork). */
-export function Diya({ className }: { className?: string }) {
+// The lotus diya (120 × 96 artwork). A petal is a teardrop from its base (0, 0) to its tip (0, -length), turned by
+// `angle` (0 = up) and set at (x, y): an orange petal with a magenta heart and a light vein.
+type Petal = { x: number; y: number; length: number; width: number; angle: number }
+const petalPath = (length: number, width: number) =>
+  `M0 0C${width} ${-length * 0.3} ${width * 0.7} ${-length * 0.78} 0 ${-length}C${-width * 0.7} ${-length * 0.78} ${-width} ${-length * 0.3} 0 0Z`
+// Behind the bowl: two upright, two leaning out, two low and wide. In front: two sweeping out from the bottom.
+const BACK_PETALS: Petal[] = [
+  { x: 44, y: 54, length: 30, width: 11, angle: -22 },
+  { x: 76, y: 54, length: 30, width: 11, angle: 22 },
+  { x: 36, y: 64, length: 33, width: 12, angle: -52 },
+  { x: 84, y: 64, length: 33, width: 12, angle: 52 },
+  { x: 40, y: 76, length: 36, width: 12, angle: -76 },
+  { x: 80, y: 76, length: 36, width: 12, angle: 76 },
+]
+const FRONT_PETALS: Petal[] = [
+  { x: 60, y: 86, length: 34, width: 10, angle: -96 },
+  { x: 60, y: 86, length: 34, width: 10, angle: 96 },
+]
+// The bowl's band of gold dots under the rim: P0 (28, 58) → P1 (60, 70) → P2 (92, 58) (a quadratic curve).
+const bandAt = (t: number) => ({ x: 28 + 64 * t, y: 58 + 24 * t * (1 - t) })
+const BAND_DOTS = Array.from({ length: 15 }, (_, i) => bandAt((i + 0.5) / 15))
+// The flame: one teardrop, drawn four times smaller and lighter towards its heart (each scaled from its base).
+const FLAME = 'M60 4C68.5 16 73 26 73 35C73 43 67.5 49 60 49C52.5 49 47 43 47 35C47 26 51.5 16 60 4Z'
+const FLAME_LAYERS = [
+  { scale: 1, className: styles.flameOuter },
+  { scale: 0.78, className: styles.flameMid },
+  { scale: 0.56, className: styles.flameInner },
+  { scale: 0.32, className: styles.flameHeart },
+]
+
+function PetalShape({ x, y, length, width, angle }: Petal) {
   return (
-    <svg className={[styles.diya, className].filter(Boolean).join(' ')} viewBox="0 0 48 40" aria-hidden="true">
-      <g className={styles.flame}>
-        <path className={styles.flameOuter} d="M24 3C28 9.5 30.5 13.5 30.5 18C30.5 22 27.6 24.5 24 24.5C20.4 24.5 17.5 22 17.5 18C17.5 13.5 20 9.5 24 3Z" />
-        <path className={styles.flameInner} d="M24 11C25.9 14 27 16.2 27 18.6C27 20.6 25.7 21.8 24 21.8C22.3 21.8 21 20.6 21 18.6C21 16.2 22.1 14 24 11Z" />
-      </g>
-      <path className={styles.bowl} d="M3.5 24.5H44.5C42.5 33.5 34.5 38.5 24 38.5C13.5 38.5 5.5 33.5 3.5 24.5Z" />
-      <circle className={styles.dot} cx="14" cy="30" r="1.3" />
-      <circle className={styles.dot} cx="24" cy="32" r="1.3" />
-      <circle className={styles.dot} cx="34" cy="30" r="1.3" />
-    </svg>
+    <g transform={`translate(${x} ${y}) rotate(${angle})`}>
+      <path className={styles.petalEdge} d={petalPath(length, width)} />
+      <path className={styles.petalHeart} d={petalPath(length * 0.8, width * 0.62)} transform={`translate(${width * 0.12} ${-length * 0.08})`} />
+      <path className={styles.petalVein} d={`M${-width * 0.2} ${-length * 0.12}Q${-width * 0.45} ${-length * 0.55} 0 ${-length * 0.9}`} />
+    </g>
   )
 }
-
-// The toran's string: a gentle dip across the top, P0 (0, 6) → P1 (196, 46) → P2 (392, 6) (a quadratic curve).
-const stringAt = (t: number) => ({ x: 392 * t, y: 6 + 80 * t * (1 - t) })
-const FLOWERS = Array.from({ length: 11 }, (_, i) => stringAt(0.05 + i * 0.09))
-const LANTERNS = [0.16, 0.84].map(stringAt)
-
-/** A marigold toran across the top with two small lanterns hanging from it (they sway a little). */
-export function Toran({ className }: { className?: string }) {
-  return (
-    <svg className={[styles.toran, className].filter(Boolean).join(' ')} viewBox="0 0 392 96" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
-      <path className={styles.line} d="M0 6Q196 46 392 6" />
-      {LANTERNS.map((p, i) => (
-        <g key={i} className={styles.lantern} style={{ transformOrigin: `${p.x}px ${p.y}px`, animationDelay: `${i * -1.4}s` }}>
-          <path className={styles.line} d={`M${p.x} ${p.y}V${p.y + 34}`} />
-          <path className={styles.lanternCap} d={`M${p.x - 6} ${p.y + 38}L${p.x} ${p.y + 33}L${p.x + 6} ${p.y + 38}Z`} />
-          <rect className={styles.lanternBody} x={p.x - 7} y={p.y + 38} width="14" height="18" rx="4" />
-          <path className={styles.flameOuter} d={`M${p.x} ${p.y + 42}C${p.x + 2.2} ${p.y + 45.5} ${p.x + 2.4} ${p.y + 48.5} ${p.x} ${p.y + 50.5}C${p.x - 2.4} ${p.y + 48.5} ${p.x - 2.2} ${p.y + 45.5} ${p.x} ${p.y + 42}Z`} />
-          <path className={styles.line} d={`M${p.x} ${p.y + 56}V${p.y + 64}`} />
-          <circle className={styles.dot} cx={p.x} cy={p.y + 65.5} r="1.5" />
-        </g>
-      ))}
-      {FLOWERS.map((p, i) => (
-        <g key={i}>
-          <circle className={styles.petals} cx={p.x} cy={p.y} r="5" />
-          <circle className={styles.dot} cx={p.x} cy={p.y} r="1.6" />
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-// The avatar flip's timeline (ms from the home showing): the initials turn into the diya, hold, turn back — twice.
-const FLIP_HALF_MS = 160
-const FLIPS = [
-  { at: 1000, to: 'diya' },
-  { at: 2800, to: 'initials' },
-  { at: 3600, to: 'diya' },
-  { at: 5400, to: 'initials' },
-] as const
-
-/** Homes (by key) whose avatar has already flipped this visit: it plays once per page load, not on every tab switch. */
-const flipped = new Set<string>()
-
-/** When a splash covering the home is gone (ms, Date.now()): the flips wait for it, so the first one isn't hidden. */
-let splashGoneAt = 0
-/** The splash calls this as it starts showing (src/shared/ui/Splash). */
-export const holdFlipsFor = (ms: number) => { splashGoneAt = Date.now() + ms }
 
 /**
- * The profile avatar's Diwali flip: with `diwaliAvatar` on, the initials turn (a card flip, half then half) into a
- * diya and back, twice, then stay. Spread `flip` onto the profile button (className + data attributes) and render
- * `face`. `home` names the home ('stocks', 'fno') so each plays once per visit.
+ * A lotus diya: a purple bowl painted with gold dots and a lotus bud, a gold rim holding the oil, a layered flame on its
+ * wick, sitting in magenta-and-orange lotus petals. The flame flickers. Fills its width (120 × 96 artwork).
+ */
+export function Diya({ className }: { className?: string }) {
+  const bowlClip = useId()
+  return (
+    <svg className={[styles.diya, className].filter(Boolean).join(' ')} viewBox="0 0 120 96" aria-hidden="true">
+      {BACK_PETALS.map((petal, i) => <PetalShape key={i} {...petal} />)}
+      <clipPath id={bowlClip}>
+        <path d="M24 52C26 72 42 84 60 84C78 84 94 72 96 52Z" />
+      </clipPath>
+      <path className={styles.bowl} d="M24 52C26 72 42 84 60 84C78 84 94 72 96 52Z" />
+      <g clipPath={`url(#${bowlClip})`}>
+        <path className={styles.bowlShade} d="M24 52C26 72 42 84 60 84C50 78 38 68 34 52Z" />
+        {BAND_DOTS.map((p, i) => <circle key={i} className={styles.gold} cx={p.x} cy={p.y} r="1.1" />)}
+        <path className={styles.goldLine} d="M26 63Q60 77 94 63" />
+        {/* The lotus bud painted on the front, with leaves either side. */}
+        <g transform="translate(60 84)">
+          <path className={styles.leafGold} d={petalPath(13, 4)} transform="translate(-7 -3) rotate(-48)" />
+          <path className={styles.leafGold} d={petalPath(13, 4)} transform="translate(7 -3) rotate(48)" />
+          <path className={styles.leafPink} d={petalPath(14, 4)} transform="translate(-12 -1) rotate(-70)" />
+          <path className={styles.leafPink} d={petalPath(14, 4)} transform="translate(12 -1) rotate(70)" />
+          <path className={styles.petalEdge} d={petalPath(19, 7)} transform="translate(0 -1)" />
+          <path className={styles.petalHeart} d={petalPath(14, 4.6)} transform="translate(0 -2)" />
+          <path className={styles.leafPink} d={petalPath(8, 2.4)} transform="translate(0 -3)" />
+        </g>
+        <circle className={styles.gold} cx="42" cy="71" r="1.6" />
+        <circle className={styles.gold} cx="78" cy="71" r="1.6" />
+      </g>
+      <ellipse className={styles.rim} cx="60" cy="52" rx="36" ry="7" />
+      <ellipse className={styles.oil} cx="60" cy="52.6" rx="31" ry="4.8" />
+      <ellipse className={styles.oilRipple} cx="60" cy="53" rx="17" ry="2.2" />
+      <g className={styles.glowPulse}>
+        <circle className={styles.glow} cx="60" cy="32" r="18" />
+      </g>
+      <g className={styles.flame}>
+        {FLAME_LAYERS.map(({ scale, className: layer }) => (
+          <path key={scale} className={layer} d={FLAME} transform={`translate(60 49) scale(${scale}) translate(-60 -49)`} />
+        ))}
+      </g>
+      <path className={styles.wick} d="M60 41V52" />
+      {FRONT_PETALS.map((petal, i) => <PetalShape key={i} {...petal} />)}
+      <path className={styles.petalHeart} d={petalPath(9, 4.5)} transform="translate(60 82) rotate(180)" />
+    </svg>
+  )
+}
+
+// Hanging lanterns (392 × 280 artwork, pinned to the top edge): where each hangs, how far its string drops, its scale.
+const HANGING = [
+  { x: 64, drop: 112, scale: 1.05 },
+  { x: 268, drop: 64, scale: 0.85 },
+  { x: 326, drop: 176, scale: 1.25 },
+]
+
+/** One fine-line lantern, its top at (0, 0): gold caps, a glass body lit from inside, three ribs, a small tassel. */
+function HangingLantern({ glow }: { glow: string }) {
+  return (
+    <>
+      <circle className={styles.lightUp} cx="0" cy="24" r="26" fill={`url(#${glow})`} />
+      <circle className={styles.hairline} cx="0" cy="2" r="2" />
+      <path className={styles.goldFill} d="M-5 4H5L9 10H-9Z" />
+      <path className={styles.lanternGlass} d="M-9 10C-15 18 -15 30 -9 38H9C15 30 15 18 9 10Z" />
+      <ellipse className={[styles.lanternLight, styles.lightUp].join(' ')} cx="0" cy="24" rx="5" ry="8" />
+      <path className={styles.hairline} d="M-4 10.5Q-7 24 -4 37.5M4 10.5Q7 24 4 37.5" />
+      <path className={styles.goldFill} d="M-9 38H9L5 43H-5Z" />
+      <path className={styles.hairline} d="M0 43V50" />
+      <path className={styles.goldFill} d="M0 49.5C1.6 52 2 54.5 0 57C-2 54.5 -1.6 52 0 49.5Z" />
+    </>
+  )
+}
+
+/**
+ * The Lanterns splash's art: three lanterns hanging from the top at different heights, swaying a little. On the way in
+ * they come down one after another, then light up.
+ */
+export function Lanterns({ className }: { className?: string }) {
+  const glow = useId()
+  return (
+    <svg className={[styles.art, className].filter(Boolean).join(' ')} viewBox="0 0 392 280" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+      <defs>
+        <radialGradient id={glow}>
+          <stop offset="0" className={styles.haloStop} stopOpacity="0.32" />
+          <stop offset="1" className={styles.haloStop} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {HANGING.map(({ x, drop, scale }, i) => (
+        // Comes down from above the top edge (one after another), then sways from where it hangs.
+        <g key={x} className={styles.lowerIn} style={{ '--i': i } as CSSProperties}>
+          <g className={styles.sway} style={{ transformOrigin: `${x}px 0px`, animationDelay: `${i * -1.3}s` }}>
+            <path className={styles.hairline} d={`M${x} 0V${drop}`} />
+            <g transform={`translate(${x} ${drop}) scale(${scale})`}>
+              <HangingLantern glow={glow} />
+            </g>
+          </g>
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+// The garland's string: a gentle dip across the top, P0 (0, 4) → P1 (196, 92) → P2 (392, 4) (a quadratic curve).
+const garlandAt = (t: number) => ({ x: 392 * t, y: 4 + 176 * t * (1 - t) })
+const GARLAND_FLOWERS = Array.from({ length: 9 }, (_, i) => ({ ...garlandAt(0.1 + i * 0.1), tone: i % 2 }))
+const GARLAND_DROPS = Array.from({ length: 8 }, (_, i) => ({ ...garlandAt(0.15 + i * 0.1), long: i % 2 === 0 }))
+const PETAL_RING = Array.from({ length: 8 }, (_, i) => (i * Math.PI * 2) / 8)
+
+/** The Garland splash's art: one thin gold string of small two-tone marigolds, a tiny gold drop between each. */
+export function Garland({ className }: { className?: string }) {
+  return (
+    <svg className={[styles.art, className].filter(Boolean).join(' ')} viewBox="0 0 392 120" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+      {/* On the way in the string draws across from the left, then each drop and flower pops on in turn. */}
+      <path className={[styles.hairline, styles.drawIn].join(' ')} pathLength={1} d="M0 4Q196 92 392 4" />
+      {GARLAND_DROPS.map(({ x, y, long }, i) => (
+        <g key={x} className={styles.popIn} style={{ '--i': i + 0.5 } as CSSProperties}>
+          <path className={styles.hairline} d={`M${x} ${y}V${y + (long ? 22 : 14)}`} />
+          <circle className={styles.goldFill} cx={x} cy={y + (long ? 24.5 : 16.5)} r="2" />
+        </g>
+      ))}
+      {GARLAND_FLOWERS.map(({ x, y, tone }, i) => (
+        <g key={x} className={styles.popIn} style={{ '--i': i } as CSSProperties}>
+          {PETAL_RING.map((a) => (
+            <circle key={a} className={tone ? styles.marigoldGold : styles.marigoldOrange} cx={x + Math.cos(a) * 4.2} cy={y + Math.sin(a) * 4.2} r="2.8" />
+          ))}
+          <circle className={styles.marigoldCore} cx={x} cy={y} r="2" />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+// Twinkling lights across the night splash (392 × 872 artwork): a few small warm dots, each on its own beat.
+const SPARKS = [
+  [48, 300, 1.2], [344, 330, 1], [92, 560, 0.9], [306, 640, 1.3], [32, 720, 1], [360, 520, 0.8],
+  [196, 250, 0.8], [150, 780, 1.1], [250, 740, 0.9],
+] as const
+
+/** Warm twinkling lights scattered over the Diwali splash (behind everything else). */
+export function Sparkles({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 392 872" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      {SPARKS.map(([x, y, r], i) => (
+        <circle key={i} className={styles.spark} cx={x} cy={y} r={r} style={{ animationDelay: `${(i * -0.53) % 3}s` }} />
+      ))}
+    </svg>
+  )
+}
+
+// The diya flip's timeline (ms from the home showing, or from the splash starting to leave): the initials / search content
+// turn into the diya, hold, turn back — twice. The search pill's Diwali face (with its sparkler) holds 3 s each time.
+const FLIP_HALF_MS = 160
+const PROFILE_FLIPS = [
+  { at: 1000, to: 'diya' },
+  { at: 2800, to: 'regular' },
+  { at: 3600, to: 'diya' },
+  { at: 5400, to: 'regular' },
+] as const
+const SEARCH_FLIPS = [
+  { at: 1000, to: 'diya' },
+  { at: 4000, to: 'regular' },
+  { at: 4800, to: 'diya' },
+  { at: 7800, to: 'regular' },
+] as const
+
+/** Whether a splash covers the home: the flips wait until it starts leaving, however long it stays, so none is hidden. */
+let splashUp = false
+const splashListeners = new Set<() => void>()
+/** The splash calls this as it shows (true) and as it starts leaving (false) (src/shared/ui/Splash). */
+export function setSplashUp(up: boolean) {
+  splashUp = up
+  if (!up) splashListeners.forEach((listener) => listener())
+}
+
+/**
+ * The Diwali diya flip on a home's top bar (App settings → Diwali → Diya flip): the initials — or the search pill's icon
+ * and label — turn into the diya and back, twice, then stay. It plays each time the home shows. `home` names the home
+ * ('stocks', 'fno').
+ * - Profile: spread `profile.flip` onto the profile button (className + data attributes) and render `profile.face`.
+ * - Search: add `search.className` and `search.turning` (as `data-turning`) to the search pill and, while
+ *   `search.diya`, render <DiwaliSearchFace /> in place of its icon and label. Only the pill's content changes: it
+ *   fades and slides up out, and the new content slides up and fades in (icon first, then the label).
  */
 export function useDiyaFlip(home: string, initials: string) {
-  const on = useDiwali('avatar')
-  const [face, setFace] = useState<'initials' | 'diya'>('initials')
+  const target = useFlowOption('app', DIWALI_FLIP.id, DIWALI_FLIP.default) as DiwaliFlip
+  const [face, setFace] = useState<'regular' | 'diya'>('regular')
   const [turning, setTurning] = useState(false)
+  // The search content has changed once: from then on new content slides in (not on the home's first paint).
+  const [swapped, setSwapped] = useState(false)
 
   useEffect(() => {
-    if (!on || flipped.has(home)) return
-    flipped.add(home)
-    let finished = false
-    const wait = Math.max(0, splashGoneAt - Date.now())
-    const timers = FLIPS.flatMap(({ at, to }, i) => [
-      window.setTimeout(() => setTurning(true), wait + at),
-      window.setTimeout(() => { setFace(to); setTurning(false); finished = i === FLIPS.length - 1 }, wait + at + FLIP_HALF_MS),
-    ])
-    return () => {
-      timers.forEach(window.clearTimeout)
-      // Left before the flips ended (or React's dev double-mount): play again next time.
-      if (!finished) flipped.delete(home)
-      setFace('initials')
-      setTurning(false)
+    if (target === 'off') return
+    const timers: number[] = []
+    const play = () => {
+      splashListeners.delete(play)
+      const flips = target === 'search' ? SEARCH_FLIPS : PROFILE_FLIPS
+      flips.forEach(({ at, to }) => timers.push(
+        window.setTimeout(() => setTurning(true), at),
+        window.setTimeout(() => { setFace(to); setTurning(false); setSwapped(true) }, at + FLIP_HALF_MS),
+      ))
     }
-  }, [on, home])
+    if (splashUp) splashListeners.add(play)
+    else play()
+    return () => {
+      splashListeners.delete(play)
+      timers.forEach(window.clearTimeout)
+      setFace('regular')
+      setTurning(false)
+      setSwapped(false)
+    }
+  }, [target, home])
 
+  const profileDiya = target === 'profile' && face === 'diya'
   return {
-    flip: { className: styles.flip, 'data-turning': turning || undefined, 'data-diya': face === 'diya' || undefined },
-    face: face === 'diya' ? <Diya className={styles.avatarDiya} /> : initials,
+    profile: {
+      flip: target === 'profile'
+        ? { className: styles.flip, 'data-turning': turning || undefined, 'data-diya': profileDiya || undefined }
+        : { className: '' },
+      face: profileDiya ? <Diya className={styles.avatarDiya} /> : initials,
+    },
+    search: {
+      className: target === 'search' ? [styles.searchFlip, swapped && styles.searchSwapped].filter(Boolean).join(' ') : '',
+      turning: (target === 'search' && turning) || undefined,
+      diya: target === 'search' && face === 'diya',
+    },
   }
+}
+
+/**
+ * The search pill's Diwali face: the lotus diya in place of the search icon, "Happy Green Diwali" for the label, and a
+ * sparkler running round the pill's edge while it shows.
+ */
+export function DiwaliSearchFace({ labelClassName }: { labelClassName?: string }) {
+  return (
+    <>
+      <Diya className={styles.searchDiya} />
+      <SlidingLabel className={labelClassName} text={t('diwali.searchWish')} />
+      <Sparkler />
+    </>
+  )
+}
+
+/**
+ * The wish as the pill's label. When the pill is too narrow for it (F&O home, beside the DASH pill), the text slides
+ * along once to show its end, then rests there. Reduced motion: it stays cut off.
+ */
+function SlidingLabel({ className, text }: { className?: string; text: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const [overflow, setOverflow] = useState(0)
+  useLayoutEffect(() => {
+    const label = ref.current
+    if (!label || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const measure = () => setOverflow(Math.max(0, (label.firstElementChild as HTMLElement).offsetWidth - label.clientWidth))
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(label)
+    return () => observer.disconnect()
+  }, [])
+  const sliding = overflow > 0
+  return (
+    <span
+      ref={ref}
+      className={[className, sliding && styles.wishSliding].filter(Boolean).join(' ')}
+      style={sliding ? ({ '--slide': `${-overflow}px` } as CSSProperties) : undefined}
+    >
+      <span className={styles.wishText}>{text}</span>
+    </span>
+  )
+}
+
+// The sparkler: one lap of the pill's edge takes SPARKLER_LAP. Its trail is three dashes ending at the same point — a
+// long faint orange one, a shorter gold one, a short white-hot head (length = share of the edge) — and sparks fly off
+// the head, outwards and back.
+const SPARKLER_LAP = '2.8s'
+const SPARKLER_TRAIL = [
+  { length: 0.22, className: styles.sparklerTrailFar },
+  { length: 0.1, className: styles.sparklerTrailNear },
+  { length: 0.025, className: styles.sparklerHead },
+]
+// Each spark rises out of the edge at the head, twinkles, and sinks back into it: how far out it drifts (in the direction
+// of travel: x along, y outwards is negative), its size and its delay within the cycle.
+const SPARKLER_SPARKS = [
+  { to: '-3px -10px', r: 1.5, delay: '0ms' },
+  { to: '-8px -6px', r: 1.2, delay: '150ms' },
+  { to: '-1px -12px', r: 1.1, delay: '300ms' },
+  { to: '-6px -9px', r: 1.4, delay: '450ms' },
+  { to: '-10px -4px', r: 1.1, delay: '600ms' },
+  { to: '-2px -7px', r: 1.6, delay: '750ms' },
+  { to: '-5px -13px', r: 1, delay: '900ms' },
+  { to: '-1px -8px', r: 1.3, delay: '1050ms' },
+]
+
+/** The pill's outline as a path (clockwise from the top left of its straight edge), on the middle of its 1px edge. */
+const pillPath = (w: number, h: number) => {
+  const r = (h - 1) / 2
+  return `M${0.5 + r} 0.5H${w - 0.5 - r}A${r} ${r} 0 0 1 ${w - 0.5 - r} ${h - 0.5}H${0.5 + r}A${r} ${r} 0 0 1 ${0.5 + r} 0.5Z`
+}
+
+/**
+ * A Diwali sparkler running round the edge of its parent pill (laid over it; it doesn't take clicks): a gold tint on the
+ * edge, a burning head with a fading trail, sparks flying off it. Reduced motion: just the gold edge.
+ */
+function Sparkler() {
+  const ref = useRef<SVGSVGElement>(null)
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null)
+  useLayoutEffect(() => {
+    const pill = ref.current?.parentElement
+    if (!pill) return
+    const measure = () => setSize({ w: pill.offsetWidth, h: pill.offsetHeight })
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(pill)
+    return () => observer.disconnect()
+  }, [])
+  const still = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const path = size && pillPath(size.w, size.h)
+  return (
+    <svg ref={ref} className={styles.sparkler} aria-hidden="true">
+      {path && (
+        <>
+          <path className={styles.sparklerEdge} d={path} />
+          {!still && (
+            <>
+              {/* The dashes move with the head: the head's front is at `t` of the edge, a dash of length L starts at t − L. */}
+              {SPARKLER_TRAIL.map(({ length, className }) => (
+                <path key={length} className={className} d={path} pathLength={1} strokeDasharray={`${length} ${1 - length}`}>
+                  <animate attributeName="stroke-dashoffset" values={`${length};${length - 1}`} dur={SPARKLER_LAP} repeatCount="indefinite" />
+                </path>
+              ))}
+              {/* The head's glow and sparks ride along the edge, turned with it (x = the way it travels). */}
+              <g>
+                <animateMotion path={path} dur={SPARKLER_LAP} repeatCount="indefinite" rotate="auto" />
+                <circle className={styles.sparklerGlow} r="5" />
+                {SPARKLER_SPARKS.map(({ to, r, delay }) => (
+                  <circle key={delay} className={styles.sparklerSpark} r={r} style={{ '--to': to, animationDelay: delay } as CSSProperties} />
+                ))}
+              </g>
+            </>
+          )}
+        </>
+      )}
+    </svg>
+  )
 }
 ```
 
@@ -19354,7 +19969,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   display: grid;
   place-items: center;
   background: var(--l3-surface-default);
-  /* A button (a tap skips ahead): no button chrome. */
+  /* A button: no button chrome. */
   border: 0;
   padding: 0;
   cursor: pointer;
@@ -19362,35 +19977,102 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 }
 
 
+/* The logo rises in and settles as the splash opens (the regular splash too). */
+.logo {
+  animation: logoIn var(--app-splash-in) var(--app-splash-ease-settle) both;
+  animation-delay: var(--app-splash-logo-at);
+}
+
+@keyframes logoIn {
+  from { opacity: 0; scale: 0.92; translate: 0 var(--l3-spacing-08); }
+}
+
 .splash[data-state='leaving'] {
   opacity: 0;
   pointer-events: none;
 }
 
-/* Diwali: a soft warm glow behind the logo, the toran hanging from the top edge, the wish rising in under the logo. */
+/* Diwali: a quiet night scene (the splash takes L3's dark theme) — a faint dusk from the top, a soft warm glow behind
+   the logo, a few twinkling lights, the lanterns or garland at the top edge, the wish rising in under the logo.
+   Its entrance (local tokens --app-splash-*) is over before the splash fades: the glow swells in with the art, the
+   logo rises, the lights come on, the wish's two lines rise in, a gold shine crosses "Happy Diwali". */
 .splash[data-diwali] {
   background:
-    radial-gradient(circle at 50% 50%, var(--app-diwali-glow), transparent 60%),
+    radial-gradient(ellipse 120% 50% at 50% 0%, var(--app-diwali-dusk), transparent 70%),
     var(--l3-surface-default);
 }
 
-.toran {
+.splash[data-diwali]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, var(--app-diwali-glow), transparent 50%);
+  animation: glowIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
+}
+
+@keyframes glowIn {
+  from { opacity: 0; scale: 0.6; }
+}
+
+.sparkles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: fadeIn var(--app-splash-in) var(--l3-motion-easing-standard) both;
+  animation-delay: var(--app-splash-lights-at);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+}
+
+.art {
   position: absolute;
   inset: 0 0 auto;
   width: 100%;
 }
 
-.diya {
-  width: var(--l3-size-48);
-  height: auto;
-}
-
-.wishText {
-  max-width: 24ch;
+.wishLead {
   margin: 0;
+  animation: riseIn var(--app-splash-in) var(--l3-motion-easing-standard) both;
+  animation-delay: var(--app-splash-lead-at);
   color: var(--l3-content-secondary);
   font: var(--l3-text-label-14);
   text-align: center;
+}
+
+/* "Happy Diwali": L3's heading 28 in gold, a faint warm glow; once in, a pale gold shine sweeps across it once (a copy
+   of the words on top, data-text, painted only by a moving highlight). */
+.headline {
+  position: relative;
+  margin: 0;
+  animation: riseIn var(--app-splash-in) var(--app-splash-ease-settle) both;
+  animation-delay: var(--app-splash-headline-at);
+  color: var(--app-diwali-headline);
+  text-shadow: 0 0 var(--l3-spacing-16) var(--app-diwali-headline-glow);
+  font: var(--l3-text-heading-28);
+  text-align: center;
+}
+
+.headline::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 35%, var(--app-diwali-headline-shine) 50%, transparent 65%) 100% 0 / 300% 100%;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  animation: shine var(--app-splash-shine) var(--l3-motion-easing-standard) both;
+  animation-delay: var(--app-splash-shine-at);
+}
+
+@keyframes shine {
+  to { background-position: 0% 0; }
+}
+
+@keyframes riseIn {
+  from { opacity: 0; translate: 0 var(--l3-spacing-08); }
 }
 
 .centre {
@@ -19403,16 +20085,15 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   left: 50%;
   width: max-content;
   translate: -50% 0;
-  animation: wishIn var(--l3-motion-duration-long) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--l3-motion-duration-medium);
-}
-
-@keyframes wishIn {
-  from { opacity: 0; translate: -50% var(--l3-spacing-08); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wish {
+  .logo,
+  .splash[data-diwali]::before,
+  .sparkles,
+  .wishLead,
+  .headline,
+  .headline::after {
     animation: none;
   }
 
@@ -19425,12 +20106,13 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 ### `src/shared/ui/Splash.tsx`
 
 ```tsx
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { BrandLogo } from '@l3/components/BrandLogo'
 import { Stack } from '@l3/components/Stack'
+import { useTheme } from '@l3/theme'
 import { makeCopy } from '../copy'
 import copy from './copy.json'
-import { Diya, Toran, holdFlipsFor, useDiwali } from './Diwali'
+import { Garland, Lanterns, Sparkles, setSplashUp, useDiwaliSplash } from './Diwali'
 import styles from './Splash.module.css'
 
 const t = makeCopy('shared', copy)
@@ -19438,7 +20120,7 @@ const t = makeCopy('shared', copy)
 /** The screens a launch can land on that open with the splash: the two home pages (Stocks, F&O). */
 export const SPLASH_SCREENS = ['stocks-01', 'fno-01']
 /** How long the logo stays before the splash fades away. */
-export const SPLASH_MS = 2000
+export const SPLASH_MS = 1500
 
 /**
  * Show the splash when the app launches (opens or reloads) onto a home page. A launch straight into an inner page (a
@@ -19451,45 +20133,79 @@ export function shouldShowSplash(landing: string) {
 /** Longest the fade may take before the splash is removed anyway (a background tab never ends its transition). */
 const FADE_FALLBACK_MS = 600
 
-/** The splash's own timing: shown for 2 s ('shown'), then fading ('leaving'), then gone ('done'). A tap skips ahead. */
-function useSplashState(show: boolean) {
+/**
+ * The splash's own timing: shown for 1.5 s ('shown'), then fading ('leaving'), then gone ('done'). While `held` (prototype
+ * only, see SplashCover) it stays shown; once let go it waits its 1.5 s again.
+ */
+function useSplashState(show: boolean, held = false) {
   const [state, setState] = useState<'shown' | 'leaving' | 'done'>(() => {
-    if (show) holdFlipsFor(SPLASH_MS + FADE_FALLBACK_MS) // the home's Diwali avatar flip starts once the splash is gone
+    if (show) setSplashUp(true) // the home's Diwali diya flip waits until the splash starts leaving
     return show ? 'shown' : 'done'
   })
   useEffect(() => {
-    if (state === 'done') return
+    if (state !== 'shown') setSplashUp(false)
+  }, [state])
+  // Removed while still shown: let the flips go (after a tick, so React's dev double-mount doesn't count as removed).
+  const mounted = useRef(false)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      window.setTimeout(() => { if (!mounted.current) setSplashUp(false) })
+    }
+  }, [])
+  useEffect(() => {
+    if (state === 'done' || (state === 'shown' && held)) return
     const t = window.setTimeout(() => setState(state === 'shown' ? 'leaving' : 'done'), state === 'shown' ? SPLASH_MS : FADE_FALLBACK_MS)
     return () => window.clearTimeout(t)
-  }, [state])
+  }, [state, held])
   return [state, setState] as const
 }
 
 /**
- * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali version
- * (App settings → Diwali splash) adds a marigold toran across the top, a warm glow, and a diya with the wish under the
- * logo.
+ * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali versions
+ * (App settings → Diwali) are a quiet night scene in L3's dark theme, in either app theme: hanging lanterns or a marigold
+ * garland at the top, a soft warm glow, a few twinkling lights, and the wish under the logo with "Happy Diwali" in gold.
  */
-function SplashCover({ state, onLeave, onGone }: { state: 'shown' | 'leaving'; onLeave: () => void; onGone: () => void }) {
-  const diwali = useDiwali('splash')
+function SplashCover({ state, onHold, onLeave, onGone }: {
+  state: 'shown' | 'leaving'
+  onHold: (held: boolean) => void
+  onLeave: () => void
+  onGone: () => void
+}) {
+  const diwali = useDiwaliSplash()
+  const { product } = useTheme()
+  // Prototype only (not app behaviour — leave out of the build): to look at the splash, hovering (mouse) holds it, a
+  // tap / click pins it, and a second tap lets it fade.
+  const [hovered, setHovered] = useState(false)
+  const [pinned, setPinned] = useState(false)
+  useEffect(() => onHold(hovered || pinned), [hovered, pinned]) // onHold is a new function every render
   return (
     <button
       type="button"
       className={styles.splash}
       data-state={state}
-      data-diwali={diwali || undefined}
-      aria-label={diwali ? `${t('splash.label')}. ${t('splash.diwali')}` : t('splash.label')}
-      onClick={onLeave}
+      data-diwali={diwali === 'off' ? undefined : diwali}
+      // Diwali is a night scene: the splash always takes L3's dark theme (the logo's name turns light with it).
+      data-product={diwali === 'off' ? undefined : product}
+      data-mode={diwali === 'off' ? undefined : 'dark'}
+      data-system-bars={diwali === 'off' ? undefined : 'dark'}
+      aria-label={diwali === 'off' ? t('splash.label') : `${t('splash.label')}. ${t('splash.diwali')}`}
+      onClick={() => (pinned ? onLeave() : setPinned(true))}
+      onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHovered(true) }}
+      onPointerLeave={(e) => { if (e.pointerType === 'mouse') setHovered(false) }}
       onTransitionEnd={(e) => { if (e.target === e.currentTarget) onGone() }}
     >
-      {diwali && <Toran className={styles.toran} />}
+      {diwali !== 'off' && <Sparkles className={styles.sparkles} />}
+      {diwali === 'lanterns' && <Lanterns className={styles.art} />}
+      {diwali === 'garland' && <Garland className={styles.art} />}
       <Stack align="center" className={styles.centre}>
-        <BrandLogo brand="lemonn" variant="full" size={48} decorative />
+        <BrandLogo brand="lemonn" variant="full" size={48} decorative className={styles.logo} />
         {/* Hangs under the logo, so the logo stays where the regular splash has it. */}
-        {diwali && (
-          <Stack gap="12" align="center" className={styles.wish}>
-            <Diya className={styles.diya} />
-            <p className={styles.wishText}>{t('splash.diwali')}</p>
+        {diwali !== 'off' && (
+          <Stack gap="08" align="center" className={styles.wish}>
+            <p className={styles.wishLead}>{t('splash.diwaliLead')}</p>
+            <p className={styles.headline} data-text={t('splash.diwaliHeadline')}>{t('splash.diwaliHeadline')}</p>
           </Stack>
         )}
       </Stack>
@@ -19498,28 +20214,31 @@ function SplashCover({ state, onLeave, onGone }: { state: 'shown' | 'leaving'; o
 }
 
 /**
- * The launch splash: the Lemonn logo in the middle of a plain screen for 2 seconds, then it fades and the home page
+ * The launch splash: the Lemonn logo in the middle of a plain screen for 1.5 seconds (it rises in as the splash opens),
+ * then it fades and the home page
  * underneath shows. It covers the app (not the phone's status bar). Every launch onto a home page, reloads included.
  */
 export function Splash({ landing }: { landing: string }) {
-  const [state, setState] = useSplashState(shouldShowSplash(landing))
+  const [held, setHeld] = useState(false)
+  const [state, setState] = useSplashState(shouldShowSplash(landing), held)
   if (state === 'done') return null
-  return <SplashCover state={state} onLeave={() => setState('leaving')} onGone={() => setState('done')} />
+  return <SplashCover state={state} onHold={setHeld} onLeave={() => setState('leaving')} onGone={() => setState('done')} />
 }
 
 /**
  * The splash as a page of its own (the Stocks and F&O flows list it before their home): it plays like the launch
- * splash — 2 s, then it fades over `home` (drawn underneath) and `onDone` moves to the home screen itself.
+ * splash — 1.5 s, then it fades over `home` (drawn underneath) and `onDone` moves to the home screen itself.
  */
 export function SplashScreen({ home, onDone }: { home: ReactNode; onDone: () => void }) {
-  const [state, setState] = useSplashState(true)
+  const [held, setHeld] = useState(false)
+  const [state, setState] = useSplashState(true, held)
   useEffect(() => {
     if (state === 'done') onDone()
   }, [state]) // once, when the splash is gone (onDone is a new function every render)
   return (
     <>
       {home}
-      {state !== 'done' && <SplashCover state={state} onLeave={() => setState('leaving')} onGone={() => setState('done')} />}
+      {state !== 'done' && <SplashCover state={state} onHold={setHeld} onLeave={() => setState('leaving')} onGone={() => setState('done')} />}
     </>
   )
 }
@@ -19530,362 +20249,9 @@ export function SplashScreen({ home, onDone }: { home: ReactNode; onDone: () => 
 ```json
 {
   "splash.label": "Lemonn",
-  "splash.diwali": "Team Lemonn wishes every trader a Happy Diwali"
+  "splash.diwali": "Team Lemonn wishes every trader a Happy Diwali",
+  "splash.diwaliLead": "Team Lemonn wishes every trader a",
+  "splash.diwaliHeadline": "Happy Diwali",
+  "diwali.searchWish": "Happy Green Diwali"
 }
-```
-
-### `src/shared/ui/dash/DashEntry.module.css`
-
-```css
-/*
- * DASH pill — Figma "Dash entry point" (DASH AI main flow, 11492:7740), copied as drawn: hugs its content (4 / 8
- * padding, 2 between the orb and the word), full radius, a 1px green-300 edge, a 176° fill from surface/primary
- * (37.5%) into the brand-light lime (93.4%), the orb at 21.8 without its halo, "DASH" in Heading/10, success green.
- */
-.entry {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--l3-spacing-02);
-  padding: var(--l3-spacing-04) var(--l3-spacing-08);
-  border: 1px solid var(--l3-base-hue-green-300); /* 1px: Figma stroke */
-  border-radius: var(--l3-radius-full);
-  background: linear-gradient(176deg, var(--l3-surface-primary) 37.508%, var(--l3-surface-accent-brand-light) 93.358%);
-  color: var(--l3-content-accent-success-default);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform var(--l3-motion-duration-short) var(--l3-motion-easing-standard);
-}
-
-.entry:active {
-  transform: scale(var(--l3-motion-scale-press-default));
-}
-
-.entry:focus-visible {
-  outline: 2px solid var(--l3-content-primary);
-  outline-offset: 2px;
-}
-
-/* Figma "logo": 21.818 (local token — no L3 size). */
-.entry > span:first-child {
-  --orb-box: var(--app-dash-orb-pill);
-}
-
-.label {
-  font: var(--l3-text-heading-10);
-  text-align: center;
-  white-space: nowrap;
-}
-```
-
-### `src/shared/ui/dash/DashEntry.tsx`
-
-```tsx
-import { DashOrb } from './DashOrb'
-import styles from './DashEntry.module.css'
-
-type DashEntryProps = {
-  /** The visible word ("DASH"), from the caller's copy file. */
-  label: string
-  /** What a screen reader says ("Open DASH AI"). */
-  ariaLabel: string
-  onClick?: () => void
-}
-
-/**
- * The way into DASH AI — a pill in the Stocks home top bar (Figma "Dash entry point", DASH AI main flow 11492:7740):
- * the orb and "DASH" on a white-into-lime fill with a thin green edge. It hugs its content (≈ 32 tall).
- */
-export function DashEntry({ label, ariaLabel, onClick }: DashEntryProps) {
-  return (
-    <button type="button" className={styles.entry} onClick={onClick} aria-label={ariaLabel}>
-      <DashOrb size="sm" halo={false} />
-      <span className={styles.label} aria-hidden="true">{label}</span>
-    </button>
-  )
-}
-```
-
-### `src/shared/ui/dash/DashOrb.module.css`
-
-```css
-/*
- * The orb artwork is the Figma vector component: every part keeps the exact Figma box (px inside a 100 × 100 frame —
- * artwork geometry, not layout), and the whole thing scales to the slot. Sizes come from L3 size tokens.
- */
-.orb {
-  --orb-box: var(--l3-size-96);
-  position: relative;
-  display: inline-block;
-  flex: none;
-  width: var(--orb-box);
-  height: var(--orb-box);
-}
-
-.orb[data-size='lg'] { --orb-box: var(--l3-size-96); }
-.orb[data-size='md'] { --orb-box: var(--l3-size-64); }
-.orb[data-size='compact'] { --orb-box: var(--l3-size-40); }
-.orb[data-size='sm'] { --orb-box: var(--l3-size-32); }
-
-/* The art is drawn at 100 and scaled to the box. */
-.scale {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100px;
-  height: 100px;
-  transform: scale(calc(var(--orb-box) / 100px));
-  transform-origin: 0 0;
-}
-
-.art {
-  position: absolute;
-  inset: 0;
-}
-
-/* Figma: the halo copy sits 8 right / 10 down, layer blur 23.35. */
-.halo {
-  transform: translate(8px, 10px);
-  filter: blur(var(--app-dash-orb-halo-blur));
-}
-
-.art img {
-  display: block;
-  max-width: none;
-}
-
-/* "Group 1000006113" (back leaf, blurred glow): box 55.5 × 57.8, bottom 49.7, centre +17.2. */
-.leafBackBox,
-.leafFrontBox {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(-50%);
-}
-
-.leafBackBox {
-  bottom: 49.71px;
-  left: calc(50% + 17.24px);
-  width: 55.526px;
-  height: 57.791px;
-}
-
-.leafBack,
-.leafFront {
-  position: relative;
-  flex: none;
-  /* Figma's order: rotate, then skew, then the vertical flip (Tailwind -scale-y-100 rotate-[-108.93deg] skew-x-1) */
-  transform: rotate(-108.93deg) skewX(1deg) scaleY(-1);
-}
-
-.leafBack {
-  width: 45.469px;
-  height: 43.372px;
-}
-
-.leafBackImg {
-  position: absolute;
-  inset: -14.91% -14.25% -14.71% -13.92%;
-  width: auto;
-  height: auto;
-}
-
-/* "Group 1000006112" (front leaves). */
-.leafFrontBox {
-  bottom: 50.97px;
-  left: calc(50% + 17.61px);
-  width: 50.159px;
-  height: 51.373px;
-}
-
-.leafFront {
-  width: 40.069px;
-  height: 39.526px;
-}
-
-.leafFront img {
-  width: 100%;
-  height: 100%;
-}
-
-/* "Ellipse 8": the ring's soft inner fill. */
-.fill {
-  position: absolute;
-  top: 30.85px;
-  left: 10.38px;
-  width: 57.662px;
-  height: 59.282px;
-}
-
-/* "circleGroup": the angular-gradient ring. */
-.ringBox {
-  position: absolute;
-  top: 27.88px;
-  left: 7.5px;
-  width: 62.852px;
-  height: 64.618px;
-}
-
-.ring {
-  position: absolute;
-  inset: -7.11% -7.31%;
-  width: auto;
-  height: auto;
-}
-
-/*
- * Idle motion (live app, 2026-10-23): the ring's yellow highlight goes round clockwise once a second, at a steady
- * speed — the ring and its soft fill turn on their own centres; the leaves stay still. Off for reduced motion.
- */
-.ringBox,
-.fill {
-  animation: dash-orb-spin var(--app-dash-orb-spin) linear infinite;
-}
-
-@keyframes dash-orb-spin {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ringBox,
-  .fill {
-    animation: none;
-  }
-}
-```
-
-### `src/shared/ui/dash/DashOrb.tsx`
-
-```tsx
-import leafBack from './assets/leaf-back.svg'
-import leafFront from './assets/leaf-front.svg'
-import orbFill from './assets/orb-fill.svg'
-import orbRing from './assets/orb-ring.svg'
-import styles from './DashOrb.module.css'
-
-export type DashOrbSize = 'sm' | 'compact' | 'md' | 'lg' // 32 · 40 · 64 · 96
-
-/**
- * DASH's mascot — the lime ring with two leaves (Figma "Logo" / "BotIcon", the 100 × 100 vector component), drawn from
- * its own vector parts in the Figma positions, with the soft halo behind it (a blurred copy).
- * Sizes: lg 96 (landing pages), md 64 (sheet headers, on a soft disc), sm 32 (the rule card's icon). The DASH pill sets its own
- * box (21.8). Shared: DASH flows and the home's entry pill use the same artwork.
- * Decorative: screen readers skip it — the text next to it says what it is.
- */
-export function DashOrb({ size = 'lg', halo = true }: { size?: DashOrbSize; halo?: boolean }) {
-  return (
-    <span className={styles.orb} data-size={size} aria-hidden="true">
-      <span className={styles.scale}>
-        {halo && <OrbArt className={styles.halo} />}
-        <OrbArt />
-      </span>
-    </span>
-  )
-}
-
-/** The artwork at its Figma size (100 × 100); the parent scales it. */
-function OrbArt({ className }: { className?: string }) {
-  return (
-    <span className={[styles.art, className].filter(Boolean).join(' ')}>
-      <span className={styles.leafBackBox}>
-        <span className={styles.leafBack}>
-          <img src={leafBack} alt="" className={styles.leafBackImg} />
-        </span>
-      </span>
-      <span className={styles.leafFrontBox}>
-        <span className={styles.leafFront}>
-          <img src={leafFront} alt="" />
-        </span>
-      </span>
-      <img src={orbFill} alt="" className={styles.fill} />
-      <span className={styles.ringBox}>
-        <img src={orbRing} alt="" className={styles.ring} />
-      </span>
-    </span>
-  )
-}
-```
-
-### `src/shared/ui/dash/assets/leaf-back.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="58.2771" height="56.2179" viewBox="0 0 58.2771 56.2179" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Group 1000006113" filter="url(#filter0_f_0_282)">
-<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M11.1805 6.4948L10.2325 8.23984C7.21698 13.7241 6.07176 19.8031 6.63218 25.5588C7.5941 35.2352 13.3302 44.2732 22.6694 49.2476L23.6172 47.5025C27.4934 40.6061 28.2232 32.8573 26.4785 25.7606C24.3978 17.9116 19.1614 10.7108 11.1805 6.4948Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
-<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M51.7823 38.3919C48.9397 43.4603 44.4029 47.018 39.1965 48.6543C33.6484 50.4553 27.3477 50.0009 21.8287 47.1335C24.6713 42.065 29.2933 38.5078 34.4997 36.8715C39.9626 35.07 46.2638 35.4411 51.7823 38.3919Z" fill="#8EF087" style="fill:#8EF087;fill:color(display-p3 0.5578 0.9428 0.5275);fill-opacity:1;"/>
-</g>
-<defs>
-<filter id="filter0_f_0_282" x="-7.45058e-08" y="2.2538e-07" width="58.2771" height="56.2179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feGaussianBlur stdDeviation="3.2474" result="effect1_foregroundBlur_0_282"/>
-</filter>
-</defs>
-</svg>
-```
-
-### `src/shared/ui/dash/assets/leaf-front.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40.0692" height="39.5257" viewBox="0 0 40.0692 39.5257" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Group 1000006112">
-<path id="Small_leaf_00000086657169406454258550000009755690847739837326_" d="M40.0554 29.6165C37.5947 34.0042 33.6673 37.084 29.1603 38.5005C24.3574 40.0595 18.9031 39.6661 14.1254 37.1839C16.5862 32.7963 20.5873 29.7169 25.0943 28.3004C29.8234 26.7409 35.2782 27.0621 40.0554 29.6165Z" fill="url(#paint0_linear_0_409)"/>
-<path id="Big_leaf_00000052817416241482779350000003325489541389591972_" d="M4.19434 0.0243672L3.37396 1.5349C0.764101 6.28215 -0.226587 11.5445 0.259219 16.5271C1.09303 24.9038 6.05968 32.7283 14.1449 37.0356L14.9652 35.525C18.3199 29.5554 18.9507 22.8476 17.4396 16.704C15.6376 9.90912 11.1037 3.67494 4.19434 0.0243672Z" fill="url(#paint1_linear_0_409)"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear_0_409" x1="21.3968" y1="29.3938" x2="22.0238" y2="39.1604" gradientUnits="userSpaceOnUse">
-<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
-<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
-</linearGradient>
-<linearGradient id="paint1_linear_0_409" x1="5.24577" y1="6.42552" x2="13.4379" y2="33.8372" gradientUnits="userSpaceOnUse">
-<stop stop-color="#7CE883" style="stop-color:#7CE883;stop-color:color(display-p3 0.4863 0.9098 0.5137);stop-opacity:1;"/>
-<stop offset="1" stop-color="#3EBF47" style="stop-color:#3EBF47;stop-color:color(display-p3 0.2433 0.7503 0.2802);stop-opacity:1;"/>
-</linearGradient>
-</defs>
-</svg>
-```
-
-### `src/shared/ui/dash/assets/orb-fill.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="57.6624" height="59.2824" viewBox="0 0 57.6624 59.2824" fill="none" xmlns="http://www.w3.org/2000/svg">
-<mask id="stroke0_0_416" fill="white">
-<path d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z"/>
-</mask>
-<path id="Ellipse 8" d="M57.6624 29.6412C57.6624 46.0116 44.7543 59.2824 28.8312 59.2824C12.9082 59.2824 0 46.0116 0 29.6412C0 13.2708 12.9082 0 28.8312 0C44.7543 0 57.6624 13.2708 57.6624 29.6412Z" stroke-width="16.8671" stroke="url(#paint0_linear_0_416)" mask="url(#stroke0_0_416)"/>
-<defs>
-<linearGradient id="paint0_linear_0_416" x1="17.0104" y1="56.2094" x2="43.5226" y2="4.92706" gradientUnits="userSpaceOnUse">
-<stop stop-color="#72E780" style="stop-color:#72E780;stop-color:color(display-p3 0.4476 0.9047 0.5009);stop-opacity:1;"/>
-<stop offset="1" stop-color="#FDFFB5" style="stop-color:#FDFFB5;stop-color:color(display-p3 0.9903 1.0000 0.7091);stop-opacity:1;"/>
-</linearGradient>
-</defs>
-</svg>
-```
-
-### `src/shared/ui/dash/assets/orb-ring.svg`
-
-```tsx
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="72.0446" height="73.8103" viewBox="0 0 72.0446 73.8103" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="circleGroup">
-<g id="Ellipse 9" filter="url(#filter0_f_0_407)">
-<mask id="stroke0_0_407" fill="white">
-<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z"/>
-</mask>
-<mask id="stroke1_0_407">
-<path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="white" mask="url(#stroke0_0_407)"/>
-</mask>
-<g clip-path="url(#paint0_angular_0_407_clip_path)" data-figma-skip-parse="true" mask="url(#stroke1_0_407)"><g transform="matrix(0.01625 -0.02375 0.0230642 0.0166474 37.0963 36.713)"><foreignObject x="-3827.82" y="-3827.82" width="7655.64" height="7655.64"><div xmlns="http://www.w3.org/1999/xhtml" style="background:conic-gradient(from 90deg,rgba(121, 234, 105, 1) 0deg,rgba(246, 253, 38, 1) 124.615deg,rgba(52, 177, 33, 1) 238.846deg,rgba(122, 235, 105, 1) 360deg);height:100%;width:100%;opacity:1"></div></foreignObject></g></g><path d="M67.4483 36.9052C67.4483 54.7489 53.3784 69.2141 36.0223 69.2141C18.6662 69.2141 4.59628 54.7489 4.59628 36.9052C4.59628 19.0615 18.6662 4.59628 36.0223 4.59628C53.3784 4.59628 67.4483 19.0615 67.4483 36.9052Z" stroke-width="18.3851" stroke="black" stroke-opacity="0" data-figma-gradient-stroke="{&#34;type&#34;:&#34;GRADIENT_ANGULAR&#34;,&#34;stops&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;transform&#34;:{&#34;m00&#34;:32.500003814697266,&#34;m01&#34;:46.128456115722656,&#34;m02&#34;:-2.2179441452026367,&#34;m10&#34;:-47.500007629394531,&#34;m11&#34;:33.294700622558594,&#34;m12&#34;:43.815639495849609},&#34;opacity&#34;:1.0,&#34;blendMode&#34;:&#34;NORMAL&#34;,&#34;stopsVar&#34;:[{&#34;color&#34;:{&#34;r&#34;:0.47711750864982605,&#34;g&#34;:0.92151820659637451,&#34;b&#34;:0.41342675685882568,&#34;a&#34;:1.0},&#34;position&#34;:0.0},{&#34;color&#34;:{&#34;r&#34;:0.96524602174758911,&#34;g&#34;:0.99325793981552124,&#34;b&#34;:0.15290218591690063,&#34;a&#34;:1.0},&#34;position&#34;:0.34615385532379150},{&#34;color&#34;:{&#34;r&#34;:0.20681096613407135,&#34;g&#34;:0.69540637731552124,&#34;b&#34;:0.13164243102073669,&#34;a&#34;:1.0},&#34;position&#34;:0.66346156597137451},{&#34;color&#34;:{&#34;r&#34;:0.47843137383460999,&#34;g&#34;:0.92156863212585449,&#34;b&#34;:0.41176471114158630,&#34;a&#34;:1.0},&#34;position&#34;:1.0}],&#34;visible&#34;:true}" mask="url(#stroke0_0_407)"/>
-</g>
-</g>
-<defs>
-<filter id="filter0_f_0_407" x="0" y="0" width="72.0446" height="73.8103" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feGaussianBlur stdDeviation="2.29814" result="effect1_foregroundBlur_0_407"/>
-</filter>
-<clipPath id="paint0_angular_0_407_clip_path"><rect x="-41.3666" y="-41.3666" width="154.778" height="156.543"/></clipPath></defs>
-</svg>
 ```

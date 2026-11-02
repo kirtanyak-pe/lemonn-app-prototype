@@ -16,10 +16,10 @@
       "id": "dash-02",
       "name": "DASH home",
       "figma": "5612:81961",
-      "note": "From the DASH pill in the Stocks home top bar (stocks-01; first visit: the coach mark, stocks-08). Follows the prototype setting User: New user → the landing (DASH AI · BETA in the top bar, the three build cards: Indicator, Trading rules, Strategy); Returning user → their home (as dash-28). Back returns home. The history button opens Past chats.",
+      "note": "From the DASH pill in the F&O home top bar (fno-01). Follows the prototype setting User: New user → the landing (DASH AI · BETA in the top bar, the three build cards: Indicator, Trading rules, Strategy); Returning user → their home (as dash-28). Back returns home. The history button opens Past chats.",
       "goesTo": [
         "dash-03",
-        "stocks-01",
+        "fno-01",
         "dash-14",
         "dash-20",
         "dash-06",
@@ -35,7 +35,7 @@
       "note": "For someone who has used DASH before (prototype setting User → Returning user; New user shows the landing, dash-02). No explaining again: the still orb and “What do you want to create today?”, the Rule · Indicator · Strategy pills (each with a count of what they made), then a sideways row of the picked kind — the Create card first, their latest three (tap: the details sheet), View all. Under it, Pick up where you left off (drafts, if they have any). Past chats: the history button in the top bar. The field to ask or change anything; typing shows suggestions.",
       "goesTo": [
         "dash-03",
-        "stocks-01",
+        "fno-01",
         "dash-14",
         "dash-20",
         "dash-06",
@@ -262,7 +262,7 @@
       "note": "A tall bottom sheet over DASH (here over the home): from the history button in the top bar, or a chat’s ⋮ → Past chats. Every chat by day, newest first; a row closes the sheet and opens its chat (rule → the rule preview, indicator → the ready indicator).",
       "goesTo": [
         "dash-03",
-        "stocks-01",
+        "fno-01",
         "dash-14",
         "dash-20",
         "dash-06",
