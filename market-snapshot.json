@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-11-02T11:43:31.543Z",
+ "fetchedAt": "2026-11-02T19:58:16.632Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -319,10 +319,6 @@
     {
      "date": "2026-10-30",
      "close": 2579.4
-    },
-    {
-     "date": "2026-11-02",
-     "close": 2615.4
     }
    ],
    "sector": "Energy",
@@ -587,10 +583,6 @@
     {
      "date": "2026-10-30",
      "close": 1298.7
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1337
     }
    ],
    "sector": "Utilities",
@@ -855,10 +847,6 @@
     {
      "date": "2026-10-30",
      "close": 1850
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1854
     }
    ],
    "sector": "Industrials",
@@ -1123,10 +1111,6 @@
     {
      "date": "2026-10-30",
      "close": 189
-    },
-    {
-     "date": "2026-11-02",
-     "close": 195.35
     }
    ],
    "sector": "Utilities",
@@ -1391,10 +1375,6 @@
     {
      "date": "2026-10-30",
      "close": 2320
-    },
-    {
-     "date": "2026-11-02",
-     "close": 2344.3
     }
    ],
    "sector": "Basic Materials",
@@ -1659,10 +1639,6 @@
     {
      "date": "2026-10-30",
      "close": 1217
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1209
     }
    ],
    "sector": "Financial Services",
@@ -1927,10 +1903,6 @@
     {
      "date": "2026-10-30",
      "close": 10350
-    },
-    {
-     "date": "2026-11-02",
-     "close": 10339
     }
    ],
    "sector": "Consumer Cyclical",
@@ -2195,10 +2167,6 @@
     {
      "date": "2026-10-30",
      "close": 1667.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1691.5
     }
    ],
    "sector": "Financial Services",
@@ -2463,10 +2431,6 @@
     {
      "date": "2026-10-30",
      "close": 939.1
-    },
-    {
-     "date": "2026-11-02",
-     "close": 959.4
     }
    ],
    "sector": "Financial Services",
@@ -2731,10 +2695,6 @@
     {
      "date": "2026-10-30",
      "close": 369.9
-    },
-    {
-     "date": "2026-11-02",
-     "close": 376.5
     }
    ],
    "sector": "Industrials",
@@ -2999,10 +2959,6 @@
     {
      "date": "2026-10-30",
      "close": 1973.7
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1989.9
     }
    ],
    "sector": "Communication Services",
@@ -3267,10 +3223,6 @@
     {
      "date": "2026-10-30",
      "close": 389
-    },
-    {
-     "date": "2026-11-02",
-     "close": 408
     }
    ],
    "sector": "Energy",
@@ -3535,10 +3487,6 @@
     {
      "date": "2026-10-30",
      "close": 9780
-    },
-    {
-     "date": "2026-11-02",
-     "close": 9945.5
     }
    ],
    "sector": "Healthcare",
@@ -3803,10 +3751,6 @@
     {
      "date": "2026-10-30",
      "close": 3199
-    },
-    {
-     "date": "2026-11-02",
-     "close": 3230
     }
    ],
    "sector": "Consumer Defensive",
@@ -4071,10 +4015,6 @@
     {
      "date": "2026-10-30",
      "close": 7220
-    },
-    {
-     "date": "2026-11-02",
-     "close": 7213
     }
    ],
    "sector": "Consumer Cyclical",
@@ -4339,10 +4279,6 @@
     {
      "date": "2026-10-30",
      "close": 343.65
-    },
-    {
-     "date": "2026-11-02",
-     "close": 344
     }
    ],
    "sector": "Consumer Cyclical",
@@ -4607,10 +4543,6 @@
     {
      "date": "2026-10-30",
      "close": 2981.4
-    },
-    {
-     "date": "2026-11-02",
-     "close": 3057.1
     }
    ],
    "sector": "Basic Materials",
@@ -4875,10 +4807,6 @@
     {
      "date": "2026-10-30",
      "close": 4853.7
-    },
-    {
-     "date": "2026-11-02",
-     "close": 4855
     }
    ],
    "sector": "Industrials",
@@ -5143,10 +5071,6 @@
     {
      "date": "2026-10-30",
      "close": 1428.1
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1434
     }
    ],
    "sector": "Technology",
@@ -5411,10 +5335,6 @@
     {
      "date": "2026-10-30",
      "close": 692.8
-    },
-    {
-     "date": "2026-11-02",
-     "close": 700
     }
    ],
    "sector": "Financial Services",
@@ -5679,10 +5599,6 @@
     {
      "date": "2026-10-30",
      "close": 884.7
-    },
-    {
-     "date": "2026-11-02",
-     "close": 911.4
     }
    ],
    "sector": "Basic Materials",
@@ -5947,10 +5863,6 @@
     {
      "date": "2026-10-30",
      "close": 1864.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1898.3
     }
    ],
    "sector": "Consumer Defensive",
@@ -6215,10 +6127,6 @@
     {
      "date": "2026-10-30",
      "close": 505.8
-    },
-    {
-     "date": "2026-11-02",
-     "close": 518
     }
    ],
    "sector": "Basic Materials",
@@ -6483,10 +6391,6 @@
     {
      "date": "2026-10-30",
      "close": 1398
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1387.4
     }
    ],
    "sector": "Financial Services",
@@ -6751,10 +6655,6 @@
     {
      "date": "2026-10-30",
      "close": 11.83
-    },
-    {
-     "date": "2026-11-02",
-     "close": 12.25
     }
    ],
    "sector": "Communication Services",
@@ -7019,10 +6919,6 @@
     {
      "date": "2026-10-30",
      "close": 4877.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 4919.9
     }
    ],
    "sector": "Industrials",
@@ -7287,10 +7183,6 @@
     {
      "date": "2026-10-30",
      "close": 1185
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1161
     }
    ],
    "sector": "Technology",
@@ -7555,10 +7447,6 @@
     {
      "date": "2026-10-30",
      "close": 130.15
-    },
-    {
-     "date": "2026-11-02",
-     "close": 134.59
     }
    ],
    "sector": "Energy",
@@ -7823,10 +7711,6 @@
     {
      "date": "2026-10-30",
      "close": 73.37
-    },
-    {
-     "date": "2026-11-02",
-     "close": 75.65
     }
    ],
    "sector": "Financial Services",
@@ -8091,10 +7975,6 @@
     {
      "date": "2026-10-30",
      "close": 265.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 266.4
     }
    ],
    "sector": "Consumer Defensive",
@@ -8359,10 +8239,6 @@
     {
      "date": "2026-10-30",
      "close": 1246
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1309.9
     }
    ],
    "sector": "Basic Materials",
@@ -8627,10 +8503,6 @@
     {
      "date": "2026-10-30",
      "close": 461.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 458.35
     }
    ],
    "sector": "Financial Services",
@@ -8895,10 +8767,6 @@
     {
      "date": "2026-10-30",
      "close": 383.25
-    },
-    {
-     "date": "2026-11-02",
-     "close": 389
     }
    ],
    "sector": "Financial Services",
@@ -9163,10 +9031,6 @@
     {
      "date": "2026-10-30",
      "close": 3871.7
-    },
-    {
-     "date": "2026-11-02",
-     "close": 3939.9
     }
    ],
    "sector": "Industrials",
@@ -9431,10 +9295,6 @@
     {
      "date": "2026-10-30",
      "close": 2840.3
-    },
-    {
-     "date": "2026-11-02",
-     "close": 2868.8
     }
    ],
    "sector": "Consumer Cyclical",
@@ -9699,10 +9559,6 @@
     {
      "date": "2026-10-30",
      "close": 11397
-    },
-    {
-     "date": "2026-11-02",
-     "close": 11672
     }
    ],
    "sector": "Consumer Cyclical",
@@ -9967,10 +9823,6 @@
     {
      "date": "2026-10-30",
      "close": 1167
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1195
     }
    ],
    "sector": "Consumer Defensive",
@@ -10235,10 +10087,6 @@
     {
      "date": "2026-10-30",
      "close": 77.74
-    },
-    {
-     "date": "2026-11-02",
-     "close": 78.78
     }
    ],
    "sector": "Utilities",
@@ -10503,10 +10351,6 @@
     {
      "date": "2026-10-30",
      "close": 316.25
-    },
-    {
-     "date": "2026-11-02",
-     "close": 323
     }
    ],
    "sector": "Utilities",
@@ -10771,10 +10615,6 @@
     {
      "date": "2026-10-30",
      "close": 225.39
-    },
-    {
-     "date": "2026-11-02",
-     "close": 234.83
     }
    ],
    "sector": "Energy",
@@ -11039,10 +10879,6 @@
     {
      "date": "2026-10-30",
      "close": 265
-    },
-    {
-     "date": "2026-11-02",
-     "close": 267.7
     }
    ],
    "sector": "Utilities",
@@ -11307,10 +11143,6 @@
     {
      "date": "2026-10-30",
      "close": 1164.9
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1300
     }
    ],
    "sector": "Energy",
@@ -11575,10 +11407,6 @@
     {
      "date": "2026-10-30",
      "close": 961.85
-    },
-    {
-     "date": "2026-11-02",
-     "close": 987
     }
    ],
    "sector": "Financial Services",
@@ -11843,10 +11671,6 @@
     {
      "date": "2026-10-30",
      "close": 823.15
-    },
-    {
-     "date": "2026-11-02",
-     "close": 863.35
     }
    ],
    "sector": "Financial Services",
@@ -12111,10 +11935,6 @@
     {
      "date": "2026-10-30",
      "close": 18800
-    },
-    {
-     "date": "2026-11-02",
-     "close": 19438
     }
    ],
    "sector": "Basic Materials",
@@ -12379,10 +12199,6 @@
     {
      "date": "2026-10-30",
      "close": 55.49
-    },
-    {
-     "date": "2026-11-02",
-     "close": 54.51
     }
    ],
    "sector": "Financial Services",
@@ -12647,10 +12463,6 @@
     {
      "date": "2026-10-30",
      "close": 1777.7
-    },
-    {
-     "date": "2026-11-02",
-     "close": 1770
     }
    ],
    "sector": "Healthcare",
@@ -12915,10 +12727,6 @@
     {
      "date": "2026-10-30",
      "close": 33.9
-    },
-    {
-     "date": "2026-11-02",
-     "close": 35.25
     }
    ],
    "sector": "Industrials",
@@ -13183,10 +12991,6 @@
     {
      "date": "2026-10-30",
      "close": 167.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 177.37
     }
    ],
    "sector": "Basic Materials",
@@ -13451,10 +13255,6 @@
     {
      "date": "2026-10-30",
      "close": 2502.6
-    },
-    {
-     "date": "2026-11-02",
-     "close": 2501.7
     }
    ],
    "sector": "Technology",
@@ -13719,10 +13519,6 @@
     {
      "date": "2026-10-30",
      "close": 4436.5
-    },
-    {
-     "date": "2026-11-02",
-     "close": 4476.3
     }
    ],
    "sector": "Consumer Cyclical",
@@ -13987,10 +13783,6 @@
     {
      "date": "2026-10-30",
      "close": 4613.4
-    },
-    {
-     "date": "2026-11-02",
-     "close": 4595
     }
    ],
    "sector": "Healthcare",
@@ -14255,10 +14047,6 @@
     {
      "date": "2026-10-30",
      "close": 4195.2
-    },
-    {
-     "date": "2026-11-02",
-     "close": 4213
     }
    ],
    "sector": "Consumer Cyclical",
@@ -14523,10 +14311,6 @@
     {
      "date": "2026-10-30",
      "close": 11045
-    },
-    {
-     "date": "2026-11-02",
-     "close": 11387
     }
    ],
    "sector": "Basic Materials",
@@ -14791,10 +14575,6 @@
     {
      "date": "2026-10-30",
      "close": 198.31
-    },
-    {
-     "date": "2026-11-02",
-     "close": 196.4
     }
    ],
    "sector": "Technology",
@@ -15059,10 +14839,6 @@
     {
      "date": "2026-10-30",
      "close": 15.15
-    },
-    {
-     "date": "2026-11-02",
-     "close": 15.57
     }
    ],
    "sector": "Financial Services",
