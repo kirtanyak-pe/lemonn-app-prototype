@@ -19,7 +19,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-06` | Scalper · DASH indicator | — | `fno-01`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list. |
 | `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles. |
 | `fno-35` | Scalper · position + breakeven line | [11756:78739](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11756-78739) | `fno-01`, `dash-20` | Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “B/E 105.55 ⓘ” chip flush to the price axis (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large. |
-| `fno-36` | How breakeven works | [11783:5569](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11783-5569) | `fno-01`, `dash-20` | Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 12 s explainer copied from the designer’s recording: on a white chart the buy at ₹100, the dashed B/E line at ₹100.60 and the orange charges zone come in, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (6.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). |
+| `fno-36` | How breakeven works | [11783:5569](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11783-5569) | `fno-01`, `dash-20` | Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 15 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in and the orange charges zone fills one band per charge from the F&O options rate card (brokerage 0.01% first at the bottom, a thin band next to STT’s, then transaction, GST, SEBI, stamp duty — heights by what each costs, each tagged with its rate), then zooms back out to one zone; the dashed B/E line at ₹100.60 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief). |
 | `fno-37` | Chart tools · Settings | [11754:69563](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11754-69563) | `fno-01`, `dash-20` | The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here. |
 | `fno-08` | Commodities home | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. |
 | `fno-09` | Commodities · heatmap & Smart Futures | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The same long screen, scrolled to the Futures Heatmap. |
@@ -174,9 +174,21 @@ Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are n
 - **First buy** → How breakeven works opens by itself, once (prototype: remembered in this browser,
   `fno.breakevenIntroSeen`; in the app, per user).
 - **How breakeven works** (`sheets/BreakevenSheet`, fno-36): L3 sheet, heading only. The example card ("Example:
-  Bought 1 lot at ₹100") plays the explainer on a 12 s loop (`components/BreakevenExplainer`), copied from the
-  designer's screen recording (Figma's own export holds only the intro). Data: `data.ts` `breakevenExample` — bought
-  ₹100, B/E ₹100.60, sold ₹102, the price path's five turns.
+  Bought 1 lot at ₹100") plays the explainer on a 15 s loop (`components/BreakevenExplainer`), copied from the
+  designer's screen recording (Figma's own export holds only the intro), plus a charges breakdown before the B/E line
+  (designer's brief, 2026-11-03). Data: `data.ts` `breakevenExample` — bought ₹100, B/E ₹100.60, sold ₹102, the price
+  path's five turns; `breakevenCharges` — the F&O options rate card (brokerage 0.01% each way, STT 0.15% on the sell,
+  NSE transaction 0.03553% each way, GST 18% on brokerage + SEBI + transaction, SEBI 0.0001% each way, stamp 0.003% on
+  the buy) and what each costs per unit on this trade, which sizes its band.
+
+  **Charges, zoomed in:** at the normal scale the charges zone is 32 tall and most charges would be a hairline, so the
+  chart zooms in on ₹100 → ₹100.60 (170 tall; ₹100 stays at y 209, ₹101–₹103 move up out of view) and the zone fills
+  one band per charge, bottom to top — Brokerage, STT, Transaction, GST, SEBI, Stamp duty — each as tall as its share
+  of the charges (at least 2; 1 apart), in the charges-zone orange. Each band gets a white tag like the B/E chip (name
+  Label/12 primary · rate secondary) in a column 140 from the plot's right, at least 24 apart and 10 from the top,
+  joined by an orange leader to a dot at its band's middle. Zooming out, the tags go and the bands close into one zone
+  labelled "Order charges". By the rate card brokerage is ~8 % of the charges (STT ~58 %, transaction ~27 %, GST ~6 %,
+  stamp ~1 %, SEBI ~0.1 %), so its band is thin next to STT's — the numbers aren't bent to make it the smallest.
 
   The stage is white (surface/primary), 286 tall. Plot: ₹100 at y 209, 53 per rupee; gridlines from x 53.5 to 12.5 short
   of the right edge (dashed 4 / 3 border/light; ₹100 solid); axis labels at x 12.5 (₹101–103 Description/12 tertiary,
@@ -190,18 +202,20 @@ Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are n
   |---|---|
   | 150 | axis and gridlines fade in (250) |
   | 400 | buy dot pops in (200, back-out); 650 "Bought at ₹100" fades in and rises 4 → 0 (150) |
-  | 1250 | B/E line draws left → right (450, ease-in-out); 1700 its chip fades and scales 0.9 → 1 (200) |
-  | 1950 | charges zone grows up from ₹100 to B/E (250, ease-out); 2400 "Order charges" fades in (150) |
-  | 2550 | LTP bubble pops in at ₹100.00 (150) |
-  | 2800 | the price line draws at a steady pace to ₹102 (2150); the bubble rides its head showing the last turn passed (cross-fades 100 ms at each); at B/E a ringed marker appears and pulses (r 7.5 → 14, fading, 400 ms) |
-  | 4950 | the line ends: a green ring; 5000 the bubble fades (150), the green dot pops in (200), 5200 it pulses (500) |
-  | 5250 | "Sold at ₹102" fades in sliding 6 → 0 from the right (150) |
-  | 5450 | net-profit zone grows up from B/E to ₹102 (550, ease-out); 6150 "Net Profit" fades in (150) |
-  | 8750 | hard cut to the intro (surface/secondary): the Breakeven mark fades in (+30, 250) and pops 0.55 → 1 (+100, 400, L3 pop easing); INTRODUCING, Breakeven Line, the one-liner at +300 / +470 / +670, each fading in and rising 8 → 0 (400) |
-  | 12000 | the intro fades out (200) over a blank chart and the loop starts again |
+  | 1000 | zoom in on ₹100 → B/E (500, ease-in-out): 53 → 283 per rupee, around ₹100 |
+  | 1550 | the bands fill up one every 350 (brokerage → stamp duty): each grows up from the one below (300, ease-out) as its tag fades in rising 4 → 0 with its leader; the last is in by 3600 |
+  | 4100 | zoom out (600, ease-in-out); the tags fade (200); the whole zone fades in over the bands, closing their gaps |
+  | 4750 | B/E line draws left → right along the zone's top (450, ease-in-out); 5200 its chip fades and scales 0.9 → 1 (200); 5400 "Order charges" fades in (150) |
+  | 5550 | LTP bubble pops in at ₹100.00 (150) |
+  | 5800 | the price line draws at a steady pace to ₹102 (2150); the bubble rides its head showing the last turn passed (cross-fades 100 ms at each); at B/E a ringed marker appears and pulses (r 7.5 → 14, fading, 400 ms) |
+  | 7950 | the line ends: a green ring; 8000 the bubble fades (150), the green dot pops in (200), 8200 it pulses (500) |
+  | 8250 | "Sold at ₹102" fades in sliding 6 → 0 from the right (150) |
+  | 8450 | net-profit zone grows up from B/E to ₹102 (550, ease-out); 9150 "Net Profit" fades in (150) |
+  | 11750 | hard cut to the intro (surface/secondary): the Breakeven mark fades in (+30, 250) and pops 0.55 → 1 (+100, 400, L3 pop easing); INTRODUCING, Breakeven Line, the one-liner at +300 / +470 / +670, each fading in and rising 8 → 0 (400) |
+  | 15000 | the intro fades out (200) over a blank chart and the loop starts again |
 
   "I understand" is disabled until the chart has played once (Figma's button variants 11783:12460, dark 11805:374): a
-  4 track (surface/tertiary) across the button's top edge fills (surface/inverted, linear) over 6.3 s, then the button
+  4 track (surface/tertiary) across the button's top edge fills (surface/inverted, linear) over 9.3 s, then the button
   turns primary. Reduced motion: the finished chart, no loop, the button ready. Dark mode (the recording is light only):
   L3's warning / success colours. The info rows (20 icons, Description/12 with bold parts) are as Figma.
 - **Chart tools → Settings** (`sheets/ChartSettingsPanel`, fno-37): Auto TP/SL card row (animated mark · Applied tag
@@ -315,10 +329,13 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 - Pills, Exit and Add Trail are 24 tall (L3 Secondary Small resized to sit on the pills, as in Figma), not Large.
 - Figma's rail (Bolt · Indicators · Drawings · Settings) is the live app's six groups here; its chart-type cards read
   "Line, Heiken Ashi, Line" — built as Candles, Heikin Ashi, Line.
-- How breakeven works: Figma's explainer is a video fill (11802:369) whose export holds only the intro; the full 12 s
-  loop (chart + intro) is rebuilt from the designer's screen recording, measured frame by frame (theme-aware, no video
+- How breakeven works: Figma's explainer is a video fill (11802:369) whose export holds only the intro; the loop
+  (chart + intro) is rebuilt from the designer's screen recording, measured frame by frame (theme-aware, no video
   file). The recording's labels are ~11 px; here they're L3's 12 styles (Label/12, Description/12, Label/14), so text
   runs ~8 % wider. Its orange (charges zone, B/E line and tag) isn't L3's warning (a yellow) — kept as local tokens.
+  The zoomed-in charges (3 s, before the B/E line, which now draws after the zone instead of before it) aren't in
+  Figma or the recording: added from the designer's brief with the F&O options rate card; everything after is the
+  recording's timing moved 3 s later.
 - Figma's breakeven marks and the Auto TP/SL mark couldn't be downloaded (asset links fail here), so they're drawn in
   SVG on L3 tokens to match (`BreakevenIcon`, `AutoTpSlIcon`).
 - The explainer card's stage keeps the sheet's 24 gap (L3 Stack has no 20; Figma 20).
@@ -351,6 +368,7 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
+- 2026-11-03 — How breakeven works: before the B/E line the chart zooms in and the charges zone fills one band per charge (brokerage first at the bottom, then STT, transaction, GST, SEBI, stamp duty — F&O options rate card, heights by cost, each tagged with its rate), then zooms out to one "Order charges" zone; loop 15 s, button lock 9.3 s. Breakeven mark tile flat surface/inverted; the Scalper's ribbon tab has no outline.
 - 2026-11-03 — Scalper charts: thin candles (max 4), the charts tick live, the last-price tag turns red on a down candle; TP line grey and SL line light red as in Figma C.
 - 2026-11-03 — Scalper breakeven (Figma version C, Boxed chip): positions on the option chart with draggable TP / SL pills, Exit, Add Trail and the yellow breakeven line + chip (fno-35); the How breakeven works sheet, its 12 s explainer (chart building up to a sell above the breakeven line, then the intro) copied from the designer's recording, with the locked "I understand" (fno-36); the Auto TP/SL mark on Figma's exact easings; chart tools → Settings with Auto TP/SL, chart type, stop-loss preference and View on chart, Cancel / Apply (fno-37).
 
@@ -2314,6 +2332,41 @@ export function AutoTpSlIcon() {
   color: var(--l3-content-secondary);
   font: var(--l3-text-label-12);
 }
+
+/*
+ * Zoomed in, the charges (designer's brief, 2026-11-03): a tag per band — white like the B/E chip, the name then the
+ * rate — joined to its band by an orange leader and dot.
+ */
+.chargeTag {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-02) var(--l3-spacing-06);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-06);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+.chargeRate {
+  color: var(--l3-content-secondary);
+}
+
+.leader line {
+  stroke: var(--app-be-orange);
+  stroke-width: 1;
+}
+
+.leader circle {
+  fill: var(--app-be-orange);
+}
 ```
 
 ### `src/flows/fno/components/BreakevenExplainer.tsx`
@@ -2324,22 +2377,26 @@ import { Icon } from '@l3/components/Icon'
 import { msCheckCircleFill } from '@l3/icons/material'
 import { inr } from '../../../shared/data/format'
 import { t } from '../copy'
-import { breakevenExample } from '../data'
+import { breakevenCharges, breakevenExample } from '../data'
 import { BreakevenIcon } from './BreakevenIcon'
 import styles from './BreakevenExplainer.module.css'
 
 /**
- * The example in How breakeven works — copied from the designer's recording of the explainer (a 12 s loop, measured
- * frame by frame). On a white stage:
+ * The example in How breakeven works — copied from the designer's recording of the explainer (measured frame by frame),
+ * plus the charges breakdown (designer's brief, 2026-11-03). A 15 s loop on a white stage:
  * 1. the price axis (₹100–₹103) and its dashed gridlines fade in; the buy dot pops in at ₹100 with "Bought at ₹100";
- * 2. the breakeven line draws across at ₹100.60 and its B/E chip comes in; the orange charges zone grows up to it,
- *    labelled "Order charges";
+ * 2. the chart zooms in on ₹100 → ₹100.60 (the charges are too thin to see at the normal scale): ₹101–₹103 move up out
+ *    of view and the charges zone fills up from ₹100 one charge at a time, each a band as tall as its share of the
+ *    charges, with a tag (name · rate) — brokerage first at the bottom (0.01%, a thin band), then STT, transaction, GST,
+ *    SEBI, stamp duty;
+ * 3. it zooms back out: the tags go, the bands close into one orange charges zone; the breakeven line draws across its
+ *    top at ₹100.60, its B/E chip comes in and the zone is labelled "Order charges";
  * 3. an LTP bubble rides the price line as it draws up to ₹102 (showing the last price it passed); where it crosses the
  *    breakeven line a ringed marker pulses;
  * 4. at ₹102 the bubble goes, a green dot pulses, "Sold at ₹102" slides in and the green net-profit zone grows from the
  *    breakeven line up to the sell price, labelled "Net Profit"; it holds;
- * 5. at 8.75 s the stage cuts to grey and the intro plays (the Breakeven mark, INTRODUCING, Breakeven Line, the one-liner,
- *    at Figma's timings); at 12 s it fades out and the chart plays again.
+ * 5. at 11.75 s the stage cuts to grey and the intro plays (the Breakeven mark, INTRODUCING, Breakeven Line, the
+ *    one-liner, at Figma's timings); at 15 s it fades out and the chart plays again.
  * `still` (reduced motion) shows the finished chart and no intro.
  */
 export function BreakevenExplainer({ still = false }: { still?: boolean }) {
@@ -2358,28 +2415,35 @@ export function BreakevenExplainer({ still = false }: { still?: boolean }) {
   )
 }
 
-/** Where each part comes in on the 12 s loop: [start, duration] in ms (t = 0 is the chart starting on a blank stage). */
+/**
+ * Where each part comes in on the loop: [start, duration] in ms (t = 0 is the chart starting on a blank stage). From
+ * the B/E line on, it's the recording's timing moved 3 s later for the charges breakdown.
+ */
 const SHOT = {
   axis: [150, 250],
   buyDot: [400, 200],
   bought: [650, 150],
-  breakevenLine: [1250, 450],
-  breakevenChip: [1700, 200],
-  chargesZone: [1950, 250],
-  chargesLabel: [2400, 150],
-  ltpIn: [2550, 150],
-  priceLine: [2800, 2150],
+  zoomIn: [1000, 500],
+  chargeFill: [1550, 300], // the first band and its tag; each next one CHARGE_STEP later
+  zoomOut: [4100, 600],
+  tagsOut: [4100, 200],
+  breakevenLine: [4750, 450],
+  breakevenChip: [5200, 200],
+  chargesLabel: [5400, 150],
+  ltpIn: [5550, 150],
+  priceLine: [5800, 2150],
   crossingPulse: [120, 400], // after the line reaches the crossing
-  ltpOut: [5000, 150],
-  sellDot: [5000, 200],
-  sellPulse: [5200, 500],
-  sold: [5250, 150],
-  profitZone: [5450, 550],
-  profitLabel: [6150, 150],
+  ltpOut: [8000, 150],
+  sellDot: [8000, 200],
+  sellPulse: [8200, 500],
+  sold: [8250, 150],
+  profitZone: [8450, 550],
+  profitLabel: [9150, 150],
 } satisfies Record<string, [number, number]>
-const LOOP = 12000
+const CHARGE_STEP = 350
+const LOOP = 15000
 /** The hard cut to the intro, and how long the intro takes to fade when the loop starts again. */
-const INTRO_AT = 8750
+const INTRO_AT = 11750
 const INTRO_OUT = 200
 /** The LTP value cross-fades for this long when the line passes a turn. */
 const LTP_SWAP = 100
@@ -2396,12 +2460,32 @@ const BOUGHT_GAP = 12.5
 const BOUGHT_NOTCH_X = 20
 const SOLD_GAP = 10
 const LTP_GAP = 8.5
-/** ₹100 sits at 209 and every rupee is 53 higher. */
-const y = (price: number) => 209 - (price - breakevenExample.entry) * 53
+/** ₹100 sits at 209 and every rupee is 53 higher; zoomed in, the charges zone (₹100 → B/E) is 170 tall. */
+const BASELINE = 209
+const RUPEE = 53
+const ZOOMED_ZONE = 170
+const ZOOMED_RUPEE = ZOOMED_ZONE / (breakevenExample.breakeven - breakevenExample.entry)
+const priceY = (price: number, perRupee: number) => BASELINE - (price - breakevenExample.entry) * perRupee
+/**
+ * Zoomed in, each charge is a band of the zone, as tall as its share of the charges (at least 2, so SEBI's ~0.1% still
+ * shows; the rest shrink to make room), 1 apart. Their tags sit in a column 140 from the plot's right, at least 24
+ * apart and 10 from the top, each joined by a leader to a dot 20 left of it at its band's middle.
+ */
+const MIN_BAND = 2
+const BAND_GAP = 1
+const TAG_COLUMN = 140
+const TAG_SPACING = 24
+const TAG_TOP = 10
+const LEADER = 20
+const BANDS = chargeBands()
 
 function ExampleChart({ time, width }: { time: number; width: number }) {
   const gradientId = useId()
   const { entry, breakeven, exit, axis, path } = breakevenExample
+  const zoomIn = ramp(time, SHOT.zoomIn, easeInOut)
+  const zoomOut = ramp(time, SHOT.zoomOut, easeInOut)
+  const perRupee = RUPEE + (ZOOMED_RUPEE - RUPEE) * zoomIn * (1 - zoomOut)
+  const y = (price: number) => priceY(price, perRupee)
   const plotRight = width - PLOT_RIGHT_INSET
   const points = path.map((p) => ({ x: PLOT_LEFT + p.at * (plotRight - PLOT_LEFT), y: y(p.price), price: p.price }))
   const start = points[0]
@@ -2419,10 +2503,12 @@ function ExampleChart({ time, width }: { time: number; width: number }) {
   const lastTurnAt = SHOT.priceLine[0] + ((last.x - start.x) / (end.x - start.x)) * SHOT.priceLine[1]
 
   const axisIn = ramp(time, SHOT.axis)
-  const chargesZone = ramp(time, SHOT.chargesZone, easeOut) * (y(entry) - y(breakeven))
   const profitZone = ramp(time, SHOT.profitZone, easeOut) * (y(breakeven) - y(exit))
   const ltp = ramp(time, SHOT.ltpIn, easeOut) * (1 - ramp(time, SHOT.ltpOut))
   const sellIn = ramp(time, SHOT.sellDot, easeOutBack)
+  const bandFill = (order: number) => ramp(time, [SHOT.chargeFill[0] + order * CHARGE_STEP, SHOT.chargeFill[1]], easeOut)
+  const tagsShown = 1 - ramp(time, SHOT.tagsOut)
+  const tagX = plotRight - TAG_COLUMN
 
   return (
     <>
@@ -2439,7 +2525,26 @@ function ExampleChart({ time, width }: { time: number; width: number }) {
             <line key={price} className={price === entry ? styles.baseline : styles.gridline} x1={PLOT_LEFT} x2={plotRight} y1={y(price)} y2={y(price)} />
           ))}
         </g>
-        <rect className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(entry) - chargesZone} height={chargesZone} />
+        {/* The charges zone: the bands fill up one by one; zooming out, the whole zone fades in over them and closes the gaps. */}
+        {BANDS.map((band, order) => {
+          const top = y(band.from + (band.to - band.from) * bandFill(order))
+          const height = Math.max(0, y(band.from) - top - BAND_GAP)
+          return height > 0 && <rect key={band.charge.id} className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={top} height={height} />
+        })}
+        <rect className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven)} height={y(entry) - y(breakeven)} opacity={zoomOut} />
+        {tagsShown > 0 &&
+          BANDS.map((band, order) => {
+            const shown = ramp(time, [SHOT.chargeFill[0] + order * CHARGE_STEP, SHOT.chargeFill[1]]) * tagsShown
+            const middle = y((band.from + band.to) / 2)
+            return (
+              shown > 0 && (
+                <g key={band.charge.id} className={styles.leader} opacity={shown}>
+                  <line x1={tagX - LEADER} y1={middle} x2={tagX} y2={band.tagY} />
+                  <circle cx={tagX - LEADER} cy={middle} r={2} />
+                </g>
+              )
+            )
+          })}
         <rect fill={`url(#${gradientId})`} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven) - profitZone} height={profitZone} />
         <line
           className={styles.breakevenLine}
@@ -2484,6 +2589,19 @@ function ExampleChart({ time, width }: { time: number; width: number }) {
         {t('breakeven.netProfit')}
       </span>
 
+      {tagsShown > 0 &&
+        BANDS.map((band, order) => {
+          const shown = ramp(time, [SHOT.chargeFill[0] + order * CHARGE_STEP, SHOT.chargeFill[1]], easeOut)
+          return (
+            shown > 0 && (
+              <span key={band.charge.id} className={styles.chargeTag} style={{ ...rise(at(tagX, band.tagY), shown, 0, 4), opacity: shown * tagsShown }}>
+                {t(`breakeven.charge.${band.charge.id}`)}
+                <span className={styles.chargeRate}>{band.charge.rate}</span>
+              </span>
+            )
+          )
+        })}
+
       <span className={styles.bought} style={rise(at(start.x - BOUGHT_NOTCH_X, start.y + BOUGHT_GAP), ramp(time, SHOT.bought, easeOut), 0, 4)}>
         {t('breakeven.bought', { price: inr(entry, 0) })}
       </span>
@@ -2502,6 +2620,33 @@ function ExampleChart({ time, width }: { time: number; width: number }) {
       )}
     </>
   )
+}
+
+/**
+ * The charges as bands of the zone, bottom to top (in rupees, so they follow the zoom), and where each tag sits when
+ * zoomed in: at its band's middle, pushed up to stay TAG_SPACING apart, then back down to stay under TAG_TOP.
+ */
+function chargeBands() {
+  const { entry, breakeven } = breakevenExample
+  const zone = breakeven - entry
+  const total = breakevenCharges.reduce((sum, charge) => sum + charge.amount, 0)
+  const heights = breakevenCharges.map((charge) => Math.max((charge.amount / total) * zone, MIN_BAND / ZOOMED_RUPEE))
+  const fit = zone / heights.reduce((sum, height) => sum + height, 0)
+  let from = entry
+  const bands = breakevenCharges.map((charge, order) => {
+    const band = { charge, from, to: from + heights[order] * fit, tagY: 0 }
+    from = band.to
+    return band
+  })
+  bands.forEach((band, order) => {
+    const middle = priceY((band.from + band.to) / 2, ZOOMED_RUPEE)
+    band.tagY = order === 0 ? middle : Math.min(middle, bands[order - 1].tagY - TAG_SPACING)
+  })
+  for (let order = bands.length - 1; order >= 0; order--) {
+    const above = bands[order + 1]
+    bands[order].tagY = Math.max(bands[order].tagY, above ? above.tagY + TAG_SPACING : TAG_TOP)
+  }
+  return bands
 }
 
 /** A ring that grows from the marker (7.5 → 14) and fades. */
@@ -2580,14 +2725,15 @@ function useWidth(ref: React.RefObject<HTMLElement | null>, fallback: number) {
 ```css
 /* Breakeven marks (How breakeven works). L3 colour tokens only. */
 
-/* 48 tile: surface/quaternary → surface/inverted, radius 12 (Figma). */
+/* 48 tile: flat surface/inverted, radius 12 (designer's call, 2026-11-03: Figma's quaternary → inverted gradient
+   washed out to white at the top). */
 .tile {
   display: grid;
   place-items: center;
   width: var(--l3-size-48);
   height: var(--l3-size-48);
   border-radius: var(--l3-radius-12);
-  background: linear-gradient(180deg, var(--l3-surface-quaternary), var(--l3-surface-inverted));
+  background: var(--l3-surface-inverted);
 }
 
 .dashed {
@@ -4083,12 +4229,18 @@ function addMinutes(start: string, add: number) {
   "breakeven.introducing": "Introducing",
   "breakeven.lineName": "Breakeven Line",
   "breakeven.tagline": "Sell above this line and your Net P&L stays positive",
-  "breakeven.chartLabel": "Example chart: bought at ₹100, the breakeven line at ₹100.60 covers the order charges, sold at ₹102 above it for a net profit",
+  "breakeven.chartLabel": "Example chart: bought at ₹100, the order charges stack up (brokerage 0.01%, a small part next to STT 0.15% and transaction charges 0.03553%, plus GST, SEBI and stamp duty) into the breakeven line at ₹100.60; sold at ₹102 above it for a net profit",
   "breakeven.bought": "Bought at {price}",
   "breakeven.sold": "Sold at {price}",
   "breakeven.ltp": "LTP",
   "breakeven.netProfit": "Net Profit",
   "breakeven.charges": "Order charges",
+  "breakeven.charge.brokerage": "Brokerage",
+  "breakeven.charge.stt": "STT",
+  "breakeven.charge.transaction": "Transaction",
+  "breakeven.charge.gst": "GST",
+  "breakeven.charge.sebi": "SEBI",
+  "breakeven.charge.stamp": "Stamp duty",
   "breakeven.beTag": "B/E",
   "breakeven.info1": "See your **Breakeven price** live on your ScalpPro",
   "breakeven.info2": "For a positive P&L after charges, always **sell above your breakeven line**",
@@ -4286,6 +4438,34 @@ export const breakevenExample = {
   ],
 }
 
+/**
+ * What the example pays, on F&O options (the rate card, % of the premium turnover): brokerage 0.01% each way, STT
+ * 0.15% on the sell, NSE transaction 0.03553% each way, GST 18% on (brokerage + SEBI + transaction), SEBI 0.0001%
+ * each way, stamp 0.003% on the buy. `amount` is ₹ per unit for a buy at the entry and a sell at the breakeven (the lot
+ * size cancels out, so it only sets the bands' heights). Bottom to top, in the order they stack up: brokerage first.
+ */
+export type ExampleChargeId = 'brokerage' | 'stt' | 'transaction' | 'gst' | 'sebi' | 'stamp'
+export type ExampleCharge = { id: ExampleChargeId; rate: string; amount: number }
+
+const percent = (rate: number, value: number) => (rate / 100) * value
+const exampleBuy = breakevenExample.entry
+const exampleSell = breakevenExample.breakeven
+const exampleTurnover = exampleBuy + exampleSell
+const exampleFees = {
+  brokerage: percent(0.01, exampleTurnover),
+  transaction: percent(0.03553, exampleTurnover),
+  sebi: percent(0.0001, exampleTurnover),
+}
+
+export const breakevenCharges: ExampleCharge[] = [
+  { id: 'brokerage', rate: '0.01%', amount: exampleFees.brokerage },
+  { id: 'stt', rate: '0.15%', amount: percent(0.15, exampleSell) },
+  { id: 'transaction', rate: '0.03553%', amount: exampleFees.transaction },
+  { id: 'gst', rate: '18%', amount: percent(18, exampleFees.brokerage + exampleFees.sebi + exampleFees.transaction) },
+  { id: 'sebi', rate: '0.0001%', amount: exampleFees.sebi },
+  { id: 'stamp', rate: '0.003%', amount: percent(0.003, exampleBuy) },
+]
+
 /** Options trade in steps of ₹0.05. */
 export const OPTION_TICK = 0.05
 
@@ -4342,7 +4522,7 @@ export const fno: Flow = {
     { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-35', group: 'scalper', name: 'Scalper · position + breakeven line', figma: '11756:78739', badge: 'new', note: 'Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “B/E 105.55 ⓘ” chip flush to the price axis (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} /> },
-    { id: 'fno-36', group: 'scalper', name: 'How breakeven works', figma: '11783:5569', badge: 'new', note: 'Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 12 s explainer copied from the designer’s recording: on a white chart the buy at ₹100, the dashed B/E line at ₹100.60 and the orange charges zone come in, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (6.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11).', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="breakeven" /> },
+    { id: 'fno-36', group: 'scalper', name: 'How breakeven works', figma: '11783:5569', badge: 'new', note: 'Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 15 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in and the orange charges zone fills one band per charge from the F&O options rate card (brokerage 0.01% first at the bottom, a thin band next to STT’s, then transaction, GST, SEBI, stamp duty — heights by what each costs, each tagged with its rate), then zooms back out to one zone; the dashed B/E line at ₹100.60 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief).', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="breakeven" /> },
     { id: 'fno-37', group: 'scalper', name: 'Chart tools · Settings', figma: '11754:69563', badge: 'new', note: 'The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="settings" openIndicators={false} /> },
     { id: 'fno-08', group: 'home', name: 'Commodities home', figma: '6754:63637', tab: true, note: 'The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals.', render: (go) => home(go, undefined, { product: 'commodities' }) },
     { id: 'fno-09', group: 'home', name: 'Commodities · heatmap & Smart Futures', figma: '6754:63637', tab: true, note: 'The same long screen, scrolled to the Futures Heatmap.', render: (go) => home(go, 'heatmap', { product: 'commodities' }) },
@@ -5167,9 +5347,9 @@ export function Home({ product = 'equity', segment = 'equity', picker, onProduct
   box-shadow: none;
 }
 
-.strategies [aria-selected='true'] {
+.strategies.strategies [role='tab'][aria-selected='true'] { /* beats L3's ribbon selector (0,3,0) */
   --tab-surface: var(--l3-surface-primary);
-  --tab-border: var(--l3-border-light);
+  --tab-border: var(--tab-surface); /* no outline (designer's call, 2026-11-03): sides and flares in the fill colour */
 }
 
 .addStrategies {
@@ -5859,7 +6039,7 @@ import styles from './BreakevenSheet.module.css'
  * - The example card ("Example: Bought 1 lot at ₹100") plays the explainer on a loop (BreakevenExplainer — copied from
  *   the designer's recording: the chart builds up to a sell above the breakeven line, then the Breakeven Line intro).
  * - "I understand" is locked while it plays (Figma's button variants 11783:12460: a loader line fills along the
- *   button's top edge, then the button turns primary) until the chart has played once (6.3 s). Reduced motion: the
+ *   button's top edge, then the button turns primary) until the chart has played once (9.3 s). Reduced motion: the
  *   finished chart, the button ready.
  */
 export function BreakevenSheet({ onClose }: { onClose: () => void }) {
