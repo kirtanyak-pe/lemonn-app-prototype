@@ -18,6 +18,9 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-05` | Scalper | — | `fno-01`, `dash-20` | From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators. |
 | `fno-06` | Scalper · DASH indicator | — | `fno-01`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list. |
 | `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles. |
+| `fno-35` | Scalper · position + breakeven line | [11756:78739](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11756-78739) | `fno-01`, `dash-20` | Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “B/E 105.55 ⓘ” chip flush to the price axis (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large. |
+| `fno-36` | How breakeven works | [11783:5569](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11783-5569) | `fno-01`, `dash-20` | Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 12 s explainer copied from the designer’s recording: on a white chart the buy at ₹100, the dashed B/E line at ₹100.60 and the orange charges zone come in, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (6.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). |
+| `fno-37` | Chart tools · Settings | [11754:69563](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11754-69563) | `fno-01`, `dash-20` | The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here. |
 | `fno-08` | Commodities home | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. |
 | `fno-09` | Commodities · heatmap & Smart Futures | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The same long screen, scrolled to the Futures Heatmap. |
 | `fno-10` | Contract picker · Commodities | [6754:65111](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-65111) | — | From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet. |
@@ -68,6 +71,9 @@ The F&O tab, implemented with Lemonnade V3 components from Figma [F&O Home → E
 | fno-05 | Scalper | Screenshot supplied 2026-10-26 |
 | fno-06 | Scalper, with DASH indicator sheet open | — |
 | fno-07 | Scalper, with the saved indicator applied | — |
+| fno-35 | Scalper, a position open: TP / entry / SL pills and the breakeven line (version C, Boxed chip) | 11756:78739 |
+| fno-36 | How breakeven works (animated explainer sheet) | 11783:5569 (dark 11783:6220) |
+| fno-37 | Chart tools sheet on Settings | 11754:69563 (dark 11783:9335) |
 | fno-08 | Commodities home | 6754:63637 |
 | fno-09 | Commodities home, at Futures Heatmap | 6754:63637 |
 | fno-10 | Contract picker sheet, Commodities tab | 6754:65111 |
@@ -136,6 +142,76 @@ The other F&O navbar items open a sheet explaining that those destinations are o
   created yet.") and **Lemonn indicators**, each a starred 32-tall row. DASH's View indicator opens it with the saved
   indicator listed. Picking one closes the sheet and applies it (fno-07): its name under the spot quote and two
   illustrative moving-average lines (EMA 9 / 21 of the sample candles) on the spot chart.
+
+#### Scalper position and breakeven (fno-35 … 37)
+
+Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are not built).
+
+- **A position on the option chart** (`components/PositionOverlay`, laid over `TradingPane` via its `overlay` prop,
+  which hands it the pane's price ↔ pixel scale):
+  - dashed lines across the plot at TP (up colour), entry (content/primary) and SL (down colour); the entry price is
+    tagged on the axis (inverted), the last price keeps its own tag;
+  - **TP pill** (from 64 in): drag handle ⠿ · green Tag "TP Qty:65" · the P&L if it fills, (TP − entry) × qty · ✕
+    (removes the TP);
+  - **entry row** (from 12 in): Exit · blue Tag "+65" · live P&L, (last − entry) × qty · ✕ (exits too). With TP or SL
+    removed, "+ TP" / "+ SL" buttons appear here and put it back 10 from the price;
+  - **SL pill**: ⠿ · red Tag "SL Qty:65" · the P&L if it fills · ✕ · Add Trail (toggles; "✓ Trailing" when on);
+  - **dragging** a ⠿ (or focusing it and ↑ / ↓, Shift = ×20) moves TP / SL in ₹0.05 ticks. TP stays above the last
+    price and SL below it, both at least 30 px clear of the entry row and 12 px inside the plot. The P&L updates live;
+  - **the breakeven line**: yellow dashed (`border-accent-warning-default`) at the breakeven price, ending in the
+    boxed chip "B/E 105.55 ⓘ" flush to the price axis (Figma 11756:79332: warning-light surface and edge, no right
+    edge, left corners 4, Label/10 in warning, 12 ⓘ). Tap → How breakeven works. Hidden when Settings → Breakeven
+    line is off.
+- **Breakeven price** (`data.ts` `breakevenPrice`): entry + the round trip's charges ÷ quantity, rounded **up** to the
+  ₹0.05 tick, so selling at it is never a loss. Charges (`optionCharges`): brokerage ₹20 × 2 orders, STT 0.1% of the
+  sell premium, NSE transaction 0.03503% of turnover, SEBI ₹10 / crore, stamp 0.003% of the buy, GST 18% on
+  brokerage + exchange + SEBI. 1 lot (65) at ₹104.60 → ₹105.55; at ₹100 → ₹100.95. The API should send the real
+  breakeven (it knows the user's brokerage plan); this is the client-side fallback.
+- **Buy at Mkt** opens a position at the last price (TP / SL 10 either side) or adds to the open one (average entry);
+  **Sell at Mkt** sells the dock's quantity (all of it closes the position). With a position, the option chart shows
+  its last 18 candles and its scale takes in the TP / SL as they were when it opened (not while dragging, or the scale
+  would run away), and the option pane takes 3 parts of the height to the spot pane's 2.
+- **First buy** → How breakeven works opens by itself, once (prototype: remembered in this browser,
+  `fno.breakevenIntroSeen`; in the app, per user).
+- **How breakeven works** (`sheets/BreakevenSheet`, fno-36): L3 sheet, heading only. The example card ("Example:
+  Bought 1 lot at ₹100") plays the explainer on a 12 s loop (`components/BreakevenExplainer`), copied from the
+  designer's screen recording (Figma's own export holds only the intro). Data: `data.ts` `breakevenExample` — bought
+  ₹100, B/E ₹100.60, sold ₹102, the price path's five turns.
+
+  The stage is white (surface/primary), 286 tall. Plot: ₹100 at y 209, 53 per rupee; gridlines from x 53.5 to 12.5 short
+  of the right edge (dashed 4 / 3 border/light; ₹100 solid); axis labels at x 12.5 (₹101–103 Description/12 tertiary,
+  ₹100 Label/12 primary). Orange charges zone ₹100 → B/E; green net-profit zone B/E → ₹102 (green 100 → 50 → 40 % fade);
+  dashed orange B/E line with a white chip at the right ("B/E" tag on orange, ₹100.60). The price line (1.75, primary)
+  turns at 2.9 / 23.9 / 40.7 / 60.8 / 86 % across the plot (₹100, 100.20, 100.60, 101.10, 102). Callouts are white pills
+  with a light edge and a soft shadow: "Bought at ₹100" 12.5 under the buy dot (notch up), "Sold at ₹102" 10 left of the
+  sell dot (green edge and text, check icon, tail right), LTP 8.5 above the line's head.
+
+  | t (ms) | What |
+  |---|---|
+  | 150 | axis and gridlines fade in (250) |
+  | 400 | buy dot pops in (200, back-out); 650 "Bought at ₹100" fades in and rises 4 → 0 (150) |
+  | 1250 | B/E line draws left → right (450, ease-in-out); 1700 its chip fades and scales 0.9 → 1 (200) |
+  | 1950 | charges zone grows up from ₹100 to B/E (250, ease-out); 2400 "Order charges" fades in (150) |
+  | 2550 | LTP bubble pops in at ₹100.00 (150) |
+  | 2800 | the price line draws at a steady pace to ₹102 (2150); the bubble rides its head showing the last turn passed (cross-fades 100 ms at each); at B/E a ringed marker appears and pulses (r 7.5 → 14, fading, 400 ms) |
+  | 4950 | the line ends: a green ring; 5000 the bubble fades (150), the green dot pops in (200), 5200 it pulses (500) |
+  | 5250 | "Sold at ₹102" fades in sliding 6 → 0 from the right (150) |
+  | 5450 | net-profit zone grows up from B/E to ₹102 (550, ease-out); 6150 "Net Profit" fades in (150) |
+  | 8750 | hard cut to the intro (surface/secondary): the Breakeven mark fades in (+30, 250) and pops 0.55 → 1 (+100, 400, L3 pop easing); INTRODUCING, Breakeven Line, the one-liner at +300 / +470 / +670, each fading in and rising 8 → 0 (400) |
+  | 12000 | the intro fades out (200) over a blank chart and the loop starts again |
+
+  "I understand" is disabled until the chart has played once (Figma's button variants 11783:12460, dark 11805:374): a
+  4 track (surface/tertiary) across the button's top edge fills (surface/inverted, linear) over 6.3 s, then the button
+  turns primary. Reduced motion: the finished chart, no loop, the button ready. Dark mode (the recording is light only):
+  L3's warning / success colours. The info rows (20 icons, Description/12 with bold parts) are as Figma.
+- **Chart tools → Settings** (`sheets/ChartSettingsPanel`, fno-37): Auto TP/SL card row (animated mark · Applied tag
+  · ›; nothing behind it yet), Chart type (Candles / Heikin Ashi / Line, selected = discover tint; the chart doesn't
+  redraw yet), Stop Loss Preference (At Market Price / At Limit Price, radio cards), View on chart (Breakeven line ⓘ
+  New, Buy/Sell executions, Sync Charts, checkbox cards). Edits are a draft: the sheet's dock shows Cancel · Apply
+  only while Settings is open; Apply keeps them, Cancel / closing the sheet drops them. The ⓘ opens How breakeven works.
+- **Auto TP/SL mark** (`components/AutoTpSlIcon`) — Figma's motion (11756:79819 / 79827 / 79835): 1.198 s, played
+  forward then back. Candle: opacity 0 → 1 and scaleY 0.15 → 1 by 29%, ease-out. TP bar: from 25% to 46% it fades in
+  (ease-out) and slides 5 → 0 (cubic-bezier(0.2, 0, 0.2, 1.3), a slight overshoot). SL bar: the same from 38% to 58%.
 
 #### Commodities (fno-08 … 14)
 
@@ -234,6 +310,38 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 - The Zing trader photo is replaced by initials (fictional trader); the Smart Invest logo by the basket's initials.
 - Equity (8) in the picker lists 8 indices (Figma draws 6). Copper, Aluminium and Zinc have no artwork yet, so their chips and rows show the name only.
 
+#### Scalper position and breakeven vs Figma
+
+- Pills, Exit and Add Trail are 24 tall (L3 Secondary Small resized to sit on the pills, as in Figma), not Large.
+- Figma's rail (Bolt · Indicators · Drawings · Settings) is the live app's six groups here; its chart-type cards read
+  "Line, Heiken Ashi, Line" — built as Candles, Heikin Ashi, Line.
+- How breakeven works: Figma's explainer is a video fill (11802:369) whose export holds only the intro; the full 12 s
+  loop (chart + intro) is rebuilt from the designer's screen recording, measured frame by frame (theme-aware, no video
+  file). The recording's labels are ~11 px; here they're L3's 12 styles (Label/12, Description/12, Label/14), so text
+  runs ~8 % wider. Its orange (charges zone, B/E line and tag) isn't L3's warning (a yellow) — kept as local tokens.
+- Figma's breakeven marks and the Auto TP/SL mark couldn't be downloaded (asset links fail here), so they're drawn in
+  SVG on L3 tokens to match (`BreakevenIcon`, `AutoTpSlIcon`).
+- The explainer card's stage keeps the sheet's 24 gap (L3 Stack has no 20; Figma 20).
+- Figma's entry tag reads 119.20 and B/E 13.86 (placeholder numbers); here they're worked out from the sample position.
+- The charts tick (prototype): every second the last candle's close steps (a random walk pulled back to the sample
+  price), its high / low stretch, and every 15 steps a new candle opens and the oldest drops off (`useLiveInstrument`).
+  The header price, change, %, the last-price tag (green up / red down) and the entry pill's live P&L follow. In the
+  app this is the market feed.
+- Candles are at most 4 wide, however few there are. With a position open the option chart shows the 19 candles since
+  the 13:55 spike with 8 empty slots after them (Figma: the candles stop about three quarters across).
+
+#### L3 gaps (Scalper position and breakeven)
+
+- No chart overlay parts: position pill (handle · tag · P&L · ✕), price lines, axis tags, the boxed B/E chip.
+- No breakeven / Auto TP/SL icons; no overline text style ("INTRODUCING": heading-12 + `--app-overline-tracking`).
+- No "button with a loader" (a locked button that unlocks after a timer): drawn as a track over L3 Button.
+- Motion timings for the Auto TP/SL mark (`--app-auto-tpsl-loop`, `--app-auto-tpsl-ease`) and the breakeven explainer's
+  sequence (`--app-be-*`; the chart's own timeline is in `BreakevenExplainer`): L3 has no stagger / sequence timings.
+- No chart callouts (a white pill with a notch / tail pointing at a point, the LTP bubble) or chart zones; no orange
+  accent (`--app-be-charges-zone`, `--app-be-orange`, `--app-be-orange-text`, `--app-be-tag`) and no green 100 semantic
+  (`--app-be-profit-top`).
+- Stack has no 20 gap.
+
 #### L3 gaps (Commodities & Strategies)
 
 - Commodity artwork (L3/Image/Commodities/… in Figma) isn't in the code package — exported PNGs live in `commodities/assets`; Copper / Aluminium / Zinc missing.
@@ -242,6 +350,9 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 - Weekday result dots (Zing Trades): no L3 component; 16 circles on the up / down light surfaces.
 
 ### Changelog
+
+- 2026-11-03 — Scalper charts: thin candles (max 4), the charts tick live, the last-price tag turns red on a down candle; TP line grey and SL line light red as in Figma C.
+- 2026-11-03 — Scalper breakeven (Figma version C, Boxed chip): positions on the option chart with draggable TP / SL pills, Exit, Add Trail and the yellow breakeven line + chip (fno-35); the How breakeven works sheet, its 12 s explainer (chart building up to a sell above the breakeven line, then the intro) copied from the designer's recording, with the locked "I understand" (fno-36); the Auto TP/SL mark on Figma's exact easings; chart tools → Settings with Auto TP/SL, chart type, stop-loss preference and View on chart, Cancel / Apply (fno-37).
 
 - 2026-11-02 — Diwali, final: the Garland splash and the Diwali search bar are what ship (both on by default; settings are now two switches). The Lanterns splash and the profile avatar's diya flip are archived (`src/shared/ui/archive/`). Spec for developers: `docs/DIWALI.md`.
 - 2026-11-02 — Splash (fno-34): the launch splash as a page, listed first.
@@ -1751,6 +1862,821 @@ export function ContractSheet({ contract, onAsset, onIlliquid, onBuy, onSell, on
 }
 ```
 
+### `src/flows/fno/components/AutoTpSlIcon.module.css`
+
+```css
+/*
+ * Auto TP/SL mark — Figma motion (get_motion_context, 11783:10106 / 10114 / 10122), 1.198 s, boomerang (alternate):
+ * candle: opacity 0 → 1 and scaleY 0.15 → 1 by 0.2922, ease-out, then holds;
+ * tp: opacity holds 0 until 0.2504, then 0 → 1 by 0.4591 ease-out; x holds 5 until 0.2504, then 5 → 0 by 0.4591 on
+ *     cubic-bezier(0.2, 0, 0.2, 1.3) (overshoots a little);
+ * sl: the same between 0.3756 and 0.5843.
+ * Opacity and x have different easings, so each is its own animation.
+ */
+.icon {
+  display: block;
+  flex: none;
+}
+
+.candle line {
+  stroke: var(--l3-content-primary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.candle rect {
+  fill: var(--l3-content-primary);
+}
+
+.candle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: candle var(--app-auto-tpsl-loop) linear infinite alternate both;
+}
+
+.tp {
+  fill: var(--l3-surface-accent-indicator-up-default);
+  animation:
+    tpFade var(--app-auto-tpsl-loop) linear infinite alternate both,
+    tpSlide var(--app-auto-tpsl-loop) linear infinite alternate both;
+}
+
+.sl {
+  fill: var(--l3-surface-accent-indicator-down-default);
+  animation:
+    slFade var(--app-auto-tpsl-loop) linear infinite alternate both,
+    slSlide var(--app-auto-tpsl-loop) linear infinite alternate both;
+}
+
+@keyframes candle {
+  0% {
+    opacity: 0;
+    scale: 1 0.15;
+    animation-timing-function: ease-out;
+  }
+  29.22%,
+  100% {
+    opacity: 1;
+    scale: 1 1;
+  }
+}
+
+@keyframes tpFade {
+  0%,
+  25.04% {
+    opacity: 0;
+    animation-timing-function: ease-out;
+  }
+  45.91%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes tpSlide {
+  0%,
+  25.04% {
+    translate: 5px 0;
+    animation-timing-function: var(--app-auto-tpsl-ease);
+  }
+  45.91%,
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes slFade {
+  0%,
+  37.56% {
+    opacity: 0;
+    animation-timing-function: ease-out;
+  }
+  58.43%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slSlide {
+  0%,
+  37.56% {
+    translate: 5px 0;
+    animation-timing-function: var(--app-auto-tpsl-ease);
+  }
+  58.43%,
+  100% {
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candle,
+  .tp,
+  .sl {
+    animation: none;
+  }
+}
+```
+
+### `src/flows/fno/components/AutoTpSlIcon.tsx`
+
+```tsx
+import styles from './AutoTpSlIcon.module.css'
+
+/**
+ * The Auto TP/SL mark in chart Settings (Figma 11756:79819 / 79827 / 79835), animated as in Figma: the candle grows up
+ * from its base, then the TP bar (green, above) and the SL bar (red, below) slide in from the right; 1.198 s, played
+ * forward then back, on a loop. Drawn in SVG on L3 tokens (Figma's export can't be downloaded here).
+ */
+export function AutoTpSlIcon() {
+  return (
+    <svg className={styles.icon} viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+      <g className={styles.candle}>
+        <line x1="9" y1="5" x2="9" y2="19" />
+        <rect x="6.5" y="8" width="5" height="8" rx="1" />
+      </g>
+      <rect className={styles.tp} x="14" y="5" width="8" height="3" rx="1.5" />
+      <rect className={styles.sl} x="14" y="16" width="8" height="3" rx="1.5" />
+    </svg>
+  )
+}
+```
+
+### `src/flows/fno/components/BreakevenExplainer.module.css`
+
+```css
+/*
+ * How breakeven works · the example (copied from the designer's recording). L3 tokens; the orange and the profit fade
+ * are local tokens (src/local-tokens.css: the recording's orange isn't in L3). Positions come from BreakevenExplainer:
+ * each callout gets its anchor as --x / --y and places itself around it.
+ */
+.stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--l3-surface-primary);
+}
+
+.chart {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* ---- Price axis: ₹101–₹103 grey on dashed gridlines; ₹100 (the buy) bold on a solid line. ---- */
+.gridline,
+.baseline {
+  stroke: var(--l3-border-light);
+  stroke-width: 1;
+}
+
+.gridline {
+  stroke-dasharray: 4 3;
+}
+
+.axisLabel,
+.axisEntry,
+.zoneLabel,
+.chip,
+.bought,
+.sold,
+.ltp {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  white-space: nowrap;
+}
+
+.axisLabel,
+.axisEntry,
+.zoneLabel {
+  transform: translateY(-50%);
+}
+
+.axisLabel {
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-description-12);
+}
+
+.axisEntry {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+}
+
+/* ---- Zones: orange charges (₹100 → B/E), a green fade for the net profit (B/E → ₹102). ---- */
+.chargesZone {
+  fill: var(--app-be-charges-zone);
+}
+
+.profitTop {
+  stop-color: var(--app-be-profit-top);
+}
+
+.profitMid,
+.profitBottom {
+  stop-color: var(--l3-surface-accent-success-light);
+}
+
+.profitBottom {
+  stop-opacity: 0.4;
+}
+
+.zoneLabel {
+  font: var(--l3-text-label-12);
+}
+
+.zoneLabel[data-zone='charges'] {
+  color: var(--app-be-orange-text);
+}
+
+.zoneLabel[data-zone='profit'] {
+  color: var(--l3-content-accent-success-default);
+}
+
+/* ---- The breakeven line and its chip (white, a B/E tag then the price), the chip's right edge on the plot's. ---- */
+.breakevenLine {
+  stroke: var(--app-be-orange);
+  stroke-width: 1.25;
+  stroke-dasharray: 4 3;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-02) var(--l3-spacing-04) var(--l3-spacing-02) var(--l3-spacing-02);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-06);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+  transform: translate(-100%, -50%);
+  transform-origin: right center;
+}
+
+.chipTag {
+  padding: 1px var(--l3-spacing-02);
+  border-radius: var(--l3-radius-02);
+  background: var(--app-be-tag);
+  color: var(--l3-static-black); /* like L3's warning Tag: black on the solid, in both modes */
+  font: var(--l3-text-heading-10);
+}
+
+/* ---- The price line, the buy dot, the ringed crossing marker, the green sell dot and their pulses. ---- */
+.priceLine {
+  fill: none;
+  stroke: var(--l3-content-primary);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.buyDot {
+  fill: var(--l3-content-primary);
+}
+
+.crossingRing {
+  fill: var(--app-be-charges-zone);
+  stroke: var(--app-be-orange);
+  stroke-width: 1.25;
+}
+
+.crossingPulse {
+  fill: var(--app-be-orange);
+}
+
+.sellRing,
+.sellRingDrawing {
+  fill: var(--l3-surface-accent-success-light);
+  stroke-width: 1.25;
+}
+
+.sellRing {
+  stroke: var(--l3-border-accent-success-light);
+}
+
+.sellRingDrawing {
+  stroke: var(--l3-border-accent-success-default);
+}
+
+.sellDot,
+.sellPulse {
+  fill: var(--l3-surface-accent-success-default);
+}
+
+/* ---- Callouts: white pills with a light edge and a soft shadow. ---- */
+.bought,
+.sold,
+.ltp {
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-08);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+}
+
+/* "Bought at ₹100": under the buy dot, a notch on top pointing at it. */
+.bought {
+  padding: var(--l3-spacing-04) var(--l3-spacing-08);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+}
+
+.bought::before,
+.sold::after {
+  content: '';
+  position: absolute;
+  width: var(--l3-spacing-08);
+  height: var(--l3-spacing-08);
+  background: var(--l3-surface-primary);
+  rotate: 45deg;
+}
+
+.bought::before {
+  top: calc(var(--l3-spacing-04) * -1 - 1px);
+  left: var(--l3-spacing-16);
+  border-top: 1px solid var(--l3-border-light);
+  border-left: 1px solid var(--l3-border-light);
+}
+
+/* "Sold at ₹102": left of the sell dot, green edge and text, a tail pointing right at the dot. */
+.sold {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-06);
+  padding: var(--l3-spacing-04) var(--l3-spacing-08) var(--l3-spacing-04) var(--l3-spacing-06);
+  border-color: var(--l3-border-accent-success-light);
+  box-shadow: none;
+  color: var(--l3-content-accent-success-default);
+  font: var(--l3-text-label-12);
+  transform: translate(-100%, -50%);
+}
+
+.sold::after {
+  top: calc(50% - var(--l3-spacing-04));
+  right: calc(var(--l3-spacing-04) * -1 - 1px);
+  border-top: 1px solid var(--l3-border-accent-success-light);
+  border-right: 1px solid var(--l3-border-accent-success-light);
+}
+
+/* LTP: rides the line's head, centred above it — the last price the line passed. */
+.ltp {
+  display: flex;
+  flex-direction: column;
+  padding: var(--l3-spacing-02) var(--l3-spacing-08);
+  transform: translate(-50%, -100%);
+  transform-origin: center bottom;
+}
+
+.ltpName {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-10);
+}
+
+.ltpValue {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
+
+/*
+ * The intro the loop ends on (the stage cuts to surface/secondary): Figma's reveal (the video on 11802:369, 1.23 s,
+ * measured frame by frame) —
+ * - the mark: opacity 0 → 1 from 30 ms over 250 ms (linear); scale 0.55 → 1 from 100 ms over 400 ms on L3's pop easing;
+ * - INTRODUCING, Breakeven Line, the one-liner: from 300 / 470 / 670 ms, each 400 ms (L3 long): opacity 0 → 1 linear,
+ *   8 up → 0 ease-out.
+ */
+.intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--l3-spacing-24) var(--l3-spacing-16);
+  background: var(--l3-surface-secondary);
+  text-align: center;
+}
+
+.introIcon {
+  margin-bottom: var(--l3-spacing-16);
+  animation:
+    fadeIn var(--app-be-icon-fade) linear var(--app-be-icon-fade-delay) both,
+    popIn var(--l3-motion-duration-ai-pop) var(--l3-motion-easing-ai-pop) var(--app-be-icon-pop-delay) both;
+}
+
+.overline,
+.introTitle,
+.introText {
+  animation:
+    fadeIn var(--l3-motion-duration-long) linear var(--app-be-rise-delay) both,
+    riseIn var(--l3-motion-duration-long) ease-out var(--app-be-rise-delay) both;
+}
+
+.overline { --app-be-rise-delay: var(--app-be-overline-delay); }
+.introTitle { --app-be-rise-delay: var(--app-be-title-delay); }
+.introText { --app-be-rise-delay: var(--app-be-tagline-delay); }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    scale: 0.55;
+  }
+}
+
+@keyframes riseIn {
+  from {
+    translate: 0 var(--l3-spacing-08);
+  }
+}
+
+/* INTRODUCING: 12 bold, tracking 0.96 (Figma) — L3 has no overline style: heading-12 + local tracking. */
+.overline {
+  margin: 0;
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-heading-12);
+  letter-spacing: var(--app-overline-tracking);
+  text-transform: uppercase;
+}
+
+.introTitle {
+  margin: var(--l3-spacing-04) 0 var(--l3-spacing-08);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-24);
+}
+
+.introText {
+  margin: 0;
+  max-width: calc(var(--l3-size-128) * 1.75);
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-12);
+}
+```
+
+### `src/flows/fno/components/BreakevenExplainer.tsx`
+
+```tsx
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { Icon } from '@l3/components/Icon'
+import { msCheckCircleFill } from '@l3/icons/material'
+import { inr } from '../../../shared/data/format'
+import { t } from '../copy'
+import { breakevenExample } from '../data'
+import { BreakevenIcon } from './BreakevenIcon'
+import styles from './BreakevenExplainer.module.css'
+
+/**
+ * The example in How breakeven works — copied from the designer's recording of the explainer (a 12 s loop, measured
+ * frame by frame). On a white stage:
+ * 1. the price axis (₹100–₹103) and its dashed gridlines fade in; the buy dot pops in at ₹100 with "Bought at ₹100";
+ * 2. the breakeven line draws across at ₹100.60 and its B/E chip comes in; the orange charges zone grows up to it,
+ *    labelled "Order charges";
+ * 3. an LTP bubble rides the price line as it draws up to ₹102 (showing the last price it passed); where it crosses the
+ *    breakeven line a ringed marker pulses;
+ * 4. at ₹102 the bubble goes, a green dot pulses, "Sold at ₹102" slides in and the green net-profit zone grows from the
+ *    breakeven line up to the sell price, labelled "Net Profit"; it holds;
+ * 5. at 8.75 s the stage cuts to grey and the intro plays (the Breakeven mark, INTRODUCING, Breakeven Line, the one-liner,
+ *    at Figma's timings); at 12 s it fades out and the chart plays again.
+ * `still` (reduced motion) shows the finished chart and no intro.
+ */
+export function BreakevenExplainer({ still = false }: { still?: boolean }) {
+  const stageRef = useRef<HTMLDivElement>(null)
+  const width = useWidth(stageRef, FIGMA_WIDTH)
+  const elapsed = useElapsed(!still)
+  const loop = Math.floor(elapsed / LOOP)
+  const time = still ? SHOT.profitLabel[0] + SHOT.profitLabel[1] : elapsed % LOOP
+
+  return (
+    <div ref={stageRef} className={styles.stage} style={{ height: HEIGHT }} role="img" aria-label={t('breakeven.chartLabel')}>
+      <ExampleChart time={time} width={width} />
+      {!still && time >= INTRO_AT && <Intro key={loop} />}
+      {!still && loop > 0 && time < INTRO_OUT && <Intro key={loop - 1} fade={1 - ramp(time, [0, INTRO_OUT])} />}
+    </div>
+  )
+}
+
+/** Where each part comes in on the 12 s loop: [start, duration] in ms (t = 0 is the chart starting on a blank stage). */
+const SHOT = {
+  axis: [150, 250],
+  buyDot: [400, 200],
+  bought: [650, 150],
+  breakevenLine: [1250, 450],
+  breakevenChip: [1700, 200],
+  chargesZone: [1950, 250],
+  chargesLabel: [2400, 150],
+  ltpIn: [2550, 150],
+  priceLine: [2800, 2150],
+  crossingPulse: [120, 400], // after the line reaches the crossing
+  ltpOut: [5000, 150],
+  sellDot: [5000, 200],
+  sellPulse: [5200, 500],
+  sold: [5250, 150],
+  profitZone: [5450, 550],
+  profitLabel: [6150, 150],
+} satisfies Record<string, [number, number]>
+const LOOP = 12000
+/** The hard cut to the intro, and how long the intro takes to fade when the loop starts again. */
+const INTRO_AT = 8750
+const INTRO_OUT = 200
+/** The LTP value cross-fades for this long when the line passes a turn. */
+const LTP_SWAP = 100
+
+/** The plot, in px (measured at the card's 326 width in Figma; it stretches with the card). */
+const FIGMA_WIDTH = 326
+const HEIGHT = 286
+const PLOT_LEFT = 53.5
+const PLOT_RIGHT_INSET = 12.5
+const AXIS_X = 12.5
+const ZONE_LABEL_INSET = 8.5
+/** Callouts around their dots: "Bought" hangs 12.5 below with its notch 20 in; "Sold" ends 10 left; LTP sits 8.5 above. */
+const BOUGHT_GAP = 12.5
+const BOUGHT_NOTCH_X = 20
+const SOLD_GAP = 10
+const LTP_GAP = 8.5
+/** ₹100 sits at 209 and every rupee is 53 higher. */
+const y = (price: number) => 209 - (price - breakevenExample.entry) * 53
+
+function ExampleChart({ time, width }: { time: number; width: number }) {
+  const gradientId = useId()
+  const { entry, breakeven, exit, axis, path } = breakevenExample
+  const plotRight = width - PLOT_RIGHT_INSET
+  const points = path.map((p) => ({ x: PLOT_LEFT + p.at * (plotRight - PLOT_LEFT), y: y(p.price), price: p.price }))
+  const start = points[0]
+  const end = points[points.length - 1]
+  const crossing = points.find((p) => p.price === breakeven) ?? points[0]
+
+  // The price line draws at a steady pace across the plot; its head is where the LTP bubble rides.
+  const drawn = ramp(time, SHOT.priceLine)
+  const headX = start.x + drawn * (end.x - start.x)
+  const passed = points.filter((p) => p.x <= headX)
+  const next = points[passed.length]
+  const last = passed[passed.length - 1] ?? start
+  const head = next ? { x: headX, y: last.y + ((headX - last.x) / (next.x - last.x)) * (next.y - last.y) } : end
+  const crossedAt = SHOT.priceLine[0] + ((crossing.x - start.x) / (end.x - start.x)) * SHOT.priceLine[1]
+  const lastTurnAt = SHOT.priceLine[0] + ((last.x - start.x) / (end.x - start.x)) * SHOT.priceLine[1]
+
+  const axisIn = ramp(time, SHOT.axis)
+  const chargesZone = ramp(time, SHOT.chargesZone, easeOut) * (y(entry) - y(breakeven))
+  const profitZone = ramp(time, SHOT.profitZone, easeOut) * (y(breakeven) - y(exit))
+  const ltp = ramp(time, SHOT.ltpIn, easeOut) * (1 - ramp(time, SHOT.ltpOut))
+  const sellIn = ramp(time, SHOT.sellDot, easeOutBack)
+
+  return (
+    <>
+      <svg className={styles.chart} width={width} height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} aria-hidden>
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" className={styles.profitTop} />
+            <stop offset="0.6" className={styles.profitMid} />
+            <stop offset="1" className={styles.profitBottom} />
+          </linearGradient>
+        </defs>
+        <g opacity={axisIn}>
+          {axis.map((price) => (
+            <line key={price} className={price === entry ? styles.baseline : styles.gridline} x1={PLOT_LEFT} x2={plotRight} y1={y(price)} y2={y(price)} />
+          ))}
+        </g>
+        <rect className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(entry) - chargesZone} height={chargesZone} />
+        <rect fill={`url(#${gradientId})`} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven) - profitZone} height={profitZone} />
+        <line
+          className={styles.breakevenLine}
+          x1={PLOT_LEFT}
+          x2={PLOT_LEFT + ramp(time, SHOT.breakevenLine, easeInOut) * (plotRight - PLOT_LEFT)}
+          y1={y(breakeven)}
+          y2={y(breakeven)}
+        />
+        {drawn > 0 && <polyline className={styles.priceLine} points={[...passed, head].map((p) => `${p.x},${p.y}`).join(' ')} />}
+        <circle className={styles.buyDot} cx={start.x} cy={start.y} r={4.5 * ramp(time, SHOT.buyDot, easeOutBack)} />
+        {time >= crossedAt && (
+          <g>
+            <Pulse cx={crossing.x} cy={crossing.y} time={time - crossedAt} shot={SHOT.crossingPulse} className={styles.crossingPulse} />
+            <circle className={styles.crossingRing} cx={crossing.x} cy={crossing.y} r={7.5} />
+            <circle className={styles.buyDot} cx={crossing.x} cy={crossing.y} r={4} />
+          </g>
+        )}
+        {drawn >= 1 && (
+          <g>
+            <Pulse cx={end.x} cy={end.y} time={time} shot={SHOT.sellPulse} className={styles.sellPulse} />
+            <circle className={sellIn > 0 ? styles.sellRing : styles.sellRingDrawing} cx={end.x} cy={end.y} r={7.5} />
+            <circle className={styles.sellDot} cx={end.x} cy={end.y} r={4.5 * sellIn} />
+          </g>
+        )}
+      </svg>
+
+      {axis.map((price) => (
+        <span key={price} className={price === entry ? styles.axisEntry : styles.axisLabel} style={at(AXIS_X, y(price), axisIn)}>
+          {inr(price, 0)}
+        </span>
+      ))}
+
+      <span className={styles.chip} style={{ ...at(plotRight, y(breakeven), ramp(time, SHOT.breakevenChip, easeOut)), scale: `${0.9 + 0.1 * ramp(time, SHOT.breakevenChip, easeOut)}` }}>
+        <span className={styles.chipTag}>{t('breakeven.beTag')}</span>
+        {inr(breakeven)}
+      </span>
+
+      <span className={styles.zoneLabel} style={at(PLOT_LEFT + ZONE_LABEL_INSET, y(breakeven) + 10.5, ramp(time, SHOT.chargesLabel))} data-zone="charges">
+        {t('breakeven.charges')}
+      </span>
+      <span className={styles.zoneLabel} style={at(PLOT_LEFT + ZONE_LABEL_INSET, y(exit) + 32.5, ramp(time, SHOT.profitLabel))} data-zone="profit">
+        {t('breakeven.netProfit')}
+      </span>
+
+      <span className={styles.bought} style={rise(at(start.x - BOUGHT_NOTCH_X, start.y + BOUGHT_GAP), ramp(time, SHOT.bought, easeOut), 0, 4)}>
+        {t('breakeven.bought', { price: inr(entry, 0) })}
+      </span>
+      <span className={styles.sold} style={rise(at(end.x - SOLD_GAP, end.y), ramp(time, SHOT.sold, easeOut), 6, 0)}>
+        <Icon icon={msCheckCircleFill} size={16} />
+        {t('breakeven.sold', { price: inr(exit, 0) })}
+      </span>
+
+      {ltp > 0 && (
+        <span className={styles.ltp} style={{ ...at(head.x, head.y - LTP_GAP, ltp), scale: `${0.9 + 0.1 * ltp}` }}>
+          <span className={styles.ltpName}>{t('breakeven.ltp')}</span>
+          <span key={last.price} className={styles.ltpValue} style={{ opacity: last === start ? 1 : ramp(time, [lastTurnAt, LTP_SWAP]) }}>
+            {inr(last.price)}
+          </span>
+        </span>
+      )}
+    </>
+  )
+}
+
+/** A ring that grows from the marker (7.5 → 14) and fades. */
+function Pulse({ cx, cy, time, shot, className }: { cx: number; cy: number; time: number; shot: [number, number]; className: string }) {
+  const p = ramp(time, shot, easeOut)
+  if (p <= 0 || p >= 1) return null
+  return <circle className={className} cx={cx} cy={cy} r={7.5 + 6.5 * p} opacity={0.4 * (1 - p)} />
+}
+
+/** The intro the loop ends on: Figma's reveal (its timings are CSS animations, so it plays each time it mounts). */
+function Intro({ fade = 1 }: { fade?: number }) {
+  return (
+    <div className={styles.intro} style={{ opacity: fade }}>
+      <BreakevenIcon variant="tile" className={styles.introIcon} />
+      <p className={styles.overline}>{t('breakeven.introducing')}</p>
+      <p className={styles.introTitle}>{t('breakeven.lineName')}</p>
+      <p className={styles.introText}>{t('breakeven.tagline')}</p>
+    </div>
+  )
+}
+
+/** A callout anchored at (x, y) on the stage; each callout's CSS places itself around that point. */
+function at(x: number, y: number, opacity = 1): CSSProperties {
+  return { '--x': `${x}px`, '--y': `${y}px`, opacity } as CSSProperties
+}
+
+/** Comes in by `progress`, moving from (dx, dy) px away to its place. */
+function rise(style: CSSProperties, progress: number, dx: number, dy: number): CSSProperties {
+  return { ...style, opacity: progress, translate: `${dx * (1 - progress)}px ${dy * (1 - progress)}px` }
+}
+
+/** 0 → 1 over [start, duration], eased. */
+function ramp(time: number, [start, duration]: [number, number], ease = linear) {
+  return ease(Math.min(1, Math.max(0, (time - start) / duration)))
+}
+const linear = (x: number) => x
+const easeOut = (x: number) => 1 - (1 - x) ** 3
+const easeInOut = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
+const easeOutBack = (x: number) => 1 + 2.70158 * (x - 1) ** 3 + 1.70158 * (x - 1) ** 2
+
+/** Milliseconds since mount, every frame (stays 0 when not playing). */
+function useElapsed(playing: boolean) {
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    if (!playing) return
+    let frame = 0
+    let start: number | undefined
+    const tick = (now: number) => {
+      start ??= now
+      setElapsed(now - start)
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [playing])
+  return elapsed
+}
+
+/** The element's width, kept current. */
+function useWidth(ref: React.RefObject<HTMLElement | null>, fallback: number) {
+  const [width, setWidth] = useState(fallback)
+  useLayoutEffect(() => {
+    const element = ref.current
+    if (!element) return
+    const observer = new ResizeObserver(() => setWidth(element.clientWidth))
+    observer.observe(element)
+    setWidth(element.clientWidth)
+    return () => observer.disconnect()
+  }, [ref])
+  return width
+}
+```
+
+### `src/flows/fno/components/BreakevenIcon.module.css`
+
+```css
+/* Breakeven marks (How breakeven works). L3 colour tokens only. */
+
+/* 48 tile: surface/quaternary → surface/inverted, radius 12 (Figma). */
+.tile {
+  display: grid;
+  place-items: center;
+  width: var(--l3-size-48);
+  height: var(--l3-size-48);
+  border-radius: var(--l3-radius-12);
+  background: linear-gradient(180deg, var(--l3-surface-quaternary), var(--l3-surface-inverted));
+}
+
+.dashed {
+  stroke: var(--l3-content-inverted);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+
+.arrow {
+  fill: none;
+  stroke: var(--l3-content-accent-brand-default);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.small {
+  display: block;
+  flex: none;
+}
+
+.smallDashed {
+  stroke: var(--l3-border-accent-warning-default);
+  stroke-width: 1.5;
+  stroke-dasharray: 2.5 2;
+}
+
+.chip {
+  fill: var(--l3-surface-accent-warning-light);
+  stroke: var(--l3-border-accent-warning-default);
+  stroke-width: 1;
+}
+
+.small[data-variant='up'] .smallDashed {
+  stroke: var(--l3-content-tertiary);
+}
+
+.smallArrow {
+  fill: none;
+  stroke: var(--l3-content-accent-success-default);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+```
+
+### `src/flows/fno/components/BreakevenIcon.tsx`
+
+```tsx
+import styles from './BreakevenIcon.module.css'
+
+type BreakevenIconProps = {
+  /**
+   * tile: the 48 "Breakeven" mark (Figma 11783:12564) — a dark tile, a lime arrow rising through a dashed line;
+   * line: 20, the yellow breakeven line with its chip (11783:12573); up: 20, a green arrow over the line (11783:12586).
+   */
+  variant: 'tile' | 'line' | 'up'
+  className?: string
+}
+
+/**
+ * The breakeven marks of How breakeven works. Figma's exports can't be downloaded here, so they're drawn to match in
+ * SVG on L3 colour tokens (listed as an L3 gap: no breakeven icon in the icon set).
+ */
+export function BreakevenIcon({ variant, className }: BreakevenIconProps) {
+  if (variant === 'tile') {
+    return (
+      <span className={`${styles.tile} ${className ?? ''}`} aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="48" height="48">
+          <line className={styles.dashed} x1="6" y1="27" x2="42" y2="27" />
+          <path className={styles.arrow} d="M24 36V13M16 21l8-8 8 8" />
+        </svg>
+      </span>
+    )
+  }
+  return (
+    <svg className={`${styles.small} ${className ?? ''}`} data-variant={variant} viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+      <line className={styles.smallDashed} x1="1" y1="12" x2="19" y2="12" />
+      {variant === 'line' ? (
+        <rect className={styles.chip} x="11" y="8.5" width="8" height="7" rx="1.5" />
+      ) : (
+        <path className={styles.smallArrow} d="M10 17V4M6 8l4-4 4 4" />
+      )}
+    </svg>
+  )
+}
+```
+
 ### `src/flows/fno/components/ContractSection.tsx`
 
 ```tsx
@@ -2053,6 +2979,332 @@ export function Overview({ onDestination }: { onDestination: (name: string) => v
 }
 ```
 
+### `src/flows/fno/components/PositionOverlay.module.css`
+
+```css
+/*
+ * A position on the option chart (Figma "Scalper screen · C · Boxed chip", 11756:78739). Laid over the plot; only the
+ * pills, buttons and the breakeven chip take taps, so the chart under them still scrolls / zooms.
+ */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* Dashed lines across the plot. 1px hairlines. */
+.line {
+  position: absolute;
+  left: 0;
+  height: 0;
+  border-top: 1px dashed var(--l3-border-dark);
+}
+
+.line[data-kind='tp'] {
+  border-top-color: var(--l3-border-dark);
+}
+
+.line[data-kind='entry'] {
+  border-top-color: var(--l3-content-primary);
+}
+
+.line[data-kind='sl'] {
+  border-top-color: var(--l3-border-accent-indicator-down-light);
+}
+
+/* Breakeven: yellow, a longer dash than the others (Figma 4 / 4). */
+.line[data-kind='be'] {
+  border-top: 0;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--l3-border-accent-warning-default) 0 var(--l3-spacing-04), transparent var(--l3-spacing-04) var(--l3-spacing-08));
+}
+
+/* The entry price on the axis: inverted, as tall as the last price's tag. */
+.axisTag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: var(--l3-size-16);
+  padding-left: var(--l3-spacing-02);
+  border-radius: var(--l3-radius-02);
+  background: var(--l3-surface-inverted);
+  color: var(--l3-content-inverted);
+  font: var(--l3-text-label-12);
+  translate: 0 -50%;
+}
+
+/* A row of pills centred on its line: TP and SL from 64 in (past the entry row's Exit), the entry row from 12. */
+.row {
+  position: absolute;
+  left: var(--l3-spacing-64);
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-08);
+  translate: 0 -50%;
+}
+
+.row[data-kind='entry'] {
+  left: var(--l3-spacing-12);
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  height: var(--l3-size-24);
+  padding-inline: var(--l3-spacing-02) var(--l3-spacing-04);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-04);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+  pointer-events: auto;
+}
+
+.row[data-kind='entry'] .pill {
+  padding-left: var(--l3-spacing-04);
+}
+
+.pnl {
+  font: var(--l3-text-label-12);
+  white-space: nowrap;
+}
+
+.pnl[data-tone='up'] {
+  color: var(--l3-content-accent-indicator-up-default);
+}
+
+.pnl[data-tone='down'] {
+  color: var(--l3-content-accent-indicator-down-default);
+}
+
+.pnl[data-tone='flat'] {
+  color: var(--l3-content-secondary);
+}
+
+/* The drag handle and ✕: bare 16 icons; the handle is the pill's grip (vertical drag, no page scroll). */
+.handle,
+.close {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-primary);
+  cursor: pointer;
+}
+
+.handle {
+  touch-action: none;
+  cursor: ns-resize;
+}
+
+.handle:focus-visible,
+.close:focus-visible,
+.breakeven:focus-visible {
+  outline: 2px solid var(--l3-border-accent-discover-default);
+  outline-offset: 1px;
+}
+
+/* Exit / Add Trail / Add TP: L3 Secondary Small, 24 tall here to sit on the 24 pills (Figma). */
+.exit.exit {
+  --btn-height: var(--l3-size-24);
+  --btn-padding-block: 0;
+  --btn-padding-inline: var(--l3-spacing-08);
+  --btn-radius: var(--l3-radius-04);
+  --btn-font: var(--l3-text-label-12);
+  --btn-icon-size: var(--l3-icon-size-14);
+  pointer-events: auto;
+}
+
+/* "B/E 105.55 ⓘ" — Figma 11756:79332: warning-light box, edged top / bottom / left only, flush to the price axis,
+   left corners rounded 4, padding 2 4 2 6, Label/10 in warning, a 12 ⓘ, gap 2. */
+.breakeven {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: var(--l3-spacing-02);
+  padding: var(--l3-spacing-02) var(--l3-spacing-04) var(--l3-spacing-02) var(--l3-spacing-06);
+  border: 1px solid var(--l3-border-accent-warning-light);
+  border-right: 0;
+  border-radius: var(--l3-radius-04) 0 0 var(--l3-radius-04);
+  background: var(--l3-surface-accent-warning-light);
+  color: var(--l3-content-accent-warning-default);
+  font: var(--l3-text-label-10);
+  white-space: nowrap;
+  translate: 0 -50%;
+  cursor: pointer;
+  pointer-events: auto;
+}
+```
+
+### `src/flows/fno/components/PositionOverlay.tsx`
+
+```tsx
+import { useRef, type KeyboardEvent, type PointerEvent } from 'react'
+import { Button } from '@l3/components/Button'
+import { Icon } from '@l3/components/Icon'
+import { Tag } from '@l3/components/Tag'
+import { msAdd, msCheck, msClose, msDragIndicator, msInfo } from '@l3/icons/material'
+import { t } from '../copy'
+import { OPTION_TICK, SCALPER_TP_SL_GAP, type ScalperPosition } from '../data'
+import type { PaneScale } from './TradingPane'
+import styles from './PositionOverlay.module.css'
+
+type PositionOverlayProps = {
+  scale: PaneScale
+  position: ScalperPosition
+  /** The option's last traded price: the entry row's live P&L, and the side TP / SL must stay on. */
+  last: number
+  /** The breakeven price, or null when the Breakeven line is off (Settings → View on chart). */
+  breakeven: number | null
+  onChange: (position: ScalperPosition) => void
+  /** Exit (or the entry pill's ✕): sell the whole position at market. */
+  onExit: () => void
+  /** The ⓘ on the breakeven chip: How breakeven works. */
+  onBreakevenInfo: () => void
+}
+
+/** The pills can't come closer than this to the entry row (px), so they never overlap it. */
+const MIN_GAP = 30
+/** …nor closer than this to the plot's top or bottom edge (px). */
+const EDGE = 12
+
+/**
+ * A position on the option chart (Scalper "C · Boxed chip"): dashed lines across the plot at the take-profit, the
+ * entry and the stop-loss, each with its pill at the left —
+ * - TP: drag handle · green "TP Qty:65" · the P&L if it fills · ✕ (removes the TP);
+ * - entry: Exit · blue "+65" (the quantity) · the live P&L · ✕ (exits too); "Add TP" / "Add SL" when one is removed;
+ * - SL: drag handle · red "SL Qty:65" · the P&L if it fills · ✕ · Add Trail (the stop-loss follows the price up).
+ * Drag a handle (or focus it and use ↑ / ↓) to move TP or SL: they stay on their side of the price and clear of the
+ * entry row, in ₹0.05 steps. The breakeven line (yellow, dashed) ends in a boxed chip flush to the price axis:
+ * "B/E 105.55 ⓘ"; tapping it opens How breakeven works.
+ */
+export function PositionOverlay({ scale, position, last, breakeven, onChange, onExit, onBreakevenInfo }: PositionOverlayProps) {
+  const { y, price, plotW, plotH, axis } = scale
+  const { entry, quantity, takeProfit, stopLoss, trailing } = position
+  const root = useRef<HTMLDivElement>(null)
+
+  /** Keep a dragged price on its side of the market, clear of the entry row and inside the plot, on the tick. */
+  const clampTp = (p: number) => tick(Math.min(Math.max(p, last + OPTION_TICK, price(y(entry) - MIN_GAP)), price(EDGE)))
+  const clampSl = (p: number) => tick(Math.max(Math.min(p, last - OPTION_TICK, price(y(entry) + MIN_GAP)), price(plotH - EDGE)))
+  const move = (kind: 'tp' | 'sl', p: number) =>
+    onChange(kind === 'tp' ? { ...position, takeProfit: clampTp(p) } : { ...position, stopLoss: clampSl(p) })
+
+  const drag = (kind: 'tp' | 'sl') => ({
+    onPointerDown: (e: PointerEvent<HTMLButtonElement>) => {
+      e.currentTarget.setPointerCapture(e.pointerId)
+      e.preventDefault()
+    },
+    onPointerMove: (e: PointerEvent<HTMLButtonElement>) => {
+      if (!e.currentTarget.hasPointerCapture(e.pointerId) || !root.current) return
+      move(kind, price(e.clientY - root.current.getBoundingClientRect().top))
+    },
+    onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => {
+      const step = e.key === 'ArrowUp' ? OPTION_TICK : e.key === 'ArrowDown' ? -OPTION_TICK : 0
+      if (!step) return
+      e.preventDefault()
+      move(kind, (kind === 'tp' ? takeProfit : stopLoss)! + step * (e.shiftKey ? 20 : 1))
+    },
+  })
+
+  const pnl = (exit: number) => (exit - entry) * quantity
+  const live = pnl(last)
+
+  return (
+    <div ref={root} className={styles.overlay} style={{ width: plotW + axis, height: plotH }}>
+      {/* Lines first, so every pill sits above every line. */}
+      {takeProfit !== null && <span className={styles.line} data-kind="tp" style={{ top: y(takeProfit), width: plotW }} aria-hidden="true" />}
+      <span className={styles.line} data-kind="entry" style={{ top: y(entry), width: plotW }} aria-hidden="true" />
+      {stopLoss !== null && <span className={styles.line} data-kind="sl" style={{ top: y(stopLoss), width: plotW }} aria-hidden="true" />}
+      {breakeven !== null && <span className={styles.line} data-kind="be" style={{ top: y(breakeven), width: plotW }} aria-hidden="true" />}
+
+      {/* The entry price on the axis (the last price keeps its own green / red tag). */}
+      <span className={styles.axisTag} style={{ top: y(entry), left: plotW + 1, width: axis }} aria-hidden="true">{entry.toFixed(2)}</span>
+
+      {takeProfit !== null && (
+        <div className={styles.row} style={{ top: y(takeProfit) }}>
+          <div className={styles.pill}>
+            <button type="button" className={styles.handle} aria-label={t('position.moveTp', { price: takeProfit.toFixed(2) })} {...drag('tp')}>
+              <Icon icon={msDragIndicator} size={16} />
+            </button>
+            <Tag variant="primary" color="profit" size="sm">{t('position.tp', { quantity })}</Tag>
+            <span className={styles.pnl} data-tone={tone(pnl(takeProfit))}>{rupees(pnl(takeProfit))}</span>
+            <button type="button" className={styles.close} aria-label={t('position.removeTp')} onClick={() => onChange({ ...position, takeProfit: null })}>
+              <Icon icon={msClose} size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.row} data-kind="entry" style={{ top: y(entry) }}>
+        <Button variant="secondary" size="sm" onClick={onExit} className={styles.exit}>{t('position.exit')}</Button>
+        <div className={styles.pill}>
+          <Tag variant="primary" color="discover" size="sm">{`+${quantity}`}</Tag>
+          <span className={styles.pnl} data-tone={tone(live)} aria-label={t('position.livePnl', { amount: rupees(live) })}>{rupees(live)}</span>
+          <button type="button" className={styles.close} aria-label={t('position.close')} onClick={onExit}>
+            <Icon icon={msClose} size={16} />
+          </button>
+        </div>
+        {takeProfit === null && (
+          <Button variant="secondary" size="sm" iconLeft={<Icon icon={msAdd} />} className={styles.exit} onClick={() => onChange({ ...position, takeProfit: clampTp(Math.max(last, entry) + SCALPER_TP_SL_GAP) })}>
+            {t('position.addTp')}
+          </Button>
+        )}
+        {stopLoss === null && (
+          <Button variant="secondary" size="sm" iconLeft={<Icon icon={msAdd} />} className={styles.exit} onClick={() => onChange({ ...position, stopLoss: clampSl(Math.min(last, entry) - SCALPER_TP_SL_GAP), trailing: false })}>
+            {t('position.addSl')}
+          </Button>
+        )}
+      </div>
+
+      {stopLoss !== null && (
+        <div className={styles.row} style={{ top: y(stopLoss) }}>
+          <div className={styles.pill}>
+            <button type="button" className={styles.handle} aria-label={t('position.moveSl', { price: stopLoss.toFixed(2) })} {...drag('sl')}>
+              <Icon icon={msDragIndicator} size={16} />
+            </button>
+            <Tag variant="primary" color="loss" size="sm">{t('position.sl', { quantity })}</Tag>
+            <span className={styles.pnl} data-tone={tone(pnl(stopLoss))}>{rupees(pnl(stopLoss))}</span>
+            <button type="button" className={styles.close} aria-label={t('position.removeSl')} onClick={() => onChange({ ...position, stopLoss: null, trailing: false })}>
+              <Icon icon={msClose} size={16} />
+            </button>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            iconLeft={trailing ? <Icon icon={msCheck} /> : undefined}
+            aria-pressed={trailing}
+            onClick={() => onChange({ ...position, trailing: !trailing })}
+            className={styles.exit}
+          >
+            {trailing ? t('position.trailing') : t('position.addTrail')}
+          </Button>
+        </div>
+      )}
+
+      {breakeven !== null && (
+        <button type="button" className={styles.breakeven} style={{ top: y(breakeven), right: axis }} onClick={onBreakevenInfo} aria-label={t('breakeven.chipLabel', { price: breakeven.toFixed(2) })}>
+          {t('breakeven.chip', { price: breakeven.toFixed(2) })}
+          <Icon icon={msInfo} size={12} />
+        </button>
+      )}
+    </div>
+  )
+}
+
+/** Round to the option tick (₹0.05), clear of float noise. */
+const tick = (p: number) => Math.round(Math.round(p / OPTION_TICK) * OPTION_TICK * 100) / 100
+
+const tone = (v: number) => (v > 0 ? 'up' : v < 0 ? 'down' : 'flat')
+
+/** "+₹766", "-₹468", "₹0" — whole rupees, Indian grouping, as on the live app's position pills. */
+export const rupees = (v: number) => {
+  const r = Math.round(v)
+  return `${r > 0 ? '+' : r < 0 ? '-' : ''}₹${Math.abs(r).toLocaleString('en-IN')}`
+}
+```
+
 ### `src/flows/fno/components/TradingChart.tsx`
 
 ```tsx
@@ -2147,6 +3399,14 @@ export function TradingChart({ instrument, onInstrument, onChoose, onDestination
   fill: var(--l3-surface-accent-indicator-up-default);
 }
 
+[data-tone='down'] > .lastLine {
+  stroke: var(--l3-content-accent-indicator-down-default);
+}
+
+[data-tone='down'] > .lastTag {
+  fill: var(--l3-surface-accent-indicator-down-default);
+}
+
 .lastText {
   fill: var(--l3-static-white);
   font: var(--l3-text-label-12);
@@ -2213,7 +3473,7 @@ export function TradingChart({ instrument, onInstrument, onChoose, onDestination
 ### `src/flows/fno/components/TradingPane.tsx`
 
 ```tsx
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from '@l3/components/Button'
 import type { ChartCandle } from '@l3/components/Chart'
 import { Icon } from '@l3/components/Icon'
@@ -2224,7 +3484,7 @@ import styles from './TradingPane.module.css'
 /** A line drawn over the candles (an applied indicator), one value per candle. */
 export type PaneLine = { values: number[]; tone: 'fast' | 'slow' }
 
-type TradingPaneProps = {
+export type TradingPaneProps = {
   candles: ChartCandle[]
   /** The first candle's time ("11:30") and the candle length in minutes: the time axis is worked out from them. */
   start: string
@@ -2232,7 +3492,16 @@ type TradingPaneProps = {
   /** Accessible name, e.g. "NIFTY 50, today, 5-minute candles". */
   label: string
   lines?: PaneLine[]
+  /** Prices the scale must show besides the candles (an open position's TP / SL), so their lines stay on the chart. */
+  include?: number[]
+  /** Things laid over the plot at prices (a position's lines and pills, the breakeven line), placed with `scale`. */
+  overlay?: (scale: PaneScale) => ReactNode
+  /** Empty candle slots after the last candle (room for the price to run into). Default 3. */
+  room?: number
 }
+
+/** The pane's price ↔ pixel scale, for an overlay: `y(price)` from the pane's top, `price(y)` back. */
+export type PaneScale = { y: (price: number) => number; price: (y: number) => number; plotW: number; plotH: number; axis: number }
 
 // Geometry in CSS px, measured on the live app's screenshot (392 wide).
 const AXIS = 50 // the price axis on the right, past its separator line
@@ -2240,6 +3509,7 @@ const TIME = 30 // the time axis under the plot
 const PAD_TOP = 26 // the session high sits this far under the top
 const PAD_BOTTOM = 34 // …and the low this far above the time axis
 const EMPTY_SLOTS = 3 // room after the last candle
+const MAX_BODY = 4 // candles never get wider than this, however few there are (Figma: thin candles)
 const TIME_EVERY = 10 // a time label every 10 candles (50 minutes)
 const MARKER = 18 // the high / low marker's line length
 
@@ -2249,7 +3519,7 @@ const MARKER = 18 // the high / low marker's line length
  * Drawn at the pane's real size (it fills its parent), so the text never stretches. Colours are L3 tokens.
  * L3's Chart is a fixed 360 × 200 picture without high / low markers, zoom or a timeframe — listed as an L3 gap.
  */
-export function TradingPane({ candles, start, minutes, label, lines = [] }: TradingPaneProps) {
+export function TradingPane({ candles, start, minutes, label, lines = [], include = [], overlay, room = EMPTY_SLOTS }: TradingPaneProps) {
   const box = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
   useLayoutEffect(() => {
@@ -2266,15 +3536,20 @@ export function TradingPane({ candles, start, minutes, label, lines = [] }: Trad
   const plotH = Math.max(0, size.h - TIME)
   const highs = candles.map((c) => c.high)
   const lows = candles.map((c) => c.low)
-  const hi = Math.max(...highs)
-  const lo = Math.min(...lows)
-  const slot = plotW / (candles.length + EMPTY_SLOTS)
+  const candleHi = Math.max(...highs)
+  const candleLo = Math.min(...lows)
+  const hi = Math.max(candleHi, ...include)
+  const lo = Math.min(candleLo, ...include)
+  const slot = plotW / (candles.length + room)
+  const bodyW = Math.min(slot * 0.6, MAX_BODY)
   const x = (i: number) => slot * (i + 0.5)
   const y = (v: number) => PAD_TOP + ((hi - v) / (hi - lo || 1)) * (plotH - PAD_TOP - PAD_BOTTOM)
+  const span = plotH - PAD_TOP - PAD_BOTTOM
+  const price = (py: number) => hi - ((py - PAD_TOP) / (span || 1)) * (hi - lo)
   const last = candles[candles.length - 1]
   const ticks = niceTicks(lo, hi).filter((v) => y(v) > 8 && y(v) < plotH - 8 && Math.abs(y(v) - y(last.close)) > 14)
-  const hiIndex = highs.indexOf(hi)
-  const loIndex = lows.indexOf(lo)
+  const hiIndex = highs.indexOf(candleHi)
+  const loIndex = lows.indexOf(candleLo)
   const fmt = (v: number) => v.toFixed(2)
   const times = candles.map((_, i) => i).filter((i) => (i + 1) % TIME_EVERY === 0 || i === candles.length - 1)
 
@@ -2297,7 +3572,7 @@ export function TradingPane({ candles, start, minutes, label, lines = [] }: Trad
             return (
               <g key={i} className={up ? styles.up : styles.down}>
                 <line x1={x(i)} x2={x(i)} y1={y(c.high)} y2={y(c.low)} />
-                <rect x={x(i) - slot * 0.32} y={top} width={slot * 0.64} height={body} />
+                <rect x={x(i) - bodyW / 2} y={top} width={bodyW} height={body} rx={0.5} />
               </g>
             )
           })}
@@ -2306,13 +3581,15 @@ export function TradingPane({ candles, start, minutes, label, lines = [] }: Trad
             <path key={l.tone} className={styles[l.tone]} d={l.values.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')} />
           ))}
 
-          {/* last price: a dashed line to the axis, then the tag */}
-          <line className={styles.lastLine} x1={x(candles.length - 1) + slot * 0.5} y1={y(last.close)} x2={plotW} y2={y(last.close)} />
-          <rect className={styles.lastTag} x={plotW + 1} y={y(last.close) - 8} width={AXIS} height={16} rx={2} />
-          <text className={styles.lastText} x={plotW + 3} y={y(last.close)} dominantBaseline="central">{fmt(last.close)}</text>
+          {/* last price: a dashed line to the axis, then the tag — green while the candle is up, red while it's down */}
+          <g data-tone={last.close >= last.open ? 'up' : 'down'}>
+            <line className={styles.lastLine} x1={x(candles.length - 1) + slot * 0.5} y1={y(last.close)} x2={plotW} y2={y(last.close)} />
+            <rect className={styles.lastTag} x={plotW + 1} y={y(last.close) - 8} width={AXIS} height={16} rx={2} />
+            <text className={styles.lastText} x={plotW + 3} y={y(last.close)} dominantBaseline="central">{fmt(last.close)}</text>
+          </g>
 
-          <Marker x={x(hiIndex)} y={y(hi)} value={fmt(hi)} towardRight={hiIndex < candles.length / 2} />
-          <Marker x={x(loIndex)} y={y(lo)} value={fmt(lo)} towardRight={loIndex < candles.length / 2} />
+          <Marker x={x(hiIndex)} y={y(candleHi)} value={fmt(candleHi)} towardRight={hiIndex < candles.length / 2} />
+          <Marker x={x(loIndex)} y={y(candleLo)} value={fmt(candleLo)} towardRight={loIndex < candles.length / 2} />
 
           {times.map((i) => (
             <g key={i}>
@@ -2322,6 +3599,7 @@ export function TradingPane({ candles, start, minutes, label, lines = [] }: Trad
           ))}
         </svg>
       )}
+      {size.w > 0 && overlay?.({ y, price, plotW, plotH, axis: AXIS })}
       <div className={styles.zoom} style={{ right: AXIS + 2, height: plotH }}>
         <Button variant="ghost" size="sm" iconLeft={<Icon icon={msZoomIn} />} aria-label={t('scalper.zoomIn')} className={styles.zoomButton} />
         <Button variant="ghost" size="sm" iconLeft={<Icon icon={msZoomOut} />} aria-label={t('scalper.zoomOut')} className={styles.zoomButton} />
@@ -2363,6 +3641,72 @@ function niceTicks(lo: number, hi: number) {
 
 /** "11:30" + 45 minutes → "12:15". */
 function clock(start: string, add: number) {
+  const [h, m] = start.split(':').map(Number)
+  const total = h * 60 + m + add
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+```
+
+### `src/flows/fno/components/useLiveInstrument.ts`
+
+```ts
+import { useEffect, useState } from 'react'
+import type { ChartCandle } from '@l3/components/Chart'
+import type { ScalperInstrument } from '../data'
+
+type LiveOptions = {
+  /** The price step (₹0.05 for NIFTY and its options). */
+  tick: number
+  /** A new price every this many ms. */
+  everyMs?: number
+  /** A new candle starts after this many prices (prototype: ~15 s, so the chart visibly moves; the axis keeps 5m). */
+  pricesPerCandle?: number
+}
+
+/**
+ * Makes a Scalper chart feel live (prototype): every second the last candle's close takes a small step, stretching its
+ * high / low; every `pricesPerCandle` steps a new candle opens at that close and the oldest drops off, so the window
+ * keeps its length and its time axis moves on. The steps lean back toward the sample price, so the chart stays around
+ * the design's numbers (and an open position's TP / SL stay on their sides). The header's price, change and % follow.
+ * In the real app this is the market feed.
+ */
+export function useLiveInstrument(base: ScalperInstrument, { tick, everyMs = 1000, pricesPerCandle = 15 }: LiveOptions): ScalperInstrument {
+  const [state, setState] = useState(() => ({ candles: base.candles, opened: 0, steps: 0 }))
+
+  useEffect(() => {
+    const typicalRange = base.candles.reduce((sum, c) => sum + c.high - c.low, 0) / base.candles.length
+    const id = window.setInterval(() => {
+      setState(({ candles, opened, steps }) => {
+        const last = candles[candles.length - 1]
+        const pull = (base.price - last.close) * 0.08
+        const close = snap(last.close + pull + (Math.random() - 0.5) * typicalRange * 0.12, tick)
+        const updated: ChartCandle = { ...last, close, high: Math.max(last.high, close), low: Math.min(last.low, close) }
+        if ((steps + 1) % pricesPerCandle === 0) {
+          const next: ChartCandle = { open: close, high: close, low: close, close }
+          return { candles: [...candles.slice(1, -1), updated, next], opened: opened + 1, steps: steps + 1 }
+        }
+        return { candles: [...candles.slice(0, -1), updated], opened, steps: steps + 1 }
+      })
+    }, everyMs)
+    return () => window.clearInterval(id)
+  }, [base, tick, everyMs, pricesPerCandle])
+
+  const price = state.candles[state.candles.length - 1].close
+  const previousClose = base.price - base.change
+  const change = Math.round((price - previousClose) * 100) / 100
+  return {
+    ...base,
+    candles: state.candles,
+    start: addMinutes(base.start, state.opened * base.minutes),
+    price,
+    change,
+    percent: (change / previousClose) * 100,
+  }
+}
+
+const snap = (p: number, tick: number) => Math.round(Math.round(p / tick) * tick * 100) / 100
+
+function addMinutes(start: string, add: number) {
   const [h, m] = start.split(':').map(Number)
   const total = h * 60 + m + add
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
@@ -2714,7 +4058,57 @@ function clock(start: string, add: number) {
   "order.required": "Req",
   "order.buy": "Buy",
   "order.sell": "Sell",
-  "order.placed": "{side} order placed · {name} {contract}"
+  "order.placed": "{side} order placed · {name} {contract}",
+  "position.tp": "TP Qty:{quantity}",
+  "position.sl": "SL Qty:{quantity}",
+  "position.moveTp": "Take-profit at ₹{price}. Drag or use the arrow keys to move it",
+  "position.moveSl": "Stop-loss at ₹{price}. Drag or use the arrow keys to move it",
+  "position.removeTp": "Remove take-profit",
+  "position.removeSl": "Remove stop-loss",
+  "position.exit": "Exit",
+  "position.close": "Exit position",
+  "position.livePnl": "P&L {amount}",
+  "position.addTp": "TP",
+  "position.addSl": "SL",
+  "position.addTrail": "Add Trail",
+  "position.trailing": "Trailing",
+  "breakeven.chip": "B/E {price}",
+  "breakeven.chipLabel": "Breakeven ₹{price}. How breakeven works",
+  "breakeven.title": "How breakeven works",
+  "breakeven.understand": "I understand",
+  "breakeven.playing": "Example playing",
+  "breakeven.exampleLabel": "Example",
+  "breakeven.example": "Example:",
+  "breakeven.exampleTrade": "Bought 1 lot at {price}",
+  "breakeven.introducing": "Introducing",
+  "breakeven.lineName": "Breakeven Line",
+  "breakeven.tagline": "Sell above this line and your Net P&L stays positive",
+  "breakeven.chartLabel": "Example chart: bought at ₹100, the breakeven line at ₹100.60 covers the order charges, sold at ₹102 above it for a net profit",
+  "breakeven.bought": "Bought at {price}",
+  "breakeven.sold": "Sold at {price}",
+  "breakeven.ltp": "LTP",
+  "breakeven.netProfit": "Net Profit",
+  "breakeven.charges": "Order charges",
+  "breakeven.beTag": "B/E",
+  "breakeven.info1": "See your **Breakeven price** live on your ScalpPro",
+  "breakeven.info2": "For a positive P&L after charges, always **sell above your breakeven line**",
+  "settings.title": "Chart settings",
+  "settings.autoTpSl": "Auto TP/SL",
+  "settings.applied": "Applied",
+  "settings.chartType": "Chart type",
+  "settings.type.candles": "Candles",
+  "settings.type.heikinAshi": "Heikin Ashi",
+  "settings.type.line": "Line",
+  "settings.stopLoss": "Stop Loss Preference",
+  "settings.sl.market": "At Market Price",
+  "settings.sl.limit": "At Limit Price",
+  "settings.view": "View on chart",
+  "settings.breakeven": "Breakeven line",
+  "settings.new": "New",
+  "settings.executions": "Buy/Sell executions",
+  "settings.sync": "Sync Charts",
+  "settings.cancel": "Cancel",
+  "settings.apply": "Apply"
 }
 ```
 
@@ -2820,6 +4214,92 @@ export const scalperOption: ScalperInstrument = {
 
 /** The Lemonn indicators in the chart-tools sheet (the live app's list, alphabetical). */
 export const lemonnIndicators = ['5 EMA Sell - Power Of Stocks', '5/20 EMA by AbhishekX Trades', 'ADX', 'ALMA', 'ASP by TradersPath Academy', 'ATR', 'Bollinger Band Width', 'Bollinger Bands', 'CPR', 'DEMA', 'EMA', 'Ichimoku Cloud', 'MACD', 'Nifty 5-Star Indicator by Dr. Gokul Chhabra', 'Opening Range Breakout (ORB)', 'RSI', 'Supertrend', 'VWAP']
+
+/**
+ * A position on the Scalper's option chart: bought `quantity` units at `entry` (the average price). Take-profit and
+ * stop-loss are exit prices (null = not set). `trailing`: the stop-loss follows the price up (Add Trail).
+ */
+export type ScalperPosition = {
+  entry: number
+  quantity: number
+  takeProfit: number | null
+  stopLoss: number | null
+  trailing: boolean
+}
+
+/** The sample open position (fno-35): 1 lot bought at ₹104.60 a little earlier, TP and SL set. */
+export const scalperPosition: ScalperPosition = { entry: 104.6, quantity: 65, takeProfit: 115.2, stopLoss: 96.4, trailing: false }
+
+/** A new order's TP and SL start this far from the entry (₹ per unit); the user drags them from there. */
+export const SCALPER_TP_SL_GAP = 10
+
+/**
+ * Round-trip charges for buying and later selling `quantity` options at `entry` (NSE options, Lemonn's flat brokerage).
+ * The sell side is priced at the entry too — at breakeven the sell price is only a few paise higher, so the difference
+ * is far below a paisa per unit.
+ */
+export const optionCharges = {
+  brokeragePerOrder: 20, // ₹ per executed order: one to buy, one to sell
+  stt: 0.001, // 0.1% of the sell premium
+  exchange: 0.0003503, // NSE transaction charge, 0.03503% of premium turnover (buy + sell)
+  sebi: 10 / 1e7, // ₹10 per crore of turnover
+  stamp: 0.00003, // 0.003% of the buy premium
+  gst: 0.18, // 18% on brokerage + exchange + SEBI charges
+}
+
+/** Total ₹ charges for a round trip (buy and sell) of `quantity` units at `entry`. */
+export function roundTripCharges(entry: number, quantity: number) {
+  const c = optionCharges
+  const buy = entry * quantity
+  const turnover = buy * 2
+  const brokerage = c.brokeragePerOrder * 2
+  const exchange = turnover * c.exchange
+  const sebi = turnover * c.sebi
+  return brokerage + exchange + sebi + buy * c.stt + buy * c.stamp + (brokerage + exchange + sebi) * c.gst
+}
+
+/**
+ * Breakeven: the sell price at which the Net P&L (after every charge) is zero — the entry plus the charges spread over
+ * every unit, rounded up to the option tick (₹0.05) so selling at it never ends in a loss.
+ */
+export function breakevenPrice(entry: number, quantity: number) {
+  const exact = entry + roundTripCharges(entry, quantity) / quantity
+  return Math.round(Math.ceil(exact / OPTION_TICK - 1e-9) * OPTION_TICK * 100) / 100
+}
+
+/**
+ * How breakeven works — the example trade its explainer plays (the recorded Figma explainer): 1 lot bought at ₹100,
+ * breakeven ₹100.60 after charges, sold at ₹102. `path` is the price line: where each turn sits across the plot (0 = its
+ * left edge, 1 = its right) and the price there; it crosses the breakeven line at its 3rd point.
+ */
+export const breakevenExample = {
+  entry: 100,
+  breakeven: 100.6,
+  exit: 102,
+  axis: [103, 102, 101, 100],
+  path: [
+    { at: 0.029, price: 100 },
+    { at: 0.239, price: 100.2 },
+    { at: 0.407, price: 100.6 },
+    { at: 0.608, price: 101.1 },
+    { at: 0.86, price: 102 },
+  ],
+}
+
+/** Options trade in steps of ₹0.05. */
+export const OPTION_TICK = 0.05
+
+/** The chart's display settings (chart-tools sheet → Settings). */
+export type ChartType = 'candles' | 'heikinAshi' | 'line'
+export type StopLossPreference = 'market' | 'limit'
+export type ChartSettings = {
+  chartType: ChartType
+  stopLoss: StopLossPreference
+  breakevenLine: boolean
+  executions: boolean
+  syncCharts: boolean
+}
+export const defaultChartSettings: ChartSettings = { chartType: 'candles', stopLoss: 'market', breakevenLine: true, executions: true, syncCharts: false }
 ```
 
 ### `src/flows/fno/index.tsx`
@@ -2833,6 +4313,7 @@ import { goldMiniAsset, illiquidAsset } from './commodities/data'
 import { OptionChain } from './option-chain/screens/OptionChain'
 import { OrderPad } from './order-pad/screens/OrderPad'
 import type { Segment } from './strategies/data'
+import { scalperPosition } from './data'
 import { Scalper } from './screens/Scalper'
 import { SplashScreen } from '../../shared/ui/Splash'
 
@@ -2860,6 +4341,9 @@ export const fno: Flow = {
     { id: 'fno-05', name: 'Scalper', figma: '', note: 'From ScalpPro on F&O home or the Scalper bottom-nav tab. The chart-tools sheet groups personal DASH AI indicators separately from Lemon indicators.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
+    { id: 'fno-35', group: 'scalper', name: 'Scalper · position + breakeven line', figma: '11756:78739', badge: 'new', note: 'Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “B/E 105.55 ⓘ” chip flush to the price axis (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} /> },
+    { id: 'fno-36', group: 'scalper', name: 'How breakeven works', figma: '11783:5569', badge: 'new', note: 'Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 12 s explainer copied from the designer’s recording: on a white chart the buy at ₹100, the dashed B/E line at ₹100.60 and the orange charges zone come in, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (6.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11).', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="breakeven" /> },
+    { id: 'fno-37', group: 'scalper', name: 'Chart tools · Settings', figma: '11754:69563', badge: 'new', note: 'The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="settings" openIndicators={false} /> },
     { id: 'fno-08', group: 'home', name: 'Commodities home', figma: '6754:63637', tab: true, note: 'The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals.', render: (go) => home(go, undefined, { product: 'commodities' }) },
     { id: 'fno-09', group: 'home', name: 'Commodities · heatmap & Smart Futures', figma: '6754:63637', tab: true, note: 'The same long screen, scrolled to the Futures Heatmap.', render: (go) => home(go, 'heatmap', { product: 'commodities' }) },
     { id: 'fno-10', group: 'home', name: 'Contract picker · Commodities', figma: '6754:65111', tab: true, note: 'From the chart’s “Gold ⇕”. Equity / Commodities tabs in the sheet header’s bottom slot, commodity chips (All, Gold, Silver …) under them; contracts grouped by commodity as radio rows (Gold Mini tagged “Lowest Margin”). Picking one updates the chart and closes the sheet.', render: (go) => home(go, undefined, { product: 'commodities', picker: 'commodities' }) },
@@ -3960,6 +5444,12 @@ export function Home({ product = 'equity', segment = 'equity', picker, onProduct
 .sheet.sheet.sheet {
   box-shadow: var(--l3-shadow-elevation-high);
 }
+
+/* An open position (fno-35): the option pane takes 3 parts of the height to the spot pane's 2, so the TP, entry and
+   SL pills clear each other (Figma C). */
+.panel[data-tall] {
+  flex: 1.5;
+}
 ```
 
 ### `src/flows/fno/screens/Scalper.tsx`
@@ -3967,6 +5457,7 @@ export function Home({ product = 'equity', segment = 'equity', picker, onProduct
 ```tsx
 import { useMemo, useState } from 'react'
 import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
 import type { ChartCandle } from '@l3/components/Chart'
 import { Icon } from '@l3/components/Icon'
 import { Stack } from '@l3/components/Stack'
@@ -3975,10 +5466,13 @@ import { Tabs } from '@l3/components/Tabs'
 import { msAdd, msArrowBack, msArrowDropUp, msJoin, msLink, msMonitoring, msPlaylistAdd, msReceiptLong, msKeyboardArrowDown, msRefresh, msSwapHoriz, msUnfoldMore } from '@l3/icons/material'
 import { Screen } from '../../../shared/ui/Screen'
 import { Sheet } from '../../../shared/ui/Sheet'
-import { TradingPane, type PaneLine } from '../components/TradingPane'
+import { PositionOverlay } from '../components/PositionOverlay'
+import { TradingPane, type PaneLine, type TradingPaneProps } from '../components/TradingPane'
+import { useLiveInstrument } from '../components/useLiveInstrument'
 import { t } from '../copy'
-import { scalperOption, scalperSpot, type ScalperInstrument } from '../data'
-import { ChartToolsSheet } from '../sheets/ChartToolsSheet'
+import { breakevenPrice, defaultChartSettings, OPTION_TICK, SCALPER_TP_SL_GAP, scalperOption, scalperSpot, type ChartSettings, type ScalperInstrument, type ScalperPosition } from '../data'
+import { BreakevenSheet } from '../sheets/BreakevenSheet'
+import { ChartToolsSheet, type ToolsSection } from '../sheets/ChartToolsSheet'
 import styles from './Scalper.module.css'
 
 type ScalperProps = {
@@ -3991,6 +5485,10 @@ type ScalperProps = {
   initialIndicator?: string
   onCreateIndicator?: () => void
   onApplyIndicator?: (name: string) => void
+  /** An open position on the option chart (TP / SL pills, the breakeven line). Default: none — Buy opens one. */
+  initialPosition?: ScalperPosition
+  /** Open with How breakeven works up, or the chart-tools sheet on Settings. */
+  initialSheet?: 'breakeven' | 'settings'
 }
 
 const LOT = 65
@@ -4003,14 +5501,55 @@ const LOT = 65
  * - the order dock: Market / Limit-Trigger, Buy at Mkt · quantity in lots · Sell at Mkt, the margin each needs.
  * The spot pane's "add" button opens the chart-tools sheet (indicators). Prices are sample data.
  */
-export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator }: ScalperProps) {
-  const [sheetOpen, setSheetOpen] = useState(openIndicators ?? Boolean(createdIndicator))
+export function Scalper({ onBack, createdIndicator, openIndicators, initialIndicator, onCreateIndicator, onApplyIndicator, initialPosition, initialSheet }: ScalperProps) {
+  const [sheetOpen, setSheetOpen] = useState(initialSheet === 'settings' || (openIndicators ?? Boolean(createdIndicator)))
+  const [toolsSection, setToolsSection] = useState<ToolsSection>(initialSheet === 'settings' ? 'settings' : 'indicators')
+  /** The chart's settings, and the copy being edited in the sheet's Settings (Apply keeps it, Cancel drops it). */
+  const [settings, setSettings] = useState<ChartSettings>(defaultChartSettings)
+  const [draft, setDraft] = useState<ChartSettings>(defaultChartSettings)
+  const [position, setPosition] = useState<ScalperPosition | null>(initialPosition ?? null)
+  /** The option chart's scale takes in the TP / SL as they were set when the position opened (not while one is being
+   * dragged — the scale would run away with it; dragging stays inside the chart). */
+  const [scaleFor, setScaleFor] = useState<number[]>(() => tpSl(initialPosition))
+  const [breakevenOpen, setBreakevenOpen] = useState(initialSheet === 'breakeven')
   /** Indicators on the NIFTY 50 chart (the sheet adds and removes them, several at once). */
   // An indicator saved with DASH is applied straight away (and a favourite in the sheet), so it's already on the chart.
   const [applied, setApplied] = useState<string[]>(() => [...new Set([initialIndicator, createdIndicator].filter((n): n is string => Boolean(n)))])
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
   const [quantity, setQuantity] = useState(LOT)
-  const overlay = useMemo<PaneLine[]>(() => (applied.length ? [{ values: ema(scalperSpot.candles, 9), tone: 'fast' }, { values: ema(scalperSpot.candles, 21), tone: 'slow' }] : []), [applied.length])
+  /** Both charts tick (prototype: a random walk around the sample prices; the real app's market feed). */
+  const spot = useLiveInstrument(scalperSpot, { tick: OPTION_TICK })
+  const option = useLiveInstrument(scalperOption, { tick: OPTION_TICK })
+  const last = option.price
+  const breakeven = position ? breakevenPrice(position.entry, position.quantity) : null
+
+  /** Buy at Mkt: opens a position at the last price with a TP and SL 10 either side (or adds to the open one, averaging
+   * the entry). The first buy ever opens How breakeven works. */
+  const buy = () => {
+    if (position) {
+      setPosition({ ...position, entry: round2((position.entry * position.quantity + last * quantity) / (position.quantity + quantity)), quantity: position.quantity + quantity })
+    } else {
+      const opened = { entry: last, quantity, takeProfit: round2(last + SCALPER_TP_SL_GAP), stopLoss: round2(last - SCALPER_TP_SL_GAP), trailing: false }
+      setPosition(opened)
+      setScaleFor(tpSl(opened))
+    }
+    if (!breakevenIntroSeen()) {
+      markBreakevenIntroSeen()
+      setBreakevenOpen(true)
+    }
+  }
+  /** Sell at Mkt: sells the dock's quantity from the open position (all of it closes the position). */
+  const sell = () => setPosition((p) => (p && p.quantity > quantity ? { ...p, quantity: p.quantity - quantity } : null))
+  const closeTools = () => {
+    setSheetOpen(false)
+    setDraft(settings)
+  }
+  const openTools = () => {
+    setDraft(settings)
+    setSheetOpen(true)
+  }
+
+  const overlay = useMemo<PaneLine[]>(() => (applied.length ? [{ values: ema(spot.candles, 9), tone: 'fast' }, { values: ema(spot.candles, 21), tone: 'slow' }] : []), [applied.length, spot.candles])
 
   return (
     <Screen
@@ -4054,7 +5593,7 @@ export function Scalper({ onBack, createdIndicator, openIndicators, initialIndic
           />
           <div className={styles.order}>
             <div className={styles.side}>
-              <Button variant="brand" size="md" fullWidth className={styles.buy}>{t('scalper.buy')}</Button>
+              <Button variant="brand" size="md" fullWidth className={styles.buy} onClick={buy}>{t('scalper.buy')}</Button>
               <span className={styles.req}>{t('scalper.required', { amount: '₹7,059.75' })}</span>
             </div>
             <div className={styles.qty}>
@@ -4062,16 +5601,43 @@ export function Scalper({ onBack, createdIndicator, openIndicators, initialIndic
               <span className={styles.funds}>{t('scalper.funds', { amount: '₹-39.96' })}</span>
             </div>
             <div className={styles.side}>
-              <Button variant="secondary" size="md" fullWidth className={styles.sell}>{t('scalper.sell')}</Button>
+              <Button variant="secondary" size="md" fullWidth className={styles.sell} onClick={sell}>{t('scalper.sell')}</Button>
               <span className={styles.req}>{t('scalper.required', { amount: '₹1,57,436.49' })}</span>
             </div>
           </div>
         </div>
       }
       sheet={
-        sheetOpen && (
-          <Sheet label={t('scalper.chartTools')} onClose={() => setSheetOpen(false)} className={styles.sheet}>
+        breakevenOpen ? (
+          <BreakevenSheet onClose={() => setBreakevenOpen(false)} />
+        ) : sheetOpen && (
+          <Sheet
+            label={t('scalper.chartTools')}
+            onClose={closeTools}
+            className={styles.sheet}
+            footer={
+              toolsSection === 'settings' ? (
+                <ButtonGroup aria-label={t('settings.title')} direction="horizontal">
+                  <Button variant="secondary" onClick={closeTools}>{t('settings.cancel')}</Button>
+                  <Button
+                    variant="brand"
+                    onClick={() => {
+                      setSettings(draft)
+                      setSheetOpen(false)
+                    }}
+                  >
+                    {t('settings.apply')}
+                  </Button>
+                </ButtonGroup>
+              ) : undefined
+            }
+          >
             <ChartToolsSheet
+              section={toolsSection}
+              onSectionChange={setToolsSection}
+              settings={draft}
+              onSettingsChange={setDraft}
+              onBreakevenInfo={() => setBreakevenOpen(true)}
               yourIndicators={createdIndicator ? [createdIndicator] : []}
               applied={applied}
               guide={Boolean(createdIndicator) && openIndicators !== false}
@@ -4087,20 +5653,42 @@ export function Scalper({ onBack, createdIndicator, openIndicators, initialIndic
         )
       }
     >
-      <ChartPanel instrument={scalperSpot} lines={overlay} applied={applied.length} onTools={() => setSheetOpen(true)} />
+      <ChartPanel instrument={spot} lines={overlay} applied={applied.length} onTools={openTools} />
       <div className={styles.split}>
         <button type="button" className={styles.handle} aria-label={t('scalper.resize')} />
       </div>
-      <ChartPanel instrument={scalperOption} refresh onTools={() => setSheetOpen(true)} />
+      <ChartPanel
+        instrument={position ? { ...option, ...recent(option, POSITION_CANDLES) } : option}
+        room={position ? POSITION_ROOM : undefined}
+        include={position ? scaleFor : undefined}
+        tall={Boolean(position)}
+        refresh
+        onTools={openTools}
+        overlay={
+          position
+            ? (scale) => (
+                <PositionOverlay
+                  scale={scale}
+                  position={position}
+                  last={last}
+                  breakeven={settings.breakevenLine ? breakeven : null}
+                  onChange={setPosition}
+                  onExit={() => setPosition(null)}
+                  onBreakevenInfo={() => setBreakevenOpen(true)}
+                />
+              )
+            : undefined
+        }
+      />
     </Screen>
   )
 }
 
 /** One chart pane: the instrument (name ⇅, segment ⇅, link), its price and change, the pane's buttons, the chart. */
-function ChartPanel({ instrument, lines, applied = 0, refresh, onTools }: { instrument: ScalperInstrument; lines?: PaneLine[]; /** Indicators on this chart: "N ▾" at its top-left (opens the sheet). */ applied?: number; /** The live app's reset button, bottom centre of the option chart. */ refresh?: boolean; onTools: () => void }) {
+function ChartPanel({ instrument, lines, applied = 0, refresh, onTools, overlay, include, room, tall }: { instrument: ScalperInstrument; lines?: PaneLine[]; overlay?: TradingPaneProps['overlay']; include?: number[]; room?: number; /** With a position open the option pane takes more of the height, so its pills have room (Figma C). */ tall?: boolean; /** Indicators on this chart: "N ▾" at its top-left (opens the sheet). */ applied?: number; /** The live app's reset button, bottom centre of the option chart. */ refresh?: boolean; onTools: () => void }) {
   const { name, segment, side, price, change, percent } = instrument
   return (
-    <section className={styles.panel} aria-label={name}>
+    <section className={styles.panel} data-tall={tall || undefined} aria-label={name}>
       <div className={styles.panelHead}>
         <div className={styles.instrument}>
           <div className={styles.nameRow}>
@@ -4130,7 +5718,7 @@ function ChartPanel({ instrument, lines, applied = 0, refresh, onTools }: { inst
         </Stack>
       </div>
       <div className={styles.chart}>
-        <TradingPane candles={instrument.candles} start={instrument.start} minutes={instrument.minutes} lines={lines} label={t('scalper.chartLabel', { name })} />
+        <TradingPane candles={instrument.candles} start={instrument.start} minutes={instrument.minutes} lines={lines} include={include} room={room} overlay={overlay} label={t('scalper.chartLabel', { name })} />
         {applied > 0 && (
           <Button variant="ghost" size="sm" iconRight={<Icon icon={msKeyboardArrowDown} />} aria-label={t('scalper.indicatorCount', { count: applied })} onClick={onTools} className={styles.indicatorCount}>
             {applied}
@@ -4148,6 +5736,318 @@ const inr = (v: number) => v.toLocaleString('en-IN', { minimumFractionDigits: 2,
 function ema(candles: ChartCandle[], period: number) {
   const k = 2 / (period + 1)
   return candles.reduce<number[]>((out, c, i) => [...out, i ? c.close * k + out[i - 1] * (1 - k) : c.close], [])
+}
+
+/** With a position open, the option chart shows the candles since the 13:55 spike (its last 19), thin, with room after
+ * them for the price to run into (Figma C: the candles stop about three quarters across). */
+const POSITION_CANDLES = 19
+const POSITION_ROOM = 8
+function recent(instrument: ScalperInstrument, count: number) {
+  const skip = Math.max(0, instrument.candles.length - count)
+  const [h, m] = instrument.start.split(':').map(Number)
+  const total = h * 60 + m + skip * instrument.minutes
+  return { candles: instrument.candles.slice(skip), start: `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}` }
+}
+
+const tpSl = (p?: ScalperPosition | null) => (p ? [p.takeProfit, p.stopLoss].filter((v): v is number => v !== null) : [])
+
+const round2 = (v: number) => Math.round(v * 100) / 100
+
+/** How breakeven works opens by itself on the first buy only (prototype: once per browser). */
+const BREAKEVEN_INTRO_KEY = 'fno.breakevenIntroSeen'
+function breakevenIntroSeen() {
+  try { return localStorage.getItem(BREAKEVEN_INTRO_KEY) === '1' } catch { return false }
+}
+function markBreakevenIntroSeen() {
+  try { localStorage.setItem(BREAKEVEN_INTRO_KEY, '1') } catch { /* storage off: it may show again next time */ }
+}
+```
+
+### `src/flows/fno/sheets/BreakevenSheet.module.css`
+
+```css
+/* How breakeven works (Figma 11783:5569). L3 tokens; the explainer's timings are local tokens (src/local-tokens.css). */
+
+/* The example card: 1px light edge, radius 12, a header line then the stage. */
+.example {
+  overflow: hidden;
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-12);
+}
+
+.exampleHead {
+  margin: 0;
+  padding: var(--l3-spacing-12) var(--l3-spacing-16);
+  border-bottom: 1px solid var(--l3-border-light);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-12);
+}
+
+.exampleTag {
+  color: var(--l3-content-secondary);
+}
+
+/* ---- Info rows ---- */
+.infoIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--l3-size-20);
+  height: var(--l3-size-20);
+}
+
+.infoText {
+  margin: 0;
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-12);
+}
+
+.infoText strong {
+  color: var(--l3-content-primary);
+  font-weight: var(--l3-text-heading-12-weight);
+}
+
+/* ---- "I understand" with its loader (Figma 11783:12460): a 4 track across the button's top edge fills while the
+   example chart plays once (6.3 s), then the button unlocks (BreakevenSheet listens for the fill's animationend). ---- */
+.loader {
+  position: relative;
+  display: grid;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--l3-radius-12);
+}
+
+.track {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--l3-spacing-04);
+  background: var(--l3-surface-tertiary);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--l3-surface-inverted);
+  transform-origin: left;
+  animation: fill var(--app-be-explainer) linear both;
+}
+
+@keyframes fill {
+  from {
+    scale: 0 1;
+  }
+}
+```
+
+### `src/flows/fno/sheets/BreakevenSheet.tsx`
+
+```tsx
+import { Fragment, useId, useState } from 'react'
+import { BottomSheetHeader } from '@l3/components/BottomSheet'
+import { Button } from '@l3/components/Button'
+import { ButtonGroup } from '@l3/components/ButtonGroup'
+import { Stack } from '@l3/components/Stack'
+import { Sheet } from '../../../shared/ui/Sheet'
+import { BreakevenExplainer } from '../components/BreakevenExplainer'
+import { BreakevenIcon } from '../components/BreakevenIcon'
+import { t } from '../copy'
+import styles from './BreakevenSheet.module.css'
+
+/**
+ * How breakeven works (Figma 11783:5569, dark 11783:6220) — opens the first time the user buys on the Scalper, and from
+ * the ⓘ on the chart's breakeven chip.
+ * - The example card ("Example: Bought 1 lot at ₹100") plays the explainer on a loop (BreakevenExplainer — copied from
+ *   the designer's recording: the chart builds up to a sell above the breakeven line, then the Breakeven Line intro).
+ * - "I understand" is locked while it plays (Figma's button variants 11783:12460: a loader line fills along the
+ *   button's top edge, then the button turns primary) until the chart has played once (6.3 s). Reduced motion: the
+ *   finished chart, the button ready.
+ */
+export function BreakevenSheet({ onClose }: { onClose: () => void }) {
+  const headingId = useId()
+  const [still] = useState(prefersReducedMotion)
+  const [ready, setReady] = useState(still)
+
+  return (
+    <Sheet
+      labelledBy={headingId}
+      onClose={onClose}
+      header={<BottomSheetHeader size="sm" headingId={headingId} heading={t('breakeven.title')} />}
+      footer={
+        <ButtonGroup aria-label={t('breakeven.title')}>
+          <div className={styles.loader}>
+            <Button fullWidth disabled={!ready} onClick={onClose}>{t('breakeven.understand')}</Button>
+            {!ready && (
+              <span className={styles.track} role="progressbar" aria-label={t('breakeven.playing')}>
+                <span className={styles.fill} onAnimationEnd={() => setReady(true)} />
+              </span>
+            )}
+          </div>
+        </ButtonGroup>
+      }
+    >
+      <Stack gap="24">
+        <section className={styles.example} aria-label={t('breakeven.exampleLabel')}>
+          <p className={styles.exampleHead}>
+            <span className={styles.exampleTag}>{t('breakeven.example')}</span> {t('breakeven.exampleTrade', { price: '₹100' })}
+          </p>
+          <BreakevenExplainer still={still} />
+        </section>
+        <Stack gap="12">
+          <InfoRow icon={<BreakevenIcon variant="line" />} text={t('breakeven.info1')} />
+          <InfoRow icon={<BreakevenIcon variant="up" />} text={t('breakeven.info2')} />
+        </Stack>
+      </Stack>
+    </Sheet>
+  )
+}
+
+/** A line of the explainer: a 20 icon and text with **bold** parts. */
+function InfoRow({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <Stack direction="horizontal" gap="12" align="start">
+      <span className={styles.infoIcon}>{icon}</span>
+      <p className={styles.infoText}>
+        {text.split('**').map((part, k) => (k % 2 ? <strong key={k}>{part}</strong> : <Fragment key={k}>{part}</Fragment>))}
+      </p>
+    </Stack>
+  )
+}
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+}
+```
+
+### `src/flows/fno/sheets/ChartSettingsPanel.tsx`
+
+```tsx
+import { Card } from '@l3/components/Card'
+import { Checkbox, Radio } from '@l3/components/Checkbox'
+import { Grid } from '@l3/components/Grid'
+import { Icon } from '@l3/components/Icon'
+import { ListCell } from '@l3/components/ListCell'
+import { Stack } from '@l3/components/Stack'
+import { Tag } from '@l3/components/Tag'
+import { msBarChart, msCandlestickChart, msChevronRight, msInfo, msShowChart } from '@l3/icons/material'
+import { AutoTpSlIcon } from '../components/AutoTpSlIcon'
+import { t } from '../copy'
+import type { ChartSettings, ChartType, StopLossPreference } from '../data'
+import styles from './ChartToolsSheet.module.css'
+
+type ChartSettingsPanelProps = {
+  /** The settings as edited in the sheet (a draft: Apply keeps them, Cancel drops them). */
+  value: ChartSettings
+  onChange: (value: ChartSettings) => void
+  /** The ⓘ after Breakeven line: How breakeven works. */
+  onBreakevenInfo: () => void
+}
+
+const chartTypes: { value: ChartType; icon: typeof msShowChart }[] = [
+  { value: 'candles', icon: msCandlestickChart },
+  { value: 'heikinAshi', icon: msBarChart },
+  { value: 'line', icon: msShowChart },
+]
+
+const stopLossOptions: StopLossPreference[] = ['market', 'limit']
+
+/**
+ * Chart tools → Settings (Figma 11754:69563, dark 11783:9335):
+ * - Auto TP/SL: a card row with the animated mark, "Applied" (blue tag) and a chevron;
+ * - Chart type: three cards — Candles, Heikin Ashi, Line — one selected (blue);
+ * - Stop Loss Preference: At Market Price / At Limit Price (radio cards);
+ * - View on chart: Breakeven line ⓘ (New), Buy/Sell executions, Sync Charts (checkbox cards).
+ * Changes are a draft until Apply in the sheet's dock (Cancel leaves the chart as it was).
+ */
+export function ChartSettingsPanel({ value, onChange, onBreakevenInfo }: ChartSettingsPanelProps) {
+  const set = <K extends keyof ChartSettings>(key: K, v: ChartSettings[K]) => onChange({ ...value, [key]: v })
+  const views = [
+    { key: 'breakevenLine', label: t('settings.breakeven'), info: true, isNew: true },
+    { key: 'executions', label: t('settings.executions') },
+    { key: 'syncCharts', label: t('settings.sync') },
+  ] as const
+
+  return (
+    <Stack gap="24">
+      <ListCell
+        variant="card"
+        size="sm"
+        as="button"
+        iconLeft={<AutoTpSlIcon />}
+        label={t('settings.autoTpSl')}
+        trailing={<Tag variant="secondary" color="discover" size="sm">{t('settings.applied')}</Tag>}
+        iconRight={<Icon icon={msChevronRight} />}
+        onClick={() => {}}
+        className={styles.row}
+      />
+
+      <Stack as="section" gap="12" aria-labelledby="settings-chart-type">
+        <h3 id="settings-chart-type" className={styles.subTitle}>{t('settings.chartType')}</h3>
+        <Grid columns={3} gap="08">
+          {chartTypes.map((type) => (
+            <Card key={type.value} selected={value.chartType === type.value} onClick={() => set('chartType', type.value)} aria-label={t(`settings.type.${type.value}`)} className={styles.typeCard}>
+              <Stack gap="04" align="center">
+                <Icon icon={type.icon} size={20} />
+                <span className={styles.typeLabel}>{t(`settings.type.${type.value}`)}</span>
+              </Stack>
+            </Card>
+          ))}
+        </Grid>
+      </Stack>
+
+      <Stack as="section" gap="12" aria-labelledby="settings-sl">
+        <h3 id="settings-sl" className={styles.subTitle}>{t('settings.stopLoss')}</h3>
+        <Stack gap="08" role="radiogroup" aria-labelledby="settings-sl">
+          {stopLossOptions.map((option) => (
+            <ListCell
+              key={option}
+              variant="card"
+              size="sm"
+              as="label"
+              label={t(`settings.sl.${option}`)}
+              selected={value.stopLoss === option}
+              trailing={<Radio name="chart-sl-preference" checked={value.stopLoss === option} onChange={() => set('stopLoss', option)} />}
+              className={styles.row}
+            />
+          ))}
+        </Stack>
+      </Stack>
+
+      <Stack as="section" gap="12" aria-labelledby="settings-view">
+        <h3 id="settings-view" className={styles.subTitle}>{t('settings.view')}</h3>
+        <Stack gap="08">
+          {views.map((view) => (
+            <ListCell
+              key={view.key}
+              variant="card"
+              size="sm"
+              as="label"
+              label={
+                'info' in view ? (
+                  <span className={styles.settingLabel}>
+                    {view.label}
+                    <button
+                      type="button"
+                      className={styles.infoButton}
+                      aria-label={t('breakeven.title')}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onBreakevenInfo()
+                      }}
+                    >
+                      <Icon icon={msInfo} size={16} />
+                    </button>
+                    <Tag variant="primary" color="success" size="sm">{t('settings.new')}</Tag>
+                  </span>
+                ) : view.label
+              }
+              trailing={<Checkbox checked={value[view.key]} onChange={(e) => set(view.key, e.target.checked)} aria-label={view.label} />}
+              className={styles.row}
+            />
+          ))}
+        </Stack>
+      </Stack>
+    </Stack>
+  )
 }
 ```
 
@@ -4371,6 +6271,49 @@ function ema(candles: ChartCandle[], period: number) {
     animation: none;
   }
 }
+
+/* ---- Settings (Figma 11754:69563) ---- */
+
+/* Chart type: three small cards, icon over label; the chosen one is L3's selected card in the discover tint (Figma). */
+.typeCard.typeCard {
+  padding: var(--l3-spacing-12) var(--l3-spacing-04);
+  border-radius: var(--l3-radius-08);
+  color: var(--l3-content-primary);
+}
+
+.typeCard.typeCard[data-selected],
+.typeCard.typeCard[aria-pressed='true'] {
+  background: var(--l3-surface-accent-discover-light);
+  box-shadow: inset 0 0 0 1px var(--l3-border-accent-discover-default); /* 1px: Figma stroke weight has no variable */
+  color: var(--l3-content-accent-discover-default);
+}
+
+.typeLabel {
+  font: var(--l3-text-label-12);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* "Breakeven line ⓘ New": the label, a tappable ⓘ (How breakeven works) and the New tag on one line. */
+.settingLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+}
+
+.infoButton {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--l3-content-secondary);
+  cursor: pointer;
+}
+
+.settingLabel > :last-child {
+  margin-left: var(--l3-spacing-04);
+}
 ```
 
 ### `src/flows/fno/sheets/ChartToolsSheet.tsx`
@@ -4387,11 +6330,12 @@ import { TextField } from '@l3/components/TextField'
 import { Tooltip } from '@l3/components/Tooltip'
 import { msAdd, msBookmarkFill, msClose, msDelete, msDraw, msFunction, msSearch, msSettings, msSpaceBar, msStar, msStarFill, msSwapHoriz } from '@l3/icons/material'
 import { t } from '../copy'
-import { lemonnIndicators } from '../data'
+import { lemonnIndicators, type ChartSettings } from '../data'
+import { ChartSettingsPanel } from './ChartSettingsPanel'
 import { IndicatorDetailsSheet } from './IndicatorDetailsSheet'
 import styles from './ChartToolsSheet.module.css'
 
-type Section = 'range' | 'zing' | 'indicators' | 'drawings' | 'templates' | 'settings'
+export type ToolsSection = 'range' | 'zing' | 'indicators' | 'drawings' | 'templates' | 'settings'
 
 type ChartToolsSheetProps = {
   /** Indicators the user made with DASH AI (Your indicators). */
@@ -4408,6 +6352,13 @@ type ChartToolsSheetProps = {
    * one-line tooltip above it and a ✕. ✕ (or picking one) ends it. Shown once only.
    */
   guide?: boolean
+  /** The open group, when the screen keeps it (Settings brings a Cancel / Apply dock to the sheet). Default: Indicators. */
+  section?: ToolsSection
+  onSectionChange?: (section: ToolsSection) => void
+  /** Settings: the draft being edited, its change, and the ⓘ after Breakeven line. */
+  settings?: ChartSettings
+  onSettingsChange?: (settings: ChartSettings) => void
+  onBreakevenInfo?: () => void
 }
 
 /**
@@ -4420,8 +6371,13 @@ type ChartToolsSheetProps = {
  * Your indicators ("Made with DASH AI" under the heading; or "No indicators created yet.") and Create indicator sit above
  * Lemonn indicators. An indicator made with DASH is a favourite from the start (filled star).
  */
-export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll, onCreateIndicator, guide = false }: ChartToolsSheetProps) {
-  const [section, setSection] = useState<Section>('indicators')
+export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll, onCreateIndicator, guide = false, settings, onSettingsChange, onBreakevenInfo, ...props }: ChartToolsSheetProps) {
+  const [ownSection, setOwnSection] = useState<ToolsSection>('indicators')
+  const section = props.section ?? ownSection
+  const setSection = (next: ToolsSection) => {
+    setOwnSection(next)
+    props.onSectionChange?.(next)
+  }
   const [guiding, setGuiding] = useState(() => guide && !guideSeen())
   // Shown once: as soon as it's up, it's remembered (prototype: in this browser).
   useEffect(() => { if (guiding) markGuideSeen() }, [guiding])
@@ -4497,7 +6453,7 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
   return (
     <div ref={root} className={styles.body} data-search={searching || undefined}>
       {guiding && <div className={styles.dim} aria-hidden="true" />}
-      <SideNav<Section>
+      <SideNav<ToolsSection>
         selectedTone="discover"
         aria-label={t('scalper.chartTools')}
         aria-controls="chart-tools-panel"
@@ -4545,7 +6501,9 @@ export function ChartToolsSheet({ yourIndicators, applied, onToggle, onClearAll,
         )}
         </div>
 
-        {section !== 'indicators' ? (
+        {section === 'settings' && settings && onSettingsChange ? (
+          <ChartSettingsPanel value={settings} onChange={onSettingsChange} onBreakevenInfo={() => onBreakevenInfo?.()} />
+        ) : section !== 'indicators' ? (
           <p className={styles.empty}>{t('tools.soon')}</p>
         ) : searching ? (
           results.length ? <Stack gap="12">{results.map((name) => row(name, undefined, true))}</Stack> : <p className={styles.empty}>{t('tools.noResults', { query })}</p>

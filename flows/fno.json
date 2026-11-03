@@ -88,6 +88,39 @@
       "figmaUrl": ""
     },
     {
+      "id": "fno-35",
+      "name": "Scalper · position + breakeven line",
+      "figma": "11756:78739",
+      "note": "Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “B/E 105.55 ⓘ” chip flush to the price axis (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large.",
+      "goesTo": [
+        "fno-01",
+        "dash-20"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11756-78739"
+    },
+    {
+      "id": "fno-36",
+      "name": "How breakeven works",
+      "figma": "11783:5569",
+      "note": "Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 12 s explainer copied from the designer’s recording: on a white chart the buy at ₹100, the dashed B/E line at ₹100.60 and the orange charges zone come in, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (6.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11).",
+      "goesTo": [
+        "fno-01",
+        "dash-20"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11783-5569"
+    },
+    {
+      "id": "fno-37",
+      "name": "Chart tools · Settings",
+      "figma": "11754:69563",
+      "note": "The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here.",
+      "goesTo": [
+        "fno-01",
+        "dash-20"
+      ],
+      "figmaUrl": "https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11754-69563"
+    },
+    {
       "id": "fno-08",
       "name": "Commodities home",
       "figma": "6754:63637",
@@ -363,6 +396,12 @@
     "src/flows/fno/commodities/sheets/ContractPickerSheet.tsx",
     "src/flows/fno/commodities/sheets/ContractSheet.module.css",
     "src/flows/fno/commodities/sheets/ContractSheet.tsx",
+    "src/flows/fno/components/AutoTpSlIcon.module.css",
+    "src/flows/fno/components/AutoTpSlIcon.tsx",
+    "src/flows/fno/components/BreakevenExplainer.module.css",
+    "src/flows/fno/components/BreakevenExplainer.tsx",
+    "src/flows/fno/components/BreakevenIcon.module.css",
+    "src/flows/fno/components/BreakevenIcon.tsx",
     "src/flows/fno/components/ContractSection.tsx",
     "src/flows/fno/components/Discovery.tsx",
     "src/flows/fno/components/FnoNav.tsx",
@@ -371,9 +410,12 @@
     "src/flows/fno/components/Heatmap.tsx",
     "src/flows/fno/components/HomeParts.module.css",
     "src/flows/fno/components/Overview.tsx",
+    "src/flows/fno/components/PositionOverlay.module.css",
+    "src/flows/fno/components/PositionOverlay.tsx",
     "src/flows/fno/components/TradingChart.tsx",
     "src/flows/fno/components/TradingPane.module.css",
     "src/flows/fno/components/TradingPane.tsx",
+    "src/flows/fno/components/useLiveInstrument.ts",
     "src/flows/fno/copy.json",
     "src/flows/fno/copy.ts",
     "src/flows/fno/data.ts",
@@ -389,6 +431,9 @@
     "src/flows/fno/screens/Home.tsx",
     "src/flows/fno/screens/Scalper.module.css",
     "src/flows/fno/screens/Scalper.tsx",
+    "src/flows/fno/sheets/BreakevenSheet.module.css",
+    "src/flows/fno/sheets/BreakevenSheet.tsx",
+    "src/flows/fno/sheets/ChartSettingsPanel.tsx",
     "src/flows/fno/sheets/ChartToolsSheet.module.css",
     "src/flows/fno/sheets/ChartToolsSheet.tsx",
     "src/flows/fno/sheets/HomeSheets.tsx",
