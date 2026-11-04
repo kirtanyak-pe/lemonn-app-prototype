@@ -16,7 +16,7 @@
       "id": "stocks-17",
       "name": "Splash",
       "figma": "",
-      "note": "The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page.",
+      "note": "The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Hidden at launch for now (src/shared/ui/Splash: SPLASH_SCREENS is empty), so the app opens straight on the home; this page still plays it.",
       "goesTo": [
         "stocks-01"
       ],

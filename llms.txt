@@ -19,7 +19,7 @@ Start with [CONVERT.md](https://kirtanyak-pe.github.io/lemonn-app-prototype/CONV
 ## Cross-flow features
 
 - [ILLIQUID contracts](https://kirtanyak-pe.github.io/lemonn-app-prototype/ILLIQUID.md): the rule, data flag, UI patterns and every place it appears (F&O option chain, asset page, Buy / Sell sheet, Gold Summary, Search).
-- [Diwali](https://kirtanyak-pe.github.io/lemonn-app-prototype/DIWALI.md): the festive launch splash (garland) and the Stocks / F&O home search bar's diya and sparkler — what ships, timings, tokens.
+- [Diwali](https://kirtanyak-pe.github.io/lemonn-app-prototype/DIWALI.md): the Stocks / F&O home search bar's diya and sparkler — what ships, timings, tokens.
 
 ## Design system
 

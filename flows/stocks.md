@@ -10,7 +10,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/stocks · machi
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `stocks-17` | Splash | — | `stocks-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page. |
+| `stocks-17` | Splash | — | `stocks-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Hidden at launch for now (src/shared/ui/Splash: SPLASH_SCREENS is empty), so the app opens straight on the home; this page still plays it. |
 | `stocks-01` | Home | — | `stocks-09`, `search-01`, `profile-01` | Top of the page: search, indices, holdings, products, shortcuts. |
 | `stocks-02` | Home · top movers & watchlists | — | `stocks-09`, `search-01`, `profile-01` | Same page, scrolled. |
 | `stocks-03` | Home · top losers | — | `stocks-09`, `search-01`, `profile-01` | The "Top losers" chip picked. |
@@ -2185,7 +2185,7 @@ export const stocks: Flow = {
     { id: 'stock', title: 'Stock page' },
   ],
   screens: [
-    { id: 'stocks-17', section: 'splash', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Plays when the app opens or reloads on Home (src/shared/ui/Splash); not on a link to an inner page.', render: (go) => <SplashScreen onDone={() => go('stocks-01')} home={home(go)} /> },
+    { id: 'stocks-17', section: 'splash', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Home (a tap skips ahead). Hidden at launch for now (src/shared/ui/Splash: SPLASH_SCREENS is empty), so the app opens straight on the home; this page still plays it.', render: (go) => <SplashScreen onDone={() => go('stocks-01')} home={home(go)} /> },
     { id: 'stocks-01', name: 'Home', figma: '', note: 'Top of the page: search, indices, holdings, products, shortcuts.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} /> },
     { id: 'stocks-02', name: 'Home · top movers & watchlists', figma: '', note: 'Same page, scrolled.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" /> },
     { id: 'stocks-03', name: 'Home · top losers', figma: '', note: 'The "Top losers" chip picked.', section: 'home', tab: true, render: (go) => <Home onStock={(s) => { openStock(s); go('stocks-09') }} onTab={(t) => goToTab(go, t)} onSearch={() => go('search-01')} onProfile={() => go('profile-01')} scrollTo="movers" movers="losers" /> },
@@ -18750,7 +18750,7 @@ export function useSystemKeyboard() {
 ### `src/shared/ui/Diwali.module.css`
 
 ```css
-/* Diwali art (src/shared/ui/Diwali): fine gold line work, small marigolds, the lotus diya —
+/* Diwali art (src/shared/ui/Diwali): fine gold line work, the lotus diya —
    local tokens --app-diwali-* (L3 has no festive palette). */
 
 .diya,
@@ -18759,7 +18759,7 @@ export function useSystemKeyboard() {
   overflow: visible;
 }
 
-/* The splash art's line work: fine gold strings and outlines, small gold caps and drops. */
+/* Fine gold line work: strings and outlines, small gold caps and drops (also the archived splashes'). */
 .hairline {
   fill: none;
   stroke: var(--app-diwali-line);
@@ -18861,56 +18861,6 @@ export function useSystemKeyboard() {
 
 .flameInner {
   fill: var(--app-diwali-flame-core);
-}
-
-/* The garland's marigolds: orange and gold in turn, a darker centre. */
-.marigoldOrange {
-  fill: var(--app-diwali-petal-edge);
-}
-
-.marigoldGold {
-  fill: var(--app-diwali-gold);
-}
-
-.marigoldCore {
-  fill: var(--app-diwali-marigold-core);
-}
-
-/* The splash's entrance (inside the splash's 1.5 s — timings in local tokens --app-splash-*): the garland's string draws
-   across from the left and its drops and flowers pop on in turn. `--i` (inline) is each part's place in the order. */
-.drawIn {
-  stroke-dasharray: 1;
-  animation: drawIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
-  animation-delay: var(--app-splash-art-at);
-}
-
-@keyframes drawIn {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
-}
-
-.popIn {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
-  animation: popIn var(--l3-motion-duration-long) var(--app-splash-ease-settle) both;
-  animation-delay: calc(var(--app-splash-art-at) + var(--app-splash-stagger) * 2 + var(--i) * var(--app-splash-stagger));
-}
-
-@keyframes popIn {
-  from { opacity: 0; scale: 0; }
-}
-
-/* The night splash's lights twinkle, each on its own beat (delay set inline). */
-.spark {
-  fill: var(--app-diwali-spark);
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: twinkle var(--app-diwali-twinkle) ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.25; scale: 0.7; }
-  50% { opacity: 1; scale: 1.2; }
 }
 
 /* The flame breathes from its base. */
@@ -19061,10 +19011,7 @@ export function useSystemKeyboard() {
 
 @media (prefers-reduced-motion: reduce) {
   .flame,
-  .glowPulse,
-  .spark,
-  .drawIn,
-  .popIn {
+  .glowPulse {
     animation: none;
   }
 
@@ -19095,16 +19042,14 @@ import styles from './Diwali.module.css'
 const t = makeCopy('shared', copy)
 
 /**
- * Diwali touches (temporary, festival only) — each one a switch in the prototype's App settings → Diwali, both on by
- * default (the spec for developers: docs/DIWALI.md):
- * - `diwaliSplash`: the launch splash becomes a quiet night scene — a marigold garland, twinkling lights and the wish
- *   (src/shared/ui/Splash).
+ * Diwali touch (temporary, festival only) — a switch in the prototype's App settings → Diwali, on by default (the spec
+ * for developers: docs/DIWALI.md):
  * - `diwaliFlip`: on Stocks / F&O home, the search pill's icon and label turn into the lotus diya and "Happy Green
  *   Diwali" (with a sparkler round the pill) twice, then go back.
- * Archived versions (the Lanterns splash, the profile avatar flip): src/shared/ui/archive/DiwaliArchive.tsx.
+ * Archived versions (not in the app): the Garland splash (archive/DiwaliSplash.tsx), the Lanterns splash and the profile
+ * avatar flip (archive/DiwaliArchive.tsx).
  */
 export const DIWALI_OPTIONS = {
-  splash: { id: 'diwaliSplash', off: 'off', on: 'on', default: 'on' },
   search: { id: 'diwaliFlip', off: 'off', on: 'search', default: 'search' },
 } as const
 
@@ -19198,53 +19143,6 @@ export function Diya({ className }: { className?: string }) {
       <path className={styles.wick} d="M60 41V52" />
       {FRONT_PETALS.map((petal, i) => <PetalShape key={i} {...petal} />)}
       <path className={styles.petalHeart} d={petalPath(9, 4.5)} transform="translate(60 82) rotate(180)" />
-    </svg>
-  )
-}
-
-// The garland's string: a gentle dip across the top, P0 (0, 4) → P1 (196, 92) → P2 (392, 4) (a quadratic curve).
-const garlandAt = (t: number) => ({ x: 392 * t, y: 4 + 176 * t * (1 - t) })
-const GARLAND_FLOWERS = Array.from({ length: 9 }, (_, i) => ({ ...garlandAt(0.1 + i * 0.1), tone: i % 2 }))
-const GARLAND_DROPS = Array.from({ length: 8 }, (_, i) => ({ ...garlandAt(0.15 + i * 0.1), long: i % 2 === 0 }))
-const PETAL_RING = Array.from({ length: 8 }, (_, i) => (i * Math.PI * 2) / 8)
-
-/** The Diwali splash's art: one thin gold string of small two-tone marigolds, a tiny gold drop between each. */
-export function Garland({ className }: { className?: string }) {
-  return (
-    <svg className={[styles.art, className].filter(Boolean).join(' ')} viewBox="0 0 392 120" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
-      {/* On the way in the string draws across from the left, then each drop and flower pops on in turn. */}
-      <path className={[styles.hairline, styles.drawIn].join(' ')} pathLength={1} d="M0 4Q196 92 392 4" />
-      {GARLAND_DROPS.map(({ x, y, long }, i) => (
-        <g key={x} className={styles.popIn} style={{ '--i': i + 0.5 } as CSSProperties}>
-          <path className={styles.hairline} d={`M${x} ${y}V${y + (long ? 22 : 14)}`} />
-          <circle className={styles.goldFill} cx={x} cy={y + (long ? 24.5 : 16.5)} r="2" />
-        </g>
-      ))}
-      {GARLAND_FLOWERS.map(({ x, y, tone }, i) => (
-        <g key={x} className={styles.popIn} style={{ '--i': i } as CSSProperties}>
-          {PETAL_RING.map((a) => (
-            <circle key={a} className={tone ? styles.marigoldGold : styles.marigoldOrange} cx={x + Math.cos(a) * 4.2} cy={y + Math.sin(a) * 4.2} r="2.8" />
-          ))}
-          <circle className={styles.marigoldCore} cx={x} cy={y} r="2" />
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-// Twinkling lights across the night splash (392 × 872 artwork): a few small warm dots, each on its own beat.
-const SPARKS = [
-  [48, 300, 1.2], [344, 330, 1], [92, 560, 0.9], [306, 640, 1.3], [32, 720, 1], [360, 520, 0.8],
-  [196, 250, 0.8], [150, 780, 1.1], [250, 740, 0.9],
-] as const
-
-/** Warm twinkling lights scattered over the Diwali splash (behind everything else). */
-export function Sparkles({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 392 872" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {SPARKS.map(([x, y, r], i) => (
-        <circle key={i} className={styles.spark} cx={x} cy={y} r={r} style={{ animationDelay: `${(i * -0.53) % 3}s` }} />
-      ))}
     </svg>
   )
 }
@@ -19792,8 +19690,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
 }
 
-
-/* The logo rises in and settles as the splash opens (the regular splash too). */
+/* The logo rises in and settles as the splash opens. */
 .logo {
   animation: logoIn var(--app-splash-in) var(--app-splash-ease-settle) both;
   animation-delay: var(--app-splash-logo-at);
@@ -19808,108 +19705,8 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   pointer-events: none;
 }
 
-/* Diwali: a quiet night scene (the splash takes L3's dark theme) — a faint dusk from the top, a soft warm glow behind
-   the logo, a few twinkling lights, the garland at the top edge, the wish rising in under the logo.
-   Its entrance (local tokens --app-splash-*) is over before the splash fades: the glow swells in with the art, the
-   logo rises, the lights come on, the wish's two lines rise in, a gold shine crosses "Happy Diwali". */
-.splash[data-diwali] {
-  background:
-    radial-gradient(ellipse 120% 50% at 50% 0%, var(--app-diwali-dusk), transparent 70%),
-    var(--l3-surface-default);
-}
-
-.splash[data-diwali]::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 50%, var(--app-diwali-glow), transparent 50%);
-  animation: glowIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
-}
-
-@keyframes glowIn {
-  from { opacity: 0; scale: 0.6; }
-}
-
-.sparkles {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  animation: fadeIn var(--app-splash-in) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-lights-at);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-}
-
-.art {
-  position: absolute;
-  inset: 0 0 auto;
-  width: 100%;
-}
-
-.wishLead {
-  margin: 0;
-  animation: riseIn var(--app-splash-in) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-lead-at);
-  color: var(--l3-content-secondary);
-  font: var(--l3-text-label-14);
-  text-align: center;
-}
-
-/* "Happy Diwali": L3's heading 28 in gold, a faint warm glow; once in, a pale gold shine sweeps across it once (a copy
-   of the words on top, data-text, painted only by a moving highlight). */
-.headline {
-  position: relative;
-  margin: 0;
-  animation: riseIn var(--app-splash-in) var(--app-splash-ease-settle) both;
-  animation-delay: var(--app-splash-headline-at);
-  color: var(--app-diwali-headline);
-  text-shadow: 0 0 var(--l3-spacing-16) var(--app-diwali-headline-glow);
-  font: var(--l3-text-heading-28);
-  text-align: center;
-}
-
-.headline::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 35%, var(--app-diwali-headline-shine) 50%, transparent 65%) 100% 0 / 300% 100%;
-  background-clip: text;
-  color: transparent;
-  text-shadow: none;
-  animation: shine var(--app-splash-shine) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-shine-at);
-}
-
-@keyframes shine {
-  to { background-position: 0% 0; }
-}
-
-@keyframes riseIn {
-  from { opacity: 0; translate: 0 var(--l3-spacing-08); }
-}
-
-.centre {
-  position: relative;
-}
-
-.wish {
-  position: absolute;
-  top: calc(100% + var(--l3-spacing-32));
-  left: 50%;
-  width: max-content;
-  translate: -50% 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .logo,
-  .splash[data-diwali]::before,
-  .sparkles,
-  .wishLead,
-  .headline,
-  .headline::after {
+  .logo {
     animation: none;
   }
 
@@ -19924,17 +19721,18 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 ```tsx
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { BrandLogo } from '@l3/components/BrandLogo'
-import { Stack } from '@l3/components/Stack'
-import { useTheme } from '@l3/theme'
 import { makeCopy } from '../copy'
 import copy from './copy.json'
-import { Garland, Sparkles, setSplashUp, useDiwali } from './Diwali'
+import { setSplashUp } from './Diwali'
 import styles from './Splash.module.css'
 
 const t = makeCopy('shared', copy)
 
-/** The screens a launch can land on that open with the splash: the two home pages (Stocks, F&O). */
-export const SPLASH_SCREENS = ['stocks-01', 'fno-01']
+/**
+ * The screens a launch can land on that open with the splash. Hidden for now (2026-11-04): none, so the app opens
+ * straight on its page. To bring it back: ['stocks-01', 'fno-01'] (the two home pages).
+ */
+export const SPLASH_SCREENS: string[] = []
 /** How long the logo stays before the splash fades away. */
 export const SPLASH_MS = 1500
 
@@ -19979,9 +19777,8 @@ function useSplashState(show: boolean, held = false) {
 }
 
 /**
- * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali splash
- * (App settings → Diwali, on by default) is a quiet night scene in L3's dark theme, in either app theme: a marigold
- * garland at the top, a soft warm glow, a few twinkling lights, and the wish under the logo with "Happy Diwali" in gold.
+ * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. (The Diwali 2026
+ * Garland splash is archived: src/shared/ui/archive/DiwaliSplash.tsx.)
  */
 function SplashCover({ state, onHold, onLeave, onGone }: {
   state: 'shown' | 'leaving'
@@ -19989,8 +19786,6 @@ function SplashCover({ state, onHold, onLeave, onGone }: {
   onLeave: () => void
   onGone: () => void
 }) {
-  const diwali = useDiwali('splash')
-  const { product } = useTheme()
   // Prototype only (not app behaviour — leave out of the build): to look at the splash, hovering (mouse) holds it, a
   // tap / click pins it, and a second tap lets it fade.
   const [hovered, setHovered] = useState(false)
@@ -20001,29 +19796,13 @@ function SplashCover({ state, onHold, onLeave, onGone }: {
       type="button"
       className={styles.splash}
       data-state={state}
-      data-diwali={diwali || undefined}
-      // Diwali is a night scene: the splash always takes L3's dark theme (the logo's name turns light with it).
-      data-product={diwali ? product : undefined}
-      data-mode={diwali ? 'dark' : undefined}
-      data-system-bars={diwali ? 'dark' : undefined}
-      aria-label={diwali ? `${t('splash.label')}. ${t('splash.diwali')}` : t('splash.label')}
+      aria-label={t('splash.label')}
       onClick={() => (pinned ? onLeave() : setPinned(true))}
       onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHovered(true) }}
       onPointerLeave={(e) => { if (e.pointerType === 'mouse') setHovered(false) }}
       onTransitionEnd={(e) => { if (e.target === e.currentTarget) onGone() }}
     >
-      {diwali && <Sparkles className={styles.sparkles} />}
-      {diwali && <Garland className={styles.art} />}
-      <Stack align="center" className={styles.centre}>
-        <BrandLogo brand="lemonn" variant="full" size={48} decorative className={styles.logo} />
-        {/* Hangs under the logo, so the logo stays where the regular splash has it. */}
-        {diwali && (
-          <Stack gap="08" align="center" className={styles.wish}>
-            <p className={styles.wishLead}>{t('splash.diwaliLead')}</p>
-            <p className={styles.headline} data-text={t('splash.diwaliHeadline')}>{t('splash.diwaliHeadline')}</p>
-          </Stack>
-        )}
-      </Stack>
+      <BrandLogo brand="lemonn" variant="full" size={48} decorative className={styles.logo} />
     </button>
   )
 }
@@ -20064,9 +19843,6 @@ export function SplashScreen({ home, onDone }: { home: ReactNode; onDone: () => 
 ```json
 {
   "splash.label": "Lemonn",
-  "splash.diwali": "Team Lemonn wishes every trader a Happy Diwali",
-  "splash.diwaliLead": "Team Lemonn wishes every trader a",
-  "splash.diwaliHeadline": "Happy Diwali",
   "diwali.searchWish": "Happy Green Diwali"
 }
 ```

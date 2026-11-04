@@ -10,7 +10,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 
 | Id | Screen | Figma | Taps go to | Note |
 |---|---|---|---|---|
-| `fno-34` | Splash | — | `fno-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Plays when the app opens or reloads on F&O home (src/shared/ui/Splash); not on a link to an inner page. |
+| `fno-34` | Splash | — | `fno-01` | The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Hidden at launch for now (src/shared/ui/Splash: SPLASH_SCREENS is empty), so the app opens straight on the home; this page still plays it. |
 | `fno-01` | Equity home | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — | From the main F&O tab. Home returns to Stocks; DASH, Search, Profile and Wallet open their existing flows. Selectors, chart metrics, filters, sorting and watchlist creation work locally. Destinations outside this frame open an explanatory sheet. |
 | `fno-02` | Home · watchlists & Smart Options | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — | The same long screen, scrolled to watchlists. |
 | `fno-03` | Home · Futures Heatmap | [11569:41100](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11569-41100) | — |  |
@@ -19,7 +19,7 @@ Prototype: https://kirtanyak-pe.github.io/lemonn-app-prototype/#/fno · machine-
 | `fno-06` | Scalper · DASH indicator | — | `fno-01`, `dash-20` | From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list. |
 | `fno-07` | Scalper · indicator applied | — | `fno-01`, `dash-20` | With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles. |
 | `fno-35` | Scalper · position + breakeven line | [11756:78739](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11756-78739) | `fno-01`, `dash-20` | Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “Breakeven ⓘ” chip flush to the price axis (Figma’s “B/E 105.55”: spelled out, no price — designer’s call; the label still reads the price) (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large. |
-| `fno-36` | How breakeven works | [11783:5569](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11783-5569) | `fno-01`, `dash-20` | Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 15 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in 2× and the orange charges zone fills one band per charge from the F&O options rate card, in ₹ on the ₹100 buy (top down: stamp duty, SEBI, transaction ₹0.07, STT ₹0.15, then brokerage ₹0.02 last at the bottom with a smaller tag — no GST band: it’s charged on the charges; heights by cost), then zooms back out to one thin zone, the tags sliding down under it and stacking into one “Order charges ≈₹0.24” tag; the dashed B/E line at ₹100.25 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief). |
+| `fno-36` | How breakeven works | [11783:5569](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11783-5569) | `fno-01`, `dash-20` | Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card plays once (then stops on the finished chart; a tap replays it) a 9.3 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in 2× and the orange charges zone fills one band per charge from the F&O options rate card, in ₹ on the ₹100 buy (top down: STT ₹0.15, transaction ₹0.07, stamp duty, SEBI, then brokerage ₹0.02 last at the bottom with a smaller tag; they come in top down — no GST band: it’s charged on the charges; heights by cost), then zooms back out to one thin zone, the tags sliding down under it and stacking into one “Order charges ≈₹0.24” tag; the dashed B/E line at ₹100.25 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, and it stops there. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief). A V2 (starts zoomed in on a blue ₹0 → ₹100 fill, zooms out true to scale, sold 12% up at ₹112) is archived in fno/archive/BreakevenExplainerV2.tsx. |
 | `fno-37` | Chart tools · Settings | [11754:69563](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=11754-69563) | `fno-01`, `dash-20` | The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here. |
 | `fno-08` | Commodities home | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals. |
 | `fno-09` | Commodities · heatmap & Smart Futures | [6754:63637](https://www.figma.com/design/nLs24dTJdPz9A5pu3AWMbe/?node-id=6754-63637) | — | The same long screen, scrolled to the Futures Heatmap. |
@@ -174,7 +174,7 @@ Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are n
 - **First buy** → How breakeven works opens by itself, once (prototype: remembered in this browser,
   `fno.breakevenIntroSeen`; in the app, per user).
 - **How breakeven works** (`sheets/BreakevenSheet`, fno-36): L3 sheet, heading only. The example card ("Example:
-  Bought 1 lot at ₹100") plays the explainer on a 15 s loop (`components/BreakevenExplainer`), copied from the
+  Bought 1 lot at ₹100") plays the explainer once and stops on the finished chart; a tap on it plays it again from the start (`components/BreakevenExplainer`), copied from the
   designer's screen recording (Figma's own export holds only the intro), plus a charges breakdown before the B/E line
   (designer's brief, 2026-11-03). Data: `data.ts` `breakevenCharges` — the F&O options rate card worked out in ₹ on
   the ₹100 buy, one unit so a % reads straight as ₹ (brokerage 0.01% each way ₹0.02, STT 0.15% on the sell ₹0.15, NSE
@@ -184,7 +184,7 @@ Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are n
 
   **Charges, zoomed in:** at the normal scale the charges zone is ~13 tall, so the chart zooms in 2× (106 per rupee;
   the zone ~27 tall; ₹100 stays at y 209, ₹102–₹103 move up out of view — only 2× so the charges don't look big) and
-  the zone fills one band per charge, top down — Stamp duty, SEBI, Transaction, STT, then Brokerage last at the bottom (its tag the small one: Label/10, 1 / 4 padding — designer's call, brokerage is a small part) — each band, stacked bottom to top Brokerage → Stamp duty, as tall as its share
+  the zone fills one band per charge, top down — STT, Transaction, Stamp duty, SEBI, then Brokerage last at the bottom. They come in top down, so Brokerage comes in last (its tag the small one: Label/10, 1 / 4 padding — designer's call, brokerage is a small part) — each band, stacked bottom to top Brokerage → Stamp duty, as tall as its share
   of the charges (at least 2; 1 apart), in the charges-zone orange. Each band gets a white tag like the B/E chip (name
   Label/12 primary · ₹ amount secondary: ₹0.15, the tiny ones to their first digit, ₹0.003) in a column 140 from the plot's right, at least 24 apart and 10 from the top,
   joined by an orange leader to a dot at its band's middle. Zooming out, the bands close into one zone and the tags
@@ -206,7 +206,7 @@ Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are n
   | 150 | axis and gridlines fade in (250) |
   | 400 | buy dot pops in (200, back-out); 650 "Bought at ₹100" fades in and rises 4 → 0 (150) |
   | 1000 | zoom in on ₹100 → B/E (500, ease-in-out): 53 → 283 per rupee, around ₹100 |
-  | 1550 | the bands fill up one every 350 (brokerage → stamp duty): each grows up from the one below (300, ease-out) as its tag fades in rising 4 → 0 with its leader; the last is in by 3600 |
+  | 1550 | the bands fill up one every 350 (STT, transaction, stamp duty, SEBI, then brokerage): each grows up from the one below (300, ease-out) as its tag fades in rising 4 → 0 with its leader; the last is in by 3600 |
   | 4100 | zoom out (600, ease-in-out); the leaders fade (150); the whole zone fades in over the bands, closing their gaps; the tags slide to the zone's label spot (8.5 in, 10.5 under B/E), top tag first, each 30 later (450, ease-in-out), stacking up |
   | 4600 | the stacked tags cross-fade (150) into one white "Order charges" tag in the charges orange; 4950 its pill fades (250), leaving the label |
   | 4750 | B/E line draws left → right along the zone's top (450, ease-in-out); 5200 its chip fades and scales 0.9 → 1 (200) |
@@ -215,8 +215,12 @@ Figma: "Scalper screen · C · Boxed chip" (the yellow chip version; A / B are n
   | 7950 | the line ends: a green ring; 8000 the bubble fades (150), the green dot pops in (200), 8200 it pulses (500) |
   | 8250 | "Sold at ₹102" fades in sliding 6 → 0 from the right (150) |
   | 8450 | net-profit zone grows up from B/E to ₹102 (550, ease-out); 9150 "Net Profit" fades in (150) |
-  | 11750 | hard cut to the intro (surface/secondary): the Breakeven mark fades in (+30, 250) and pops 0.55 → 1 (+100, 400, L3 pop easing); INTRODUCING, Breakeven Line, the one-liner at +300 / +470 / +670, each fading in and rising 8 → 0 (400) |
-  | 15000 | the intro fades out (200) over a blank chart and the loop starts again |
+  | 9300 | it stops on the finished chart. A tap (or Enter / Space) plays it again from 0. The recording's intro (11750: the Breakeven mark, INTRODUCING, Breakeven Line, the one-liner; 15000: fade and loop) is kept in the code but not reached |
+
+  **V2 — archived 2026-11-04, not in the app** (`archive/BreakevenExplainerV2.tsx` + its CSS, with the steps to bring it
+  back): starts zoomed in, the line rises from the bottom to the buy at ₹100 over a blue ₹0 → ₹100 fill, the charges
+  fill and merge into Order charges, then it zooms out true to scale (₹100 stays put, the chart shrinks down to ₹0) and
+  runs 12% up to "Sold at ₹112" (10.25 s). Copy `breakeven.chartLabelV2` is kept for it.
 
   "I understand" is disabled until the chart has played once (Figma's button variants 11783:12460, dark 11805:374): a
   4 track (surface/tertiary) across the button's top edge fills (surface/inverted, linear) over 9.3 s, then the button
@@ -372,7 +376,10 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 ### Changelog
 
-- 2026-11-04 — How breakeven works: the charges come in top down (brokerage last); brokerage's tag is the small one.
+- 2026-11-04 — How breakeven works V2 (F&O setting "Breakeven explainer", V2 by default; V1 kept): starts zoomed in, the line rises from the bottom to the buy at ₹100 with a blue ₹0 → ₹100 fill, the charges fill and merge into Order charges, then it zooms out true to scale (₹100 stays put, the chart shrinks down to ₹0 at the bottom): the ₹0.25 of charges a hairline on the blue ₹100, the run up 12% to Sold at ₹112, Net Profit. 10.25 s, then it stops.
+- 2026-11-04 — V2 archived (`archive/BreakevenExplainerV2.tsx`) and the "Breakeven explainer" setting removed: V1 ships.
+- 2026-11-04 — How breakeven works: the explainer plays once and stops on the finished chart (no loop, no intro); a tap replays it. The launch splash is hidden.
+- 2026-11-04 — How breakeven works: the charges stack STT on top, then transaction, stamp duty, SEBI, and brokerage last at the bottom, so brokerage no longer sits on STT's band; they come in top down (brokerage last), its tag the small one.
 - 2026-11-03 — How breakeven works: the Order charges tag shows the total (≈₹0.24).
 - 2026-11-03 — How breakeven works: the charges in ₹ on the ₹100 buy (no %), no GST band, B/E ₹100.25 (a thinner charges zone); zooms in only 2×; "Order charges" stays a tag under the zone.
 - 2026-11-03 — How breakeven works: before the B/E line the chart zooms in and the charges zone fills one band per charge (brokerage first at the bottom, then STT, transaction, GST, SEBI, stamp duty — F&O options rate card, heights by cost, each tagged with its rate), then zooms out to one zone, the tags stacking into its "Order charges" label; loop 15 s, button lock 9.3 s. Breakeven mark tile flat surface/inverted; the Scalper's ribbon tab has no outline.
@@ -405,6 +412,930 @@ The source uses old D2 controls alongside L3; their code equivalents are L3 comp
 
 
 ## Source — this flow
+
+### `src/flows/fno/archive/BreakevenExplainerV2.module.css`
+
+```css
+/*
+ * How breakeven works · the example (copied from the designer's recording). L3 tokens; the orange and the profit fade
+ * are local tokens (src/local-tokens.css: the recording's orange isn't in L3). Positions come from BreakevenExplainer:
+ * each callout gets its anchor as --x / --y and places itself around it.
+ */
+.stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--l3-surface-primary);
+  cursor: pointer; /* a tap plays it again */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chart {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* ---- Price axis: ₹101–₹103 grey on dashed gridlines; ₹100 (the buy) bold on a solid line. ---- */
+.gridline,
+.baseline {
+  stroke: var(--l3-border-light);
+  stroke-width: 1;
+}
+
+.gridline {
+  stroke-dasharray: 4 3;
+}
+
+.axisLabel,
+.axisEntry,
+.zoneLabel,
+.chip,
+.bought,
+.sold,
+.ltp {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  white-space: nowrap;
+}
+
+.axisLabel,
+.axisEntry,
+.zoneLabel {
+  transform: translateY(-50%);
+}
+
+.axisLabel {
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-description-12);
+}
+
+.axisEntry {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+}
+
+/* V2: what the buy cost (₹0 → ₹100), L3's light blue. */
+.boughtZone {
+  fill: var(--l3-surface-accent-discover-light);
+}
+
+/* ---- Zones: orange charges (₹100 → B/E), a green fade for the net profit (B/E → ₹102). ---- */
+.chargesZone {
+  fill: var(--app-be-charges-zone);
+}
+
+.profitTop {
+  stop-color: var(--app-be-profit-top);
+}
+
+.profitMid,
+.profitBottom {
+  stop-color: var(--l3-surface-accent-success-light);
+}
+
+.profitBottom {
+  stop-opacity: 0.4;
+}
+
+.zoneLabel {
+  font: var(--l3-text-label-12);
+}
+
+.zoneLabel[data-zone='charges'] {
+  isolation: isolate;
+  display: inline-flex;
+  gap: var(--l3-spacing-04);
+  color: var(--app-be-orange-text);
+}
+
+/* "Order charges" is the tag the charge tags stack into (the same white pill, behind its text), under the zone. */
+.zoneLabel[data-zone='charges']::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--l3-spacing-02) - 1px) calc(-1 * var(--l3-spacing-06) - 1px);
+  z-index: -1;
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-06);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+}
+
+.zoneLabel[data-zone='bought'] {
+  color: var(--l3-content-accent-discover-default);
+}
+
+.zoneLabel[data-zone='profit'] {
+  color: var(--l3-content-accent-success-default);
+}
+
+/* ---- The breakeven line and its chip (white, a B/E tag then the price), the chip's right edge on the plot's. ---- */
+.breakevenLine {
+  stroke: var(--app-be-orange);
+  stroke-width: 1.25;
+  stroke-dasharray: 4 3;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-02) var(--l3-spacing-04) var(--l3-spacing-02) var(--l3-spacing-02);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-06);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+  transform: translate(-100%, -50%);
+  transform-origin: right center;
+}
+
+.chipTag {
+  padding: 1px var(--l3-spacing-02);
+  border-radius: var(--l3-radius-02);
+  background: var(--app-be-tag);
+  color: var(--l3-static-black); /* like L3's warning Tag: black on the solid, in both modes */
+  font: var(--l3-text-heading-10);
+}
+
+/* ---- The price line, the buy dot, the ringed crossing marker, the green sell dot and their pulses. ---- */
+.priceLine {
+  fill: none;
+  stroke: var(--l3-content-primary);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.buyDot {
+  fill: var(--l3-content-primary);
+}
+
+.crossingRing {
+  fill: var(--app-be-charges-zone);
+  stroke: var(--app-be-orange);
+  stroke-width: 1.25;
+}
+
+.crossingPulse {
+  fill: var(--app-be-orange);
+}
+
+.sellRing,
+.sellRingDrawing {
+  fill: var(--l3-surface-accent-success-light);
+  stroke-width: 1.25;
+}
+
+.sellRing {
+  stroke: var(--l3-border-accent-success-light);
+}
+
+.sellRingDrawing {
+  stroke: var(--l3-border-accent-success-default);
+}
+
+.sellDot,
+.sellPulse {
+  fill: var(--l3-surface-accent-success-default);
+}
+
+/* ---- Callouts: white pills with a light edge and a soft shadow. ---- */
+.bought,
+.sold,
+.ltp {
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-08);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+}
+
+/* "Bought at ₹100": under the buy dot, a notch on top pointing at it. */
+.bought {
+  padding: var(--l3-spacing-04) var(--l3-spacing-08);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+}
+
+.bought::before,
+.sold::after {
+  content: '';
+  position: absolute;
+  width: var(--l3-spacing-08);
+  height: var(--l3-spacing-08);
+  background: var(--l3-surface-primary);
+  rotate: 45deg;
+}
+
+.bought::before {
+  top: calc(var(--l3-spacing-04) * -1 - 1px);
+  left: var(--l3-spacing-16);
+  border-top: 1px solid var(--l3-border-light);
+  border-left: 1px solid var(--l3-border-light);
+}
+
+/* "Sold at ₹102": left of the sell dot, green edge and text, a tail pointing right at the dot. */
+.sold {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-06);
+  padding: var(--l3-spacing-04) var(--l3-spacing-08) var(--l3-spacing-04) var(--l3-spacing-06);
+  border-color: var(--l3-border-accent-success-light);
+  box-shadow: none;
+  color: var(--l3-content-accent-success-default);
+  font: var(--l3-text-label-12);
+  transform: translate(-100%, -50%);
+}
+
+.sold::after {
+  top: calc(50% - var(--l3-spacing-04));
+  right: calc(var(--l3-spacing-04) * -1 - 1px);
+  border-top: 1px solid var(--l3-border-accent-success-light);
+  border-right: 1px solid var(--l3-border-accent-success-light);
+}
+
+/* V2: the sell sits on a thin strip next to the B/E chip, so "Sold" goes above the dot (its right edge 10 past it), no tail. */
+.sold[data-place='above'] {
+  transform: translate(-100%, -100%);
+}
+
+.sold[data-place='above']::after {
+  content: none;
+}
+
+/* LTP: rides the line's head, centred above it — the last price the line passed. */
+.ltp {
+  display: flex;
+  flex-direction: column;
+  padding: var(--l3-spacing-02) var(--l3-spacing-08);
+  transform: translate(-50%, -100%);
+  transform-origin: center bottom;
+}
+
+.ltpName {
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-description-10);
+}
+
+.ltpValue {
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-14);
+}
+
+/*
+ * The intro the loop ends on (the stage cuts to surface/secondary): Figma's reveal (the video on 11802:369, 1.23 s,
+ * measured frame by frame) —
+ * - the mark: opacity 0 → 1 from 30 ms over 250 ms (linear); scale 0.55 → 1 from 100 ms over 400 ms on L3's pop easing;
+ * - INTRODUCING, Breakeven Line, the one-liner: from 300 / 470 / 670 ms, each 400 ms (L3 long): opacity 0 → 1 linear,
+ *   8 up → 0 ease-out.
+ */
+.intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--l3-spacing-24) var(--l3-spacing-16);
+  background: var(--l3-surface-secondary);
+  text-align: center;
+}
+
+.introIcon {
+  margin-bottom: var(--l3-spacing-16);
+  animation:
+    fadeIn var(--app-be-icon-fade) linear var(--app-be-icon-fade-delay) both,
+    popIn var(--l3-motion-duration-ai-pop) var(--l3-motion-easing-ai-pop) var(--app-be-icon-pop-delay) both;
+}
+
+.overline,
+.introTitle,
+.introText {
+  animation:
+    fadeIn var(--l3-motion-duration-long) linear var(--app-be-rise-delay) both,
+    riseIn var(--l3-motion-duration-long) ease-out var(--app-be-rise-delay) both;
+}
+
+.overline { --app-be-rise-delay: var(--app-be-overline-delay); }
+.introTitle { --app-be-rise-delay: var(--app-be-title-delay); }
+.introText { --app-be-rise-delay: var(--app-be-tagline-delay); }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    scale: 0.55;
+  }
+}
+
+@keyframes riseIn {
+  from {
+    translate: 0 var(--l3-spacing-08);
+  }
+}
+
+/* INTRODUCING: 12 bold, tracking 0.96 (Figma) — L3 has no overline style: heading-12 + local tracking. */
+.overline {
+  margin: 0;
+  color: var(--l3-content-tertiary);
+  font: var(--l3-text-heading-12);
+  letter-spacing: var(--app-overline-tracking);
+  text-transform: uppercase;
+}
+
+.introTitle {
+  margin: var(--l3-spacing-04) 0 var(--l3-spacing-08);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-heading-24);
+}
+
+.introText {
+  margin: 0;
+  max-width: calc(var(--l3-size-128) * 1.75);
+  color: var(--l3-content-secondary);
+  font: var(--l3-text-label-12);
+}
+
+/*
+ * Zoomed in, the charges (designer's brief, 2026-11-03): a tag per band — white like the B/E chip, the name then the
+ * rate — joined to its band by an orange leader and dot.
+ */
+.chargeTag {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--l3-spacing-04);
+  padding: var(--l3-spacing-02) var(--l3-spacing-06);
+  border: 1px solid var(--l3-border-light);
+  border-radius: var(--l3-radius-06);
+  background: var(--l3-surface-primary);
+  box-shadow: var(--l3-shadow-elevation-low);
+  color: var(--l3-content-primary);
+  font: var(--l3-text-label-12);
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+/* Brokerage's tag is the small one (designer's call: Lemonn's brokerage is a small part of the charges). */
+.chargeTag[data-size='small'] {
+  gap: var(--l3-spacing-02);
+  padding: 1px var(--l3-spacing-04);
+  font: var(--l3-text-label-10);
+}
+
+.chargeRate {
+  color: var(--l3-content-secondary);
+}
+
+.leader line {
+  stroke: var(--app-be-orange);
+  stroke-width: 1;
+}
+
+.leader circle {
+  fill: var(--app-be-orange);
+}
+```
+
+### `src/flows/fno/archive/BreakevenExplainerV2.tsx`
+
+```tsx
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { Icon } from '@l3/components/Icon'
+import { msCheckCircleFill } from '@l3/icons/material'
+import { inr } from '../../../shared/data/format'
+import { t } from '../copy'
+import { breakevenCharges, breakevenExample, exampleChargesTotal } from '../data'
+import { BreakevenIcon } from '../components/BreakevenIcon'
+import styles from './BreakevenExplainerV2.module.css'
+
+/*
+ * ARCHIVED 2026-11-04 — not in the app. V2 of the How breakeven works explainer (and V1, the version that ships, as it
+ * was then). To bring it back: move this file and its CSS to components/ (as BreakevenExplainer), put
+ * `breakevenExampleV2` back in data.ts, and add the F&O option `breakevenExplainer` (V1 / V2) that BreakevenSheet reads
+ * with useFlowOption, passing `version` and `explainerLength(version)` for the button's lock.
+ */
+
+/**
+ * V2 of the explainer, true to scale once it zooms out: ₹0 → ₹100 (the buy), the ₹0.25 of charges on it, and a 12% gain
+ * to the sell at ₹112. `path` runs after the buy (`at` 0 → 1 of the plot after it).
+ */
+const breakevenExampleV2 = {
+  entry: breakevenExample.entry,
+  breakeven: breakevenExample.breakeven,
+  exit: 112,
+  axis: [100, 0],
+  path: [
+    { at: 0, price: breakevenExample.entry },
+    { at: 0.1, price: 100.1 },
+    { at: 0.2, price: breakevenExample.breakeven },
+    { at: 0.36, price: 103.5 },
+    { at: 0.48, price: 102.6 },
+    { at: 0.66, price: 107 },
+    { at: 0.76, price: 106 },
+    { at: 0.9, price: 112 },
+  ],
+}
+
+/**
+ * The example in How breakeven works — copied from the designer's recording of the explainer (measured frame by frame),
+ * plus the charges breakdown (designer's brief, 2026-11-03). A 15 s loop on a white stage:
+ * 1. the price axis (₹100–₹103) and its dashed gridlines fade in; the buy dot pops in at ₹100 with "Bought at ₹100";
+ * 2. the chart zooms in 2× on ₹100 → ₹100.25 (the charges are thin at the normal scale): ₹102–₹103 move up out
+ *    of view and the charges zone fills one charge at a time, each a band as tall as its share of the charges, with a
+ *    tag (name · ₹ on the ₹100 buy). Top down: STT, transaction, stamp duty, SEBI, and brokerage last at
+ *    the bottom. They come in top down, so brokerage comes in last (₹0.02, a thin band, its tag the small one);
+ * 3. it zooms back out: the bands close into one orange charges zone and the tags slide down under it, stacking into one
+ *    tag that reads "Order charges" and stays under the zone; the breakeven line draws across its top at ₹100.25
+ *    and its B/E chip comes in;
+ * 3. an LTP bubble rides the price line as it draws up to ₹102 (showing the last price it passed); where it crosses the
+ *    breakeven line a ringed marker pulses;
+ * 4. at ₹102 the bubble goes, a green dot pulses, "Sold at ₹102" slides in and the green net-profit zone grows from the
+ *    breakeven line up to the sell price, labelled "Net Profit"; it holds;
+ * 5. it plays once and stops on the finished chart (at 9.3 s); a tap on it plays it again from the start.
+ * (The recording looped on into an intro — the Breakeven mark, INTRODUCING, Breakeven Line, the one-liner — at 11.75 s;
+ * kept below but not reached while it stops on the chart.)
+ * `still` (reduced motion) shows the finished chart and no intro.
+ */
+export function BreakevenExplainer({ still = false, version = 'v1' }: { still?: boolean; version?: ExplainerVersion }) {
+  const stageRef = useRef<HTMLDivElement>(null)
+  const width = useWidth(stageRef, FIGMA_WIDTH)
+  const [run, setRun] = useState(0)
+  const played = explainerLength(version)
+  const elapsed = useElapsed(!still, played, run)
+  const loop = Math.floor(elapsed / LOOP)
+  const time = still ? played : elapsed % LOOP
+  const replay = () => { if (!still && elapsed >= played) setRun(run + 1) }
+
+  return (
+    <div
+      ref={stageRef}
+      className={styles.stage}
+      style={{ height: HEIGHT }}
+      role="button"
+      tabIndex={0}
+      aria-label={`${t(version === 'v2' ? 'breakeven.chartLabelV2' : 'breakeven.chartLabel')} ${t('breakeven.replay')}`}
+      onClick={replay}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); replay() } }}
+    >
+      <ExampleChart time={time} width={width} version={version} />
+      {!still && time >= INTRO_AT && <Intro key={loop} />}
+      {!still && loop > 0 && time < INTRO_OUT && <Intro key={loop - 1} fade={1 - ramp(time, [0, INTRO_OUT])} />}
+    </div>
+  )
+}
+
+/**
+ * V1: the recording's order — the buy, zoom in for the charges, zoom out. V2 (designer's brief, 2026-11-04): it starts
+ * zoomed in; the price line rises from the bottom of the chart to the buy at ₹100 ("Bought at ₹100") and a blue fill
+ * rises under it to the ₹100 line (₹0 → ₹100, what the buy cost), the charges fill and close into one "Order charges"
+ * zone, and only then it zooms out — all the way, true to scale (₹100 stays put, the chart shrinks down to ₹0): the blue ₹100, the ₹0.25 of charges
+ * a hairline on it, then the B/E line, the run up 12% to "Sold at ₹112" and the green Net Profit.
+ */
+export type ExplainerVersion = 'v1' | 'v2'
+type Timeline = Record<keyof typeof SHOT_V1, [number, number]>
+
+/**
+ * Where each part comes in: [start, duration] in ms (t = 0 is the chart starting on a blank stage). From the B/E line
+ * on, it's the recording's timing moved 3 s later for the charges breakdown. `leadIn` (V2 only) is the line rising to
+ * the buy; a start of -1 means already there at t = 0.
+ */
+const SHOT_V1 = {
+  axis: [150, 250],
+  leadIn: [-1, 1],
+  boughtZone: [Infinity, 1], // V2 only
+  buyDot: [400, 200],
+  bought: [650, 150],
+  boughtOut: [Infinity, 1], // V2 only
+  boughtLabel: [Infinity, 1], // V2 only
+  zoomIn: [1000, 500],
+  chargeFill: [1550, 300], // the top band and its tag first; each one below CHARGE_STEP later, brokerage last
+  zoomOut: [4100, 600],
+  leadersOut: [4100, 150],
+  zoneMerge: [4100, 600], // the bands close into one zone
+  tagsMerge: [4100, 450], // the top tag first; each one below TAG_MERGE_STEP later
+  tagsOut: [4600, 150], // the stacked tags cross-fade into the one "Order charges" tag under the zone
+  chargesLabel: [4600, 150],
+  breakevenLine: [4750, 450],
+  breakevenChip: [5200, 200],
+  ltpIn: [5550, 150],
+  priceLine: [5800, 2150],
+  crossingPulse: [120, 400], // after the line reaches the crossing
+  ltpOut: [8000, 150],
+  sellDot: [8000, 200],
+  sellPulse: [8200, 500],
+  sold: [8250, 150],
+  profitZone: [8450, 550],
+  profitLabel: [9150, 150],
+} satisfies Record<string, [number, number]>
+
+/** V2: zoomed in from the start; the line rises to the buy, the charges fill and merge, then it zooms out. */
+const SHOT_V2: Timeline = {
+  axis: [100, 250],
+  leadIn: [300, 1100],
+  boughtZone: [1400, 450], // the blue ₹0 → ₹100 fill rises from the bottom to the buy
+  buyDot: [1400, 200],
+  bought: [1600, 150],
+  boughtOut: [4600, 150], // the callout hands over to the blue zone's own label (the Order charges tag takes its place)
+  boughtLabel: [5600, 200], // zoomed out: "Bought at ₹100" inside the blue zone
+  zoomIn: [-1, 1],
+  chargeFill: [2000, 300],
+  leadersOut: [4100, 150],
+  zoneMerge: [4100, 450],
+  tagsMerge: [4100, 450],
+  tagsOut: [4600, 150],
+  chargesLabel: [4600, 150],
+  zoomOut: [5000, 600],
+  breakevenLine: [5700, 450],
+  breakevenChip: [6150, 200],
+  ltpIn: [6500, 150],
+  priceLine: [6750, 2150],
+  crossingPulse: [120, 400],
+  ltpOut: [8950, 150],
+  sellDot: [8950, 200],
+  sellPulse: [9150, 500],
+  sold: [9200, 150],
+  profitZone: [9400, 550],
+  profitLabel: [10100, 150],
+}
+const SHOTS: Record<ExplainerVersion, Timeline> = { v1: SHOT_V1, v2: SHOT_V2 }
+/**
+ * V2's line before the buy: rising from the bottom of the chart to ₹100, in the plot's first 28% (the trade after the
+ * buy takes the rest). It comes in from the left, above "Bought at ₹100", so the callout stays clear.
+ */
+const BUY_AT: Record<ExplainerVersion, number> = { v1: 0, v2: 0.28 }
+const LEAD_IN: Record<ExplainerVersion, { at: number; price: number }[]> = {
+  v1: [],
+  v2: [
+    { at: 0, price: 99.28 },
+    { at: 0.06, price: 99.5 },
+    { at: 0.1, price: 99.42 },
+    { at: 0.15, price: 99.62 },
+    { at: 0.2, price: 99.9 },
+    { at: 0.28, price: 100 },
+  ],
+}
+const CHARGE_STEP = 350
+const TAG_MERGE_STEP = 30
+const LOOP = 15000
+/** How long one play takes (ms): it stops on the finished chart, its Net Profit label in. */
+export function explainerLength(version: ExplainerVersion) {
+  const { profitLabel } = SHOTS[version]
+  return profitLabel[0] + profitLabel[1]
+}
+/** The hard cut to the intro, and how long the intro takes to fade when the loop starts again. */
+const INTRO_AT = 11750
+const INTRO_OUT = 200
+/** The LTP value cross-fades for this long when the line passes a turn. */
+const LTP_SWAP = 100
+
+/** The plot, in px (measured at the card's 326 width in Figma; it stretches with the card). */
+const FIGMA_WIDTH = 326
+const HEIGHT = 286
+const PLOT_LEFT = 53.5
+const PLOT_RIGHT_INSET = 12.5
+const AXIS_X = 12.5
+const ZONE_LABEL_INSET = 8.5
+/**
+ * "Order charges" is a tag in the charge tags' column, 6 under the zone (its middle 17 under ₹100): the zone, ₹0.25
+ * tall, is too thin to hold it. A tag's text starts 7 in (its 6 padding and 1 edge).
+ */
+const CHARGES_LABEL_DROP = 17
+const TAG_TEXT_INSET = 7
+/** Callouts around their dots: "Bought" hangs 12.5 below with its notch 20 in; "Sold" ends 10 left; LTP sits 8.5 above. */
+const BOUGHT_GAP = 12.5
+const BOUGHT_NOTCH_X = 20
+const SOLD_GAP = 10
+const LTP_GAP = 8.5
+/** V2's green strip is too thin to hold its label: "Net Profit" sits 10 above it. */
+const PROFIT_LABEL_ABOVE = 10
+/** ₹100 sits at 209 and every rupee is 53 higher; zoomed in, 2× that (the charges zone twice its final height). */
+const BASELINE = 209
+const RUPEE = 53
+const ZOOM = 2
+const ZOOMED_RUPEE = RUPEE * ZOOM
+const priceY = (price: number, perRupee: number) => BASELINE - (price - breakevenExample.entry) * perRupee
+/**
+ * V2 zoomed out, true to scale: ₹100 stays where it was and the chart shrinks down to it — ₹0 comes up to 12 above the
+ * stage's bottom, so everything (the ₹0.25 of charges, the 12% to ₹112) is at that scale.
+ */
+const TRUE_ZERO_Y = HEIGHT - 12
+const TRUE_RUPEE = (TRUE_ZERO_Y - BASELINE) / breakevenExampleV2.entry
+const EXAMPLES = { v1: breakevenExample, v2: breakevenExampleV2 }
+/**
+ * Zoomed in, each charge is a band of the zone, as tall as its share of the charges (at least 2, so SEBI's ~0.1% still
+ * shows; the rest shrink to make room), 1 apart. Their tags sit in a column 140 from the plot's right, at least 24
+ * apart and 10 from the top, each joined by a leader to a dot 20 left of it at its band's middle.
+ */
+const MIN_BAND = 2
+const BAND_GAP = 1
+const TAG_COLUMN = 140
+const TAG_SPACING = 24
+const TAG_TOP = 10
+const LEADER = 20
+const BANDS = chargeBands()
+
+function ExampleChart({ time, width, version }: { time: number; width: number; version: ExplainerVersion }) {
+  const gradientId = useId()
+  const SHOT = SHOTS[version]
+  const { entry, breakeven, exit, axis, path } = EXAMPLES[version]
+  const zoomIn = ramp(time, SHOT.zoomIn, easeInOut)
+  const zoomOut = ramp(time, SHOT.zoomOut, easeInOut)
+  // V1 zooms out to 1 rupee = 53; V2 all the way to true scale (on a log scale, so the 50× zoom reads as one move).
+  const perRupee = version === 'v2'
+    ? ZOOMED_RUPEE * (TRUE_RUPEE / ZOOMED_RUPEE) ** zoomOut
+    : RUPEE + (ZOOMED_RUPEE - RUPEE) * zoomIn * (1 - zoomOut)
+  const y = (price: number) => priceY(price, perRupee)
+  const plotRight = width - PLOT_RIGHT_INSET
+  const buyAt = BUY_AT[version]
+  const plotX = (at: number) => PLOT_LEFT + at * (plotRight - PLOT_LEFT)
+  const points = path.map((p) => ({ x: plotX(buyAt + p.at * (1 - buyAt)), y: y(p.price), price: p.price }))
+  const leadIn = LEAD_IN[version].map((p) => ({ x: plotX(p.at), y: y(p.price) }))
+  const leadInDrawn = leadIn.length ? lineTo(leadIn, ramp(time, SHOT.leadIn)) : []
+  const start = points[0]
+  const end = points[points.length - 1]
+  const crossing = points.find((p) => p.price === breakeven) ?? points[0]
+
+  // The price line draws at a steady pace across the plot; its head is where the LTP bubble rides.
+  const drawn = ramp(time, SHOT.priceLine)
+  const headX = start.x + drawn * (end.x - start.x)
+  const passed = points.filter((p) => p.x <= headX)
+  const next = points[passed.length]
+  const last = passed[passed.length - 1] ?? start
+  const head = next ? { x: headX, y: last.y + ((headX - last.x) / (next.x - last.x)) * (next.y - last.y) } : end
+  const crossedAt = SHOT.priceLine[0] + ((crossing.x - start.x) / (end.x - start.x)) * SHOT.priceLine[1]
+  const lastTurnAt = SHOT.priceLine[0] + ((last.x - start.x) / (end.x - start.x)) * SHOT.priceLine[1]
+
+  const axisIn = ramp(time, SHOT.axis)
+  const boughtZone = ramp(time, SHOT.boughtZone, easeOut)
+  const zoneBottom = Math.min(y(0), HEIGHT)
+  const profitZone = ramp(time, SHOT.profitZone, easeOut) * (y(breakeven) - y(exit))
+  const ltp = ramp(time, SHOT.ltpIn, easeOut) * (1 - ramp(time, SHOT.ltpOut))
+  const sellIn = ramp(time, SHOT.sellDot, easeOutBack)
+  const chargeIn = (order: number) => SHOT.chargeFill[0] + (BANDS.length - 1 - order) * CHARGE_STEP
+  const bandFill = (order: number) => ramp(time, [chargeIn(order), SHOT.chargeFill[1]], easeOut)
+  const leadersShown = 1 - ramp(time, SHOT.leadersOut)
+  const tagsShown = 1 - ramp(time, SHOT.tagsOut)
+  const tagX = plotRight - TAG_COLUMN
+  const labelX = tagX + TAG_TEXT_INSET
+  const labelY = y(entry) + CHARGES_LABEL_DROP
+  const tagMerge = (order: number) =>
+    ramp(time, [SHOT.tagsMerge[0] + (BANDS.length - 1 - order) * TAG_MERGE_STEP, SHOT.tagsMerge[1]], easeInOut)
+
+  return (
+    <>
+      <svg className={styles.chart} width={width} height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} aria-hidden>
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" className={styles.profitTop} />
+            <stop offset="0.6" className={styles.profitMid} />
+            <stop offset="1" className={styles.profitBottom} />
+          </linearGradient>
+        </defs>
+        {/* V2: what the buy cost, ₹0 → ₹100 — blue up from the bottom of the chart to the ₹100 line. */}
+        <rect className={styles.boughtZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={zoneBottom - boughtZone * (zoneBottom - y(entry))} height={boughtZone * (zoneBottom - y(entry))} />
+        <g opacity={axisIn}>
+          {axis.map((price) => (
+            <line key={price} className={price === entry ? styles.baseline : styles.gridline} x1={PLOT_LEFT} x2={plotRight} y1={y(price)} y2={y(price)} />
+          ))}
+        </g>
+        {/* The charges zone: the bands fill up one by one; zooming out, the whole zone fades in over them and closes the gaps. */}
+        {BANDS.map((band, order) => {
+          const top = y(band.from + (band.to - band.from) * bandFill(order))
+          const height = Math.max(0, y(band.from) - top - BAND_GAP)
+          return height > 0 && <rect key={band.charge.id} className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={top} height={height} />
+        })}
+        <rect className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven)} height={y(entry) - y(breakeven)} opacity={ramp(time, SHOT.zoneMerge, easeInOut)} />
+        {leadersShown > 0 &&
+          BANDS.map((band, order) => {
+            const shown = ramp(time, [chargeIn(order), SHOT.chargeFill[1]]) * leadersShown
+            const middle = y((band.from + band.to) / 2)
+            return (
+              shown > 0 && (
+                <g key={band.charge.id} className={styles.leader} opacity={shown}>
+                  <line x1={tagX - LEADER} y1={middle} x2={tagX} y2={band.tagY} />
+                  <circle cx={tagX - LEADER} cy={middle} r={2} />
+                </g>
+              )
+            )
+          })}
+        <rect fill={`url(#${gradientId})`} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven) - profitZone} height={profitZone} />
+        <line
+          className={styles.breakevenLine}
+          x1={PLOT_LEFT}
+          x2={PLOT_LEFT + ramp(time, SHOT.breakevenLine, easeInOut) * (plotRight - PLOT_LEFT)}
+          y1={y(breakeven)}
+          y2={y(breakeven)}
+        />
+        {leadInDrawn.length > 1 && <polyline className={styles.priceLine} points={leadInDrawn.map((p) => `${p.x},${p.y}`).join(' ')} />}
+        {drawn > 0 && <polyline className={styles.priceLine} points={[...passed, head].map((p) => `${p.x},${p.y}`).join(' ')} />}
+        <circle className={styles.buyDot} cx={start.x} cy={start.y} r={4.5 * ramp(time, SHOT.buyDot, easeOutBack)} />
+        {time >= crossedAt && (
+          <g>
+            <Pulse cx={crossing.x} cy={crossing.y} time={time - crossedAt} shot={SHOT.crossingPulse} className={styles.crossingPulse} />
+            <circle className={styles.crossingRing} cx={crossing.x} cy={crossing.y} r={7.5} />
+            <circle className={styles.buyDot} cx={crossing.x} cy={crossing.y} r={4} />
+          </g>
+        )}
+        {drawn >= 1 && (
+          <g>
+            <Pulse cx={end.x} cy={end.y} time={time} shot={SHOT.sellPulse} className={styles.sellPulse} />
+            <circle className={sellIn > 0 ? styles.sellRing : styles.sellRingDrawing} cx={end.x} cy={end.y} r={7.5} />
+            <circle className={styles.sellDot} cx={end.x} cy={end.y} r={4.5 * sellIn} />
+          </g>
+        )}
+      </svg>
+
+      {axis.map((price) => (
+        <span key={price} className={price === entry ? styles.axisEntry : styles.axisLabel} style={at(AXIS_X, y(price), axisIn)}>
+          {inr(price, 0)}
+        </span>
+      ))}
+
+      <span className={styles.chip} style={{ ...at(plotRight, y(breakeven), ramp(time, SHOT.breakevenChip, easeOut)), scale: `${0.9 + 0.1 * ramp(time, SHOT.breakevenChip, easeOut)}` }}>
+        <span className={styles.chipTag}>{t('breakeven.beTag')}</span>
+        {inr(breakeven)}
+      </span>
+
+      <span
+        className={styles.zoneLabel}
+        style={at(labelX, labelY, ramp(time, SHOT.chargesLabel))}
+        data-zone="charges"
+      >
+        {t('breakeven.charges')}
+        <span className={styles.chargeRate}>{t('breakeven.chargesTotal', { amount: chargeInr(exampleChargesTotal) })}</span>
+      </span>
+      <span className={styles.zoneLabel} style={at(PLOT_LEFT + ZONE_LABEL_INSET, version === 'v2' ? y(exit) - PROFIT_LABEL_ABOVE : y(exit) + 32.5, ramp(time, SHOT.profitLabel))} data-zone="profit">
+        {t('breakeven.netProfit')}
+      </span>
+      <span className={styles.zoneLabel} style={at(PLOT_LEFT + ZONE_LABEL_INSET, (y(entry) + zoneBottom) / 2, ramp(time, SHOT.boughtLabel))} data-zone="bought">
+        {t('breakeven.bought', { price: inr(entry, 0) })}
+      </span>
+
+      {/* Zooming out, the tags slide into the zone and stack where its "Order charges" label comes in. */}
+      {tagsShown > 0 &&
+        BANDS.map((band, order) => {
+          const shown = ramp(time, [chargeIn(order), SHOT.chargeFill[1]], easeOut)
+          const merge = tagMerge(order)
+          const tagY = band.tagY + (labelY - band.tagY) * merge
+          return (
+            shown > 0 && (
+              <span key={band.charge.id} className={styles.chargeTag} data-size={band.charge.id === 'brokerage' ? 'small' : undefined} style={{ ...rise(at(tagX, tagY), shown, 0, 4), opacity: shown * tagsShown }}>
+                {t(`breakeven.charge.${band.charge.id}`)}
+                <span className={styles.chargeRate}>{chargeInr(band.charge.amount)}</span>
+              </span>
+            )
+          )
+        })}
+
+      <span className={styles.bought} style={rise(at(start.x - BOUGHT_NOTCH_X, start.y + BOUGHT_GAP), ramp(time, SHOT.bought, easeOut) * (1 - ramp(time, SHOT.boughtOut)), 0, 4)}>
+        {t('breakeven.bought', { price: inr(entry, 0) })}
+      </span>
+      <span
+        className={styles.sold}
+        data-place={version === 'v2' ? 'above' : undefined}
+        style={version === 'v2'
+          ? rise(at(end.x + SOLD_GAP, end.y - SOLD_GAP), ramp(time, SHOT.sold, easeOut), 0, 4)
+          : rise(at(end.x - SOLD_GAP, end.y), ramp(time, SHOT.sold, easeOut), 6, 0)}
+      >
+        <Icon icon={msCheckCircleFill} size={16} />
+        {t('breakeven.sold', { price: inr(exit, 0) })}
+      </span>
+
+      {ltp > 0 && (
+        <span className={styles.ltp} style={{ ...at(head.x, head.y - LTP_GAP, ltp), scale: `${0.9 + 0.1 * ltp}` }}>
+          <span className={styles.ltpName}>{t('breakeven.ltp')}</span>
+          <span key={last.price} className={styles.ltpValue} style={{ opacity: last === start ? 1 : ramp(time, [lastTurnAt, LTP_SWAP]) }}>
+            {inr(last.price)}
+          </span>
+        </span>
+      )}
+    </>
+  )
+}
+
+/**
+ * The charges as bands of the zone, bottom to top (in rupees, so they follow the zoom), and where each tag sits when
+ * zoomed in: at its band's middle, pushed up to stay TAG_SPACING apart, then back down to stay under TAG_TOP.
+ */
+function chargeBands() {
+  const { entry, breakeven } = breakevenExample
+  const zone = breakeven - entry
+  const total = breakevenCharges.reduce((sum, charge) => sum + charge.amount, 0)
+  const heights = breakevenCharges.map((charge) => Math.max((charge.amount / total) * zone, MIN_BAND / ZOOMED_RUPEE))
+  const fit = zone / heights.reduce((sum, height) => sum + height, 0)
+  let from = entry
+  const bands = breakevenCharges.map((charge, order) => {
+    const band = { charge, from, to: from + heights[order] * fit, tagY: 0 }
+    from = band.to
+    return band
+  })
+  bands.forEach((band, order) => {
+    const middle = priceY((band.from + band.to) / 2, ZOOMED_RUPEE)
+    band.tagY = order === 0 ? middle : Math.min(middle, bands[order - 1].tagY - TAG_SPACING)
+  })
+  for (let order = bands.length - 1; order >= 0; order--) {
+    const above = bands[order + 1]
+    bands[order].tagY = Math.max(bands[order].tagY, above ? above.tagY + TAG_SPACING : TAG_TOP)
+  }
+  return bands
+}
+
+/** The polyline `points` drawn `progress` (0 → 1) of the way along x, ending at its moving head. */
+function lineTo(points: { x: number; y: number }[], progress: number) {
+  const first = points[0]
+  const headX = first.x + progress * (points[points.length - 1].x - first.x)
+  const passed = points.filter((p) => p.x <= headX)
+  const next = points[passed.length]
+  if (!next || passed.length === 0) return passed
+  const last = passed[passed.length - 1]
+  return [...passed, { x: headX, y: last.y + ((headX - last.x) / (next.x - last.x)) * (next.y - last.y) }]
+}
+
+/** A charge in ₹: paise to 2 places (₹0.15); the tiny ones to their first digit (₹0.003, ₹0.0002). */
+function chargeInr(amount: number) {
+  return `₹${amount >= 0.01 ? amount.toFixed(2) : Number(amount.toPrecision(1))}`
+}
+
+/** A ring that grows from the marker (7.5 → 14) and fades. */
+function Pulse({ cx, cy, time, shot, className }: { cx: number; cy: number; time: number; shot: [number, number]; className: string }) {
+  const p = ramp(time, shot, easeOut)
+  if (p <= 0 || p >= 1) return null
+  return <circle className={className} cx={cx} cy={cy} r={7.5 + 6.5 * p} opacity={0.4 * (1 - p)} />
+}
+
+/** The intro the loop ends on: Figma's reveal (its timings are CSS animations, so it plays each time it mounts). */
+function Intro({ fade = 1 }: { fade?: number }) {
+  return (
+    <div className={styles.intro} style={{ opacity: fade }}>
+      <BreakevenIcon variant="tile" className={styles.introIcon} />
+      <p className={styles.overline}>{t('breakeven.introducing')}</p>
+      <p className={styles.introTitle}>{t('breakeven.lineName')}</p>
+      <p className={styles.introText}>{t('breakeven.tagline')}</p>
+    </div>
+  )
+}
+
+/** A callout anchored at (x, y) on the stage; each callout's CSS places itself around that point. */
+function at(x: number, y: number, opacity = 1): CSSProperties {
+  return { '--x': `${x}px`, '--y': `${y}px`, opacity } as CSSProperties
+}
+
+/** Comes in by `progress`, moving from (dx, dy) px away to its place. */
+function rise(style: CSSProperties, progress: number, dx: number, dy: number): CSSProperties {
+  return { ...style, opacity: progress, translate: `${dx * (1 - progress)}px ${dy * (1 - progress)}px` }
+}
+
+/** 0 → 1 over [start, duration], eased. */
+function ramp(time: number, [start, duration]: [number, number], ease = linear) {
+  return ease(Math.min(1, Math.max(0, (time - start) / duration)))
+}
+const linear = (x: number) => x
+const easeOut = (x: number) => 1 - (1 - x) ** 3
+const easeInOut = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
+const easeOutBack = (x: number) => 1 + 2.70158 * (x - 1) ** 3 + 1.70158 * (x - 1) ** 2
+
+/** Milliseconds since the play started, every frame, stopping at `until`; a new `run` plays it again from 0. */
+function useElapsed(playing: boolean, until: number, run: number) {
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    if (!playing) return
+    let frame = 0
+    let start: number | undefined
+    setElapsed(0)
+    const tick = (now: number) => {
+      start ??= now
+      const passed = Math.min(now - start, until)
+      setElapsed(passed)
+      if (passed < until) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [playing, until, run])
+  return elapsed
+}
+
+/** The element's width, kept current. */
+function useWidth(ref: React.RefObject<HTMLElement | null>, fallback: number) {
+  const [width, setWidth] = useState(fallback)
+  useLayoutEffect(() => {
+    const element = ref.current
+    if (!element) return
+    const observer = new ResizeObserver(() => setWidth(element.clientWidth))
+    observer.observe(element)
+    setWidth(element.clientWidth)
+    return () => observer.disconnect()
+  }, [ref])
+  return width
+}
+```
 
 ### `src/flows/fno/assets/commodities.svg`
 
@@ -2039,6 +2970,8 @@ export function AutoTpSlIcon() {
   position: relative;
   overflow: hidden;
   background: var(--l3-surface-primary);
+  cursor: pointer; /* a tap plays it again */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .chart {
@@ -2087,6 +3020,7 @@ export function AutoTpSlIcon() {
   font: var(--l3-text-label-12);
 }
 
+/* V2: what the buy cost (₹0 → ₹100), L3's light blue. */
 /* ---- Zones: orange charges (₹100 → B/E), a green fade for the net profit (B/E → ₹102). ---- */
 .chargesZone {
   fill: var(--app-be-charges-zone);
@@ -2258,6 +3192,7 @@ export function AutoTpSlIcon() {
   border-right: 1px solid var(--l3-border-accent-success-light);
 }
 
+/* V2: the sell sits on a thin strip next to the B/E chip, so "Sold" goes above the dot (its right edge 10 past it), no tail. */
 /* LTP: rides the line's head, centred above it — the last price the line passed. */
 .ltp {
   display: flex;
@@ -2416,8 +3351,8 @@ import styles from './BreakevenExplainer.module.css'
  * 1. the price axis (₹100–₹103) and its dashed gridlines fade in; the buy dot pops in at ₹100 with "Bought at ₹100";
  * 2. the chart zooms in 2× on ₹100 → ₹100.25 (the charges are thin at the normal scale): ₹102–₹103 move up out
  *    of view and the charges zone fills one charge at a time, each a band as tall as its share of the charges, with a
- *    tag (name · ₹ on the ₹100 buy) — top down: stamp duty, SEBI, transaction, STT, and brokerage last at the bottom
- *    (₹0.02, a thin band, its tag the small one);
+ *    tag (name · ₹ on the ₹100 buy). Top down: STT, transaction, stamp duty, SEBI, and brokerage last at
+ *    the bottom. They come in top down, so brokerage comes in last (₹0.02, a thin band, its tag the small one);
  * 3. it zooms back out: the bands close into one orange charges zone and the tags slide down under it, stacking into one
  *    tag that reads "Order charges" and stays under the zone; the breakeven line draws across its top at ₹100.25
  *    and its B/E chip comes in;
@@ -2425,19 +3360,31 @@ import styles from './BreakevenExplainer.module.css'
  *    breakeven line a ringed marker pulses;
  * 4. at ₹102 the bubble goes, a green dot pulses, "Sold at ₹102" slides in and the green net-profit zone grows from the
  *    breakeven line up to the sell price, labelled "Net Profit"; it holds;
- * 5. at 11.75 s the stage cuts to grey and the intro plays (the Breakeven mark, INTRODUCING, Breakeven Line, the
- *    one-liner, at Figma's timings); at 15 s it fades out and the chart plays again.
+ * 5. it plays once and stops on the finished chart (at 9.3 s); a tap on it plays it again from the start.
+ * (The recording looped on into an intro — the Breakeven mark, INTRODUCING, Breakeven Line, the one-liner — at 11.75 s;
+ * kept below but not reached while it stops on the chart.)
  * `still` (reduced motion) shows the finished chart and no intro.
  */
 export function BreakevenExplainer({ still = false }: { still?: boolean }) {
   const stageRef = useRef<HTMLDivElement>(null)
   const width = useWidth(stageRef, FIGMA_WIDTH)
-  const elapsed = useElapsed(!still)
+  const [run, setRun] = useState(0)
+  const elapsed = useElapsed(!still, PLAYED, run)
   const loop = Math.floor(elapsed / LOOP)
-  const time = still ? SHOT.profitLabel[0] + SHOT.profitLabel[1] : elapsed % LOOP
+  const time = still ? PLAYED : elapsed % LOOP
+  const replay = () => { if (!still && elapsed >= PLAYED) setRun(run + 1) }
 
   return (
-    <div ref={stageRef} className={styles.stage} style={{ height: HEIGHT }} role="img" aria-label={t('breakeven.chartLabel')}>
+    <div
+      ref={stageRef}
+      className={styles.stage}
+      style={{ height: HEIGHT }}
+      role="button"
+      tabIndex={0}
+      aria-label={`${t('breakeven.chartLabel')} ${t('breakeven.replay')}`}
+      onClick={replay}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); replay() } }}
+    >
       <ExampleChart time={time} width={width} />
       {!still && time >= INTRO_AT && <Intro key={loop} />}
       {!still && loop > 0 && time < INTRO_OUT && <Intro key={loop - 1} fade={1 - ramp(time, [0, INTRO_OUT])} />}
@@ -2446,17 +3393,17 @@ export function BreakevenExplainer({ still = false }: { still?: boolean }) {
 }
 
 /**
- * Where each part comes in on the loop: [start, duration] in ms (t = 0 is the chart starting on a blank stage). From
- * the B/E line on, it's the recording's timing moved 3 s later for the charges breakdown.
- */
+ * Where each part comes in: [start, duration] in ms (t = 0 is the chart starting on a blank stage). From the B/E line
+ * on, it's the recording's timing moved 3 s later for the charges breakdown. */
 const SHOT = {
   axis: [150, 250],
   buyDot: [400, 200],
   bought: [650, 150],
   zoomIn: [1000, 500],
-  chargeFill: [1550, 300], // the top band and its tag first; each one below CHARGE_STEP later (brokerage last)
+  chargeFill: [1550, 300], // the top band and its tag first; each one below CHARGE_STEP later, brokerage last
   zoomOut: [4100, 600],
   leadersOut: [4100, 150],
+  zoneMerge: [4100, 600], // the bands close into one zone
   tagsMerge: [4100, 450], // the top tag first; each one below TAG_MERGE_STEP later
   tagsOut: [4600, 150], // the stacked tags cross-fade into the one "Order charges" tag under the zone
   chargesLabel: [4600, 150],
@@ -2472,9 +3419,13 @@ const SHOT = {
   profitZone: [8450, 550],
   profitLabel: [9150, 150],
 } satisfies Record<string, [number, number]>
+
 const CHARGE_STEP = 350
 const TAG_MERGE_STEP = 30
 const LOOP = 15000
+/** How long one play takes (ms): it stops on the finished chart, its Net Profit label in. */
+export const EXPLAINER_LENGTH = SHOT.profitLabel[0] + SHOT.profitLabel[1]
+const PLAYED = EXPLAINER_LENGTH
 /** The hard cut to the intro, and how long the intro takes to fade when the loop starts again. */
 const INTRO_AT = 11750
 const INTRO_OUT = 200
@@ -2576,7 +3527,7 @@ function ExampleChart({ time, width }: { time: number; width: number }) {
           const height = Math.max(0, y(band.from) - top - BAND_GAP)
           return height > 0 && <rect key={band.charge.id} className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={top} height={height} />
         })}
-        <rect className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven)} height={y(entry) - y(breakeven)} opacity={zoomOut} />
+        <rect className={styles.chargesZone} x={PLOT_LEFT} width={plotRight - PLOT_LEFT} y={y(breakeven)} height={y(entry) - y(breakeven)} opacity={ramp(time, SHOT.zoneMerge, easeInOut)} />
         {leadersShown > 0 &&
           BANDS.map((band, order) => {
             const shown = ramp(time, [chargeIn(order), SHOT.chargeFill[1]]) * leadersShown
@@ -2745,21 +3696,23 @@ const easeOut = (x: number) => 1 - (1 - x) ** 3
 const easeInOut = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
 const easeOutBack = (x: number) => 1 + 2.70158 * (x - 1) ** 3 + 1.70158 * (x - 1) ** 2
 
-/** Milliseconds since mount, every frame (stays 0 when not playing). */
-function useElapsed(playing: boolean) {
+/** Milliseconds since the play started, every frame, stopping at `until`; a new `run` plays it again from 0. */
+function useElapsed(playing: boolean, until: number, run: number) {
   const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     if (!playing) return
     let frame = 0
     let start: number | undefined
+    setElapsed(0)
     const tick = (now: number) => {
       start ??= now
-      setElapsed(now - start)
-      frame = requestAnimationFrame(tick)
+      const passed = Math.min(now - start, until)
+      setElapsed(passed)
+      if (passed < until) frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [playing])
+  }, [playing, until, run])
   return elapsed
 }
 
@@ -4287,7 +5240,9 @@ function addMinutes(start: string, add: number) {
   "breakeven.introducing": "Introducing",
   "breakeven.lineName": "Breakeven Line",
   "breakeven.tagline": "Sell above this line and your Net P&L stays positive",
-  "breakeven.chartLabel": "Example chart: bought at ₹100, the order charges stack up (brokerage ₹0.02, STT ₹0.15, transaction ₹0.07, SEBI and stamp duty under a paisa) into the breakeven line at ₹100.25; sold at ₹102 above it for a net profit",
+  "breakeven.replay": "Tap to play it again.",
+  "breakeven.chartLabelV2": "Example chart: bought at ₹100, the order charges stack up on it (STT ₹0.15, transaction ₹0.07, stamp duty and SEBI under a paisa, brokerage ₹0.02) into the breakeven line at ₹100.25 — a sliver of the ₹100; sold 12% higher at ₹112 for a net profit",
+  "breakeven.chartLabel": "Example chart: bought at ₹100, the order charges stack up (STT ₹0.15, transaction ₹0.07, stamp duty and SEBI under a paisa, brokerage ₹0.02) into the breakeven line at ₹100.25; sold at ₹102 above it for a net profit",
   "breakeven.bought": "Bought at {price}",
   "breakeven.sold": "Sold at {price}",
   "breakeven.ltp": "LTP",
@@ -4484,7 +5439,8 @@ export const OPTION_TICK = 0.05
  * What the example pays, in ₹ on its ₹100 buy (the rate card, as a % of ₹100 — one unit, so a % reads straight as ₹):
  * brokerage 0.01% each way (₹0.02), STT 0.15% on the sell (₹0.15), NSE transaction 0.03553% each way (₹0.07), SEBI
  * 0.0001% each way (₹0.0002), stamp 0.003% on the buy (₹0.003). GST isn't a band of its own: it's charged on the
- * charges, not the trade. Bottom to top, in the order they stack up: brokerage first.
+ * charges, not the trade. Bottom to top, in the order they stack up: brokerage last at the bottom, then the rest
+smallest to biggest, so STT sits on top under the breakeven line and brokerage stays clear of it.
  */
 export type ExampleChargeId = 'brokerage' | 'stt' | 'transaction' | 'sebi' | 'stamp'
 export type ExampleCharge = { id: ExampleChargeId; amount: number }
@@ -4494,10 +5450,10 @@ const ofEntry = (percent: number) => (percent / 100) * EXAMPLE_ENTRY
 
 export const breakevenCharges: ExampleCharge[] = [
   { id: 'brokerage', amount: 2 * ofEntry(0.01) },
-  { id: 'stt', amount: ofEntry(0.15) },
-  { id: 'transaction', amount: 2 * ofEntry(0.03553) },
   { id: 'sebi', amount: 2 * ofEntry(0.0001) },
   { id: 'stamp', amount: ofEntry(0.003) },
+  { id: 'transaction', amount: 2 * ofEntry(0.03553) },
+  { id: 'stt', amount: ofEntry(0.15) },
 ]
 
 export const exampleChargesTotal = breakevenCharges.reduce((sum, charge) => sum + charge.amount, 0)
@@ -4567,7 +5523,7 @@ export const fno: Flow = {
   description: 'Equity F&O home: P&L, indices, chart metrics, watchlists, Smart Options, Futures Heatmap and Smart Futures.',
   figmaFile: 'nLs24dTJdPz9A5pu3AWMbe',
   screens: [
-    { id: 'fno-34', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Plays when the app opens or reloads on F&O home (src/shared/ui/Splash); not on a link to an inner page.', render: (go) => <SplashScreen onDone={() => go('fno-01')} home={home(go)} /> },
+    { id: 'fno-34', name: 'Splash', figma: '', badge: 'new', tab: true, note: 'The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Hidden at launch for now (src/shared/ui/Splash: SPLASH_SCREENS is empty), so the app opens straight on the home; this page still plays it.', render: (go) => <SplashScreen onDone={() => go('fno-01')} home={home(go)} /> },
     { id: 'fno-01', group: 'home', name: 'Equity home', figma: '11569:41100', tab: true, note: 'From the main F&O tab. Home returns to Stocks; DASH, Search, Profile and Wallet open their existing flows. Selectors, chart metrics, filters, sorting and watchlist creation work locally. Destinations outside this frame open an explanatory sheet.', render: (go) => home(go) },
     { id: 'fno-02', group: 'home', name: 'Home · watchlists & Smart Options', figma: '11569:41100', tab: true, note: 'The same long screen, scrolled to watchlists.', render: (go) => home(go, 'watchlists') },
     { id: 'fno-03', group: 'home', name: 'Home · Futures Heatmap', figma: '11569:41100', tab: true, render: (go) => home(go, 'heatmap') },
@@ -4576,7 +5532,7 @@ export const fno: Flow = {
     { id: 'fno-06', group: 'scalper', name: 'Scalper · DASH indicator', figma: '', note: 'From DASH AI’s View indicator. Opens the chart-tools sheet directly on Indicators, the saved DASH AI indicator under Your indicators with a focus guide. Tap rows to add / remove indicators (several at once); search filters the list.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-07', group: 'scalper', name: 'Scalper · indicator applied', figma: '', note: 'With the saved DASH AI indicator on the chart: “1 ▾” at the chart’s top-left and illustrative EMA 9 / 21 lines on the NIFTY 50 candles.', render: (go) => <Scalper onBack={() => go('fno-01')} createdIndicator="Supertrend (10, 3) with EMA 20" openIndicators={false} initialIndicator="Supertrend (10, 3) with EMA 20" onCreateIndicator={() => go('dash-20')} /> },
     { id: 'fno-35', group: 'scalper', name: 'Scalper · position + breakeven line', figma: '11756:78739', badge: 'new', note: 'Version C (Boxed chip): an open position on the option chart — TP pill (drag ⠿ to move, ✕ removes), entry row (Exit · +65 · live P&L), SL pill (+ Add Trail), and the yellow dashed breakeven line ending in a “Breakeven ⓘ” chip flush to the price axis (Figma’s “B/E 105.55”: spelled out, no price — designer’s call; the label still reads the price) (tap → How breakeven works). Breakeven = entry + round-trip charges per unit (data.ts breakevenPrice). Buy at Mkt on fno-05 opens a position the same way; the first buy also opens How breakeven works. Exit buttons are 24 tall to sit on the pills (Figma), not Large.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} /> },
-    { id: 'fno-36', group: 'scalper', name: 'How breakeven works', figma: '11783:5569', badge: 'new', note: 'Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 15 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in 2× and the orange charges zone fills one band per charge from the F&O options rate card, in ₹ on the ₹100 buy (top down: stamp duty, SEBI, transaction ₹0.07, STT ₹0.15, then brokerage ₹0.02 last at the bottom with a smaller tag — no GST band: it’s charged on the charges; heights by cost), then zooms back out to one thin zone, the tags sliding down under it and stacking into one “Order charges ≈₹0.24” tag; the dashed B/E line at ₹100.25 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief).', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="breakeven" /> },
+    { id: 'fno-36', group: 'scalper', name: 'How breakeven works', figma: '11783:5569', badge: 'new', note: 'Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card plays once (then stops on the finished chart; a tap replays it) a 9.3 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in 2× and the orange charges zone fills one band per charge from the F&O options rate card, in ₹ on the ₹100 buy (top down: STT ₹0.15, transaction ₹0.07, stamp duty, SEBI, then brokerage ₹0.02 last at the bottom with a smaller tag; they come in top down — no GST band: it’s charged on the charges; heights by cost), then zooms back out to one thin zone, the tags sliding down under it and stacking into one “Order charges ≈₹0.24” tag; the dashed B/E line at ₹100.25 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, and it stops there. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief). A V2 (starts zoomed in on a blue ₹0 → ₹100 fill, zooms out true to scale, sold 12% up at ₹112) is archived in fno/archive/BreakevenExplainerV2.tsx.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="breakeven" /> },
     { id: 'fno-37', group: 'scalper', name: 'Chart tools · Settings', figma: '11754:69563', badge: 'new', note: 'The chart-tools sheet on Settings: Auto TP/SL (animated mark, Applied), Chart type (Candles / Heikin Ashi / Line), Stop Loss Preference (radio), View on chart (Breakeven line ⓘ New, Buy/Sell executions, Sync Charts). Changes are a draft: Apply keeps them (unticking Breakeven line hides the B/E line and chip), Cancel or closing drops them. Figma’s rail (Bolt, Indicators, Drawings, Settings) is the live app’s six groups here.', render: (go) => <Scalper onBack={() => go('fno-01')} onCreateIndicator={() => go('dash-20')} initialPosition={scalperPosition} initialSheet="settings" openIndicators={false} /> },
     { id: 'fno-08', group: 'home', name: 'Commodities home', figma: '6754:63637', tab: true, note: 'The Commodities product tab. Gold / Silver / Crude Oil / Natural Gas shortcuts open the Lot summary (Gold Summary). The chart’s instrument selector (“Gold”) opens the contract picker. Popular commodities: Options ⇕ Futures switch; Futures Heatmap: Bullion / Energy / Metals.', render: (go) => home(go, undefined, { product: 'commodities' }) },
     { id: 'fno-09', group: 'home', name: 'Commodities · heatmap & Smart Futures', figma: '6754:63637', tab: true, note: 'The same long screen, scrolled to the Futures Heatmap.', render: (go) => home(go, 'heatmap', { product: 'commodities' }) },
@@ -6076,13 +7032,13 @@ function markBreakevenIntroSeen() {
 ### `src/flows/fno/sheets/BreakevenSheet.tsx`
 
 ```tsx
-import { Fragment, useId, useState } from 'react'
+import { Fragment, useId, useState, type CSSProperties } from 'react'
 import { BottomSheetHeader } from '@l3/components/BottomSheet'
 import { Button } from '@l3/components/Button'
 import { ButtonGroup } from '@l3/components/ButtonGroup'
 import { Stack } from '@l3/components/Stack'
 import { Sheet } from '../../../shared/ui/Sheet'
-import { BreakevenExplainer } from '../components/BreakevenExplainer'
+import { BreakevenExplainer, EXPLAINER_LENGTH } from '../components/BreakevenExplainer'
 import { BreakevenIcon } from '../components/BreakevenIcon'
 import { t } from '../copy'
 import styles from './BreakevenSheet.module.css'
@@ -6090,7 +7046,7 @@ import styles from './BreakevenSheet.module.css'
 /**
  * How breakeven works (Figma 11783:5569, dark 11783:6220) — opens the first time the user buys on the Scalper, and from
  * the ⓘ on the chart's breakeven chip.
- * - The example card ("Example: Bought 1 lot at ₹100") plays the explainer on a loop (BreakevenExplainer — copied from
+ * - The example card ("Example: Bought 1 lot at ₹100") plays the explainer once and stops on the finished chart; a tap plays it again (BreakevenExplainer — copied from
  *   the designer's recording: the chart builds up to a sell above the breakeven line, then the Breakeven Line intro).
  * - "I understand" is locked while it plays (Figma's button variants 11783:12460: a loader line fills along the
  *   button's top edge, then the button turns primary) until the chart has played once (9.3 s). Reduced motion: the
@@ -6108,7 +7064,7 @@ export function BreakevenSheet({ onClose }: { onClose: () => void }) {
       header={<BottomSheetHeader size="sm" headingId={headingId} heading={t('breakeven.title')} />}
       footer={
         <ButtonGroup aria-label={t('breakeven.title')}>
-          <div className={styles.loader}>
+          <div className={styles.loader} style={{ '--app-be-explainer': `${EXPLAINER_LENGTH}ms` } as CSSProperties}>
             <Button fullWidth disabled={!ready} onClick={onClose}>{t('breakeven.understand')}</Button>
             {!ready && (
               <span className={styles.track} role="progressbar" aria-label={t('breakeven.playing')}>
@@ -7348,7 +8304,7 @@ export function useSystemKeyboard() {
 ### `src/shared/ui/Diwali.module.css`
 
 ```css
-/* Diwali art (src/shared/ui/Diwali): fine gold line work, small marigolds, the lotus diya —
+/* Diwali art (src/shared/ui/Diwali): fine gold line work, the lotus diya —
    local tokens --app-diwali-* (L3 has no festive palette). */
 
 .diya,
@@ -7357,7 +8313,7 @@ export function useSystemKeyboard() {
   overflow: visible;
 }
 
-/* The splash art's line work: fine gold strings and outlines, small gold caps and drops. */
+/* Fine gold line work: strings and outlines, small gold caps and drops (also the archived splashes'). */
 .hairline {
   fill: none;
   stroke: var(--app-diwali-line);
@@ -7459,56 +8415,6 @@ export function useSystemKeyboard() {
 
 .flameInner {
   fill: var(--app-diwali-flame-core);
-}
-
-/* The garland's marigolds: orange and gold in turn, a darker centre. */
-.marigoldOrange {
-  fill: var(--app-diwali-petal-edge);
-}
-
-.marigoldGold {
-  fill: var(--app-diwali-gold);
-}
-
-.marigoldCore {
-  fill: var(--app-diwali-marigold-core);
-}
-
-/* The splash's entrance (inside the splash's 1.5 s — timings in local tokens --app-splash-*): the garland's string draws
-   across from the left and its drops and flowers pop on in turn. `--i` (inline) is each part's place in the order. */
-.drawIn {
-  stroke-dasharray: 1;
-  animation: drawIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
-  animation-delay: var(--app-splash-art-at);
-}
-
-@keyframes drawIn {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
-}
-
-.popIn {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
-  animation: popIn var(--l3-motion-duration-long) var(--app-splash-ease-settle) both;
-  animation-delay: calc(var(--app-splash-art-at) + var(--app-splash-stagger) * 2 + var(--i) * var(--app-splash-stagger));
-}
-
-@keyframes popIn {
-  from { opacity: 0; scale: 0; }
-}
-
-/* The night splash's lights twinkle, each on its own beat (delay set inline). */
-.spark {
-  fill: var(--app-diwali-spark);
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: twinkle var(--app-diwali-twinkle) ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.25; scale: 0.7; }
-  50% { opacity: 1; scale: 1.2; }
 }
 
 /* The flame breathes from its base. */
@@ -7659,10 +8565,7 @@ export function useSystemKeyboard() {
 
 @media (prefers-reduced-motion: reduce) {
   .flame,
-  .glowPulse,
-  .spark,
-  .drawIn,
-  .popIn {
+  .glowPulse {
     animation: none;
   }
 
@@ -7693,16 +8596,14 @@ import styles from './Diwali.module.css'
 const t = makeCopy('shared', copy)
 
 /**
- * Diwali touches (temporary, festival only) — each one a switch in the prototype's App settings → Diwali, both on by
- * default (the spec for developers: docs/DIWALI.md):
- * - `diwaliSplash`: the launch splash becomes a quiet night scene — a marigold garland, twinkling lights and the wish
- *   (src/shared/ui/Splash).
+ * Diwali touch (temporary, festival only) — a switch in the prototype's App settings → Diwali, on by default (the spec
+ * for developers: docs/DIWALI.md):
  * - `diwaliFlip`: on Stocks / F&O home, the search pill's icon and label turn into the lotus diya and "Happy Green
  *   Diwali" (with a sparkler round the pill) twice, then go back.
- * Archived versions (the Lanterns splash, the profile avatar flip): src/shared/ui/archive/DiwaliArchive.tsx.
+ * Archived versions (not in the app): the Garland splash (archive/DiwaliSplash.tsx), the Lanterns splash and the profile
+ * avatar flip (archive/DiwaliArchive.tsx).
  */
 export const DIWALI_OPTIONS = {
-  splash: { id: 'diwaliSplash', off: 'off', on: 'on', default: 'on' },
   search: { id: 'diwaliFlip', off: 'off', on: 'search', default: 'search' },
 } as const
 
@@ -7796,53 +8697,6 @@ export function Diya({ className }: { className?: string }) {
       <path className={styles.wick} d="M60 41V52" />
       {FRONT_PETALS.map((petal, i) => <PetalShape key={i} {...petal} />)}
       <path className={styles.petalHeart} d={petalPath(9, 4.5)} transform="translate(60 82) rotate(180)" />
-    </svg>
-  )
-}
-
-// The garland's string: a gentle dip across the top, P0 (0, 4) → P1 (196, 92) → P2 (392, 4) (a quadratic curve).
-const garlandAt = (t: number) => ({ x: 392 * t, y: 4 + 176 * t * (1 - t) })
-const GARLAND_FLOWERS = Array.from({ length: 9 }, (_, i) => ({ ...garlandAt(0.1 + i * 0.1), tone: i % 2 }))
-const GARLAND_DROPS = Array.from({ length: 8 }, (_, i) => ({ ...garlandAt(0.15 + i * 0.1), long: i % 2 === 0 }))
-const PETAL_RING = Array.from({ length: 8 }, (_, i) => (i * Math.PI * 2) / 8)
-
-/** The Diwali splash's art: one thin gold string of small two-tone marigolds, a tiny gold drop between each. */
-export function Garland({ className }: { className?: string }) {
-  return (
-    <svg className={[styles.art, className].filter(Boolean).join(' ')} viewBox="0 0 392 120" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
-      {/* On the way in the string draws across from the left, then each drop and flower pops on in turn. */}
-      <path className={[styles.hairline, styles.drawIn].join(' ')} pathLength={1} d="M0 4Q196 92 392 4" />
-      {GARLAND_DROPS.map(({ x, y, long }, i) => (
-        <g key={x} className={styles.popIn} style={{ '--i': i + 0.5 } as CSSProperties}>
-          <path className={styles.hairline} d={`M${x} ${y}V${y + (long ? 22 : 14)}`} />
-          <circle className={styles.goldFill} cx={x} cy={y + (long ? 24.5 : 16.5)} r="2" />
-        </g>
-      ))}
-      {GARLAND_FLOWERS.map(({ x, y, tone }, i) => (
-        <g key={x} className={styles.popIn} style={{ '--i': i } as CSSProperties}>
-          {PETAL_RING.map((a) => (
-            <circle key={a} className={tone ? styles.marigoldGold : styles.marigoldOrange} cx={x + Math.cos(a) * 4.2} cy={y + Math.sin(a) * 4.2} r="2.8" />
-          ))}
-          <circle className={styles.marigoldCore} cx={x} cy={y} r="2" />
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-// Twinkling lights across the night splash (392 × 872 artwork): a few small warm dots, each on its own beat.
-const SPARKS = [
-  [48, 300, 1.2], [344, 330, 1], [92, 560, 0.9], [306, 640, 1.3], [32, 720, 1], [360, 520, 0.8],
-  [196, 250, 0.8], [150, 780, 1.1], [250, 740, 0.9],
-] as const
-
-/** Warm twinkling lights scattered over the Diwali splash (behind everything else). */
-export function Sparkles({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 392 872" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {SPARKS.map(([x, y, r], i) => (
-        <circle key={i} className={styles.spark} cx={x} cy={y} r={r} style={{ animationDelay: `${(i * -0.53) % 3}s` }} />
-      ))}
     </svg>
   )
 }
@@ -8409,8 +9263,7 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   transition: opacity var(--l3-motion-duration-medium) var(--l3-motion-easing-standard);
 }
 
-
-/* The logo rises in and settles as the splash opens (the regular splash too). */
+/* The logo rises in and settles as the splash opens. */
 .logo {
   animation: logoIn var(--app-splash-in) var(--app-splash-ease-settle) both;
   animation-delay: var(--app-splash-logo-at);
@@ -8425,108 +9278,8 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
   pointer-events: none;
 }
 
-/* Diwali: a quiet night scene (the splash takes L3's dark theme) — a faint dusk from the top, a soft warm glow behind
-   the logo, a few twinkling lights, the garland at the top edge, the wish rising in under the logo.
-   Its entrance (local tokens --app-splash-*) is over before the splash fades: the glow swells in with the art, the
-   logo rises, the lights come on, the wish's two lines rise in, a gold shine crosses "Happy Diwali". */
-.splash[data-diwali] {
-  background:
-    radial-gradient(ellipse 120% 50% at 50% 0%, var(--app-diwali-dusk), transparent 70%),
-    var(--l3-surface-default);
-}
-
-.splash[data-diwali]::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 50%, var(--app-diwali-glow), transparent 50%);
-  animation: glowIn var(--app-splash-in) var(--l3-motion-easing-decelerate) both;
-}
-
-@keyframes glowIn {
-  from { opacity: 0; scale: 0.6; }
-}
-
-.sparkles {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  animation: fadeIn var(--app-splash-in) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-lights-at);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-}
-
-.art {
-  position: absolute;
-  inset: 0 0 auto;
-  width: 100%;
-}
-
-.wishLead {
-  margin: 0;
-  animation: riseIn var(--app-splash-in) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-lead-at);
-  color: var(--l3-content-secondary);
-  font: var(--l3-text-label-14);
-  text-align: center;
-}
-
-/* "Happy Diwali": L3's heading 28 in gold, a faint warm glow; once in, a pale gold shine sweeps across it once (a copy
-   of the words on top, data-text, painted only by a moving highlight). */
-.headline {
-  position: relative;
-  margin: 0;
-  animation: riseIn var(--app-splash-in) var(--app-splash-ease-settle) both;
-  animation-delay: var(--app-splash-headline-at);
-  color: var(--app-diwali-headline);
-  text-shadow: 0 0 var(--l3-spacing-16) var(--app-diwali-headline-glow);
-  font: var(--l3-text-heading-28);
-  text-align: center;
-}
-
-.headline::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 35%, var(--app-diwali-headline-shine) 50%, transparent 65%) 100% 0 / 300% 100%;
-  background-clip: text;
-  color: transparent;
-  text-shadow: none;
-  animation: shine var(--app-splash-shine) var(--l3-motion-easing-standard) both;
-  animation-delay: var(--app-splash-shine-at);
-}
-
-@keyframes shine {
-  to { background-position: 0% 0; }
-}
-
-@keyframes riseIn {
-  from { opacity: 0; translate: 0 var(--l3-spacing-08); }
-}
-
-.centre {
-  position: relative;
-}
-
-.wish {
-  position: absolute;
-  top: calc(100% + var(--l3-spacing-32));
-  left: 50%;
-  width: max-content;
-  translate: -50% 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .logo,
-  .splash[data-diwali]::before,
-  .sparkles,
-  .wishLead,
-  .headline,
-  .headline::after {
+  .logo {
     animation: none;
   }
 
@@ -8541,17 +9294,18 @@ export function SheetHost({ container, children }: { container: HTMLElement | nu
 ```tsx
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { BrandLogo } from '@l3/components/BrandLogo'
-import { Stack } from '@l3/components/Stack'
-import { useTheme } from '@l3/theme'
 import { makeCopy } from '../copy'
 import copy from './copy.json'
-import { Garland, Sparkles, setSplashUp, useDiwali } from './Diwali'
+import { setSplashUp } from './Diwali'
 import styles from './Splash.module.css'
 
 const t = makeCopy('shared', copy)
 
-/** The screens a launch can land on that open with the splash: the two home pages (Stocks, F&O). */
-export const SPLASH_SCREENS = ['stocks-01', 'fno-01']
+/**
+ * The screens a launch can land on that open with the splash. Hidden for now (2026-11-04): none, so the app opens
+ * straight on its page. To bring it back: ['stocks-01', 'fno-01'] (the two home pages).
+ */
+export const SPLASH_SCREENS: string[] = []
 /** How long the logo stays before the splash fades away. */
 export const SPLASH_MS = 1500
 
@@ -8596,9 +9350,8 @@ function useSplashState(show: boolean, held = false) {
 }
 
 /**
- * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. The Diwali splash
- * (App settings → Diwali, on by default) is a quiet night scene in L3's dark theme, in either app theme: a marigold
- * garland at the top, a soft warm glow, a few twinkling lights, and the wish under the logo with "Happy Diwali" in gold.
+ * The white page with the Lemonn logo (lemon + name) in the middle, fading out once it's leaving. (The Diwali 2026
+ * Garland splash is archived: src/shared/ui/archive/DiwaliSplash.tsx.)
  */
 function SplashCover({ state, onHold, onLeave, onGone }: {
   state: 'shown' | 'leaving'
@@ -8606,8 +9359,6 @@ function SplashCover({ state, onHold, onLeave, onGone }: {
   onLeave: () => void
   onGone: () => void
 }) {
-  const diwali = useDiwali('splash')
-  const { product } = useTheme()
   // Prototype only (not app behaviour — leave out of the build): to look at the splash, hovering (mouse) holds it, a
   // tap / click pins it, and a second tap lets it fade.
   const [hovered, setHovered] = useState(false)
@@ -8618,29 +9369,13 @@ function SplashCover({ state, onHold, onLeave, onGone }: {
       type="button"
       className={styles.splash}
       data-state={state}
-      data-diwali={diwali || undefined}
-      // Diwali is a night scene: the splash always takes L3's dark theme (the logo's name turns light with it).
-      data-product={diwali ? product : undefined}
-      data-mode={diwali ? 'dark' : undefined}
-      data-system-bars={diwali ? 'dark' : undefined}
-      aria-label={diwali ? `${t('splash.label')}. ${t('splash.diwali')}` : t('splash.label')}
+      aria-label={t('splash.label')}
       onClick={() => (pinned ? onLeave() : setPinned(true))}
       onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHovered(true) }}
       onPointerLeave={(e) => { if (e.pointerType === 'mouse') setHovered(false) }}
       onTransitionEnd={(e) => { if (e.target === e.currentTarget) onGone() }}
     >
-      {diwali && <Sparkles className={styles.sparkles} />}
-      {diwali && <Garland className={styles.art} />}
-      <Stack align="center" className={styles.centre}>
-        <BrandLogo brand="lemonn" variant="full" size={48} decorative className={styles.logo} />
-        {/* Hangs under the logo, so the logo stays where the regular splash has it. */}
-        {diwali && (
-          <Stack gap="08" align="center" className={styles.wish}>
-            <p className={styles.wishLead}>{t('splash.diwaliLead')}</p>
-            <p className={styles.headline} data-text={t('splash.diwaliHeadline')}>{t('splash.diwaliHeadline')}</p>
-          </Stack>
-        )}
-      </Stack>
+      <BrandLogo brand="lemonn" variant="full" size={48} decorative className={styles.logo} />
     </button>
   )
 }
@@ -8681,9 +9416,6 @@ export function SplashScreen({ home, onDone }: { home: ReactNode; onDone: () => 
 ```json
 {
   "splash.label": "Lemonn",
-  "splash.diwali": "Team Lemonn wishes every trader a Happy Diwali",
-  "splash.diwaliLead": "Team Lemonn wishes every trader a",
-  "splash.diwaliHeadline": "Happy Diwali",
   "diwali.searchWish": "Happy Green Diwali"
 }
 ```

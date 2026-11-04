@@ -16,7 +16,7 @@
       "id": "fno-34",
       "name": "Splash",
       "figma": "",
-      "note": "The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Plays when the app opens or reloads on F&O home (src/shared/ui/Splash); not on a link to an inner page.",
+      "note": "The launch splash: the Lemonn logo centred for 2 s, then it fades into Equity home (a tap skips ahead). Hidden at launch for now (src/shared/ui/Splash: SPLASH_SCREENS is empty), so the app opens straight on the home; this page still plays it.",
       "goesTo": [
         "fno-01"
       ],
@@ -102,7 +102,7 @@
       "id": "fno-36",
       "name": "How breakeven works",
       "figma": "11783:5569",
-      "note": "Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card loops a 15 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in 2× and the orange charges zone fills one band per charge from the F&O options rate card, in ₹ on the ₹100 buy (top down: stamp duty, SEBI, transaction ₹0.07, STT ₹0.15, then brokerage ₹0.02 last at the bottom with a smaller tag — no GST band: it’s charged on the charges; heights by cost), then zooms back out to one thin zone, the tags sliding down under it and stacking into one “Order charges ≈₹0.24” tag; the dashed B/E line at ₹100.25 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, then it cuts to the Breakeven Line intro and starts again. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief).",
+      "note": "Opens on the first buy and from the B/E chip’s ⓘ (and Settings → Breakeven line ⓘ). The example card plays once (then stops on the finished chart; a tap replays it) a 9.3 s explainer copied from the designer’s recording: on a white chart the buy at ₹100; the chart zooms in 2× and the orange charges zone fills one band per charge from the F&O options rate card, in ₹ on the ₹100 buy (top down: STT ₹0.15, transaction ₹0.07, stamp duty, SEBI, then brokerage ₹0.02 last at the bottom with a smaller tag; they come in top down — no GST band: it’s charged on the charges; heights by cost), then zooms back out to one thin zone, the tags sliding down under it and stacking into one “Order charges ≈₹0.24” tag; the dashed B/E line at ₹100.25 draws along its top, an LTP bubble rides the price line up through B/E (a ringed marker pulses) to “Sold at ₹102”, the green Net Profit zone fills, and it stops there. “I understand” is locked until the chart has played once (9.3 s), a loader line filling along its top edge, then turns primary (Figma’s button variants). Reduced motion: the finished chart, button ready. Labels are L3’s 12 styles (the recording’s are ~11). The zoomed-in charges aren’t in Figma or the recording (designer’s brief). A V2 (starts zoomed in on a blue ₹0 → ₹100 fill, zooms out true to scale, sold 12% up at ₹112) is archived in fno/archive/BreakevenExplainerV2.tsx.",
       "goesTo": [
         "fno-01",
         "dash-20"
@@ -364,6 +364,8 @@
   ],
   "files": [
     "src/flows/fno/README.md",
+    "src/flows/fno/archive/BreakevenExplainerV2.module.css",
+    "src/flows/fno/archive/BreakevenExplainerV2.tsx",
     "src/flows/fno/assets/commodities.svg",
     "src/flows/fno/assets/downtrend.svg",
     "src/flows/fno/assets/equity.svg",
