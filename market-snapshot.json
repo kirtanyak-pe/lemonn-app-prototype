@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-11-09T12:11:02.675Z",
+ "fetchedAt": "2026-11-09T20:23:40.125Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -8097,8 +8097,8 @@
      "close": 278.8
     }
    ],
-   "sector": "Consumer Defensive",
-   "industry": "Tobacco"
+   "sector": null,
+   "industry": null
   },
   "JSWSTEEL": {
    "price": 1347,
