@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-11-10T11:58:06.347Z",
+ "fetchedAt": "2026-11-10T17:28:51.018Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -13725,8 +13725,8 @@
      "close": 5005
     }
    ],
-   "sector": null,
-   "industry": null
+   "sector": "Consumer Cyclical",
+   "industry": "Luxury Goods"
   },
   "TORNTPHARM": {
    "price": 4780,
