@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-11-11T11:29:31.394Z",
+ "fetchedAt": "2026-11-11T11:36:39.968Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -2737,8 +2737,8 @@
      "close": 399
     }
    ],
-   "sector": "Industrials",
-   "industry": "Aerospace & Defense"
+   "sector": null,
+   "industry": null
   },
   "BHARTIARTL": {
    "price": 2109,
