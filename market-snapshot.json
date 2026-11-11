@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart + search endpoints)",
- "fetchedAt": "2026-11-11T11:36:39.968Z",
+ "fetchedAt": "2026-11-11T17:41:38.557Z",
  "symbols": [
   "ADANIENT",
   "ADANIGREEN",
@@ -1665,8 +1665,8 @@
      "close": 1336.4
     }
    ],
-   "sector": "Financial Services",
-   "industry": "Banks—Regional"
+   "sector": null,
+   "industry": null
   },
   "BAJAJ-AUTO": {
    "price": 11040,
@@ -2737,8 +2737,8 @@
      "close": 399
     }
    ],
-   "sector": null,
-   "industry": null
+   "sector": "Industrials",
+   "industry": "Aerospace & Defense"
   },
   "BHARTIARTL": {
    "price": 2109,
