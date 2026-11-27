@@ -1,6 +1,6 @@
 {
  "source": "Yahoo Finance (public chart endpoint)",
- "fetchedAt": "2026-11-26T22:31:05.888Z",
+ "fetchedAt": "2026-11-27T03:28:56.426Z",
  "symbols": [
   "AAL",
   "AAPL",
@@ -9243,12 +9243,12 @@
   "usdInr": {
    "symbol": "USDINR=X",
    "price": 92.44,
-   "open": 92.55,
-   "prevClose": 92.81,
-   "change": -0.37,
-   "changePct": -0.4,
-   "dayHigh": 92.65,
-   "dayLow": 92.31,
+   "open": 92.43,
+   "prevClose": 92.24,
+   "change": 0.2,
+   "changePct": 0.22,
+   "dayHigh": 92.44,
+   "dayLow": 92.44,
    "high52": 97.05,
    "low52": 85.86
   }
